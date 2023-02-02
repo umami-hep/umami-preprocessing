@@ -1,0 +1,45 @@
+jets:
+  inputs:
+    - pt_btagJes
+    - absEta_btagJes
+  labels:
+    - HadronConeExclTruthLabelID
+    - pt
+    - eta
+    - mass
+    - n_tracks_loose
+    - n_truth_promptLepton
+
+tracks_loose:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - IP3D_signed_d0_significance
+    - IP3D_signed_z0_significance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    - numberOfPixelHoles
+    - numberOfSCTHoles
+    - leptonID
+  labels:
+    - truthOriginLabel
+    - truthVertexIndex
+#flow:
+#  inputs:
+#    - pt
+#    - energy
+#    - deta
+#    - dphi

@@ -1,0 +1,79 @@
+flavours: !include flavours.yaml
+variables: !include xbb-variables.yaml
+
+global_cuts:
+  train:
+    - [eventNumber, "%10<=", 7]
+  val:
+    - [eventNumber, "%10==", 8]
+  test:
+    - [eventNumber, "%10==", 9]
+
+Hbb: &Hbb
+  name: Hbb
+  pattern: user.dkobylia.801471.e8441_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+Hcc: &Hcc
+  name: Hcc
+  pattern: user.dkobylia.801472.e8441_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+top: &top
+  name: top
+  pattern: user.dkobylia.426345.e6880_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+qcd: &qcd
+  name: qcd
+  pattern: user.dkobylia.364704.e7142_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+
+inclusive: &inclusive
+  name: inclusive
+  cuts:
+    - [pt, ">", 250_000]
+    - [pt, "<", 1_000_000]
+    - [mass, ">", 50_000]
+    - [mass, "<", 300_000]
+
+components:
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *Hbb
+    flavours: [Hbb]
+    num_jets: 1_900_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *Hcc
+    flavours: [Hcc]
+    num_jets: 1_900_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *top
+    flavours: [top]
+    num_jets: 1_900_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *qcd
+    flavours: [qcd]
+    num_jets: 1_900_000
+
+resampling:
+  target: Hbb
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt:
+      bins: [[250_000, 1_000_000, 20]]
+    eta:
+      bins: [[-2, 2, 10]]
+    mass:
+      bins: [[50_000, 300_000, 20]]
+
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 2_000_000
+  base_dir: /unix/atlastracking/samples/xbb/dumps/p5488/
+  out_fname: pp_output.h5

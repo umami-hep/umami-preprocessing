@@ -1,0 +1,143 @@
+import logging as log
+
+import numpy as np
+import yaml
+
+from jetpp.hdf5 import H5Reader
+from jetpp.logger import ProgressBar
+
+
+class Normalisation:
+    def __init__(self, config):
+        self.ppc = config
+        self.components = config.components
+        self.variables = config.variables
+        self.jets_name = self.variables.jets_name
+        self.num_jets = config.num_jets_estimate
+        self.norm_fname = config.out_dir / config.config.get("norm_fname", "norm_dict.yaml")
+        self.class_fname = config.out_dir / config.config.get("class_fname", "class_dict.yaml")
+
+    @staticmethod
+    def combine_mean_std(mean_A, mean_B, std_A, std_B, num_A, num_B):
+        combined_mean = np.average([mean_A, mean_B], weights=[num_A, num_B])
+        u_A = (mean_A - combined_mean) ** 2 + std_A**2
+        u_B = (mean_B - combined_mean) ** 2 + std_B**2
+        combined_std = np.sqrt((u_A * num_A + u_B * num_B) / (num_A + num_B))
+        return float(combined_mean), float(combined_std)
+
+    def get_norm_dict(self, batch):
+        norm_dict = {k: {} for k in self.variables}
+        for name, array in batch.items():
+            if name != self.variables.jets_name:
+                array = array[array["valid"]]
+            for var in self.variables[name]["inputs"]:
+                if var in ["valid"]:
+                    continue
+                mean = float(np.mean(array[var]))
+                std = float(np.std(array[var]))
+                norm_dict[name][var] = {"mean": mean, "std": std}
+        return norm_dict, len(batch[self.variables.jets_name])
+
+    def combine_norm_dict(self, norm_A, norm_B, num_A, num_B):
+        combined = {}
+        for name in norm_A:
+            dict_A = norm_A[name]
+            dict_B = norm_B[name]
+            combined[name] = {}
+
+            assert dict_A.keys() == dict_B.keys()
+
+            for var in dict_A:
+                tf_A = dict_A[var]
+                tf_B = dict_B[var]
+
+                combined_mean, combined_std = self.combine_mean_std(
+                    tf_A["mean"], tf_B["mean"], tf_A["std"], tf_B["std"], num_A, num_B
+                )
+                combined[name][var] = {"mean": combined_mean, "std": combined_std}
+
+        return combined
+
+    def get_class_dict(self, batch):
+        class_dict = {k: {} for k in self.variables}
+        for name, array in batch.items():
+            if name != self.variables.jets_name:
+                array = array[array["valid"]]
+            for var in self.variables[name].get("labels", []):
+                if not np.issubdtype(array[var].dtype, np.integer) or var == "truthVertexIndex":
+                    continue
+                counts = np.unique(array[var], return_counts=True)
+                class_dict[name][var] = counts
+        return class_dict
+
+    def combine_class_dict(self, class_dict_A, class_dict_B):
+        for name, var in class_dict_B.items():
+            for v, stats in var.items():
+                labels, counts = stats
+                for i, label in enumerate(labels):
+                    counts_A = dict(zip(*class_dict_A[name][v]))
+                    counts[i] += counts_A.get(label, 0)
+                var[v] = (labels, counts)
+        return class_dict_B
+
+    def write_norm_dict(self, norm_dict):
+        # check for inf
+        for group, norms in norm_dict.items():
+            for var, tf in norms.items():
+                assert not np.isinf(tf["mean"]), "norm parmeter is not finite"
+                assert not np.isinf(tf["std"]), "norm parmeter is not finite"
+
+        # write
+        with open(self.norm_fname, "w") as file:
+            yaml.dump(norm_dict, file, sort_keys=False)
+
+    def write_class_dict(self, class_dict):
+        for name, var in class_dict.items():
+            for v, stats in var.items():
+                _, counts = stats
+                var[v] = list(counts / sum(counts))
+
+        # write
+        with open(self.class_fname, "w") as file:
+            yaml.dump(class_dict, file, sort_keys=False)
+
+    def run(self):
+        title = " Computing Normalisations "
+        log.info(f"[bold green]{title:-^100}")
+
+        # setup reader
+        reader = H5Reader(
+            self.ppc.out_fname, self.ppc.batch_size, self.variables.jets_name, as_full=True
+        )
+        log.debug(f"Setup reader at: {self.ppc.out_fname}")
+
+        norm_dict = None
+        class_dict = None
+        total = None
+        stream = reader.stream(self.variables, self.num_jets)
+
+        with ProgressBar() as progress:
+            task = progress.add_task(
+                f"[green]Computing normalisations using {self.num_jets:,} jets...",
+                total=self.num_jets,
+            )
+
+            for i, batch in enumerate(stream):
+                this_norm_dict, num = self.get_norm_dict(batch)
+                this_class_dict = self.get_class_dict(batch)
+                if i == 0:
+                    norm_dict = this_norm_dict
+                    class_dict = this_class_dict
+                    total = num
+                else:
+                    class_dict = self.combine_class_dict(class_dict, this_class_dict)
+                    norm_dict = self.combine_norm_dict(norm_dict, this_norm_dict, total, num)
+                    total += num
+
+                progress.update(task, advance=len(batch[self.variables.jets_name]))
+
+        log.info(f"[bold green]Finished computing normalisation params on {self.num_jets:,} jets!")
+        self.write_norm_dict(norm_dict)
+        self.write_class_dict(class_dict)
+        log.info(f"[bold green]Saved norm dict to {self.norm_fname}")
+        log.info(f"[bold green]Saved class dict to {self.class_fname}")

@@ -1,0 +1,66 @@
+# What is this?
+
+preprocessing, with
+
+- modular, class-based design (a lot of the [issues](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/?label_name%5B%5D=Preprocessing) to do with umami preprocessing are improved by this)
+- h5 virtual datasets to wrap the source files
+- 2 main stages: resample -> merge -> done!
+- parallelised processing of flavours within a sample
+- support for different resampling "regions", which is usefull for [Xbb preprocessing](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225)
+- ndim sampling support, which is also useful for Xbb
+- "new" improved training file format (which is actually just the tdd output format)
+    - (structured arrays are smaller on disk and therefore faster to read)
+    - (only one dataloader is needed and can be reused for training and testing)
+    - (other plotting scripts can support a single file format)
+    - (normalisation/concatenation is applied on the fly during training)
+- new "countup" samping which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
+
+
+# Setup
+
+```bash
+conda create -n jetpp python=3.10
+conda activate jetpp
+python -m pip install -e .
+```
+
+# Run
+
+```bash
+preprocess --config configs/test.yaml
+```
+
+By default all steps are run.
+To run with only specific steps enabled, include the flag for the required steps.
+For example
+
+```bash
+preprocess --config configs/config.yaml --prep --resample
+```
+
+will run the first two steps.
+
+To run without certain steps, include the corresponding negative flag.
+For example to run without plotting
+
+```bash
+preprocess --config configs/config.yaml --no-plot
+```
+
+
+See `preprocess --help` for the full list of flags.
+
+
+## Comparisons with umami
+
+Compared with a comparable preprocessing config from umami:
+
+1. train file size decreased by 30%
+2. train read speed improved by 30% (separate from file size reduction, by using `read_direct`)
+3. only one command is needed to generate all preprocessing outputs (running with `--stage=all` will produce train/val/test files)
+4. lines of code are reduced vs umami by 4x
+5. 10x faster than default umami preprocessing (0.06 vs 0.825 hours/million jets)
+
+
+# Not included
+- integration and unit tests (I'm not sure unit tests are a good idea anyway)

@@ -1,0 +1,42 @@
+[project]
+name = "jetpp"
+version = "0.1"
+description = "Preprocessing for jet tagging"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "h5py==3.7.0",
+    "numpy==1.22.*",
+    "pre-commit==2.20.0",
+    "pyyaml-include==1.3",
+    "PyYAML==6.0",
+    "rich==12.6.0",
+    "scipy==1.9.3",
+    "puma-hep"
+]
+
+[project.scripts]
+preprocess = "jetpp.main:main"
+
+[tool.setuptools]
+packages = ["jetpp"]
+
+[build-system]
+requires = ["setuptools>=62"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 99
+preview = "True"
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint]
+format.max-line-length = 99
+reports.output-format = "colorized"
+messages_control.enable = ["useless-suppression"]
+
+[tool.pytest.ini_options]
+log_cli_level = "debug"
+filterwarnings = ["ignore::DeprecationWarning"]

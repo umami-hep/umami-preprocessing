@@ -1,0 +1,60 @@
+flavours: !include flavours.yaml
+variables: !include variables.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  pattern: user.svanstro.410470.e6337_s3681_r13167_p4931.tdd.flow.23_0_8.22-11-17_flowtest_output.h5/*.h5
+zprime: &zprime
+  name: zprime
+  pattern: user.svanstro.800030.e7954_s3681_r13144_p4931.tdd.flow.23_0_8.22-11-17_flowtest_output.h5/*.h5
+
+global_cuts:
+  train:
+    - [eventNumber, "%10<=", 7]
+  val:
+    - [eventNumber, "%10==", 8]
+  test:
+    - [eventNumber, "%10==", 9]
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [b, c, u]
+    num_jets: 21_000_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [b, c, u]
+    num_jets: 9_000_000
+
+resampling:
+  target: c
+  method: countup
+  sampling_fraction: 1.0
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 400_000, 50], [400_000, 6_000_000, 50]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 20]]
+
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 5_000_000
+  base_dir: /unix/atlastracking/samples/gnn_training/flow/
+  out_fname: pp_output.h5
