@@ -16,7 +16,7 @@ def load_jets(paths, variable):
     df = pd.DataFrame(columns=variables)
     for path in paths:
         with h5py.File(path) as f:
-            df = df.append(pd.DataFrame(f["jets"].fields(variables)[: int(1e6)]))
+            df = pd.concat([df, pd.DataFrame(f["jets"].fields(variables)[: int(1e6)])])
     return df
 
 

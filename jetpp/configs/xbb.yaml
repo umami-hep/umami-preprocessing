@@ -73,7 +73,7 @@ resampling:
 
 global:
   jets_name: jets
-  batch_size: 1_000_000
+  batch_size: 2_000_000
   num_jets_estimate: 2_000_000
   base_dir: /unix/atlastracking/samples/xbb/dumps/p5488/
   out_fname: pp_output.h5

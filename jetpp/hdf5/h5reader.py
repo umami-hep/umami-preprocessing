@@ -111,6 +111,3 @@ class H5Reader:
                     break
 
                 yield data
-
-        if total < num_jets:
-            raise ValueError(f"{num_jets:,} but only {total} were read from {self.fname}")

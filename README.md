@@ -13,13 +13,15 @@ preprocessing, with
     - (only one dataloader is needed and can be reused for training and testing)
     - (other plotting scripts can support a single file format)
     - (normalisation/concatenation is applied on the fly during training)
+    - (training files can contain supersets of variables used for training)
 - new "countup" samping which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
+    - the code estimates the number of unique jets for you and saves this number as an attribute in the output file
 
 
 # Setup
 
 ```bash
-conda create -n jetpp python=3.10
+conda create -n jetpp python=3.11
 conda activate jetpp
 python -m pip install -e .
 ```

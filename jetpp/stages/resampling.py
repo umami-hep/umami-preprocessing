@@ -47,25 +47,24 @@ class Resampling:
 
     def countup_select_func(self, jets, component):
         num_jets = len(jets) * self.config.sampling_fraction
-        target_hist = (self.target.hist.pdf * num_jets).astype(int)
+        target_pdf = self.target.hist.pdf
+        target_hist = target_pdf * num_jets
+        target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
         _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
-        assert self.target.hist.pdf.shape == _hist.shape
+        assert target_pdf.shape == _hist.shape
 
-        # loop over jets, add jets to bins
-        thrown = 0
+        # loop over bins and select relevant jets
         all_idx = []
         for bin_id in np.ndindex(*target_hist.shape):
             idx = np.where((binnumbers.T == bin_id).all(axis=-1))[0][: target_hist[bin_id]]
-            # TODO: note, if the source bin has zero jets, we are loosing jets vs what is expected.
-            # this can lead to unexpected out of jets error. either can oversample some bins, or
-            # problem is largely mitigated by increasing the batch size to be quite large (1e6+)
             if len(idx) and len(idx) < target_hist[bin_id]:
-                idx = np.concatenate([idx, random.choices(idx, k=target_hist[bin_id] - len(idx))])
-            elif not len(idx) and target_hist[bin_id]:
-                thrown += target_hist[bin_id]
+                idx = np.concatenate([idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))])
             all_idx.append(idx)
         idx = np.concatenate(all_idx).astype(int)
+        if len(idx) < num_jets:
+            idx = np.concatenate([idx, self.rng.choice(idx, num_jets - len(idx))])
         self.rng.shuffle(idx)
+        # log.info(f"final output is {len(idx):,}/{num_jets:,} jets, or {len(idx)/num_jets:.3%}")
         self.track_upsampling_stats(idx, component)
         return idx
 
@@ -132,7 +131,7 @@ class Resampling:
 
         for c in components:
             if not c._complete:
-                raise ValueError(f"Unexpectedly ran out of {c} jets!")
+                raise ValueError(f"Ran out of {c} jets after writing {c.writer._num_written:,}")
 
     def run_on_region(self, components, region):
         # compute the target pdf

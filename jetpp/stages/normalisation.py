@@ -81,23 +81,18 @@ class Normalisation:
         return class_dict_B
 
     def write_norm_dict(self, norm_dict):
-        # check for inf
         for group, norms in norm_dict.items():
             for var, tf in norms.items():
-                assert not np.isinf(tf["mean"]), "norm parmeter is not finite"
-                assert not np.isinf(tf["std"]), "norm parmeter is not finite"
-
-        # write
+                assert not np.isinf(tf["mean"]), f"{var} mean is not finite"
+                assert not np.isinf(tf["std"]), f"{var} std is not finite"
         with open(self.norm_fname, "w") as file:
             yaml.dump(norm_dict, file, sort_keys=False)
 
     def write_class_dict(self, class_dict):
-        for name, var in class_dict.items():
-            for v, stats in var.items():
-                _, counts = stats
-                var[v] = list(counts / sum(counts))
-
-        # write
+        for labels in class_dict.values():
+            for v, (_, counts) in labels.items():
+                weights = sum(counts) / counts
+                labels[v] = np.around(weights / weights.min(), 2).tolist()
         with open(self.class_fname, "w") as file:
             yaml.dump(class_dict, file, sort_keys=False)
 

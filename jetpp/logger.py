@@ -12,8 +12,6 @@ from rich.progress import (
 )
 
 is_terminal = Console().is_terminal
-refresh = 1 if is_terminal else 0.02
-console = Console(width=100, force_terminal=True)
 ProgressBar = partial(
     Progress,
     TextColumn("[task.description]{task.description}"),
@@ -23,8 +21,9 @@ ProgressBar = partial(
     TimeRemainingColumn(),
     TextColumn("•"),
     TimeElapsedColumn(),
-    refresh_per_second=refresh,
-    console=console,
+    refresh_per_second=1 if is_terminal else 0.05,
+    speed_estimate_period=30 if is_terminal else 60,
+    console=Console(width=100, force_terminal=True),
 )
 
 
