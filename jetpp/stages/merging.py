@@ -105,7 +105,7 @@ class Merging:
         title = " Running Merging "
         log.info(f"[bold green]{title:-^100}")
 
-        if not self.ppc.is_test:
+        if not self.ppc.is_test or self.ppc.merge_test_samples:
             components = [(None, self.components)]
         else:
             components = self.components.groupby_sample()

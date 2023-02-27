@@ -38,15 +38,15 @@ class Resampling:
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
         if self.config.method == "pdf":
-            self.select_fun = self.pdf_select_func
+            self.select_func = self.pdf_select_func
         elif self.config.method == "countup":
-            self.select_fun = self.countup_select_func
+            self.select_func = self.countup_select_func
         else:
             raise ValueError(f"Unsupported resampling method {self.config.method}")
         self.rng = np.random.default_rng(42)
 
     def countup_select_func(self, jets, component):
-        num_jets = len(jets) * self.config.sampling_fraction
+        num_jets = int(len(jets) * self.config.sampling_fraction)
         target_pdf = self.target.hist.pdf
         target_hist = target_pdf * num_jets
         target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
@@ -107,7 +107,7 @@ class Resampling:
                 # apply sampling
                 idx = np.arange(len(batch_out[self.variables.jets_name]))
                 if c != self.target and not self.is_test:
-                    idx = self.select_fun(batch_out[self.variables.jets_name], c)
+                    idx = self.select_func(batch_out[self.variables.jets_name], c)
                     batch_out = select_batch(batch_out, idx)
 
                 # check for completion

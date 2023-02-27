@@ -43,6 +43,7 @@ class PreprocessingConfig:
         self.batch_size = gc["batch_size"]
         self.num_jets_estimate = gc["num_jets_estimate"]
         self.flavours = config["flavours"]
+        self.merge_test_samples = gc.get("merge_test_samples", False)
 
         # apply selections from resampling bin min and max edges
         cuts_list = config["global_cuts"].get("common", []) + config["global_cuts"][self.out_type]
@@ -52,7 +53,7 @@ class PreprocessingConfig:
         self.global_cuts = Cuts.from_list(cuts_list)
 
         self.components = Components.from_config(config["components"], self)
-        self.variables = VariableConfig(config["variables"], gc["jets_name"])
+        self.variables = VariableConfig(config["variables"], gc["jets_name"], self.is_test)
 
         # reduce number of jets for non-train pipeline by a factor of ten
         # TODO: improve this

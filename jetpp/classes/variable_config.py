@@ -8,18 +8,19 @@ from dataclasses import dataclass
 class VariableConfig:
     variables: dict[str, dict[str, list[str]]]
     jets_name: str = "jets"
+    keep_all: bool = False
 
     def __post_init__(self):
         for track_vars in self.tracks.values():
-            track_vars["inputs"] = list(set(track_vars["inputs"] + ["valid"]))
-
-    def _combine(self, name):
-        return self[name]["inputs"] + self[name].get("labels", [])
+            track_vars["inputs"] = list(dict.fromkeys(track_vars["inputs"] + ["valid"]))
 
     def combined(self):
         combined = {}
         for name in self.variables:
-            combined[name] = self._combine(name)
+            if self.keep_all:
+                combined[name] = None
+            else:
+                combined[name] = self[name]["inputs"] + self[name].get("labels", [])
         return combined.items()
 
     @property
@@ -39,14 +40,14 @@ class VariableConfig:
     def add_jet_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
         """Returns a new VariableConfig instance."""
         vc = VariableConfig(deepcopy(self.variables), self.jets_name)
-        vc.jets[kind] = list(set(vc.jets[kind] + variables))
+        vc.jets[kind] = list(dict.fromkeys(vc.jets[kind] + variables))
         return vc
 
     def add_tracks_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
         """Returns a new VariableConfig instance."""
         vc = VariableConfig(deepcopy(self.variables), self.jets_name)
         for track_vars in vc.tracks.values():
-            track_vars[kind] = list(set(track_vars[kind] + variables))
+            track_vars[kind] = list(dict.fromkeys(track_vars[kind] + variables))
         return vc
 
     def items(self):

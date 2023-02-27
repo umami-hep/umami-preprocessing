@@ -77,3 +77,4 @@ global:
   num_jets_estimate: 2_000_000
   base_dir: /unix/atlastracking/samples/xbb/dumps/p5488/
   out_fname: pp_output.h5
+  merge_test_samples: True

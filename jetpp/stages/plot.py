@@ -55,10 +55,10 @@ def make_hist(stage, flavours, variable, in_paths, x_range=None):
 
 
 def main(config, stage):
-    if stage == "test":
-        paths = [path_append(config.out_fname, sample) for sample in config.components.samples]
-    else:
+    if stage != "test" or config.merge_test_samples:
         paths = [config.out_fname]
+    else:
+        paths = [path_append(config.out_fname, sample) for sample in config.components.samples]
 
     for var in config.sampl_cfg.vars:
         make_hist(stage, config.components.flavours, var, paths)
