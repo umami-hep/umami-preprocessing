@@ -27,10 +27,10 @@ def make_hist(stage, flavours, variable, in_paths, x_range=None):
         ylabel="Number of jets",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
         xlabel=variable,
-        bins=50,
+        bins=100,
         y_scale=1.5,
         logy=True,
-        norm=False,
+        norm=True,
     )
 
     for label_value, label_string in enumerate([f.name for f in flavours]):
@@ -49,7 +49,7 @@ def make_hist(stage, flavours, variable, in_paths, x_range=None):
     out_dir = Path(in_paths[0]).parent.parent / "plots"
     out_dir.mkdir(exist_ok=True)
     fname = f"{stage}_{variable}"
-    out_path = out_dir / f"{fname}.pdf"
+    out_path = out_dir / f"{fname}.png"
     plot.savefig(out_path)
     log.info(f"Saved plot {out_path}")
 
