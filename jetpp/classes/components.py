@@ -18,12 +18,13 @@ class Component:
     region: Region
     sample: Sample
     flavour: Flavour
+    global_cuts: Cuts
     dirname: Path
     num_jets: int
     num_jets_estimate: int
 
     def __post_init__(self):
-        self.hist = Hist(self.dirname.parent / "hists" / f"{self.name}.h5")
+        self.hist = Hist(self.dirname.parent.parent / "hists" / f"{self.name}.h5")
 
     def setup_reader(self, variables, batch_size, fname=None):
         if fname is None:
@@ -42,7 +43,7 @@ class Component:
 
     @property
     def cuts(self):
-        return self.flavour.cuts + self.region.cuts
+        return self.global_cuts + self.flavour.cuts + self.region.cuts
 
     @property
     def out_path(self):
@@ -61,7 +62,7 @@ class Component:
         read = self.reader.stream(vc, num_jets, cuts if sel else None)
         return np.concatenate([np.array(x[self.reader.jets_name]) for x in read])
 
-    def _num_available(self, cuts=None):
+    def num_available(self, cuts=None):
         """Return a slightly conservative estimate for the number of available
         jets."""
         if cuts is None:
@@ -72,7 +73,7 @@ class Component:
         return math.floor(estimated_num_jets / 1000) * 1000
 
     def check_num_jets(self, num_jets, sampling_frac=None, cuts=None, silent=False):
-        total = self._num_available(cuts)
+        total = self.num_available(cuts)
         available = total
         if sampling_frac:
             available = int(total * sampling_frac)
@@ -80,7 +81,7 @@ class Component:
         # check with tolerance to avoid failure midway through preprocessing
         if available < num_jets * 1.01:
             raise ValueError(
-                f"{num_jets:,} jets requested, but only {total:,} are estimated to be in the"
+                f"{num_jets:,} jets requested, but only {total:,} are estimated to be in"
                 f" {self}. With a sampling fraction of {sampling_frac}, at most {available:,} of"
                 " these are available. You can either reduce the number of requested jets or"
                 " increase the sampling fraction."
@@ -98,24 +99,30 @@ class Components:
         self.components = components
 
     @classmethod
-    def from_config(cls, config, pp_config):
+    def from_config(cls, pp_cfg):
         components = []
-        for c in config:
-            region_cuts = Cuts.from_list(c["region"]["cuts"]) + pp_config.global_cuts
+        for c in pp_cfg.config["components"]:
+            region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts)
-            sample = Sample(pp_config.ntuple_dir, pp_config.vds_dir, **c["sample"])
+            sample = Sample(pp_cfg.ntuple_dir, pp_cfg.vds_dir, **c["sample"])
             for name in c["flavours"]:
-                assert name in pp_config.flavours, f"Unrecognised flavour {name}"
-                cuts = Cuts.from_list(pp_config.flavours[name]["cuts"])
+                assert name in pp_cfg.flavours, f"Unrecognised flavour {name}"
+                cuts = Cuts.from_list(pp_cfg.flavours[name]["cuts"])
                 flavour = Flavour(name, cuts)
+                num_jets = c["num_jets"]
+                if pp_cfg.split == "val":
+                    num_jets = num_jets // 10
+                elif pp_cfg.split == "test":
+                    num_jets = c.get("num_jets_test", num_jets // 10)
                 components.append(
                     Component(
                         region,
                         sample,
                         flavour,
-                        pp_config.components_dir,
-                        c["num_jets"],
-                        pp_config.num_jets_estimate,
+                        pp_cfg.global_cuts,
+                        pp_cfg.components_dir,
+                        num_jets,
+                        pp_cfg.num_jets_estimate,
                     )
                 )
         return cls(components)

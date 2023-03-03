@@ -82,6 +82,7 @@ class Merging:
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
         unique_jets = np.sum([c.reader.get_attr("unique_jets") for c in components])
         self.writer.add_attr("unique_jets", unique_jets)
+        self.writer.add_attr("config", str(self.ppc.config))
         log.debug(f"Setup merge output at {self.writer.fname}")
 
         # write

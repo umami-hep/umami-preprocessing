@@ -59,7 +59,7 @@ Compared with a comparable preprocessing config from umami:
 
 1. train file size decreased by 30%
 2. train read speed improved by 30% (separate from file size reduction, by using `read_direct`)
-3. only one command is needed to generate all preprocessing outputs (running with `--stage=all` will produce train/val/test files)
+3. only one command is needed to generate all preprocessing outputs (running with `--split=all` will produce train/val/test files)
 4. lines of code are reduced vs umami by 4x
 5. 10x faster than default umami preprocessing (0.06 vs 0.825 hours/million jets)
 

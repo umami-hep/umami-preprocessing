@@ -19,51 +19,47 @@ YamlIncludeConstructor.add_to_loader_class(
 
 
 class PreprocessingConfig:
-    def __init__(self, config_path: Path | str, out_type: str):
+    def __init__(self, config_path: Path | str, split: str):
         self.config_path = Path(config_path)
         with open(config_path) as file:
             config = yaml.safe_load(file)
             gc = config["global"]
 
         self.config = config
-        self.out_type = out_type
-
+        self.split = split
         self.sampl_cfg = ResamplingConfig(self.config)
 
+        # configure paths
         self.base_dir = Path(gc["base_dir"])
         self.ntuple_dir = self.get_path(gc.get("ntuple_dir", "ntuples"))
         self.vds_dir = self.get_path(gc.get("vds_dir", "vds"))
-        self.components_dir = self.get_path(gc.get("components_dir", "components")) / self.out_type
+        self.components_dir = self.get_path(gc.get("components_dir", "components")) / self.split
         self.out_dir = self.get_path(gc.get("out_dir", "output"))
         out_fname = self.out_dir / gc["out_fname"]
-        self.out_fname = path_append(out_fname, self.out_type)
+        self.out_fname = path_append(out_fname, self.split)
+        assert self.ntuple_dir.exists(), f"{self.ntuple_dir} does not exist"
 
-        assert self.ntuple_dir.exists(), self.ntuple_dir
-
+        # read global config
+        self.flavours = config["flavours"]
         self.batch_size = gc["batch_size"]
         self.num_jets_estimate = gc["num_jets_estimate"]
-        self.flavours = config["flavours"]
         self.merge_test_samples = gc.get("merge_test_samples", False)
 
-        # apply selections from resampling bin min and max edges
-        cuts_list = config["global_cuts"].get("common", []) + config["global_cuts"][self.out_type]
-        for resampling_var, cfg in config["resampling"]["variables"].items():
-            cuts_list.append([resampling_var, ">", cfg["bins"][0][0]])
-            cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
+        # get cuts
+        cuts_list = config["global_cuts"].get("common", []) + config["global_cuts"][self.split]
+        if not self.is_test:
+            for resampling_var, cfg in config["resampling"]["variables"].items():
+                cuts_list.append([resampling_var, ">", cfg["bins"][0][0]])
+                cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
         self.global_cuts = Cuts.from_list(cuts_list)
 
-        self.components = Components.from_config(config["components"], self)
+        # load components and variables
+        self.components = Components.from_config(self)
         self.variables = VariableConfig(config["variables"], gc["jets_name"], self.is_test)
-
-        # reduce number of jets for non-train pipeline by a factor of ten
-        # TODO: improve this
-        if self.out_type != "train":
-            for c in self.components:
-                c.num_jets = int(c.num_jets * 0.1)
 
     @property
     def is_test(self):
-        return self.out_type == "test"
+        return self.split == "test"
 
     def get_path(self, path: Path | str):
         """Creates an absolute path from an absolute path or relative path and

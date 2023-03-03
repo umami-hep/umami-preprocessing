@@ -34,6 +34,10 @@ class Cuts:
     def from_list(cls, cuts: list) -> Cuts:
         return cls(frozenset(Cut(*cut) for cut in cuts))
 
+    @classmethod
+    def empty(cls) -> Cuts:
+        return cls(frozenset([]))
+
     @property
     def variables(self):
         return list({cut.variable for cut in self.cuts})

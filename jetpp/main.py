@@ -32,12 +32,12 @@ def parse_args():
     parser.add_argument("--merge", action=abool, help="Run merging")
     parser.add_argument("--norm", action=abool, help="Compute normalisations")
     parser.add_argument("--plot", action=abool, help="Plot resampled distributions")
-    stages = ["train", "val", "test", "all"]
-    parser.add_argument("--stage", default="train", choices=stages, help="Which file to produce")
+    splits = ["train", "val", "test", "all"]
+    parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
 
     args = parser.parse_args()
     d = vars(args)
-    ignore = ["config", "stage"]
+    ignore = ["config", "split"]
     if not any(v for a, v in d.items() if a not in ignore):
         for v in d:
             if v not in ignore and d[v] is None:
@@ -54,11 +54,11 @@ def run_pp(args) -> None:
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
 
     # load config
-    config = PreprocessingConfig(args.config, args.stage)
+    config = PreprocessingConfig(args.config, args.split)
     config.copy_configs()
 
     # create virtual datasets and pdf files
-    if args.prep and args.stage == "train":
+    if args.prep and args.split == "train":
         vds.main(config)
         hist.main(config)
 
@@ -73,13 +73,13 @@ def run_pp(args) -> None:
         merging.run()
 
     # run the normalisation
-    if args.norm and args.stage == "train":
+    if args.norm and args.split == "train":
         norm = Normalisation(config)
         norm.run()
 
     # make plots
     if args.plot:
-        plot.main(config, args.stage)
+        plot.main(config, args.split)
 
     # print end info
     end = datetime.now()
@@ -93,12 +93,12 @@ def main() -> None:
     args = parse_args()
     log = setup_logger()
 
-    if args.stage == "all":
+    if args.split == "all":
         d = vars(args)
         for stage in ["train", "val", "test"]:
             d["stage"] = stage
             log.info(f"[bold blue]{'-'*100}")
-            title = f" {args.stage} "
+            title = f" {args.split} "
             log.info(f"[bold blue]{title:-^100}")
             log.info(f"[bold blue]{'-'*100}")
             run_pp(args)
