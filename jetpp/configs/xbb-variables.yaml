@@ -33,6 +33,7 @@ tracks:
     - numberOfSCTHoles
   labels:
     - truthOriginLabel
+    - truthTypeLabel
     - truthVertexIndex
 
 flow:
