@@ -48,9 +48,9 @@ resampling:
   sampling_fraction: 1.0
   variables:
     pt_btagJes:
-      bins: [[20_000, 400_000, 50], [400_000, 6_000_000, 50]]
+      bins: [[20_000, 6_000_000, 10]]
     absEta_btagJes:
-      bins: [[0, 2.5, 20]]
+      bins: [[0, 2.5, 10]]
 
 global:
   jets_name: jets

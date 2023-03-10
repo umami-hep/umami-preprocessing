@@ -35,7 +35,7 @@ class PreprocessingConfig:
         self.vds_dir = self.get_path(gc.get("vds_dir", "vds"))
         self.components_dir = self.get_path(gc.get("components_dir", "components")) / self.split
         self.out_dir = self.get_path(gc.get("out_dir", "output"))
-        out_fname = self.out_dir / gc["out_fname"]
+        out_fname = self.out_dir / gc.get("out_fname", "pp_output.h5")
         self.out_fname = path_append(out_fname, self.split)
         assert self.ntuple_dir.exists(), f"{self.ntuple_dir} does not exist"
 
@@ -55,7 +55,9 @@ class PreprocessingConfig:
 
         # load components and variables
         self.components = Components.from_config(self)
-        self.variables = VariableConfig(config["variables"], gc["jets_name"], self.is_test)
+        self.variables = VariableConfig(
+            config["variables"], gc.get("jets_name", "jets"), self.is_test
+        )
 
     @property
     def is_test(self):
