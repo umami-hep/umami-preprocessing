@@ -38,13 +38,13 @@ class VariableConfig:
         return {name: var for name, var in self.variables.items() if name != self.jets_name}
 
     def add_jet_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
-        """Returns a new VariableConfig instance."""
+        """Return a new VariableConfig instance."""
         vc = VariableConfig(deepcopy(self.variables), self.jets_name)
         vc.jets[kind] = list(dict.fromkeys(vc.jets[kind] + variables))
         return vc
 
     def add_tracks_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
-        """Returns a new VariableConfig instance."""
+        """Return a new VariableConfig instance."""
         vc = VariableConfig(deepcopy(self.variables), self.jets_name)
         for track_vars in vc.tracks.values():
             track_vars[kind] = list(dict.fromkeys(track_vars[kind] + variables))

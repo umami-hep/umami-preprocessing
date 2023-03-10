@@ -75,13 +75,13 @@ class Normalisation:
             for v, stats in var.items():
                 labels, counts = stats
                 for i, label in enumerate(labels):
-                    counts_A = dict(zip(*class_dict_A[name][v]))
+                    counts_A = dict(zip(*class_dict_A[name][v], strict=True))
                     counts[i] += counts_A.get(label, 0)
                 var[v] = (labels, counts)
         return class_dict_B
 
     def write_norm_dict(self, norm_dict):
-        for group, norms in norm_dict.items():
+        for norms in norm_dict.values():
             for var, tf in norms.items():
                 assert not np.isinf(tf["mean"]), f"{var} mean is not finite"
                 assert not np.isinf(tf["std"]), f"{var} std is not finite"

@@ -15,7 +15,7 @@ def get_n_per_jet(fname, group):
     return shape[1] if len(shape) == 2 else None
 
 
-def get_virtual_layout(fnames, vds_path, group):
+def get_virtual_layout(fnames, group):
     # get sources
     sources = []
     total_length = 0
@@ -50,8 +50,8 @@ def create_vritual_file(fname_pattern, vds_path):
         # create virtual file
     vds_path.parent.mkdir(exist_ok=True)
     with h5py.File(vds_path, "w") as f:
-        for group in h5py.File(fnames[0]).keys():
-            layout = get_virtual_layout(fnames, vds_path, group)
+        for group in h5py.File(fnames[0]):
+            layout = get_virtual_layout(fnames, group)
             f.create_virtual_dataset(group, layout)
 
 

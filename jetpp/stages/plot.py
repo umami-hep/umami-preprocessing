@@ -23,6 +23,11 @@ def load_jets(paths, variable):
 def make_hist(stage, flavours, variable, in_paths, x_range=None):
     df = load_jets(in_paths, variable)
 
+    if x_range:
+        x_min, x_max = x_range
+    else:
+        x_min, x_max = None, None
+
     plot = HistogramPlot(
         ylabel="Number of jets",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
@@ -31,6 +36,8 @@ def make_hist(stage, flavours, variable, in_paths, x_range=None):
         y_scale=1.5,
         logy=True,
         norm=True,
+        xmin=x_min,
+        xmax=x_max,
     )
 
     for label_value, label_string in enumerate([f.name for f in flavours]):

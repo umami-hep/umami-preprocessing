@@ -64,8 +64,7 @@ class PreprocessingConfig:
         return self.split == "test"
 
     def get_path(self, path: Path | str):
-        """Creates an absolute path from an absolute path or relative path and
-        base_dir."""
+        """Create an absolute path from potentially relative path and base_dir."""
         path = Path(path)
         if path.is_absolute():
             return path

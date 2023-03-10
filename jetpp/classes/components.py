@@ -52,7 +52,13 @@ class Component:
     def is_target(self, target_str):
         return self.flavour.name == target_str
 
-    def get_jets(self, num_jets: int, jet_vars: list = None, cuts: Cuts = None, sel: bool = True):
+    def get_jets(
+        self,
+        num_jets: int,
+        jet_vars: list | None = None,
+        cuts: Cuts | None = None,
+        sel: bool = True,
+    ):
         if cuts is None:
             cuts = self.cuts
         if jet_vars is None:
@@ -63,8 +69,7 @@ class Component:
         return np.concatenate([np.array(x[self.reader.jets_name]) for x in read])
 
     def num_available(self, cuts=None):
-        """Return a slightly conservative estimate for the number of available
-        jets."""
+        """Return a conservative estimate for the number of available jets."""
         if cuts is None:
             cuts = self.cuts
         all_jets = self.get_jets(self.num_jets_estimate, sel=False)

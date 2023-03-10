@@ -56,7 +56,7 @@ class Resampling:
         # loop over bins and select relevant jets
         all_idx = []
         for bin_id in np.ndindex(*target_hist.shape):
-            idx = np.where((binnumbers.T == bin_id).all(axis=-1))[0][: target_hist[bin_id]]
+            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][: target_hist[bin_id]]
             if len(idx) and len(idx) < target_hist[bin_id]:
                 idx = np.concatenate([idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))])
             all_idx.append(idx)

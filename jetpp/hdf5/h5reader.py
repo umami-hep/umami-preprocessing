@@ -32,7 +32,6 @@ class H5Reader:
         return np.array(0, dtype=get_dtype(ds, variables, self.as_full))
 
     def read_chunk(self, ds: h5py.Dataset, array: np.array, low: int) -> np.array:
-        """Read a chunk from a dataset at the given index into array."""
         high = min(low + self.batch_size, self.num_jets)
         shape = (high - low,) + ds.shape[1:]
         array.resize(shape, refcheck=False)
@@ -58,16 +57,9 @@ class H5Reader:
         self,
         variables: VariableConfig,
         num_jets: int,
-        cuts: Cuts = None,
+        cuts: Cuts | None = None,
         shuffle: bool = True,
     ) -> np.array:
-        """Generator that will return batches of selected jets.
-
-        Note that this will overwrite the array on each iteration, so make
-        sure you copy it. See
-        https://gitlab.cern.ch/dguest/h5-batch-read/-/blob/master/test-batch-read.py
-        """
-
         rng = np.random.default_rng(42)
 
         if num_jets > self.num_jets:
