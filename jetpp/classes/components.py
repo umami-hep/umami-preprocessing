@@ -24,7 +24,7 @@ class Component:
     num_jets_estimate: int
 
     def __post_init__(self):
-        self.hist = Hist(self.dirname.parent.parent / "hists" / f"{self.name}.h5")
+        self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
     def setup_reader(self, variables, batch_size, fname=None):
         if fname is None:
@@ -108,7 +108,7 @@ class Components:
         components = []
         for c in pp_cfg.config["components"]:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
-            region = Region(c["region"]["name"], region_cuts)
+            region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             sample = Sample(pp_cfg.ntuple_dir, pp_cfg.vds_dir, **c["sample"])
             for name in c["flavours"]:
                 assert name in pp_cfg.flavours, f"Unrecognised flavour {name}"
