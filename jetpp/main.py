@@ -95,8 +95,8 @@ def main() -> None:
 
     if args.split == "all":
         d = vars(args)
-        for stage in ["train", "val", "test"]:
-            d["stage"] = stage
+        for split in ["train", "val", "test"]:
+            d["split"] = split
             log.info(f"[bold blue]{'-'*100}")
             title = f" {args.split} "
             log.info(f"[bold blue]{title:-^100}")

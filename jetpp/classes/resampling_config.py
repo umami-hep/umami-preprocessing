@@ -7,7 +7,7 @@ class ResamplingConfig:
     def __init__(self, config):
         self.target = config["resampling"]["target"]
         self.sampling_fraction = config["resampling"]["sampling_fraction"]
-        self.method = config["resampling"]["method"]
+        self.method = config["resampling"].get("method")
 
         self.vars = list(config["resampling"]["variables"].keys())
 
