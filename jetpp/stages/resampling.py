@@ -41,6 +41,8 @@ class Resampling:
             self.select_func = self.pdf_select_func
         elif self.config.method == "countup":
             self.select_func = self.countup_select_func
+        elif not self.config.method or self.config.method == "none":
+            self.select_func = None
         else:
             raise ValueError(f"Unsupported resampling method {self.config.method}")
         self.rng = np.random.default_rng(42)
@@ -106,7 +108,7 @@ class Resampling:
 
                 # apply sampling
                 idx = np.arange(len(batch_out[self.variables.jets_name]))
-                if c != self.target and not self.is_test:
+                if c != self.target and not self.is_test and self.select_func:
                     idx = self.select_func(batch_out[self.variables.jets_name], c)
                     batch_out = select_batch(batch_out, idx)
 
