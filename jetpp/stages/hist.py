@@ -50,9 +50,46 @@ class Hist:
         with h5py.File(self.path) as f:
             return f["pdf"][:]
 
-    @property
-    def shape(self) -> np.shape:
-        return self.pdf.shape
+
+"""
+    @functools.cached_property
+    def upscaled_pdf(self):
+        upscale = 1
+        # get bins
+        xs = []
+        with h5py.File(self.path) as f:
+            attrs = dict(f.attrs)
+
+        for var in attrs["resampling_vars"]:
+            var_bins = attrs[f"bins_{var}"]
+            n_bins = len(var_bins) - 1
+            points = np.linspace(0, n_bins - 1 , n_bins * upscale)
+            xs.append(points)
+
+        # return the smoothed pdf
+        xy = np.meshgrid(*xs, indexing="ij")
+        smoothed = ndimage.map_coordinates(self.pdf, xy, order=1)
+        return smoothed / smoothed.sum()
+
+def smooth_weights(weights, path):
+    upscale = 1
+    print(upscale)
+    # get bins
+    xs = []
+    with h5py.File(path) as f:
+        attrs = dict(f.attrs)
+
+    for var in attrs["resampling_vars"]:
+        var_bins = attrs[f"bins_{var}"]
+        n_bins = len(var_bins) - 1
+        points = np.linspace(0, n_bins - 1 , n_bins * upscale)
+        xs.append(points)
+
+    # return the smoothed pdf
+    xy = np.meshgrid(*xs, indexing="ij")
+    smoothed = ndimage.map_coordinates(weights, xy, order=1)
+    return smoothed# / smoothed.sum()
+"""
 
 
 def main(config=None):
@@ -65,7 +102,7 @@ def main(config=None):
     sampl_vars = config.sampl_cfg.vars
     for c in config.components:
         log.info(f"Estimating PDF for {c}")
-        c.setup_reader(config.variables, config.batch_size)
+        c.setup_reader(config.batch_size)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(config.num_jets_estimate, cuts=cuts_no_split, silent=True)
         jets = c.get_jets(config.num_jets_estimate, jet_vars=sampl_vars, cuts=cuts_no_split)

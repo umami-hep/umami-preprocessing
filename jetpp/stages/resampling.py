@@ -4,9 +4,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
+from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
-from jetpp.hdf5 import H5Reader
 from jetpp.logger import ProgressBar
 from jetpp.stages.hist import bin_jets
 
@@ -89,7 +89,7 @@ class Resampling:
         ups_counts = np.unique(idx, return_counts=True)[1]
         mean_ups = ups_counts.mean()
         max_ups = ups_counts.max()
-        num_written = component.writer._num_written
+        num_written = component.writer.num_written
         component._ups_ratio = (mean_ups * len(idx) + component._ups_ratio * num_written) / (
             len(idx) + num_written
         )
@@ -113,8 +113,8 @@ class Resampling:
                     batch_out = select_batch(batch_out, idx)
 
                 # check for completion
-                if c.writer._num_written + len(idx) >= c.num_jets:
-                    keep = c.num_jets - c.writer._num_written
+                if c.writer.num_written + len(idx) >= c.num_jets:
+                    keep = c.num_jets - c.writer.num_written
                     for name, array in batch_out.items():
                         batch_out[name] = array[:keep]
                     c._complete = True
@@ -133,7 +133,7 @@ class Resampling:
 
         for c in components:
             if not c._complete:
-                raise ValueError(f"Ran out of {c} jets after writing {c.writer._num_written:,}")
+                raise ValueError(f"Ran out of {c} jets after writing {c.writer.num_written:,}")
 
     def run_on_region(self, components, region):
         # compute the target pdf
@@ -142,11 +142,11 @@ class Resampling:
         self.target = target[0]
 
         # groupby samples
-        for s, cs in components.groupby_sample():
+        for sample, cs in components.groupby_sample():
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
-            reader = H5Reader(s.vds_path, self.batch_size, self.variables.jets_name)
-            stream = reader.stream(variables, reader.num_jets, region.cuts)
+            reader = H5Reader(sample.path, self.batch_size)
+            stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
             # run with progress
             with ProgressBar() as progress:
@@ -177,7 +177,7 @@ class Resampling:
 
         # setup i/o
         for c in self.components:
-            c.setup_reader(self.variables, self.batch_size)
+            c.setup_reader(self.batch_size)
             c.setup_writer(self.variables)
 
         # check samples

@@ -2,8 +2,8 @@ import logging as log
 
 import numpy as np
 import yaml
+from ftag.hdf5 import H5Reader
 
-from jetpp.hdf5 import H5Reader
 from jetpp.logger import ProgressBar
 
 
@@ -101,15 +101,13 @@ class Normalisation:
         log.info(f"[bold green]{title:-^100}")
 
         # setup reader
-        reader = H5Reader(
-            self.ppc.out_fname, self.ppc.batch_size, self.variables.jets_name, as_full=True
-        )
+        reader = H5Reader(self.ppc.out_fname, self.ppc.batch_size, precision="full")
         log.debug(f"Setup reader at: {self.ppc.out_fname}")
 
         norm_dict = None
         class_dict = None
         total = None
-        stream = reader.stream(self.variables, self.num_jets)
+        stream = reader.stream(self.variables.combined(), self.num_jets)
 
         with ProgressBar() as progress:
             task = progress.add_task(

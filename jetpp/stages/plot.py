@@ -3,12 +3,10 @@ from pathlib import Path
 
 import h5py
 import pandas as pd
+from ftag import Flavours
 from puma import Histogram, HistogramPlot
-from puma.utils import global_config
 
 from jetpp.utils import path_append
-
-flav_cfg = global_config["flavour_categories"]
 
 
 def load_jets(paths, variable):
@@ -20,24 +18,18 @@ def load_jets(paths, variable):
     return df
 
 
-def make_hist(stage, flavours, variable, in_paths, x_range=None):
+def make_hist(stage, flavours, variable, in_paths, bins_range=None, suffix=""):
     df = load_jets(in_paths, variable)
 
-    if x_range:
-        x_min, x_max = x_range
-    else:
-        x_min, x_max = None, None
-
     plot = HistogramPlot(
-        ylabel="Number of jets",
+        ylabel="Normalised Number of jets",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
         xlabel=variable,
-        bins=100,
+        bins=50,
         y_scale=1.5,
         logy=True,
         norm=True,
-        xmin=x_min,
-        xmax=x_max,
+        bins_range=bins_range,
     )
 
     for label_value, label_string in enumerate([f.name for f in flavours]):
@@ -47,8 +39,8 @@ def make_hist(stage, flavours, variable, in_paths, x_range=None):
         plot.add(
             Histogram(
                 df[df["flavour_label"] == label_value][variable],
-                label=flav_cfg[puma_flavour]["legend_label"],
-                colour=flav_cfg[puma_flavour]["colour"],
+                label=Flavours[label_string].label,
+                colour=Flavours[label_string].colour,
             )
         )
 
@@ -56,7 +48,7 @@ def make_hist(stage, flavours, variable, in_paths, x_range=None):
     out_dir = Path(in_paths[0]).parent.parent / "plots"
     out_dir.mkdir(exist_ok=True)
     fname = f"{stage}_{variable}"
-    out_path = out_dir / f"{fname}.png"
+    out_path = out_dir / f"{fname}{suffix}.png"
     plot.savefig(out_path)
     log.info(f"Saved plot {out_path}")
 
@@ -69,3 +61,5 @@ def main(config, stage):
 
     for var in config.sampl_cfg.vars:
         make_hist(stage, config.components.flavours, var, paths)
+        if "pt" in var:
+            make_hist(stage, config.components.flavours, var, paths, (0, 500e3), "low")

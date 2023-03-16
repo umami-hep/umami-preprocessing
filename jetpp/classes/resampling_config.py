@@ -15,11 +15,11 @@ class ResamplingConfig:
         for variable, var_config in config["resampling"]["variables"].items():
             self.bins[variable] = var_config["bins"]
 
-    def get_bins_x(self, bins_x):
+    def get_bins_x(self, bins_x, upscale=1):
         flat_bins = []
         for i, sub_bins_x in enumerate(bins_x):
             start, stop, nbins = sub_bins_x
-            b = np.linspace(start, stop, nbins + 1)
+            b = np.linspace(start, stop, nbins * upscale + 1)
             if i > 0:
                 b = b[1:]
             flat_bins.append(b)

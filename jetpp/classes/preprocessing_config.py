@@ -4,10 +4,10 @@ import logging as log
 from pathlib import Path
 
 import yaml
+from ftag import Cuts
 from yamlinclude import YamlIncludeConstructor
 
 from jetpp.classes.components import Components
-from jetpp.classes.misc import Cuts
 from jetpp.classes.resampling_config import ResamplingConfig
 from jetpp.classes.variable_config import VariableConfig
 from jetpp.utils import path_append
@@ -32,7 +32,6 @@ class PreprocessingConfig:
         # configure paths
         self.base_dir = Path(gc["base_dir"])
         self.ntuple_dir = self.get_path(gc.get("ntuple_dir", "ntuples"))
-        self.vds_dir = self.get_path(gc.get("vds_dir", "vds"))
         self.components_dir = self.get_path(gc.get("components_dir", "components")) / self.split
         self.out_dir = self.get_path(gc.get("out_dir", "output"))
         out_fname = self.out_dir / gc.get("out_fname", "pp_output.h5")
@@ -40,7 +39,6 @@ class PreprocessingConfig:
         assert self.ntuple_dir.exists(), f"{self.ntuple_dir} does not exist"
 
         # read global config
-        self.flavours = config["flavours"]
         self.batch_size = gc["batch_size"]
         self.num_jets_estimate = gc["num_jets_estimate"]
         self.merge_test_samples = gc.get("merge_test_samples", False)
