@@ -12,7 +12,8 @@ dependencies = [
     "PyYAML==6.0",
     "rich==12.6.0",
     "scipy==1.9.3",
-    "puma-hep"
+    "puma-hep",
+    "atlas-ftag-tools==0.0.3",
 ]
 
 [project.scripts]

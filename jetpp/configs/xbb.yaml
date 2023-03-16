@@ -1,4 +1,3 @@
-flavours: !include flavours.yaml
 variables: !include xbb-variables.yaml
 
 global_cuts:
@@ -9,72 +8,71 @@ global_cuts:
   test:
     - [eventNumber, "%10==", 9]
 
-Hbb: &Hbb
-  name: Hbb
-  pattern: user.dkobylia.801471.e8441_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
-Hcc: &Hcc
-  name: Hcc
-  pattern: user.dkobylia.801472.e8441_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+hbb: &hbb
+  name: hbb
+  pattern: user.svanstro.801471.e8441_e7400_s3681_r13144_r13146_p5488.tdd.*/*.h5
+hcc: &hcc
+  name: hcc
+  pattern: user.svanstro.801472.e8441_e7400_s3681_r13144_r13146_p5488.tdd.*/*.h5
 top: &top
   name: top
-  pattern: user.dkobylia.426345.e6880_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+  pattern:
+    - user.svanstro.426345.e6880_s3681_r13144_p5488.tdd.*/*.h5
+    - user.svanstro.426345.e6880_s3681_r13145_p5488.tdd.*/*.h5
 qcd: &qcd
   name: qcd
-  pattern: user.dkobylia.364704.e7142_s3681_r13144_p5488.tdd.FatJets.22_2_100.23-01-12_test-xbb_output.h5/*.h5
+  pattern:
+    - user.svanstro.364703.e7142_s3681_r13144_p5488.tdd.*/*.h5
+    - user.svanstro.364704.e7142_s3681_r13144_p5488.tdd.*/*.h5
+    - user.svanstro.364705.e7142_s3681_r13144_p5488.tdd.*/*.h5
 
 inclusive: &inclusive
   name: inclusive
-  cuts:
-    - [pt, ">", 250_000]
-    - [pt, "<", 1_000_000]
-    - [mass, ">", 50_000]
-    - [mass, "<", 300_000]
+  cuts: []
 
 components:
   - region:
       <<: *inclusive
     sample:
-      <<: *Hbb
-    flavours: [Hbb]
-    num_jets: 1_900_000
+      <<: *hbb
+    flavours: [hbb]
+    num_jets: 14_500_000
 
   - region:
       <<: *inclusive
     sample:
-      <<: *Hcc
-    flavours: [Hcc]
-    num_jets: 1_900_000
+      <<: *hcc
+    flavours: [hcc]
+    num_jets: 14_500_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
     flavours: [top]
-    num_jets: 1_900_000
+    num_jets: 8_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 1_900_000
+    num_jets: 22_000_000
 
 resampling:
-  target: Hbb
+  target: hbb
   method: countup
   sampling_fraction: 1
   variables:
     pt:
-      bins: [[250_000, 1_000_000, 20]]
-    eta:
-      bins: [[-2, 2, 10]]
+      bins: [[250_000, 1_300_000, 50]]
+    abs_eta:
+      bins: [[0, 2, 20]]
     mass:
-      bins: [[50_000, 300_000, 20]]
+      bins: [[50_000, 300_000, 50]]
 
 global:
-  jets_name: jets
-  batch_size: 2_000_000
-  num_jets_estimate: 2_000_000
-  base_dir: /unix/atlastracking/samples/xbb/dumps/p5488/
-  out_fname: pp_output.h5
+  batch_size: 4_000_000
+  num_jets_estimate: 10_000_000
+  base_dir: /unix/atlastracking/samples/xbb/dumps/p5488_ext/
   merge_test_samples: True

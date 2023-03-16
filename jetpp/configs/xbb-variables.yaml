@@ -2,6 +2,7 @@ jets:
   inputs:
     - pt
     - eta
+    - abs_eta
     - mass
   labels:
     - R10TruthLabel_R22v1
@@ -31,14 +32,24 @@ tracks:
     - numberOfSCTSharedHits
     - numberOfPixelHoles
     - numberOfSCTHoles
+    - subjetIndex
   labels:
     - truthOriginLabel
     - truthTypeLabel
     - truthVertexIndex
 
-flow:
+subjets:
   inputs:
     - pt
-    - energy
+    - eta
+    - mass
     - deta
     - dphi
+  labels:
+    - HadronConeExclTruthLabelID
+#flow:
+#  inputs:
+#    - pt
+#    - energy
+#    - deta
+#    - dphi

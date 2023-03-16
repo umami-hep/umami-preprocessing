@@ -1,4 +1,3 @@
-flavours: !include flavours.yaml
 variables: !include variables.yaml
 
 ttbar: &ttbar
@@ -32,30 +31,28 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [b, c, u]
-    num_jets: 50_000
+    flavours: [bjets, cjets, ujets]
+    num_jets: 10_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [b, c, u]
-    num_jets: 50_000
+    flavours: [bjets, cjets, ujets]
+    num_jets: 10_000
 
 resampling:
-  target: c
-  method: countup
+  target: cjets
+  method: pdf
   sampling_fraction: 1.0
   variables:
     pt_btagJes:
-      bins: [[20_000, 6_000_000, 10]]
+      bins: [[20_000, 6_000_000, 60]]
     absEta_btagJes:
-      bins: [[0, 2.5, 10]]
+      bins: [[0, 2.5, 5]]
 
 global:
-  jets_name: jets
-  batch_size: 10_000
-  num_jets_estimate: 50_000
+  batch_size: 100_000
+  num_jets_estimate: 100_000
   base_dir: /unix/atlastracking/samples/gnn_training/flow/
   out_dir: test_out
-  out_fname: pp_output.h5

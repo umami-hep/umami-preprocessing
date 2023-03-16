@@ -3,13 +3,10 @@ import math
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
+from ftag import Cuts, Flavour, Flavours, Sample
+from ftag.hdf5 import H5Reader, H5Writer
 
-from jetpp.classes.cuts import Cuts
-from jetpp.classes.misc import Flavour, Region, Sample
-from jetpp.classes.variable_config import VariableConfig
-from jetpp.hdf5.h5reader import H5Reader
-from jetpp.hdf5.h5writer import H5Writer
+from jetpp.classes.region import Region
 from jetpp.stages.hist import Hist
 
 
@@ -26,15 +23,16 @@ class Component:
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
-    def setup_reader(self, variables, batch_size, fname=None):
+    def setup_reader(self, batch_size, fname=None):
         if fname is None:
-            fname = self.sample.vds_path
-        self.reader = H5Reader(fname, batch_size, variables.jets_name)
-        log.debug(f"Setup component reader at: {self.sample.vds_path}")
+            fname = self.sample.path
+        self.reader = H5Reader(fname, batch_size)
+        log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
-        self.writer = H5Writer(self.out_path, variables, self.num_jets)
-        self.writer.setup_file(self.sample.vds_path)
+        self.writer = H5Writer(
+            self.reader.vds_path, self.out_path, variables.combined(), self.num_jets
+        )
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property
@@ -63,17 +61,15 @@ class Component:
             cuts = self.cuts
         if jet_vars is None:
             jet_vars = []
-        all_vars = {"inputs": jet_vars.copy() + cuts.variables}
-        vc = VariableConfig({self.reader.jets_name: all_vars}, self.reader.jets_name)
-        read = self.reader.stream(vc, num_jets, cuts if sel else None)
-        return np.concatenate([np.array(x[self.reader.jets_name]) for x in read])
+        var = {"jets": jet_vars.copy() + cuts.variables}
+        return self.reader.load(var, num_jets, cuts if sel else None)["jets"]
 
     def num_available(self, cuts=None):
         """Return a conservative estimate for the number of available jets."""
         if cuts is None:
             cuts = self.cuts
         all_jets = self.get_jets(self.num_jets_estimate, sel=False)
-        sel_jets = cuts(all_jets)[1]
+        sel_jets = cuts(all_jets).values
         estimated_num_jets = len(sel_jets) / len(all_jets) * self.reader.num_jets
         return math.floor(estimated_num_jets / 1000) * 1000
 
@@ -109,11 +105,12 @@ class Components:
         for c in pp_cfg.config["components"]:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
-            sample = Sample(pp_cfg.ntuple_dir, pp_cfg.vds_dir, **c["sample"])
+            pattern = c["sample"]["pattern"]
+            if isinstance(pattern, list):
+                pattern = tuple(pattern)
+            sample = Sample(ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"], pattern=pattern)
             for name in c["flavours"]:
-                assert name in pp_cfg.flavours, f"Unrecognised flavour {name}"
-                cuts = Cuts.from_list(pp_cfg.flavours[name]["cuts"])
-                flavour = Flavour(name, cuts)
+                flavour = Flavours[name]
                 num_jets = c["num_jets"]
                 if pp_cfg.split == "val":
                     num_jets = num_jets // 10

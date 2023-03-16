@@ -2,8 +2,8 @@ import logging as log
 from copy import copy
 
 import numpy as np
+from ftag.hdf5 import H5Writer
 
-from jetpp.hdf5 import H5Writer
 from jetpp.logger import ProgressBar
 from jetpp.utils import path_append
 
@@ -68,21 +68,28 @@ class Merging:
         # setup inputs
         for c in components:
             batch_size = self.batch_size * c.num_jets // components.num_jets + 1
-            c.setup_reader(self.variables, batch_size, fname=c.out_path)
-            c.stream = c.reader.stream(self.variables, c.reader.num_jets)
+            c.setup_reader(batch_size, fname=c.out_path)
+            c.stream = c.reader.stream(self.variables.combined(), c.reader.num_jets)
             c.complete = False
 
         # setup outputs
         fname = self.ppc.out_fname
         if sample:
             fname = path_append(fname, sample)
-        self.writer = H5Writer(fname, self.variables, components.num_jets)
-        self.writer.setup_file(components[0].reader.fname, add_flavour_label=self.jets_name)
+        self.writer = H5Writer(
+            components[0].reader.vds_path,
+            fname,
+            self.variables.combined(),
+            components.num_jets,
+            add_flavour_label=self.jets_name,
+        )
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
-        unique_jets = np.sum([c.reader.get_attr("unique_jets") for c in components])
+        unique_jets = np.sum(
+            [r.get_attr("unique_jets") for r in c.reader.readers for c in components]
+        )
         self.writer.add_attr("unique_jets", unique_jets)
         self.writer.add_attr("config", str(self.ppc.config))
-        log.debug(f"Setup merge output at {self.writer.fname}")
+        log.debug(f"Setup merge output at {self.writer.dst}")
 
         # write
         with ProgressBar() as progress:

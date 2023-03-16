@@ -3,7 +3,6 @@ from datetime import datetime
 from pathlib import Path
 
 import jetpp.stages.hist as hist
-import jetpp.stages.vds as vds
 from jetpp.classes.preprocessing_config import PreprocessingConfig
 from jetpp.logger import setup_logger
 from jetpp.stages import plot
@@ -59,7 +58,6 @@ def run_pp(args) -> None:
 
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":
-        vds.main(config)
         hist.main(config)
 
     # run the resampling

@@ -21,7 +21,7 @@ class VariableConfig:
                 combined[name] = None
             else:
                 combined[name] = self[name]["inputs"] + self[name].get("labels", [])
-        return combined.items()
+        return combined
 
     @property
     def tracks_names(self):
