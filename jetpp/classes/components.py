@@ -1,5 +1,4 @@
 import logging as log
-import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -50,31 +49,13 @@ class Component:
     def is_target(self, target_str):
         return self.flavour.name == target_str
 
-    def get_jets(
-        self,
-        num_jets: int,
-        jet_vars: list | None = None,
-        cuts: Cuts | None = None,
-        sel: bool = True,
-    ):
-        if cuts is None:
-            cuts = self.cuts
-        if jet_vars is None:
-            jet_vars = []
-        var = {"jets": jet_vars.copy() + cuts.variables}
-        return self.reader.load(var, num_jets, cuts if sel else None)["jets"]
-
-    def num_available(self, cuts=None):
-        """Return a conservative estimate for the number of available jets."""
-        if cuts is None:
-            cuts = self.cuts
-        all_jets = self.get_jets(self.num_jets_estimate, sel=False)
-        sel_jets = cuts(all_jets).values
-        estimated_num_jets = len(sel_jets) / len(all_jets) * self.reader.num_jets
-        return math.floor(estimated_num_jets / 1000) * 1000
+    def get_jets(self, variables: list, num_jets: int, cuts: Cuts | None = None):
+        jn = self.reader.jets_name
+        return self.reader.load({jn: variables}, num_jets, cuts)[jn]
 
     def check_num_jets(self, num_jets, sampling_frac=None, cuts=None, silent=False):
-        total = self.num_available(cuts)
+        """Check if num_jets jets are aviailable after the cuts and sampling fraction."""
+        total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:
             available = int(total * sampling_frac)
@@ -110,7 +91,6 @@ class Components:
                 pattern = tuple(pattern)
             sample = Sample(ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"], pattern=pattern)
             for name in c["flavours"]:
-                flavour = Flavours[name]
                 num_jets = c["num_jets"]
                 if pp_cfg.split == "val":
                     num_jets = num_jets // 10
@@ -120,7 +100,7 @@ class Components:
                     Component(
                         region,
                         sample,
-                        flavour,
+                        Flavours[name],
                         pp_cfg.global_cuts,
                         pp_cfg.components_dir,
                         num_jets,

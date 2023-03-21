@@ -24,12 +24,6 @@ class VariableConfig:
         return combined
 
     @property
-    def tracks_names(self):
-        tracks_names = list(self.variables.keys())
-        tracks_names.remove(self.jets_name)
-        return tracks_names
-
-    @property
     def jets(self):
         return self[self.jets_name]
 
@@ -41,13 +35,6 @@ class VariableConfig:
         """Return a new VariableConfig instance."""
         vc = VariableConfig(deepcopy(self.variables), self.jets_name)
         vc.jets[kind] = list(dict.fromkeys(vc.jets[kind] + variables))
-        return vc
-
-    def add_tracks_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
-        """Return a new VariableConfig instance."""
-        vc = VariableConfig(deepcopy(self.variables), self.jets_name)
-        for track_vars in vc.tracks.values():
-            track_vars[kind] = list(dict.fromkeys(track_vars[kind] + variables))
         return vc
 
     def items(self):

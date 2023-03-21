@@ -2,24 +2,10 @@ import logging as log
 from copy import copy
 
 import numpy as np
-from ftag.hdf5 import H5Writer
+from ftag.hdf5 import H5Writer, join_structured_arrays
 
 from jetpp.logger import ProgressBar
 from jetpp.utils import path_append
-
-
-def join_structured_arrays(arrays: list):
-    """Join a list of structured numpy arrays.
-
-    See https://github.com/numpy/numpy/issues/7811.
-    """
-    dtype: list = sum((a.dtype.descr for a in arrays), [])
-    newrecarray = np.empty(arrays[0].shape, dtype=dtype)
-    for a in arrays:
-        for name in a.dtype.names:
-            newrecarray[name] = a[name]
-
-    return newrecarray
 
 
 class Merging:
@@ -28,7 +14,7 @@ class Merging:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.jets_name = self.variables.jets_name
+        self.jets_name = self.ppc.jets_name
         self.rng = np.random.default_rng(42)
         self.flavours = self.components.flavours
 

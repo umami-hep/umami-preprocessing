@@ -187,7 +187,7 @@ class Resampling:
         )
         for c in self.components:
             sampling_frac = 1 if c.is_target(self.config.target) else self.config.sampling_fraction
-            c.check_num_jets(c.num_jets, sampling_frac=sampling_frac)
+            c.check_num_jets(c.num_jets, sampling_frac=sampling_frac, cuts=c.cuts)
 
         # run resampling
         for region, components in self.components.groupby_region():
