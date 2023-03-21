@@ -105,7 +105,7 @@ def main(config=None):
         c.setup_reader(config.batch_size)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(config.num_jets_estimate, cuts=cuts_no_split, silent=True)
-        jets = c.get_jets(config.num_jets_estimate, jet_vars=sampl_vars, cuts=cuts_no_split)
+        jets = c.get_jets(sampl_vars, config.num_jets_estimate, cuts_no_split)
         c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
 
     log.info(f"[bold green]Saved to {config.components[0].hist.path.parent}/")

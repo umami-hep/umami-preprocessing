@@ -1,11 +1,9 @@
-variables: !include variables.yaml
-
 ttbar: &ttbar
   name: ttbar
-  pattern: user.svanstro.410470.e6337_s3681_r13167_p4931.tdd.flow.23_0_8.22-11-17_flowtest_output.h5/*.h5
+  pattern: user.*.410470.*/*.h5
 zprime: &zprime
   name: zprime
-  pattern: user.svanstro.800030.e7954_s3681_r13144_p4931.tdd.flow.23_0_8.22-11-17_flowtest_output.h5/*.h5
+  pattern: user.*.800030.*/*.h5
 
 global_cuts:
   train:
@@ -52,7 +50,30 @@ resampling:
       bins: [[0, 2.5, 5]]
 
 global:
-  batch_size: 100_000
-  num_jets_estimate: 100_000
-  base_dir: /unix/atlastracking/samples/gnn_training/flow/
+  batch_size: 10_000
+  num_jets_estimate: 10_000
+  base_dir: /unix/atlastracking/samples/gnn_training/martino/v1/
   out_dir: test_out
+  ntuple_dir: source_data
+
+variables:
+  jets:
+    inputs:
+      - pt_btagJes
+      - absEta_btagJes
+    labels:
+      - HadronConeExclTruthLabelID
+      - eta_btagJes
+      - pt
+      - eta
+
+  tracks:
+    inputs:
+      - dphi
+      - deta
+      - qOverP
+      - IP3D_signed_d0_significance
+      - IP3D_signed_z0_significance
+    labels:
+      - truthOriginLabel
+      - truthVertexIndex

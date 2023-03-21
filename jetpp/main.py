@@ -2,10 +2,9 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
-import jetpp.stages.hist as hist
 from jetpp.classes.preprocessing_config import PreprocessingConfig
 from jetpp.logger import setup_logger
-from jetpp.stages import plot
+from jetpp.stages import hist, plot
 from jetpp.stages.merging import Merging
 from jetpp.stages.normalisation import Normalisation
 from jetpp.stages.resampling import Resampling
@@ -19,14 +18,14 @@ def parse_args():
     abool = argparse.BooleanOptionalAction
     parser = argparse.ArgumentParser(
         description=(
-            "Jet taggging preprocessing. By default all stages are run. To run with only specific"
-            "\nstages enabled, include the flag for the required stages. To run without certain"
-            "\nstages, include the corresponding negative flag."
+            "Jet taggging preprocessing. By default all stages for the training split are run.\n"
+            "To run with only specific stages enabled, include the flag for the required stages.\n"
+            "To run without certain stages, include the corresponding negative flag."
         ),
         formatter_class=HelpFormatter,
     )
     parser.add_argument("--config", required=True, type=Path, help="Path to config file")
-    parser.add_argument("--prep", action=abool, help="Create virtual datasets and write PDFs")
+    parser.add_argument("--prep", action=abool, help="Estimate and write PDFs")
     parser.add_argument("--resample", action=abool, help="Run resampling")
     parser.add_argument("--merge", action=abool, help="Run merging")
     parser.add_argument("--norm", action=abool, help="Compute normalisations")
@@ -53,8 +52,7 @@ def run_pp(args) -> None:
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
 
     # load config
-    config = PreprocessingConfig(args.config, args.split)
-    config.copy_configs()
+    config = PreprocessingConfig.from_file(Path(args.config), args.split)
 
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":

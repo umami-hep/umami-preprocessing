@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import dataclasses
+import functools
 import logging as log
+from copy import copy
+from dataclasses import dataclass
 from pathlib import Path
+from subprocess import check_output
+from typing import Literal
 
 import yaml
 from ftag import Cuts
@@ -18,59 +24,71 @@ YamlIncludeConstructor.add_to_loader_class(
 )
 
 
+Split = Literal["train", "val", "test"]
+
+
+@dataclass
 class PreprocessingConfig:
-    def __init__(self, config_path: Path | str, split: str):
-        self.config_path = Path(config_path)
+    config_path: Path
+    split: Split
+    config: dict
+    base_dir: Path
+    ntuple_dir: Path = Path("ntuples")
+    components_dir: Path = Path("components")
+    out_dir: Path = Path("output")
+    out_fname: Path = Path("pp_output.h5")
+    batch_size: int = 100_000
+    num_jets_estimate: int = 1_000_000
+    merge_test_samples: bool = False
+    jets_name: str = "jets"
+
+    def __post_init__(self):
+        # postprocess paths
+        for field in dataclasses.fields(self):
+            if field.type == "Path":
+                setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
+        if not self.ntuple_dir.exists():
+            raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
+        self.components_dir = self.components_dir / self.split
+        self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
+
+        # configure classes
+        sampl_cfg = copy(self.config["resampling"])
+        self.sampl_cfg = ResamplingConfig(sampl_cfg.pop("variables"), **sampl_cfg)
+        self.components = Components.from_config(self)
+        self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test)
+
+        # copy config
+        self.git_hash = check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
+        self.config["git_hash"] = self.git_hash
+        self.copy_config()
+
+    @classmethod
+    def from_file(cls, config_path: Path, split: Split):
         with open(config_path) as file:
             config = yaml.safe_load(file)
-            gc = config["global"]
+            return cls(config_path, split, config, **config["global"])
 
-        self.config = config
-        self.split = split
-        self.sampl_cfg = ResamplingConfig(self.config)
-
-        # configure paths
-        self.base_dir = Path(gc["base_dir"])
-        self.ntuple_dir = self.get_path(gc.get("ntuple_dir", "ntuples"))
-        self.components_dir = self.get_path(gc.get("components_dir", "components")) / self.split
-        self.out_dir = self.get_path(gc.get("out_dir", "output"))
-        out_fname = self.out_dir / gc.get("out_fname", "pp_output.h5")
-        self.out_fname = path_append(out_fname, self.split)
-        assert self.ntuple_dir.exists(), f"{self.ntuple_dir} does not exist"
-
-        # read global config
-        self.batch_size = gc["batch_size"]
-        self.num_jets_estimate = gc["num_jets_estimate"]
-        self.merge_test_samples = gc.get("merge_test_samples", False)
-
-        # get cuts
-        cuts_list = config["global_cuts"].get("common", []) + config["global_cuts"][self.split]
-        if not self.is_test:
-            for resampling_var, cfg in config["resampling"]["variables"].items():
-                cuts_list.append([resampling_var, ">", cfg["bins"][0][0]])
-                cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
-        self.global_cuts = Cuts.from_list(cuts_list)
-
-        # load components and variables
-        self.components = Components.from_config(self)
-        self.variables = VariableConfig(
-            config["variables"], gc.get("jets_name", "jets"), self.is_test
-        )
+    def get_path(self, path: Path):
+        return path if path.is_absolute() else (self.base_dir / path).absolute()
 
     @property
     def is_test(self):
         return self.split == "test"
 
-    def get_path(self, path: Path | str):
-        """Create an absolute path from potentially relative path and base_dir."""
-        path = Path(path)
-        if path.is_absolute():
-            return path
-        return (self.base_dir / path).absolute()
+    @functools.cached_property
+    def global_cuts(self):
+        cuts_list = self.config["global_cuts"].get("common", [])
+        cuts_list += self.config["global_cuts"][self.split]
+        if not self.is_test:
+            for resampling_var, cfg in self.config["resampling"]["variables"].items():
+                cuts_list.append([resampling_var, ">", cfg["bins"][0][0]])
+                cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
+        return Cuts.from_list(cuts_list)
 
-    def copy_configs(self):
-        copy_config_path = self.out_dir / self.config_path.name
-        copy_config_path.parent.mkdir(parents=True, exist_ok=True)
+    def copy_config(self):
+        copy_config_path = self.out_dir / path_append(Path(self.config_path.name), self.split)
         log.info(f"Copying config to {copy_config_path}")
+        copy_config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(copy_config_path, "w") as file:
             yaml.dump(self.config, file, sort_keys=False)

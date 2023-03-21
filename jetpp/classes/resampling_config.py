@@ -1,19 +1,24 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 
 
+@dataclass
 class ResamplingConfig:
-    def __init__(self, config):
-        self.target = config["resampling"]["target"]
-        self.sampling_fraction = config["resampling"]["sampling_fraction"]
-        self.method = config["resampling"].get("method")
+    variables: dict
+    target: str
+    sampling_fraction: float = 1.0
+    method: str | None = None
 
-        self.vars = list(config["resampling"]["variables"].keys())
+    @property
+    def vars(self):
+        return list(self.variables.keys())
 
-        self.bins = {}
-        for variable, var_config in config["resampling"]["variables"].items():
-            self.bins[variable] = var_config["bins"]
+    @property
+    def bins(self):
+        return {v: vc["bins"] for v, vc in self.variables.items()}
 
     def get_bins_x(self, bins_x, upscale=1):
         flat_bins = []
