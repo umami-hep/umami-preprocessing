@@ -45,7 +45,7 @@ class PreprocessingConfig:
     def __post_init__(self):
         # postprocess paths
         for field in dataclasses.fields(self):
-            if field.type == "Path":
+            if field.type == "Path" and field.name != "out_fname":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
         if not self.ntuple_dir.exists():
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
