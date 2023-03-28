@@ -33,7 +33,7 @@ class VariableConfig:
 
     def add_jet_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
         """Return a new VariableConfig instance."""
-        vc = VariableConfig(deepcopy(self.variables), self.jets_name)
+        vc = VariableConfig(deepcopy(self.variables), self.jets_name, self.keep_all)
         vc.jets[kind] = list(dict.fromkeys(vc.jets[kind] + variables))
         return vc
 
