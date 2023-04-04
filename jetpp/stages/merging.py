@@ -63,18 +63,24 @@ class Merging:
         if sample:
             fname = path_append(fname, sample)
         self.writer = H5Writer(
-            components[0].reader.vds_path,
+            components[0].reader.files[0],
             fname,
             self.variables.combined(),
             components.num_jets,
             add_flavour_label=self.jets_name,
         )
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
-        unique_jets = np.sum(
-            [r.get_attr("unique_jets") for r in c.reader.readers for c in components]
-        )
-        self.writer.add_attr("unique_jets", unique_jets)
+        self.writer.add_attr("unique_jets", components.unique_jets)
+        for c in components:
+            self.writer.add_attr(f"num_{c}", c.num_jets)
+            self.writer.add_attr(f"num_unique_{c}", c.unique_jets)
+        dsids = str(list(set(sum([c.sample.dsid for c in components], []))))
+        self.writer.add_attr("dsids", dsids)
+        sample_ids = str(list(set(sum([c.sample.sample_id for c in components], []))))
+        self.writer.add_attr("sample_id", sample_ids)
         self.writer.add_attr("config", str(self.ppc.config))
+        self.writer.add_attr("pp_hash", self.ppc.git_hash)
+        self.writer.add_attr("sampling", self.ppc.sampl_cfg.method)
         log.debug(f"Setup merge output at {self.writer.dst}")
 
         # write

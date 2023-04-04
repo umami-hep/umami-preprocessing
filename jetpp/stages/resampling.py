@@ -47,7 +47,7 @@ class Resampling:
             raise ValueError(f"Unsupported resampling method {self.config.method}")
         self.rng = np.random.default_rng(42)
 
-    def countup_select_func(self, jets, component):
+    def countup_select_func(self, jets, component):  # noqa: ARG002
         num_jets = int(len(jets) * self.config.sampling_fraction)
         target_pdf = self.target.hist.pdf
         target_hist = target_pdf * num_jets
@@ -66,8 +66,6 @@ class Resampling:
         if len(idx) < num_jets:
             idx = np.concatenate([idx, self.rng.choice(idx, num_jets - len(idx))])
         self.rng.shuffle(idx)
-        # log.info(f"final output is {len(idx):,}/{num_jets:,} jets, or {len(idx)/num_jets:.3%}")
-        self.track_upsampling_stats(idx, component)
         return idx
 
     def pdf_select_func(self, jets, component):
@@ -81,18 +79,12 @@ class Resampling:
         num_samples = int(len(jets) * self.config.sampling_fraction)
         probs = safe_divide(self.target.hist.pdf, component.hist.pdf)[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
-        self.track_upsampling_stats(idx, component)
-
         return idx
 
     def track_upsampling_stats(self, idx, component):
-        ups_counts = np.unique(idx, return_counts=True)[1]
-        mean_ups = ups_counts.mean()
+        unique, ups_counts = np.unique(idx, return_counts=True)
+        component._unique_jets += len(unique)
         max_ups = ups_counts.max()
-        num_written = component.writer.num_written
-        component._ups_ratio = (mean_ups * len(idx) + component._ups_ratio * num_written) / (
-            len(idx) + num_written
-        )
         component._ups_max = max_ups if max_ups > component._ups_max else component._ups_max
 
     def sample(self, components, stream, progress):
@@ -115,16 +107,22 @@ class Resampling:
                 # check for completion
                 if c.writer.num_written + len(idx) >= c.num_jets:
                     keep = c.num_jets - c.writer.num_written
+                    idx = idx[:keep]
                     for name, array in batch_out.items():
                         batch_out[name] = array[:keep]
                     c._complete = True
+
+                # track upsampling stats
+                self.track_upsampling_stats(idx, c)
 
                 # write
                 c.writer.write(batch_out)
                 progress.update(c.pbar, advance=len(idx))
                 if c._complete:
+                    c._ups_ratio = c.writer.num_written / c._unique_jets
                     c.writer.add_attr("upsampling_ratio", c._ups_ratio)
-                    c.writer.add_attr("unique_jets", int(c.num_jets / c._ups_ratio))
+                    c.writer.add_attr("unique_jets", c._unique_jets)
+                    c.writer.add_attr("dsid", str(c.sample.dsid))
                     c.writer.close()
 
             # check for completion
@@ -152,7 +150,8 @@ class Resampling:
             with ProgressBar() as progress:
                 for c in cs:
                     c._complete = False
-                    c._ups_max = c._ups_ratio = 1.0
+                    c._ups_max = 1.0
+                    c._unique_jets = 0
 
                 for c in cs:
                     c.pbar = progress.add_task(
@@ -165,7 +164,7 @@ class Resampling:
         # print upsampling factors
         for c in components:
             log.info(
-                f"{c} usampling ratio is {np.mean(c._ups_ratio):.3f} for an estimated"
+                f"{c} usampling ratio is {np.mean(c._ups_ratio):.3f}, with"
                 f" {c.num_jets/np.mean(c._ups_ratio):,.0f}/{c.num_jets:,} unique jets."
                 f" Jets are upsampled at most {np.max(c._ups_max):.0f} times"
             )

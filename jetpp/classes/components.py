@@ -30,7 +30,7 @@ class Component:
 
     def setup_writer(self, variables):
         self.writer = H5Writer(
-            self.reader.vds_path, self.out_path, variables.combined(), self.num_jets
+            self.reader.files[0], self.out_path, variables.combined(), self.num_jets
         )
         log.debug(f"Setup component writer at: {self.out_path}")
 
@@ -75,6 +75,10 @@ class Component:
     def __str__(self):
         return self.name
 
+    @property
+    def unique_jets(self) -> int:
+        return sum([r.get_attr("unique_jets") for r in self.reader.readers])
+
 
 class Components:
     def __init__(self, components: list[Component]):
@@ -89,7 +93,7 @@ class Components:
             pattern = c["sample"]["pattern"]
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
-            sample = Sample(ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"], pattern=pattern)
+            sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
             for name in c["flavours"]:
                 num_jets = c["num_jets"]
                 if pp_cfg.split == "val":
@@ -128,6 +132,10 @@ class Components:
     @property
     def num_jets(self):
         return sum(c.num_jets for c in self)
+
+    @property
+    def unique_jets(self):
+        return sum(c.unique_jets for c in self)
 
     @property
     def out_dir(self):

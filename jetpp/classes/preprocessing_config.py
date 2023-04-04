@@ -59,8 +59,9 @@ class PreprocessingConfig:
         self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test)
 
         # copy config
-        self.git_hash = check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
-        self.config["git_hash"] = self.git_hash
+        git_hash = check_output(["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent)
+        self.git_hash = git_hash.decode("ascii").strip()
+        self.config["pp_git_hash"] = self.git_hash
         self.copy_config()
 
     @classmethod
