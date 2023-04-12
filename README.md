@@ -3,31 +3,20 @@
 This is a modular preprocessing pipeline for jet tagging.
 It addresses [several issues](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/?label_name%5B%5D=Preprocessing) with the current umami preprocessing workflow, and uses the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/) package extensively.
 
+This package is work in progress and still needs
 
-### Main changes from umami
+- [ ] documentation
+- [ ] integration and unit tests
+- [ ] integration with umami
 
-- modular, class-based design
-- h5 virtual datasets to wrap the source files
-- 2 main stages: resample -> merge -> done!
-- parallelised processing of flavours within a sample
-- support for different resampling "regions", which is usefull for [Xbb preprocessing](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225)
-- ndim sampling support, which is also useful for Xbb
-- "new" improved training file format (which is actually just the tdd output format)
-    - structured arrays are smaller on disk and therefore faster to read
-    - only one dataloader is needed and can be reused for training and testing
-    - other plotting scripts can support a single file format
-    - normalisation/concatenation is applied on the fly during training
-    - training files can contain supersets of variables used for training
-- new "countup" samping which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
-- the code estimates the number of unique jets for you and saves this number as an attribute in the output file
 
 
 ### Setup
 
 ```bash
-conda create -n upp python=3.11
-conda activate upp
-python -m pip install -e .
+mamba create -n upp python=3.11
+mamba activate upp
+python -m pip install -e .[dev]
 ```
 
 ### Run
@@ -59,6 +48,26 @@ See `preprocess --help` for the full list of flags.
 
 ### Comparisons with umami
 
+#### Main changes
+
+- modular, class-based design
+- h5 virtual datasets to wrap the source files
+- 2 main stages: resample -> merge -> done!
+- parallelised processing of flavours within a sample
+- support for different resampling "regions", which is usefull for [Xbb preprocessing](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225)
+- ndim sampling support, which is also useful for Xbb
+- "new" improved training file format (which is actually just the tdd output format)
+    - structured arrays are smaller on disk and therefore faster to read
+    - only one dataloader is needed and can be reused for training and testing
+    - other plotting scripts can support a single file format
+    - normalisation/concatenation is applied on the fly during training
+    - training files can contain supersets of variables used for training
+- new "countup" samping which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
+- the code estimates the number of unique jets for you and saves this number as an attribute in the output file
+
+
+#### Performance and LOC
+
 Compared with a comparable preprocessing config from umami:
 
 1. train file size decreased by 30%
@@ -68,7 +77,3 @@ Compared with a comparable preprocessing config from umami:
 5. 10x faster than default umami preprocessing (0.06 vs 0.825 hours/million jets)
 
 
-### Todo:
-
-- [ ] documentation
-- [ ] integration and unit tests
