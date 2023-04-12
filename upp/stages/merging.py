@@ -4,8 +4,8 @@ from copy import copy
 import numpy as np
 from ftag.hdf5 import H5Writer, join_structured_arrays
 
-from jetpp.logger import ProgressBar
-from jetpp.utils import path_append
+from upp.logger import ProgressBar
+from upp.utils import path_append
 
 
 class Merging:

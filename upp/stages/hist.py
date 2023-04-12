@@ -9,7 +9,7 @@ import numpy as np
 from numpy.lib.recfunctions import structured_to_unstructured as s2u
 from scipy.stats import binned_statistic_dd
 
-from jetpp.logger import setup_logger
+from upp.logger import setup_logger
 
 
 def bin_jets(array, bins) -> np.array:

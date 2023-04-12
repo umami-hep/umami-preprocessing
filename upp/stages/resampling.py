@@ -7,8 +7,8 @@ import yaml
 from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
-from jetpp.logger import ProgressBar
-from jetpp.stages.hist import bin_jets
+from upp.logger import ProgressBar
+from upp.stages.hist import bin_jets
 
 random.seed(42)
 

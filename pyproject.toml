@@ -1,5 +1,5 @@
 [project]
-name = "jetpp"
+name = "upp"
 version = "0.1"
 description = "Preprocessing for jet tagging"
 license = {text = "MIT"}
@@ -15,10 +15,10 @@ dependencies = [
 ]
 
 [project.scripts]
-preprocess = "jetpp.main:main"
+preprocess = "upp.main:main"
 
 [tool.setuptools]
-packages = ["jetpp"]
+packages = ["upp"]
 
 [build-system]
 requires = ["setuptools>=62"]

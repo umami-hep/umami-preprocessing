@@ -13,10 +13,10 @@ import yaml
 from ftag import Cuts
 from yamlinclude import YamlIncludeConstructor
 
-from jetpp.classes.components import Components
-from jetpp.classes.resampling_config import ResamplingConfig
-from jetpp.classes.variable_config import VariableConfig
-from jetpp.utils import path_append
+from upp.classes.components import Components
+from upp.classes.resampling_config import ResamplingConfig
+from upp.classes.variable_config import VariableConfig
+from upp.utils import path_append
 
 # support inclusion of yaml files in the config dir
 YamlIncludeConstructor.add_to_loader_class(

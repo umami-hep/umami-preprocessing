@@ -2,12 +2,12 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
-from jetpp.classes.preprocessing_config import PreprocessingConfig
-from jetpp.logger import setup_logger
-from jetpp.stages import hist, plot
-from jetpp.stages.merging import Merging
-from jetpp.stages.normalisation import Normalisation
-from jetpp.stages.resampling import Resampling
+from upp.classes.preprocessing_config import PreprocessingConfig
+from upp.logger import setup_logger
+from upp.stages import hist, plot
+from upp.stages.merging import Merging
+from upp.stages.normalisation import Normalisation
+from upp.stages.resampling import Resampling
 
 
 class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):

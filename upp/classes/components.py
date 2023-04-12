@@ -5,8 +5,8 @@ from pathlib import Path
 from ftag import Cuts, Flavour, Flavours, Sample
 from ftag.hdf5 import H5Reader, H5Writer
 
-from jetpp.classes.region import Region
-from jetpp.stages.hist import Hist
+from upp.classes.region import Region
+from upp.stages.hist import Hist
 
 
 @dataclass

@@ -4,7 +4,7 @@ import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
 
-from jetpp.logger import ProgressBar
+from upp.logger import ProgressBar
 
 
 class Normalisation:

@@ -6,7 +6,7 @@ import pandas as pd
 from ftag import Flavours
 from puma import Histogram, HistogramPlot
 
-from jetpp.utils import path_append
+from upp.utils import path_append
 
 
 def load_jets(paths, variable):
