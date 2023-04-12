@@ -16,5 +16,6 @@ jobs:
       with:
         python-version: 3.x
     - uses: pre-commit/action@v3.0.0
-    - uses: pre-commit-ci/lite-action@v1.0.1
-      if: always()
+    # autofix
+    #- uses: pre-commit-ci/lite-action@v1.0.1
+    #  if: always()
