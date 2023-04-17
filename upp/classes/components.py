@@ -143,6 +143,18 @@ class Components:
         assert len(out_dir) == 1
         return list(out_dir)[0]
 
+    @property
+    def jet_counts(self):
+        num_dict = {
+            c.name: {"num_jets": int(c.num_jets), "unique_jets": int(c.unique_jets)} for c in self
+        }
+        num_dict["total"] = {"num_jets": int(self.num_jets), "unique_jets": int(self.unique_jets)}
+        return num_dict
+
+    @property
+    def dsids(self):
+        return list(set(sum([c.sample.dsid for c in self], [])))
+
     def groupby_region(self):
         return [(r, Components([c for c in self if c.region == r])) for r in self.regions]
 

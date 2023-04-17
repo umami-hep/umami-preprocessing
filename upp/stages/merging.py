@@ -1,3 +1,4 @@
+import json
 import logging as log
 from copy import copy
 
@@ -71,16 +72,10 @@ class Merging:
         )
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
         self.writer.add_attr("unique_jets", components.unique_jets)
-        for c in components:
-            self.writer.add_attr(f"num_{c}", c.num_jets)
-            self.writer.add_attr(f"num_unique_{c}", c.unique_jets)
-        dsids = str(list(set(sum([c.sample.dsid for c in components], []))))
-        self.writer.add_attr("dsids", dsids)
-        sample_ids = str(list(set(sum([c.sample.sample_id for c in components], []))))
-        self.writer.add_attr("sample_id", sample_ids)
-        self.writer.add_attr("config", str(self.ppc.config))
-        self.writer.add_attr("pp_hash", self.ppc.git_hash)
-        self.writer.add_attr("sampling", self.ppc.sampl_cfg.method)
+        self.writer.add_attr("jet_counts", json.dumps(components.jet_counts))
+        self.writer.add_attr("dsids", str(components.dsids))
+        self.writer.add_attr("config", json.dumps(self.ppc.config))
+        self.writer.add_attr("upp_hash", self.ppc.git_hash)
         log.debug(f"Setup merge output at {self.writer.dst}")
 
         # write
