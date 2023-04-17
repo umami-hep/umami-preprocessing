@@ -30,7 +30,7 @@ preprocess = "upp.main:main"
 packages = ["upp"]
 
 [tool.setuptools.dynamic]
-version = {attr = "ftag.__version__"}
+version = {attr = "upp.__version__"}
 
 [build-system]
 requires = ["setuptools>=62"]
