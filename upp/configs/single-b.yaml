@@ -65,9 +65,10 @@ resampling:
     absEta_btagJes:
       bins: [[0, 2.5, 20]]
 
+# note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   jets_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 5_000_000
   base_dir: /unix/atlastracking/svanstroud/seminar/samples/
-  out_fname: pp_output_v2.h5
+

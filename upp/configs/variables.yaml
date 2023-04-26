@@ -1,7 +1,7 @@
 jets:
   inputs:
     - pt_btagJes
-    - absEta_btagJes
+    - eta_btagJes
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclTruthLabelPt
@@ -13,7 +13,7 @@ jets:
     - n_tracks_loose
     - n_truth_promptLepton
 
-tracks_loose:
+tracks:
   inputs:
     - d0
     - z0SinTheta
