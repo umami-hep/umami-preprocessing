@@ -34,8 +34,6 @@ tracks:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    - numberOfPixelHoles
-    - numberOfSCTHoles
     - leptonID
   labels:
     - truthOriginLabel
