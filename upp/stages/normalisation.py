@@ -33,8 +33,8 @@ class Normalisation:
             for var in self.variables[name]["inputs"]:
                 if var in ["valid"]:
                     continue
-                mean = float(np.mean(array[var]))
-                std = float(np.std(array[var]))
+                mean = float(np.nanmean(array[var]))
+                std = float(np.nanstd(array[var]))
                 norm_dict[name][var] = {"mean": mean, "std": std}
         return norm_dict, len(batch[self.variables.jets_name])
 
