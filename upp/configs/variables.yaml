@@ -6,8 +6,7 @@ jets:
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclTruthLabelPt
-    #- HadronConeExclTruthLabelLxy
-    - eta_btagJes
+    - HadronConeExclTruthLabelLxy
     - pt
     - eta
     - mass

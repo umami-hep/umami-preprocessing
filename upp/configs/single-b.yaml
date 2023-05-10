@@ -93,6 +93,7 @@ resampling:
     eta_btagJes:
       bins: [[-2.5, 2.5, 40]]
 
+# note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   jets_name: jets
   batch_size: 1_000_000

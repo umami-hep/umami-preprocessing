@@ -63,9 +63,7 @@ flow:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    - numberOfPixelHoles
-    - numberOfSCTHoles
-    # - subjetIndex
+    - subjetIndex
   labels:
     - truthOriginLabel
     # - truthTypeLabel

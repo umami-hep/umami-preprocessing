@@ -67,10 +67,7 @@ class PreprocessingConfig:
     @classmethod
     def from_file(cls, config_path: Path, split: Split):
         if not config_path.exists():
-            raise FileNotFoundError(
-                f"The file {config_path} does not exist."
-            )
-        
+            raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
         with open(config_path) as file:
             config = yaml.safe_load(file)
             return cls(config_path, split, config, **config["global"])

@@ -71,6 +71,7 @@ resampling:
     mass:
       bins: [[50_000, 300_000, 50]]
 
+# note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   batch_size: 4_000_000
   num_jets_estimate: 10_000_000
