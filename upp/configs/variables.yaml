@@ -1,16 +1,15 @@
 jets:
   inputs:
     - pt_btagJes
-    - eta_btagJes
+    - absEta_btagJes
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclTruthLabelPt
-    #- HadronConeExclTruthLabelLxy
-    - eta_btagJes
+    - HadronConeExclTruthLabelLxy
     - pt
     - eta
     - mass
-    - n_tracks_loose
+    - n_tracks
     - n_truth_promptLepton
 
 tracks:
