@@ -30,8 +30,6 @@ tracks:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    - numberOfPixelHoles
-    - numberOfSCTHoles
     - subjetIndex
   labels:
     - truthOriginLabel
