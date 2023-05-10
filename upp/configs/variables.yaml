@@ -1,7 +1,8 @@
 jets:
   inputs:
     - pt_btagJes
-    - absEta_btagJes
+    - eta_btagJes
+    - actualInteractionsPerCrossing
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclTruthLabelPt
@@ -10,10 +11,10 @@ jets:
     - pt
     - eta
     - mass
-    - n_tracks_loose
+    - n_tracks
     - n_truth_promptLepton
 
-tracks_loose:
+tracks:
   inputs:
     - d0
     - z0SinTheta
@@ -34,9 +35,8 @@ tracks_loose:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    - numberOfPixelHoles
-    - numberOfSCTHoles
     - leptonID
+    - pixeldEdx
   labels:
     - truthOriginLabel
     - truthVertexIndex

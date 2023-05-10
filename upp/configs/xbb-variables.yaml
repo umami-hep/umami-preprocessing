@@ -4,13 +4,46 @@ jets:
     - eta
     - abs_eta
     - mass
+    - Tau1
+    - Tau2
+    - Tau3
+    - Tau4
+    - ECF1
+    - ECF2
+    - ECF3
+    - Angularity
+    - KtDR
+    - PlanarFlow
+    - ThrustMin
+    - ThrustMaj
+    - FoxWolfram0
+    - FoxWolfram1
+    - FoxWolfram2
+    - Sphericity
+    - Aplanarity
+    - GN2Xv00_phbb
+    - GN2Xv00_phcc
+    - GN2Xv00_ptop
+    - GN2Xv00_pqcd
+    - GN2XWithMassv00_phbb
+    - GN2XWithMassv00_phcc
+    - GN2XWithMassv00_ptop
+    - GN2XWithMassv00_pqcd
+    - Xbb2020v3_Higgs
+    - Xbb2020v3_Top
+    - Xbb2020v3_QCD
   labels:
     - R10TruthLabel_R22v1
     - R10TruthLabel_R22v1_TruthJetMass
     - R10TruthLabel_R22v1_TruthJetPt
 
-tracks:
+flow:
   inputs:
+    - flow_pt
+    - flow_energy
+    - flow_deta
+    - flow_dphi
+    - flow_dr
     - d0
     - z0SinTheta
     - dphi
@@ -32,10 +65,10 @@ tracks:
     - numberOfSCTSharedHits
     - numberOfPixelHoles
     - numberOfSCTHoles
-    - subjetIndex
+    # - subjetIndex
   labels:
     - truthOriginLabel
-    - truthTypeLabel
+    # - truthTypeLabel
     - truthVertexIndex
 
 subjets:

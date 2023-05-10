@@ -2,24 +2,38 @@ variables: !include variables.yaml
 
 ttbar: &ttbar
   name: ttbar
-  pattern: "*.410470.e6337_s3681_r13144_p5169.tdd.*.h5/*.h5"
+  pattern: #user.*.410470.*/*.h5
+    - user.*.410470.*/*.h5
+    - user.*.601230.*/*.h5
+    - user.*.601229.*/*.h5
 zprime: &zprime
   name: zprime
-  pattern: "*.800030.e7954_s3681_r13144_p5169.tdd.*.h5/*.h5"
+  pattern: #user.*.800030.*/*.h5
+    - user.pgadow.800030*13144*/*.h5
+    - user.nekumari.800030*r13144*/*.h5
+    - user.*.800030*r13829*/*.h5
+graviton: &graviton
+  name: graviton
+  pattern: user.*.504648.*/*.h5
 
 global_cuts:
   train:
-    - [eventNumber, "%10<=", 7]
+    - [eventNumber, "%20<=", 17]
   val:
-    - [eventNumber, "%10==", 8]
+    - [eventNumber, "%20==", 18]
   test:
-    - [eventNumber, "%10==", 9]
+    - [eventNumber, "%20==", 19]
 
 lowpt: &lowpt
   name: lowpt
   cuts:
     - [pt_btagJes, ">", 20_000]
     - [pt_btagJes, "<", 250_000]
+midpt: &midpt
+  name: midpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 2_000_000]
 highpt: &highpt
   name: highpt
   cuts:
@@ -32,42 +46,56 @@ components:
     sample:
       <<: *ttbar
     flavours: [cjets]
-    num_jets: 40_000_000
+    num_jets: 80_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [bjets, ujets]
-    num_jets: 70_000_000
+    num_jets: 150_000_000
+  
+  - region:
+      <<: *midpt
+    sample:
+      <<: *graviton
+    flavours: [bjets, cjets]
+    num_jets: 3_500_000
+
+  - region:
+      <<: *midpt
+    sample:
+      <<: *graviton
+    flavours: [ujets]
+    num_jets: 10_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets, cjets]
-    num_jets: 9_000_000
+    num_jets: 33_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ujets]
-    num_jets: 15_000_000
+    num_jets: 40_000_000
 
 resampling:
-  target: cjets
+  target: bjets
   method: countup
-  sampling_fraction: 1.0
+  sampling_fraction: 1.5
   variables:
     pt_btagJes:
       bins: [[20_000, 400_000, 50], [400_000, 6_000_000, 50]]
-    absEta_btagJes:
-      bins: [[0, 2.5, 20]]
+    eta_btagJes:
+      bins: [[-2.5, 2.5, 40]]
 
 global:
   jets_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 5_000_000
-  base_dir: /unix/atlastracking/svanstroud/seminar/samples/
-  out_fname: pp_output_v2.h5
+  num_jets_estimate: 3_500_000
+  ntuple_dir: /share/lustre/jbarr/samples_big/ntuples/
+  base_dir: /share/lustre/jbarr/samples_test/
