@@ -11,6 +11,7 @@ from upp.stages.hist import Hist
 
 @dataclass
 class Component:
+    # (DONE) probably need equal_jets_from_samples here too
     region: Region
     sample: Sample
     flavour: Flavour
@@ -18,14 +19,16 @@ class Component:
     dirname: Path
     num_jets: int
     num_jets_estimate: int
+    equal_jets_from_samples: bool
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
     def setup_reader(self, batch_size, fname=None):
+        # (Done) equal_jets_from_samples here?
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size)
+        self.reader = H5Reader(fname, batch_size, equal_jets_from_samples=self.equal_jets_from_samples)
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
@@ -55,6 +58,7 @@ class Component:
 
     def check_num_jets(self, num_jets, sampling_frac=None, cuts=None, silent=False):
         """Check if num_jets jets are aviailable after the cuts and sampling fraction."""
+        # (DONE) (NO NEED) THIS reader must get the equal_jets_from_samples flag to know how many jets to estimate
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:
@@ -86,6 +90,7 @@ class Components:
 
     @classmethod
     def from_config(cls, pp_cfg):
+        # (DONE) Here need to read from config file for equal_jets_from_samples
         components = []
         for c in pp_cfg.config["components"]:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
@@ -100,6 +105,7 @@ class Components:
                     num_jets = num_jets // 10
                 elif pp_cfg.split == "test":
                     num_jets = c.get("num_jets_test", num_jets // 10)
+                equal_jets_from_samples = pp_cfg[name].get("equal_jets_from_samples", True)
                 components.append(
                     Component(
                         region,
@@ -109,6 +115,7 @@ class Components:
                         pp_cfg.components_dir,
                         num_jets,
                         pp_cfg.num_jets_estimate,
+                        equal_jets_from_samples,
                     )
                 )
         return cls(components)

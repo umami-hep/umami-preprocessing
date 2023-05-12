@@ -143,7 +143,8 @@ class Resampling:
         for sample, cs in components.groupby_sample():
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
-            reader = H5Reader(sample.path, self.batch_size)
+            # (DONE) THIS reader must have the equal_jets_from_samples flag to know whether to stop when 1 stream is exhausted
+            reader = H5Reader(sample.path, self.batch_size, equal_jets_from_samples=self.config[sample]["equal_jets_from_samples"])
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
             # run with progress
