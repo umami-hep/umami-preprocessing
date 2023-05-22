@@ -28,7 +28,9 @@ class Component:
         # (Done) equal_jets_from_samples here?
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size, equal_jets_from_samples=self.equal_jets_from_samples)
+        self.reader = H5Reader(
+            fname, batch_size, equal_jets_from_samples=self.equal_jets_from_samples
+        )
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
@@ -96,6 +98,7 @@ class Components:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             pattern = c["sample"]["pattern"]
+            equal_jets_from_samples = c["sample"]["equal_jets_from_samples"]
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
             sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
@@ -105,7 +108,6 @@ class Components:
                     num_jets = num_jets // 10
                 elif pp_cfg.split == "test":
                     num_jets = c.get("num_jets_test", num_jets // 10)
-                equal_jets_from_samples = pp_cfg[name].get("equal_jets_from_samples", True)
                 components.append(
                     Component(
                         region,
