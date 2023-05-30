@@ -11,7 +11,7 @@ from upp.stages.hist import Hist
 
 @dataclass
 class Component:
-    # (DONE) probably need equal_jets_from_samples here too
+    # (DONE) probably need equal_jets here too
     region: Region
     sample: Sample
     flavour: Flavour
@@ -19,17 +19,17 @@ class Component:
     dirname: Path
     num_jets: int
     num_jets_estimate: int
-    equal_jets_from_samples: bool
+    equal_jets: bool
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
     def setup_reader(self, batch_size, fname=None):
-        # (Done) equal_jets_from_samples here?
+        # (Done) equal_jets here?
         if fname is None:
             fname = self.sample.path
         self.reader = H5Reader(
-            fname, batch_size, equal_jets_from_samples=self.equal_jets_from_samples
+            fname, batch_size, equal_jets=self.equal_jets
         )
         log.debug(f"Setup component reader at: {fname}")
 
@@ -60,7 +60,7 @@ class Component:
 
     def check_num_jets(self, num_jets, sampling_frac=None, cuts=None, silent=False):
         """Check if num_jets jets are aviailable after the cuts and sampling fraction."""
-        # (DONE) (NO NEED) THIS reader must get the equal_jets_from_samples flag to know how many jets to estimate
+        # (DONE) (NO NEED) THIS reader must get the equal_jets flag to know how many jets to estimate
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:
@@ -92,13 +92,13 @@ class Components:
 
     @classmethod
     def from_config(cls, pp_cfg):
-        # (DONE) Here need to read from config file for equal_jets_from_samples
+        # (DONE) Here need to read from config file for equal_jets
         components = []
         for c in pp_cfg.config["components"]:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             pattern = c["sample"]["pattern"]
-            equal_jets_from_samples = c["sample"]["equal_jets_from_samples"]
+            equal_jets = c["sample"]["equal_jets"]
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
             sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
@@ -117,7 +117,7 @@ class Components:
                         pp_cfg.components_dir,
                         num_jets,
                         pp_cfg.num_jets_estimate,
-                        equal_jets_from_samples,
+                        equal_jets,
                     )
                 )
         return cls(components)

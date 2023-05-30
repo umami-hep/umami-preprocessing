@@ -141,21 +141,21 @@ class Resampling:
 
         # groupby samples
         for sample, cs in components.groupby_sample():
-            # make sure all tags equal_jets_from_samples are the same
-            equal_jets_flags = [c.equal_jets_from_samples for c in cs]
+            # make sure all tags equal_jets are the same
+            equal_jets_flags = [c.equal_jets for c in cs]
             if not all(flag == equal_jets_flags[0] for flag in equal_jets_flags):
                 raise ValueError(
-                    "equal_jets_from_samples must be the same for all components in a sample"
+                    "equal_jets must be the same for all components in a sample"
                 )
             equal_jets_flag = equal_jets_flags[0]
 
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
-            # (DONE) THIS reader must have the equal_jets_from_samples flag to know whether to stop when 1 stream is exhausted
+            # (DONE) THIS reader must have the equal_jets flag to know whether to stop when 1 stream is exhausted
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
-                equal_jets_from_samples=equal_jets_flag,
+                equal_jets=equal_jets_flag,
             )
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
