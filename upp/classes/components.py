@@ -28,9 +28,7 @@ class Component:
         # (Done) equal_jets here?
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(
-            fname, batch_size, equal_jets=self.equal_jets
-        )
+        self.reader = H5Reader(fname, batch_size, equal_jets=self.equal_jets)
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
