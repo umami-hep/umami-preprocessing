@@ -149,12 +149,7 @@ class Resampling:
 
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
-            # (DONE) THIS reader must have the equal_jets flag to know whether to stop when 1 stream is exhausted
-            reader = H5Reader(
-                sample.path,
-                self.batch_size,
-                equal_jets=equal_jets_flag,
-            )
+            reader = H5Reader(sample.path, self.batch_size, equal_jets=equal_jets_flag)
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
             # run with progress
