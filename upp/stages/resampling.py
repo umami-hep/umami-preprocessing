@@ -143,7 +143,7 @@ class Resampling:
         for sample, cs in components.groupby_sample():
             # make sure all tags equal_jets are the same
             equal_jets_flags = [c.equal_jets for c in cs]
-            if not all(flag == equal_jets_flags[0] for flag in equal_jets_flags):
+            if len(set(equal_jets_flags)) != 1:
                 raise ValueError("equal_jets must be the same for all components in a sample")
             equal_jets_flag = equal_jets_flags[0]
 
