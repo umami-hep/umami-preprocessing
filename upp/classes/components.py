@@ -18,7 +18,7 @@ class Component:
     dirname: Path
     num_jets: int
     num_jets_estimate: int
-    equal_jets: bool
+    equal_jets: bool = True
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
@@ -92,7 +92,7 @@ class Components:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             pattern = c["sample"]["pattern"]
-            equal_jets = c["sample"]["equal_jets"]
+            equal_jets = c["sample"].get("equal_jets", True)
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
             sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
