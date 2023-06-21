@@ -18,6 +18,7 @@ class Component:
     dirname: Path
     num_jets: int
     num_jets_estimate: int
+    equal_jets: bool = True
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
@@ -25,7 +26,7 @@ class Component:
     def setup_reader(self, batch_size, fname=None):
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size)
+        self.reader = H5Reader(fname, batch_size, equal_jets=self.equal_jets)
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
@@ -91,6 +92,7 @@ class Components:
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             pattern = c["sample"]["pattern"]
+            equal_jets = c["sample"].get("equal_jets", True)
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
             sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
@@ -109,6 +111,7 @@ class Components:
                         pp_cfg.components_dir,
                         num_jets,
                         pp_cfg.num_jets_estimate,
+                        equal_jets,
                     )
                 )
         return cls(components)
