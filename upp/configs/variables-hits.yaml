@@ -1,0 +1,55 @@
+jets:
+  inputs:
+    - pt_btagJes
+    - absEta_btagJes
+  labels:
+    - HadronConeExclTruthLabelID
+    - HadronConeExclTruthLabelPt
+    - HadronConeExclTruthLabelLxy
+    - pt
+    - eta
+    - mass
+    - n_tracks
+    - n_truth_promptLepton
+
+tracks:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - IP3D_signed_d0_significance
+    - IP3D_signed_z0_significance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    - leptonID
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthVertexIndex
+hits:
+  inputs:
+    - x_local
+    - y_local
+    - z_local
+    - j
+    - a
+    - b
+    - dphi
+    - deta
+    - abs_deta
+    - radius
+    - radius_local
+    - layer
+    - splitProbability1
+    - splitProbability2
