@@ -1,0 +1,4 @@
+variable_map:
+  tracks:
+    truthOriginLabel: ftagTruthOriginLabel
+    truthVertexIndex: ftagTruthVertexIndex

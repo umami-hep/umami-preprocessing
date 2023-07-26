@@ -23,16 +23,14 @@ class Component:
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
-    def setup_reader(self, batch_size, fname=None):
+    def setup_reader(self, batch_size, fname=None, **kwargs):
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size, equal_jets=self.equal_jets)
+        self.reader = H5Reader(fname, batch_size, equal_jets=self.equal_jets, **kwargs)
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
-        self.writer = H5Writer(
-            self.reader.files[0], self.out_path, variables.combined(), self.num_jets
-        )
+        self.writer = H5Writer(self.reader, self.out_path, variables.keys(), self.num_jets)
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property
