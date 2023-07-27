@@ -190,9 +190,7 @@ class Resampling:
         # setup i/o
         for c in self.components:
             # just used for the writer configuration
-            c.setup_reader(
-                self.batch_size, transform=self.transform
-            )
+            c.setup_reader(self.batch_size, transform=self.transform)
             c.setup_writer(self.variables)
 
         # check samples

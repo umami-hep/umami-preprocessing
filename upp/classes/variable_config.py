@@ -39,7 +39,7 @@ class VariableConfig:
 
     def items(self):
         return self.variables.items()
-    
+
     def keys(self):
         return self.variables.keys()
 
