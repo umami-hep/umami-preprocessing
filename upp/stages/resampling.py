@@ -228,7 +228,10 @@ class Resampling:
             "[bold green]Checking requested num_jets based on a sampling fraction of"
             f" {self.config.sampling_fraction}..."
         )
-        if self.config.sampling_fraction == "auto":
+        if (
+            self.config.sampling_fraction == "auto"
+            or self.config.sampling_fraction is None
+        ):
             self.set_auto_sampling_fraction()
         else:
             for c in self.components:
