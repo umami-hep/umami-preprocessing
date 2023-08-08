@@ -71,13 +71,19 @@ class Component:
             )
 
         if not silent:
-            log.info(f"Estimated {available:,} {self} jets available - {num_jets:,} requested")
+            log.info(
+                f"Estimated {available:,} {self} jets available -"
+                f" {num_jets:,} requested"
+            )
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
-        auto_sampling_frac = num_jets / (total * 1.01)  # 1.01 is a tolerance
+        auto_sampling_frac = 1.01 * num_jets / total  # 1.01 is a tolerance
         if not silent:
-            log.info(f"Estimated {total:,} {self} unique jets available - {num_jets:,} requested")
+            log.info(
+                f"Estimated {total:,} {self} unique jets available -"
+                f" {num_jets:,} requested"
+            )
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3e}")
         return auto_sampling_frac
 
@@ -97,13 +103,17 @@ class Components:
     def from_config(cls, pp_cfg):
         components = []
         for c in pp_cfg.config["components"]:
-            region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
+            region_cuts = (
+                Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
+            )
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             pattern = c["sample"]["pattern"]
             equal_jets = c["sample"].get("equal_jets", True)
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
-            sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
+            sample = Sample(
+                pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"]
+            )
             for name in c["flavours"]:
                 num_jets = c["num_jets"]
                 if pp_cfg.split == "val":
@@ -157,7 +167,8 @@ class Components:
     @property
     def jet_counts(self):
         num_dict = {
-            c.name: {"num_jets": int(c.num_jets), "unique_jets": int(c.unique_jets)} for c in self
+            c.name: {"num_jets": int(c.num_jets), "unique_jets": int(c.unique_jets)}
+            for c in self
         }
         num_dict["total"] = {
             "num_jets": int(self.num_jets),
@@ -170,10 +181,14 @@ class Components:
         return list(set(sum([c.sample.dsid for c in self], [])))
 
     def groupby_region(self):
-        return [(r, Components([c for c in self if c.region == r])) for r in self.regions]
+        return [
+            (r, Components([c for c in self if c.region == r])) for r in self.regions
+        ]
 
     def groupby_sample(self):
-        return [(s, Components([c for c in self if c.sample == s])) for s in self.samples]
+        return [
+            (s, Components([c for c in self if c.sample == s])) for s in self.samples
+        ]
 
     def __iter__(self):
         yield from self.components
