@@ -80,10 +80,6 @@ class Component:
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         auto_sampling_frac = 1.01 * num_jets / total  # 1.01 is a tolerance
         if not silent:
-            log.info(
-                f"Estimated {total:,} {self} unique jets available -"
-                f" {num_jets:,} requested"
-            )
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3e}")
         return auto_sampling_frac
 
