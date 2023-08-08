@@ -225,7 +225,6 @@ class Resampling:
             f" {self.config.sampling_fraction}..."
         )
         for c in self.components:
-            (1 if c.is_target(self.config.target) else self.config.sampling_fraction)
             c.check_num_jets(c.num_jets, sampling_frac=c.sampling_fraction, cuts=c.cuts)
 
         # run resampling
