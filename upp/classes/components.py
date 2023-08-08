@@ -64,14 +64,21 @@ class Component:
         # check with tolerance to avoid failure midway through preprocessing
         if available < num_jets * 1.01:
             raise ValueError(
-                f"{num_jets:,} jets requested, but only {total:,} are estimated to be in"
-                f" {self}. With a sampling fraction of {sampling_frac}, at most {available:,} of"
-                " these are available. You can either reduce the number of requested jets or"
-                " increase the sampling fraction."
+                f"{num_jets:,} jets requested, but only {total:,} are estimated to be"
+                f" in {self}. With a sampling fraction of {sampling_frac}, at most"
+                f" {available:,} of these are available. You can either reduce the"
+                " number of requested jets or increase the sampling fraction."
             )
 
         if not silent:
             log.info(f"Estimated {available:,} {self} jets available - {num_jets:,} requested")
+
+    def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
+        total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
+        auto_sampling_frac = 1.01 * num_jets / total  # 1.01 is a tolerance
+        if not silent:
+            log.debug(f"optimal sampling fraction {auto_sampling_frac:.3e}")
+        return auto_sampling_frac
 
     def __str__(self):
         return self.name
@@ -151,7 +158,10 @@ class Components:
         num_dict = {
             c.name: {"num_jets": int(c.num_jets), "unique_jets": int(c.unique_jets)} for c in self
         }
-        num_dict["total"] = {"num_jets": int(self.num_jets), "unique_jets": int(self.unique_jets)}
+        num_dict["total"] = {
+            "num_jets": int(self.num_jets),
+            "unique_jets": int(self.unique_jets),
+        }
         return num_dict
 
     @property

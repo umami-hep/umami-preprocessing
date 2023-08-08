@@ -18,3 +18,6 @@ build/
 bin/
 plots/
 run/
+
+**user**
+.vscode/launch.json

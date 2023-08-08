@@ -161,7 +161,8 @@ class Resampling:
 
                 for c in cs:
                     c.pbar = progress.add_task(
-                        f"[green]Sampling {c.num_jets:,} jets from {c}...", total=c.num_jets
+                        f"[green]Sampling {c.num_jets:,} jets from {c}...",
+                        total=c.num_jets,
                     )
 
                 # run sampling
@@ -175,6 +176,29 @@ class Resampling:
                 f" Jets are upsampled at most {np.max(c._ups_max):.0f} times"
             )
 
+    def set_auto_sampling_fraction(self):
+        optimal_frac_list = []
+        for c in self.components:
+            if not c.is_target(self.config.target):
+                optimal_frac_list.append(c.get_auto_sampling_frac(c.num_jets, cuts=c.cuts))
+        optimal_frac = np.max(optimal_frac_list)
+        optimal_frac = max(optimal_frac, 0.1)
+        log.info("[bold green]Auto sampling fraction chosen")
+        if optimal_frac > 1:
+            if self.config.method == "countup":
+                raise ValueError(
+                    f"Sampling fraction of {optimal_frac:.3f}>1 is needed for one"
+                    " or more components. This is not supported for countup"
+                    " method."
+                )
+            else:
+                log.warning(
+                    f"[bold yellow]sampling fraction of {optimal_frac:.3f}>1 is"
+                    " needed for one or more components."
+                )
+        log.info(f"[bold green]setting sampling fraction to {optimal_frac:.3f}...")
+        self.config.sampling_fraction = optimal_frac
+
     def run(self):
         title = " Running resampling "
         log.info(f"[bold green]{title:-^100}")
@@ -184,6 +208,10 @@ class Resampling:
         for c in self.components:
             c.setup_reader(self.batch_size)
             c.setup_writer(self.variables)
+
+        # set samplig fraction if needed
+        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
+            self.set_auto_sampling_fraction()
 
         # check samples
         log.info(
