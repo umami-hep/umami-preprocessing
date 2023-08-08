@@ -11,8 +11,8 @@ from typing import Literal
 
 import yaml
 from ftag import Cuts
-from yamlinclude import YamlIncludeConstructor
 from ftag.transform import Transform
+from yamlinclude import YamlIncludeConstructor
 
 from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
