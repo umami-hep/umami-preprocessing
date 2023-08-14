@@ -11,6 +11,7 @@ from typing import Literal
 
 import yaml
 from ftag import Cuts
+from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
 from upp.classes.components import Components
@@ -57,6 +58,9 @@ class PreprocessingConfig:
         self.sampl_cfg = ResamplingConfig(sampl_cfg.pop("variables"), **sampl_cfg)
         self.components = Components.from_config(self)
         self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test)
+        self.transform = (
+            Transform(**self.config["transform"]) if "transform" in self.config else None
+        )
 
         # copy config
         git_hash = check_output(["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent)

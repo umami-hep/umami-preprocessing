@@ -1,0 +1,13 @@
+# label renaming from https://gitlab.cern.ch/atlas/athena/-/merge_requests/62544
+variable_map:
+  tracks:
+    truthOriginLabel: ftagTruthOriginLabel
+    truthVertexIndex: ftagTruthVertexIndex
+
+# accounting for a bug introduced in https://gitlab.cern.ch/atlas/athena/-/merge_requests/62544
+# fixed in https://gitlab.cern.ch/atlas/athena/-/merge_requests/64151
+# you shouldn't use this unless you know you need to, otherwise you will mess up the labels
+ints_map:
+  ftagTruthOriginLabel:
+    0: 1
+    -2: 0

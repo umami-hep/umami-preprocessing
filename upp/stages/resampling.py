@@ -37,14 +37,19 @@ class Resampling:
         self.batch_size = config.batch_size
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
-        if self.config.method == "pdf":
-            self.select_func = self.pdf_select_func
-        elif self.config.method == "countup":
-            self.select_func = self.countup_select_func
-        elif not self.config.method or self.config.method == "none":
-            self.select_func = None
-        else:
-            raise ValueError(f"Unsupported resampling method {self.config.method}")
+        self.methods_map = {
+            "pdf": self.pdf_select_func,
+            "countup": self.countup_select_func,
+            "none": None,
+        }
+        if self.config.method not in self.methods_map:
+            raise ValueError(
+                f"Unsupported resampling method {self.config.method}, choose from"
+                f" {self.methods_map.keys()}"
+            )
+        self.select_func = self.methods_map[self.config.method]
+        self.transform = config.transform
+
         self.rng = np.random.default_rng(42)
 
     def countup_select_func(self, jets, component):  # noqa: ARG002
@@ -149,7 +154,9 @@ class Resampling:
 
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
-            reader = H5Reader(sample.path, self.batch_size, equal_jets=equal_jets_flag)
+            reader = H5Reader(
+                sample.path, self.batch_size, equal_jets=equal_jets_flag, transform=self.transform
+            )
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
             # run with progress
@@ -206,7 +213,8 @@ class Resampling:
 
         # setup i/o
         for c in self.components:
-            c.setup_reader(self.batch_size)
+            # just used for the writer configuration
+            c.setup_reader(self.batch_size, transform=self.transform)
             c.setup_writer(self.variables)
 
         # set samplig fraction if needed
