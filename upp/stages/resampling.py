@@ -186,12 +186,11 @@ class Resampling:
                     sam_frac = c.get_auto_sampling_frac(c.num_jets, cuts=c.cuts)
                     if sam_frac > 1:
                         if self.config.method == "countup":
-                            log.fatal(
+                            raise ValueError(
                                 f"[bold red]Sampling fraction of {sam_frac:.3f}>1 is"
                                 f" needed for component {c} This is not supported for"
                                 " countup method."
                             )
-                            raise ValueError()
                         else:
                             log.warning(
                                 f"[bold yellow]sampling fraction of {sam_frac:.3f}>1 is"
