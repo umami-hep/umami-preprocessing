@@ -108,7 +108,9 @@ def main(config=None):
             c.check_num_jets(config.num_jets_estimate, cuts=cuts_no_split, silent=True)
         except ValueError as e:
             log.warning(e)
-            log.warning("Ran out of jets when estimating PDFs, listed amount is total available jets")
+            log.warning(
+                "Ran out of jets when estimating PDFs, listed amount is total available jets"
+            )
         jets = c.get_jets(sampl_vars, config.num_jets_estimate, cuts_no_split)
         c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
 
