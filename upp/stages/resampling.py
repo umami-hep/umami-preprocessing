@@ -52,8 +52,8 @@ class Resampling:
 
         self.rng = np.random.default_rng(42)
 
-    def countup_select_func(self, jets, component):  # noqa: ARG002
-        num_jets = int(len(jets) * self.config.sampling_fraction)
+    def countup_select_func(self, jets, component):
+        num_jets = int(len(jets) * component.sampling_fraction)
         target_pdf = self.target.hist.pdf
         target_hist = target_pdf * num_jets
         target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
@@ -81,7 +81,7 @@ class Resampling:
             binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
 
         # importance sample with replacement
-        num_samples = int(len(jets) * self.config.sampling_fraction)
+        num_samples = int(len(jets) * component.sampling_fraction)
         probs = safe_divide(self.target.hist.pdf, component.hist.pdf)[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
@@ -183,28 +183,33 @@ class Resampling:
                 f" Jets are upsampled at most {np.max(c._ups_max):.0f} times"
             )
 
-    def set_auto_sampling_fraction(self):
-        optimal_frac_list = []
-        for c in self.components:
-            if not c.is_target(self.config.target):
-                optimal_frac_list.append(c.get_auto_sampling_frac(c.num_jets, cuts=c.cuts))
-        optimal_frac = np.max(optimal_frac_list)
-        optimal_frac = max(optimal_frac, 0.1)
-        log.info("[bold green]Auto sampling fraction chosen")
-        if optimal_frac > 1:
-            if self.config.method == "countup":
-                raise ValueError(
-                    f"Sampling fraction of {optimal_frac:.3f}>1 is needed for one"
-                    " or more components. This is not supported for countup"
-                    " method."
-                )
-            else:
-                log.warning(
-                    f"[bold yellow]sampling fraction of {optimal_frac:.3f}>1 is"
-                    " needed for one or more components."
-                )
-        log.info(f"[bold green]setting sampling fraction to {optimal_frac:.3f}...")
-        self.config.sampling_fraction = optimal_frac
+    def set_component_sampling_fractions(self):
+        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
+            log.info("[bold green]Sampling fraction chosen for each component automatically...")
+            for c in self.components:
+                if c.is_target(self.config.target):
+                    c.sampling_fraction = 1
+                else:
+                    sam_frac = c.get_auto_sampling_frac(c.num_jets, cuts=c.cuts)
+                    if sam_frac > 1:
+                        if self.config.method == "countup":
+                            raise ValueError(
+                                f"[bold red]Sampling fraction of {sam_frac:.3f}>1 is"
+                                f" needed for component {c} This is not supported for"
+                                " countup method."
+                            )
+                        else:
+                            log.warning(
+                                f"[bold yellow]sampling fraction of {sam_frac:.3f}>1 is"
+                                f" needed for component {c}"
+                            )
+                    c.sampling_fraction = max(sam_frac, 0.1)
+        else:
+            for c in self.components:
+                if c.is_target(self.config.target):
+                    c.sampling_fraction = 1
+                else:
+                    c.sampling_fraction = self.config.sampling_fraction
 
     def run(self):
         title = " Running resampling "
@@ -218,8 +223,8 @@ class Resampling:
             c.setup_writer(self.variables)
 
         # set samplig fraction if needed
-        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
-            self.set_auto_sampling_fraction()
+
+        self.set_component_sampling_fractions()
 
         # check samples
         log.info(
@@ -227,8 +232,7 @@ class Resampling:
             f" {self.config.sampling_fraction}..."
         )
         for c in self.components:
-            sampling_frac = 1 if c.is_target(self.config.target) else self.config.sampling_fraction
-            c.check_num_jets(c.num_jets, sampling_frac=sampling_frac, cuts=c.cuts)
+            c.check_num_jets(c.num_jets, sampling_frac=c.sampling_fraction, cuts=c.cuts)
 
         # run resampling
         for region, components in self.components.groupby_region():
