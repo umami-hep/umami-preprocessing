@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ftag import Cuts, Flavour, Flavours, Sample
 from ftag.hdf5 import H5Reader, H5Writer
-
+import numpy as np
 from upp.classes.region import Region
 from upp.stages.hist import Hist
 
@@ -120,7 +120,25 @@ class Components:
                         equal_jets,
                     )
                 )
-        return cls(components)
+        components = cls(components)
+        if pp_cfg.sampl_cfg.method is not None:
+            components.check_flavour_ratios()
+        return components
+
+    def check_flavour_ratios(self):
+        ratios ={}
+        flavours = self.flavours
+        for region, components in self.groupby_region():
+            this_ratios = {}
+            for f in flavours:
+                this_ratios[f.name] = components[f].num_jets / components.num_jets
+            ratios[region] = this_ratios
+
+        ref = list(ratios.values())[0]
+        ref_region = list(ratios.keys())[0]
+        for i, (region, ratio) in enumerate(ratios.items()):
+            if i != 0 and not np.allclose(list(ratio.values()), list(ref.values())):
+                raise ValueError(f"Found inconsistent flavour ratios: \n - {ref_region}: {ref} \n - {region}: {ratio}")
 
     @property
     def regions(self):
@@ -177,7 +195,10 @@ class Components:
         yield from self.components
 
     def __getitem__(self, index):
-        return self.components[index]
+        if isinstance(index, int):
+            return self.components[index]
+        if isinstance(index, str|Flavour):
+            return self.components[self.flavours.index(index)]
 
     def __len__(self):
         return len(self.components)
