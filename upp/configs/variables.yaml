@@ -1,7 +1,7 @@
 jets:
   inputs:
     - pt_btagJes
-    - absEta_btagJes
+    - eta_btagJes
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclTruthLabelPt
