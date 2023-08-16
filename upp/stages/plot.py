@@ -25,7 +25,7 @@ def make_hist(stage, flavours, variable, in_paths, bins_range=None, suffix=""):
         ylabel="Normalised Number of jets",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
         xlabel=variable,
-        bins=50,
+        bins=100,
         y_scale=1.5,
         logy=True,
         norm=True,
