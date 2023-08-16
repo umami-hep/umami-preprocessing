@@ -64,10 +64,9 @@ class Merging:
         if sample:
             fname = path_append(fname, sample)
         self.writer = H5Writer(
-            components[0].reader,
             fname,
-            self.variables.keys(),
-            components.num_jets,
+            components[0].reader.dtypes(self.variables.combined()),
+            components[0].reader.shapes(components.num_jets, self.variables.keys()),
             add_flavour_label=self.jets_name,
         )
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
