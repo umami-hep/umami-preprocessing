@@ -53,8 +53,9 @@ class Component:
         jn = self.reader.jets_name
         return self.reader.load({jn: variables}, num_jets, cuts)[jn]
 
-    def check_num_jets(self, num_jets, sampling_frac=None, cuts=None, silent=False,
-                       raise_error=True):
+    def check_num_jets(
+        self, num_jets, sampling_frac=None, cuts=None, silent=False, raise_error=True
+    ):
         """Check if num_jets jets are aviailable after the cuts and sampling fraction."""
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
@@ -63,7 +64,6 @@ class Component:
 
         # check with tolerance to avoid failure midway through preprocessing
         if available < num_jets * 1.01 and raise_error:
-
             raise ValueError(
                 f"{num_jets:,} jets requested, but only {total:,} are estimated to be"
                 f" in {self}. With a sampling fraction of {sampling_frac}, at most"
