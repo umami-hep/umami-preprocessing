@@ -59,10 +59,10 @@ components:
 resampling:
   target: cjets
   method: countup
-  sampling_fraction: 1.0
+  sampling_fraction: auto
   variables:
     pt_btagJes:
-      bins: [[20_000, 400_000, 50], [400_000, 6_000_000, 50]]
+      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
     absEta_btagJes:
       bins: [[0, 2.5, 20]]
 

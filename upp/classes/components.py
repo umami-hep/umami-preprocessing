@@ -31,7 +31,9 @@ class Component:
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
-        self.writer = H5Writer(self.reader, self.out_path, variables.keys(), self.num_jets)
+        dtypes = self.reader.dtypes(variables.combined())
+        shapes = self.reader.shapes(self.num_jets, variables.keys())
+        self.writer = H5Writer(self.out_path, dtypes, shapes)
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property
