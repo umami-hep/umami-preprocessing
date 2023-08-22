@@ -7,13 +7,16 @@ from pathlib import Path
 import h5py
 import numpy as np
 from numpy.lib.recfunctions import structured_to_unstructured as s2u
+from scipy import ndimage
 from scipy.stats import binned_statistic_dd
 
 from upp.logger import setup_logger
 
 
 def bin_jets(array, bins) -> np.array:
-    hist, _, bins = binned_statistic_dd(s2u(array), None, "count", bins, expand_binnumbers=True)
+    hist, _, bins = binned_statistic_dd(
+        s2u(array), None, "count", bins, expand_binnumbers=True
+    )
     bins -= 1
     return hist, bins
 
@@ -50,12 +53,11 @@ class Hist:
         with h5py.File(self.path) as f:
             return f["pdf"][:]
 
-
-"""
     @functools.cached_property
     def upscaled_pdf(self):
-        upscale = 1
+        upscl = 2
         # get bins
+        # upscl must be integer
         xs = []
         with h5py.File(self.path) as f:
             attrs = dict(f.attrs)
@@ -63,33 +65,15 @@ class Hist:
         for var in attrs["resampling_vars"]:
             var_bins = attrs[f"bins_{var}"]
             n_bins = len(var_bins) - 1
-            points = np.linspace(0, n_bins - 1 , n_bins * upscale)
+            points = np.linspace(
+                -0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl
+            )
             xs.append(points)
 
         # return the smoothed pdf
         xy = np.meshgrid(*xs, indexing="ij")
-        smoothed = ndimage.map_coordinates(self.pdf, xy, order=1)
+        smoothed = ndimage.map_coordinates(self.pdf, xy, order=3, mode="nearest")
         return smoothed / smoothed.sum()
-
-def smooth_weights(weights, path):
-    upscale = 1
-    print(upscale)
-    # get bins
-    xs = []
-    with h5py.File(path) as f:
-        attrs = dict(f.attrs)
-
-    for var in attrs["resampling_vars"]:
-        var_bins = attrs[f"bins_{var}"]
-        n_bins = len(var_bins) - 1
-        points = np.linspace(0, n_bins - 1 , n_bins * upscale)
-        xs.append(points)
-
-    # return the smoothed pdf
-    xy = np.meshgrid(*xs, indexing="ij")
-    smoothed = ndimage.map_coordinates(weights, xy, order=1)
-    return smoothed# / smoothed.sum()
-"""
 
 
 def main(config=None):
@@ -105,7 +89,10 @@ def main(config=None):
         c.setup_reader(config.batch_size)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(
-            config.num_jets_estimate, cuts=cuts_no_split, silent=False, raise_error=False
+            config.num_jets_estimate,
+            cuts=cuts_no_split,
+            silent=False,
+            raise_error=False,
         )
         jets = c.get_jets(sampl_vars, config.num_jets_estimate, cuts_no_split)
         c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)

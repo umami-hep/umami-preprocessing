@@ -29,6 +29,13 @@ def safe_divide(a, b):
     return np.divide(a, b, out=np.zeros_like(a), where=b != 0)
 
 
+def subdivide_bins(bins, n=2):
+    comb_list = [np.array((bins[0],))]
+    for i in range(len(bins) - 1):
+        comb_list.append(np.linspace(bins[i], bins[i + 1], n + 1)[1:])
+    return np.concatenate(comb_list)
+
+
 class Resampling:
     def __init__(self, config):
         self.config = config.sampl_cfg
@@ -40,6 +47,7 @@ class Resampling:
         self.methods_map = {
             "pdf": self.pdf_select_func,
             "countup": self.countup_select_func,
+            "pdf_upscaled": self.pdf_upscaled_select_func,
             "none": None,
         }
         if self.config.method not in self.methods_map:
@@ -56,16 +64,22 @@ class Resampling:
         num_jets = int(len(jets) * component.sampling_fraction)
         target_pdf = self.target.hist.pdf
         target_hist = target_pdf * num_jets
-        target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
+        target_hist = (
+            np.floor(target_hist + self.rng.random(target_pdf.shape))
+        ).astype(int)
         _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
         assert target_pdf.shape == _hist.shape
 
         # loop over bins and select relevant jets
         all_idx = []
         for bin_id in np.ndindex(*target_hist.shape):
-            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][: target_hist[bin_id]]
+            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][
+                : target_hist[bin_id]
+            ]
             if len(idx) and len(idx) < target_hist[bin_id]:
-                idx = np.concatenate([idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))])
+                idx = np.concatenate(
+                    [idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))]
+                )
             all_idx.append(idx)
         idx = np.concatenate(all_idx).astype(int)
         if len(idx) < num_jets:
@@ -86,11 +100,29 @@ class Resampling:
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
 
+    def pdf_upscaled_select_func(self, jets, component):
+        # bin jets
+        subd_bins = [subdivide_bins(bins, 2) for bins in self.config.flat_bins]
+        _hist, binnumbers = bin_jets(jets[self.config.vars], subd_bins)
+        assert self.target.hist.pdf.shape == _hist.upscaled_pdf.shape
+        if binnumbers.ndim > 1:
+            binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
+
+        # importance sample with replacement
+        num_samples = int(len(jets) * component.sampling_fraction)
+        probs = safe_divide(self.target.hist.upscaled_pdf, component.hist.upscaled_pdf)[
+            binnumbers
+        ]
+        idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
+        return idx
+
     def track_upsampling_stats(self, idx, component):
         unique, ups_counts = np.unique(idx, return_counts=True)
         component._unique_jets += len(unique)
         max_ups = ups_counts.max()
-        component._ups_max = max_ups if max_ups > component._ups_max else component._ups_max
+        component._ups_max = (
+            max_ups if max_ups > component._ups_max else component._ups_max
+        )
 
     def sample(self, components, stream, progress):
         # loop through input file
@@ -136,7 +168,9 @@ class Resampling:
 
         for c in components:
             if not c._complete:
-                raise ValueError(f"Ran out of {c} jets after writing {c.writer.num_written:,}")
+                raise ValueError(
+                    f"Ran out of {c} jets after writing {c.writer.num_written:,}"
+                )
 
     def run_on_region(self, components, region):
         # compute the target pdf
@@ -149,13 +183,18 @@ class Resampling:
             # make sure all tags equal_jets are the same
             equal_jets_flags = [c.equal_jets for c in cs]
             if len(set(equal_jets_flags)) != 1:
-                raise ValueError("equal_jets must be the same for all components in a sample")
+                raise ValueError(
+                    "equal_jets must be the same for all components in a sample"
+                )
             equal_jets_flag = equal_jets_flags[0]
 
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
             reader = H5Reader(
-                sample.path, self.batch_size, equal_jets=equal_jets_flag, transform=self.transform
+                sample.path,
+                self.batch_size,
+                equal_jets=equal_jets_flag,
+                transform=self.transform,
             )
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
@@ -184,8 +223,14 @@ class Resampling:
             )
 
     def set_component_sampling_fractions(self):
-        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
-            log.info("[bold green]Sampling fraction chosen for each component automatically...")
+        if (
+            self.config.sampling_fraction == "auto"
+            or self.config.sampling_fraction is None
+        ):
+            log.info(
+                "[bold green]Sampling fraction chosen for each component"
+                " automatically..."
+            )
             for c in self.components:
                 if c.is_target(self.config.target):
                     c.sampling_fraction = 1
@@ -241,6 +286,9 @@ class Resampling:
 
         # finalise
         unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
-        log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
+        log.info(
+            "[bold green]Finished resampling a total of"
+            f" {self.components.num_jets:,} jets!"
+        )
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
