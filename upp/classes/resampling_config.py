@@ -11,6 +11,7 @@ class ResamplingConfig:
     target: str
     sampling_fraction: float = 1.0
     method: str | None = None
+    upscale_pdf: int = 1
 
     @property
     def vars(self):

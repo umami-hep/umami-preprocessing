@@ -44,10 +44,11 @@ class Resampling:
         self.batch_size = config.batch_size
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
+        self.upscale_pdf = config.sampl_cfg.upscale_pdf
         self.methods_map = {
             "pdf": self.pdf_select_func,
             "countup": self.countup_select_func,
-            "pdf_upscaled": self.pdf_upscaled_select_func,
+            "pdfu": self.pdf_upscaled_select_func,
             "none": None,
         }
         if self.config.method not in self.methods_map:
@@ -104,15 +105,16 @@ class Resampling:
         # bin jets
         subd_bins = [subdivide_bins(bins, 2) for bins in self.config.flat_bins]
         _hist, binnumbers = bin_jets(jets[self.config.vars], subd_bins)
-        assert self.target.hist.upscaled_pdf.shape == _hist.shape
+        assert self.target.hist.upscaled_pdf(self.upscale_pdf).shape == _hist.shape
         if binnumbers.ndim > 1:
             binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
 
         # importance sample with replacement
         num_samples = int(len(jets) * component.sampling_fraction)
-        probs = safe_divide(self.target.hist.upscaled_pdf, component.hist.upscaled_pdf)[
-            binnumbers
-        ]
+        probs = safe_divide(
+            self.target.hist.upscaled_pdf(self.upscale_pdf),
+            component.hist.upscaled_pdf(self.upscale_pdf),
+        )[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
 

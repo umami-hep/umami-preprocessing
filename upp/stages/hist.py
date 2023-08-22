@@ -53,9 +53,7 @@ class Hist:
         with h5py.File(self.path) as f:
             return f["pdf"][:]
 
-    @functools.cached_property
-    def upscaled_pdf(self):
-        upscl = 2
+    def upscaled_pdf(self, upscl=2):
         # get bins
         # upscl must be integer
         xs = []
