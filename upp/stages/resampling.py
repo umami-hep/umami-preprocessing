@@ -65,22 +65,16 @@ class Resampling:
         num_jets = int(len(jets) * component.sampling_fraction)
         target_pdf = self.target.hist.pdf
         target_hist = target_pdf * num_jets
-        target_hist = (
-            np.floor(target_hist + self.rng.random(target_pdf.shape))
-        ).astype(int)
+        target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
         _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
         assert target_pdf.shape == _hist.shape
 
         # loop over bins and select relevant jets
         all_idx = []
         for bin_id in np.ndindex(*target_hist.shape):
-            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][
-                : target_hist[bin_id]
-            ]
+            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][: target_hist[bin_id]]
             if len(idx) and len(idx) < target_hist[bin_id]:
-                idx = np.concatenate(
-                    [idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))]
-                )
+                idx = np.concatenate([idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))])
             all_idx.append(idx)
         idx = np.concatenate(all_idx).astype(int)
         if len(idx) < num_jets:
@@ -103,7 +97,7 @@ class Resampling:
 
     def pdf_upscaled_select_func(self, jets, component):
         # bin jets
-        subd_bins = [subdivide_bins(bins, 2) for bins in self.config.flat_bins]
+        subd_bins = [subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins]
         _hist, binnumbers = bin_jets(jets[self.config.vars], subd_bins)
         assert self.target.hist.upscaled_pdf(self.upscale_pdf).shape == _hist.shape
         if binnumbers.ndim > 1:
@@ -122,9 +116,7 @@ class Resampling:
         unique, ups_counts = np.unique(idx, return_counts=True)
         component._unique_jets += len(unique)
         max_ups = ups_counts.max()
-        component._ups_max = (
-            max_ups if max_ups > component._ups_max else component._ups_max
-        )
+        component._ups_max = max_ups if max_ups > component._ups_max else component._ups_max
 
     def sample(self, components, stream, progress):
         # loop through input file
@@ -170,9 +162,7 @@ class Resampling:
 
         for c in components:
             if not c._complete:
-                raise ValueError(
-                    f"Ran out of {c} jets after writing {c.writer.num_written:,}"
-                )
+                raise ValueError(f"Ran out of {c} jets after writing {c.writer.num_written:,}")
 
     def run_on_region(self, components, region):
         # compute the target pdf
@@ -185,9 +175,7 @@ class Resampling:
             # make sure all tags equal_jets are the same
             equal_jets_flags = [c.equal_jets for c in cs]
             if len(set(equal_jets_flags)) != 1:
-                raise ValueError(
-                    "equal_jets must be the same for all components in a sample"
-                )
+                raise ValueError("equal_jets must be the same for all components in a sample")
             equal_jets_flag = equal_jets_flags[0]
 
             # setup input stream
@@ -225,14 +213,8 @@ class Resampling:
             )
 
     def set_component_sampling_fractions(self):
-        if (
-            self.config.sampling_fraction == "auto"
-            or self.config.sampling_fraction is None
-        ):
-            log.info(
-                "[bold green]Sampling fraction chosen for each component"
-                " automatically..."
-            )
+        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
+            log.info("[bold green]Sampling fraction chosen for each component automatically...")
             for c in self.components:
                 if c.is_target(self.config.target):
                     c.sampling_fraction = 1
@@ -288,9 +270,6 @@ class Resampling:
 
         # finalise
         unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
-        log.info(
-            "[bold green]Finished resampling a total of"
-            f" {self.components.num_jets:,} jets!"
-        )
+        log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
