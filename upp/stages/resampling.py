@@ -104,7 +104,7 @@ class Resampling:
         # bin jets
         subd_bins = [subdivide_bins(bins, 2) for bins in self.config.flat_bins]
         _hist, binnumbers = bin_jets(jets[self.config.vars], subd_bins)
-        assert self.target.hist.pdf.shape == _hist.upscaled_pdf.shape
+        assert self.target.hist.upscaled_pdf.shape == _hist.shape
         if binnumbers.ndim > 1:
             binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
 
