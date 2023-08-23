@@ -14,7 +14,9 @@ from upp.logger import setup_logger
 
 
 def bin_jets(array, bins) -> np.array:
-    hist, _, bins = binned_statistic_dd(s2u(array), None, "count", bins, expand_binnumbers=True)
+    hist, _, bins = binned_statistic_dd(
+        s2u(array), None, "count", bins, expand_binnumbers=True
+    )
     bins -= 1
     return hist, bins
 
@@ -51,7 +53,7 @@ class Hist:
         with h5py.File(self.path) as f:
             return f["pdf"][:]
 
-    def upscaled_pdf(self, upscl=2):
+    def upscaled_pdf(self, upscl):
         # get bins
         # upscl must be integer
         xs = []
@@ -61,12 +63,15 @@ class Hist:
         for var in attrs["resampling_vars"]:
             var_bins = attrs[f"bins_{var}"]
             n_bins = len(var_bins) - 1
-            points = np.linspace(-0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl)
+            points = np.linspace(
+                -0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl
+            )
             xs.append(points)
 
         # return the smoothed pdf
         xy = np.meshgrid(*xs, indexing="ij")
         smoothed = ndimage.map_coordinates(self.pdf, xy, order=3, mode="nearest")
+        smoothed[smoothed < 0] = 0
         return smoothed / smoothed.sum()
 
 
