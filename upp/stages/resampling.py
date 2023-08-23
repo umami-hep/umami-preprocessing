@@ -62,7 +62,7 @@ class Resampling:
         self.batch_size = config.batch_size
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
-        self.upscale_pdf = config.sampl_cfg.upscale_pdf
+        self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
         self.methods_map = {
             "pdf": self.pdf_select_func,
             "countup": self.countup_select_func,
@@ -81,12 +81,21 @@ class Resampling:
 
     def countup_select_func(self, jets, component):
         num_jets = int(len(jets) * component.sampling_fraction)
-        target_pdf = self.target.hist.pdf
+        if self.upscale_pdf > 1:
+            bins = [
+                subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins
+            ]
+            target_pdf = self.target.hist.pdf
+        else:
+            bins = self.config.flat_bins
+            target_pdf = upscale_array(self.target.hist.pdf, self.upscale_pdf)
+
         target_hist = target_pdf * num_jets
         target_hist = (
             np.floor(target_hist + self.rng.random(target_pdf.shape))
         ).astype(int)
-        _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
+
+        _hist, binnumbers = bin_jets(jets[self.config.vars], bins)
         assert target_pdf.shape == _hist.shape
 
         # loop over bins and select relevant jets
