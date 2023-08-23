@@ -108,7 +108,7 @@ class Resampling:
 
     def pdf_select_func(self, jets, component):
         # bin jets
-        if self.upscale_pdf > 0:
+        if self.upscale_pdf > 1:
             bins = [
                 subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins
             ]
@@ -117,13 +117,13 @@ class Resampling:
 
         _hist, binnumbers = bin_jets(jets[self.config.vars], bins)
         # assert target_shape == _hist.shape
-        if binnumbers.ndim > 0:
+        if binnumbers.ndim > 1:
             binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
 
         # importance sample with replacement
         num_samples = int(len(jets) * component.sampling_fraction)
         ratios = safe_divide(self.target.hist.pdf, component.hist.pdf)
-        if self.upscale_pdf > 0:
+        if self.upscale_pdf > 1:
             ratios = upscale_array(ratios, self.upscale_pdf)
         probs = ratios[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
