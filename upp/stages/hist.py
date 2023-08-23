@@ -7,16 +7,13 @@ from pathlib import Path
 import h5py
 import numpy as np
 from numpy.lib.recfunctions import structured_to_unstructured as s2u
-from scipy import ndimage
 from scipy.stats import binned_statistic_dd
 
 from upp.logger import setup_logger
 
 
 def bin_jets(array, bins) -> np.array:
-    hist, _, bins = binned_statistic_dd(
-        s2u(array), None, "count", bins, expand_binnumbers=True
-    )
+    hist, _, bins = binned_statistic_dd(s2u(array), None, "count", bins, expand_binnumbers=True)
     bins -= 1
     return hist, bins
 
@@ -31,12 +28,12 @@ class Hist:
 
         # bin jets
         hist = bin_jets(jets[resampling_vars], bins)[0]
-        pdf = hist / len(jets)
-        if not math.isclose(pdf.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
-            raise ValueError(f"{pdf.sum()} != 1, check cuts and binning")
+        pbin = hist / len(jets)  # probability (rate) of each bin
+        if not math.isclose(pbin.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
+            raise ValueError(f"{pbin.sum()} != 1, check cuts and binning")
 
         with h5py.File(self.path, "w") as f:
-            f.create_dataset("pdf", data=pdf)
+            f.create_dataset("pbin", data=pbin)
             f.create_dataset("hist", data=hist)
             f.attrs.create("num_jets", len(jets))
             f.attrs.create("resampling_vars", resampling_vars)
@@ -49,9 +46,10 @@ class Hist:
             return f["hist"][:]
 
     @functools.cached_property
-    def pdf(self) -> np.array:
+    def pbin(self) -> np.array:
+        # probability (rate) of each bin
         with h5py.File(self.path) as f:
-            return f["pdf"][:]
+            return f["pbin"][:]
 
 
 def main(config=None):
