@@ -54,6 +54,38 @@ def upscale_array(array, upscl, order=3, mode="nearest"):
     return smoothed / smoothed.sum()
 
 
+def upscale_array_regionally(array, upscl, regionlengthsd, order=3, mode="nearest"):
+    up_array = np.empty(shape=[ds * upscl for ds in array.shape])
+    starts = [np.cumsum([0] + regionlengths)[:-1] for regionlengths in regionlengthsd]
+    starts_grid = np.meshgrid(*starts)
+    starts_grid = [starts_grid[i].flatten() for i in range(len(starts_grid))]
+    finishes = [np.cumsum(regionlengths) for regionlengths in regionlengthsd]
+    finishes_grid = np.meshgrid(*finishes)
+    finishes_grid = [finishes_grid[i].flatten() for i in range(len(finishes_grid))]
+    d = len(array.shape)
+    for i in range(len(starts_grid[0])):
+        slice_obj = []
+        slice_obj_up = []
+        for j in range(d):
+            slice_obj.append(slice(starts_grid[j][i], finishes_grid[j][i]))
+            slice_obj_up.append(
+                slice(starts_grid[j][i] * upscl, finishes_grid[j][i] * upscl)
+            )
+        slice_obj = tuple(slice_obj)
+        slice_obj_up = tuple(slice_obj_up)
+        up_array[slice_obj_up] = upscale_array(
+            array[slice_obj], upscl, order=order, mode=mode
+        )
+    return up_array
+
+
+def regionlengthsd_from_config(config):
+    regionlengthsd = []
+    for row in config.bins.values():
+        regionlengthsd.append([sub[-1] for sub in row])
+    return regionlengthsd
+
+
 class Resampling:
     def __init__(self, config):
         self.config = config.sampl_cfg
@@ -63,10 +95,10 @@ class Resampling:
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
         self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
+        self.regionlengthsd = regionlengthsd_from_config(config.sampl_cfg)
         self.methods_map = {
             "pdf": self.pdf_select_func,
             "countup": self.countup_select_func,
-            "pdfu": self.pdf_upscaled_select_func,
             "none": None,
         }
         if self.config.method not in self.methods_map:
@@ -88,7 +120,9 @@ class Resampling:
             target_pdf = self.target.hist.pdf
         else:
             bins = self.config.flat_bins
-            target_pdf = upscale_array(self.target.hist.pdf, self.upscale_pdf)
+            target_pdf = upscale_array_regionally(
+                self.target.hist.pdf, self.upscale_pdf, self.regionlengthsd
+            )
 
         target_hist = target_pdf * num_jets
         target_hist = (
@@ -133,7 +167,9 @@ class Resampling:
         num_samples = int(len(jets) * component.sampling_fraction)
         ratios = safe_divide(self.target.hist.pdf, component.hist.pdf)
         if self.upscale_pdf > 1:
-            ratios = upscale_array(ratios, self.upscale_pdf)
+            ratios = upscale_array_regionally(
+                ratios, self.upscale_pdf, self.regionlengthsd
+            )
         probs = ratios[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
