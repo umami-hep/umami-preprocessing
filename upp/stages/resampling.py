@@ -129,25 +129,6 @@ class Resampling:
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
 
-    def pdf_upscaled_select_func(self, jets, component):
-        # bin jets
-        subd_bins = [
-            subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins
-        ]
-        _hist, binnumbers = bin_jets(jets[self.config.vars], subd_bins)
-        assert self.target.hist.upscaled_pdf(self.upscale_pdf).shape == _hist.shape
-        if binnumbers.ndim > 1:
-            binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
-
-        # importance sample with replacement
-        num_samples = int(len(jets) * component.sampling_fraction)
-        probs = safe_divide(
-            self.target.hist.upscaled_pdf(self.upscale_pdf),
-            component.hist.upscaled_pdf(self.upscale_pdf),
-        )[binnumbers]
-        idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
-        return idx
-
     def track_upsampling_stats(self, idx, component):
         unique, ups_counts = np.unique(idx, return_counts=True)
         component._unique_jets += len(unique)
