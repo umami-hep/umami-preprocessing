@@ -223,7 +223,6 @@ class Resampling:
             c.setup_writer(self.variables)
 
         # set samplig fraction if needed
-
         self.set_component_sampling_fractions()
 
         # check samples
@@ -232,7 +231,8 @@ class Resampling:
             f" {self.config.sampling_fraction}..."
         )
         for c in self.components:
-            c.check_num_jets(c.num_jets, sampling_frac=c.sampling_fraction, cuts=c.cuts)
+            frac = c.sampling_fraction if not self.is_test else 1
+            c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
 
         # run resampling
         for region, components in self.components.groupby_region():
