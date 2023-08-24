@@ -37,7 +37,7 @@ tracks:
   labels:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
-    - ftagTtruthVertexIndex
+    - ftagTruthVertexIndex
 
 #flow:
 #  inputs:
