@@ -35,8 +35,9 @@ tracks:
     - numberOfSCTSharedHits
     - leptonID
   labels:
-    - truthOriginLabel
-    - truthVertexIndex
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTtruthVertexIndex
 
 #flow:
 #  inputs:
