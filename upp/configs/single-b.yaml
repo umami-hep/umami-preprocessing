@@ -1,5 +1,5 @@
 # In this config, we don't have seperate samples for r2 or r3, we just combine them
-variables: !include /home/xzcappon/phd/tools/umami-preprocessing/upp/configs/variables.yaml
+variables: !include variables.yaml
 #transform: !include transform.yaml
 
 ttbar: &ttbar
