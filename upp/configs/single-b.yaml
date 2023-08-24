@@ -5,7 +5,7 @@ variables: !include variables.yaml
 ttbar: &ttbar
   name: ttbar
   equal_jets: False
-  pattern: 
+  pattern:
     - "mc20/user.nekumari.410470.e6337_s3681_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
     - "mc23/user.nekumari.601229.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
     - "mc23/user.nekumari.601230.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
@@ -13,7 +13,7 @@ ttbar: &ttbar
 zprime: &zprime
   name: zprime
   equal_jets: False
-  pattern: 
+  pattern:
     - "mc20/user.nekumari.800030.e7954_s3681_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
     - "mc20/user.nekumari.800030.e7954_s3797_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
     - "mc23/user.nekumari.800030.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-21_PFlow_Aug_23_fix_output.h5/*.h5"
@@ -97,4 +97,3 @@ global:
   num_jets_estimate: 5_000_000
   base_dir: /home/xzcappon/phd/datasets/combined_run2_run3/p5770/high_stats_320m
   ntuple_dir: /home/xzcappon/central_dumps/p5770
-
