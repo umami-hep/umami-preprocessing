@@ -1,3 +1,13 @@
+"""
+Preprocessing pipeline for jet taggging.
+
+By default all stages for the training split are run.
+To run with only specific stages enabled, include the flag for the required stages.
+To run without certain stages, include the corresponding negative flag.
+
+Note that all stages are required to run the pipeline. If you want to disable resampling,
+you need to set method: none in your config file.
+"""
 import argparse
 from datetime import datetime
 from pathlib import Path
@@ -17,11 +27,7 @@ class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelp
 def parse_args():
     abool = argparse.BooleanOptionalAction
     parser = argparse.ArgumentParser(
-        description=(
-            "Jet taggging preprocessing. By default all stages for the training split are run.\n"
-            "To run with only specific stages enabled, include the flag for the required stages.\n"
-            "To run without certain stages, include the corresponding negative flag."
-        ),
+        description=__doc__,
         formatter_class=HelpFormatter,
     )
     parser.add_argument("--config", required=True, type=Path, help="Path to config file")
