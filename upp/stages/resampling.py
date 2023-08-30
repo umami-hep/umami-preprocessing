@@ -30,14 +30,57 @@ def safe_divide(a, b):
     return np.divide(a, b, out=np.zeros_like(a), where=b != 0)
 
 
-def subdivide_bins(bins, n=2):
+def subdivide_bins(bins: np.array, n: int = 2) -> np.array:
+    """Subdivide bins into n subbins.
+
+    Parameters
+    ----------
+    bins : np.array
+        array of bins edges to be subdivided
+    n : int, optional
+        Number of subbins, by default 2
+
+    Returns
+    -------
+    np.array
+        array of bin edges for the subdivided bins
+    """
     comb_list = [np.array((bins[0],))]
     for i in range(len(bins) - 1):
         comb_list.append(np.linspace(bins[i], bins[i + 1], n + 1)[1:])
     return np.concatenate(comb_list)
 
 
-def upscale_array(array, upscl, order=3, mode="nearest", nornalise=False, positive=True):
+def upscale_array(
+    array: np.array,
+    upscl: int,
+    order: int = 3,
+    mode: str = "nearest",
+    normalise: bool = False,
+    positive: bool = True,
+) -> np.array:
+    """Upscales an array by a factor of upscl.
+
+    Parameters
+    ----------
+    array : np.array
+        The array to be upscaled
+    upscl : int
+        The upscaling factor
+    order : int, optional
+        order of the spline polynomial (max 5), by default 3
+    mode : str, optional
+        extrapolation mode applied at the edges of the array, by default "nearest"
+    normalise : bool, optional
+        divide array by the sum of its elements, by default False
+    positive : bool, optional
+        set all negative values to 0, by default True
+
+    Returns
+    -------
+    np.array
+        Array that is upscaled by a factor of upscl
+    """
     # upscl must be integer
     xs = []
     for d in array.shape:
@@ -50,14 +93,45 @@ def upscale_array(array, upscl, order=3, mode="nearest", nornalise=False, positi
     smoothed = ndimage.map_coordinates(array, xy, order=order, mode=mode)
     if positive:
         smoothed[smoothed < 0] = 0
-    if nornalise:
+    if normalise:
         smoothed = smoothed / smoothed.sum()
     return smoothed
 
 
 def upscale_array_regionally(
-    array, upscl, regionlengthsd, order=3, mode="nearest", normalise=False
-):
+    array: np.array,
+    upscl: int,
+    regionlengthsd: list,
+    order: int = 3,
+    mode: str = "nearest",
+    normalise: bool = False,
+    positive: bool = True,
+) -> np.array:
+    """Upscales an array by a factor of upscl separately in each region of the array.
+
+    Parameters
+    ----------
+    array : np.array
+        array to be upscaled
+    upscl : int
+        upscaling factor
+    regionlengthsd : list
+        list of lists of region lengths in each dimension,
+        region lengths should sum to the length of the array in that dimension
+    order : int, optional
+        order of the spline polynomial (max 5), by default 3
+    mode : str, optional
+        extrapolation mode applied at the edges of each region, by default "nearest"
+    normalise : bool, optional
+        divide the whole array by the sum of all of its elements, by default False
+    positive : bool, optional
+        set all negative values to 0, by default True
+
+    Returns
+    -------
+    np.array
+        Array that is upscaled by a factor of upscl
+    """
     up_array = np.empty(shape=[ds * upscl for ds in array.shape])
     starts = [np.cumsum([0] + regionlengths)[:-1] for regionlengths in regionlengthsd]
     starts_grid = np.meshgrid(*starts)
@@ -67,24 +141,21 @@ def upscale_array_regionally(
     finishes_grid = [finishes_grid[i].flatten() for i in range(len(finishes_grid))]
     d = len(array.shape)
     for i in range(len(starts_grid[0])):
-        slice_obj = []
-        slice_obj_up = []
+        slice_bounds = []
+        slice_obj_up_bounds = []
         for j in range(d):
-            slice_obj.append(slice(starts_grid[j][i], finishes_grid[j][i]))
-            slice_obj_up.append(slice(starts_grid[j][i] * upscl, finishes_grid[j][i] * upscl))
-        slice_obj = tuple(slice_obj)
-        slice_obj_up = tuple(slice_obj_up)
-        up_array[slice_obj_up] = upscale_array(array[slice_obj], upscl, order=order, mode=mode)
+            slice_bounds.append(slice(starts_grid[j][i], finishes_grid[j][i]))
+            slice_obj_up_bounds.append(
+                slice(starts_grid[j][i] * upscl, finishes_grid[j][i] * upscl)
+            )
+        slice_obj = tuple(slice_bounds)
+        slice_obj_up = tuple(slice_obj_up_bounds)
+        up_array[slice_obj_up] = upscale_array(
+            array[slice_obj], upscl, order=order, mode=mode, positive=positive
+        )
     if normalise:
         up_array = up_array / up_array.sum()
     return up_array
-
-
-def regionlengthsd_from_config(config):
-    regionlengthsd = []
-    for row in config.bins.values():
-        regionlengthsd.append([sub[-1] for sub in row])
-    return regionlengthsd
 
 
 class Resampling:
@@ -96,7 +167,7 @@ class Resampling:
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
         self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
-        self.regionlengthsd = regionlengthsd_from_config(config.sampl_cfg)
+        self.regionlengthsd = self.get_regionlengthsd_from_config()
         self.methods_map = {
             "pdf": self.pdf_select_func,
             "countup": self.countup_select_func,
@@ -113,6 +184,8 @@ class Resampling:
         self.rng = np.random.default_rng(42)
 
     def countup_select_func(self, jets, component):
+        if self.upscale_pdf != 1:
+            raise ValueError("Upscaling of histogrms is not supported for countup method")
         num_jets = int(len(jets) * component.sampling_fraction)
         target_pdf = self.target.hist.pbin
         target_hist = target_pdf * num_jets
@@ -316,3 +389,16 @@ class Resampling:
         log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
+
+    def get_regionlengthsd_from_config(self) -> list[list[int]]:
+        """Get the lengths of the binning regions in each variable from the config.
+
+        Returns
+        -------
+        typing.List[typing.List[int]]
+            lengths of the binning regions in each variable from the config
+        """
+        regionlengthsd = []
+        for row in self.config.bins.values():
+            regionlengthsd.append([sub[-1] for sub in row])
+        return regionlengthsd
