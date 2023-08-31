@@ -57,9 +57,7 @@ def upscale_array(
     xs = []
     for d in array.shape:
         n_bins = d
-        points = np.linspace(
-            -0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl
-        )
+        points = np.linspace(-0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl)
         xs.append(points)
 
     # return the smoothed array
