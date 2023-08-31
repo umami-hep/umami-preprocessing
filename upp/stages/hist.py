@@ -28,12 +28,12 @@ class Hist:
 
         # bin jets
         hist = bin_jets(jets[resampling_vars], bins)[0]
-        pdf = hist / len(jets)
-        if not math.isclose(pdf.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
-            raise ValueError(f"{pdf.sum()} != 1, check cuts and binning")
+        pbin = hist / len(jets)  # probability (rate) of each bin
+        if not math.isclose(pbin.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
+            raise ValueError(f"{pbin.sum()} != 1, check cuts and binning")
 
         with h5py.File(self.path, "w") as f:
-            f.create_dataset("pdf", data=pdf)
+            f.create_dataset("pbin", data=pbin)
             f.create_dataset("hist", data=hist)
             f.attrs.create("num_jets", len(jets))
             f.attrs.create("resampling_vars", resampling_vars)
@@ -46,50 +46,10 @@ class Hist:
             return f["hist"][:]
 
     @functools.cached_property
-    def pdf(self) -> np.array:
+    def pbin(self) -> np.array:
+        # probability (rate) of each bin
         with h5py.File(self.path) as f:
-            return f["pdf"][:]
-
-
-"""
-    @functools.cached_property
-    def upscaled_pdf(self):
-        upscale = 1
-        # get bins
-        xs = []
-        with h5py.File(self.path) as f:
-            attrs = dict(f.attrs)
-
-        for var in attrs["resampling_vars"]:
-            var_bins = attrs[f"bins_{var}"]
-            n_bins = len(var_bins) - 1
-            points = np.linspace(0, n_bins - 1 , n_bins * upscale)
-            xs.append(points)
-
-        # return the smoothed pdf
-        xy = np.meshgrid(*xs, indexing="ij")
-        smoothed = ndimage.map_coordinates(self.pdf, xy, order=1)
-        return smoothed / smoothed.sum()
-
-def smooth_weights(weights, path):
-    upscale = 1
-    print(upscale)
-    # get bins
-    xs = []
-    with h5py.File(path) as f:
-        attrs = dict(f.attrs)
-
-    for var in attrs["resampling_vars"]:
-        var_bins = attrs[f"bins_{var}"]
-        n_bins = len(var_bins) - 1
-        points = np.linspace(0, n_bins - 1 , n_bins * upscale)
-        xs.append(points)
-
-    # return the smoothed pdf
-    xy = np.meshgrid(*xs, indexing="ij")
-    smoothed = ndimage.map_coordinates(weights, xy, order=1)
-    return smoothed# / smoothed.sum()
-"""
+            return f["pbin"][:]
 
 
 def main(config=None):
@@ -105,7 +65,10 @@ def main(config=None):
         c.setup_reader(config.batch_size)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(
-            config.num_jets_estimate, cuts=cuts_no_split, silent=False, raise_error=False
+            config.num_jets_estimate,
+            cuts=cuts_no_split,
+            silent=False,
+            raise_error=False,
         )
         jets = c.get_jets(sampl_vars, config.num_jets_estimate, cuts_no_split)
         c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
