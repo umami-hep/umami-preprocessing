@@ -5,11 +5,11 @@ from pathlib import Path
 import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
-from scipy import ndimage
 from yamlinclude import YamlIncludeConstructor
 
 from upp.logger import ProgressBar
 from upp.stages.hist import bin_jets
+from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
 
 random.seed(42)
 
@@ -28,134 +28,6 @@ def select_batch(batch, idx):
 
 def safe_divide(a, b):
     return np.divide(a, b, out=np.zeros_like(a), where=b != 0)
-
-
-def subdivide_bins(bins: np.array, n: int = 2) -> np.array:
-    """Subdivide bins into n subbins.
-
-    Parameters
-    ----------
-    bins : np.array
-        array of bins edges to be subdivided
-    n : int, optional
-        Number of subbins, by default 2
-
-    Returns
-    -------
-    np.array
-        array of bin edges for the subdivided bins
-    """
-    comb_list = [np.array((bins[0],))]
-    for i in range(len(bins) - 1):
-        comb_list.append(np.linspace(bins[i], bins[i + 1], n + 1)[1:])
-    return np.concatenate(comb_list)
-
-
-def upscale_array(
-    array: np.array,
-    upscl: int,
-    order: int = 3,
-    mode: str = "nearest",
-    normalise: bool = False,
-    positive: bool = True,
-) -> np.array:
-    """Upscales an array by a factor of upscl.
-
-    Parameters
-    ----------
-    array : np.array
-        The array to be upscaled
-    upscl : int
-        The upscaling factor
-    order : int, optional
-        order of the spline polynomial (max 5), by default 3
-    mode : str, optional
-        extrapolation mode applied at the edges of the array, by default "nearest"
-    normalise : bool, optional
-        divide array by the sum of its elements, by default False
-    positive : bool, optional
-        set all negative values to 0, by default True
-
-    Returns
-    -------
-    np.array
-        Array that is upscaled by a factor of upscl
-    """
-    # upscl must be integer
-    xs = []
-    for d in array.shape:
-        n_bins = d
-        points = np.linspace(-0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl)
-        xs.append(points)
-
-    # return the smoothed array
-    xy = np.meshgrid(*xs, indexing="ij")
-    smoothed = ndimage.map_coordinates(array, xy, order=order, mode=mode)
-    if positive:
-        smoothed[smoothed < 0] = 0
-    if normalise:
-        smoothed = smoothed / smoothed.sum()
-    return smoothed
-
-
-def upscale_array_regionally(
-    array: np.array,
-    upscl: int,
-    regionlengthsd: list,
-    order: int = 3,
-    mode: str = "nearest",
-    normalise: bool = False,
-    positive: bool = True,
-) -> np.array:
-    """Upscales an array by a factor of upscl separately in each region of the array.
-
-    Parameters
-    ----------
-    array : np.array
-        array to be upscaled
-    upscl : int
-        upscaling factor
-    regionlengthsd : list
-        list of lists of region lengths in each dimension,
-        region lengths should sum to the length of the array in that dimension
-    order : int, optional
-        order of the spline polynomial (max 5), by default 3
-    mode : str, optional
-        extrapolation mode applied at the edges of each region, by default "nearest"
-    normalise : bool, optional
-        divide the whole array by the sum of all of its elements, by default False
-    positive : bool, optional
-        set all negative values to 0, by default True
-
-    Returns
-    -------
-    np.array
-        Array that is upscaled by a factor of upscl
-    """
-    up_array = np.empty(shape=[ds * upscl for ds in array.shape])
-    starts = [np.cumsum([0] + regionlengths)[:-1] for regionlengths in regionlengthsd]
-    starts_grid = np.meshgrid(*starts)
-    starts_grid = [starts_grid[i].flatten() for i in range(len(starts_grid))]
-    finishes = [np.cumsum(regionlengths) for regionlengths in regionlengthsd]
-    finishes_grid = np.meshgrid(*finishes)
-    finishes_grid = [finishes_grid[i].flatten() for i in range(len(finishes_grid))]
-    d = len(array.shape)
-    for i in range(len(starts_grid[0])):
-        slice_bounds = []
-        slice_obj_up_bounds = []
-        for j in range(d):
-            slice_bounds.append(slice(starts_grid[j][i], finishes_grid[j][i]))
-            slice_obj_up_bounds.append(
-                slice(starts_grid[j][i] * upscl, finishes_grid[j][i] * upscl)
-            )
-        slice_obj = tuple(slice_bounds)
-        slice_obj_up = tuple(slice_obj_up_bounds)
-        up_array[slice_obj_up] = upscale_array(
-            array[slice_obj], upscl, order=order, mode=mode, positive=positive
-        )
-    if normalise:
-        up_array = up_array / up_array.sum()
-    return up_array
 
 
 class Resampling:
@@ -185,11 +57,15 @@ class Resampling:
 
     def countup_select_func(self, jets, component):
         if self.upscale_pdf != 1:
-            raise ValueError("Upscaling of histogrms is not supported for countup method")
+            raise ValueError(
+                "Upscaling of histogrms is not supported for countup method"
+            )
         num_jets = int(len(jets) * component.sampling_fraction)
         target_pdf = self.target.hist.pbin
         target_hist = target_pdf * num_jets
-        target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
+        target_hist = (
+            np.floor(target_hist + self.rng.random(target_pdf.shape))
+        ).astype(int)
 
         _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
         assert target_pdf.shape == _hist.shape
@@ -197,9 +73,13 @@ class Resampling:
         # loop over bins and select relevant jets
         all_idx = []
         for bin_id in np.ndindex(*target_hist.shape):
-            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][: target_hist[bin_id]]
+            idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][
+                : target_hist[bin_id]
+            ]
             if len(idx) and len(idx) < target_hist[bin_id]:
-                idx = np.concatenate([idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))])
+                idx = np.concatenate(
+                    [idx, self.rng.choice(idx, target_hist[bin_id] - len(idx))]
+                )
             all_idx.append(idx)
         idx = np.concatenate(all_idx).astype(int)
         if len(idx) < num_jets:
@@ -210,7 +90,9 @@ class Resampling:
     def pdf_select_func(self, jets, component):
         # bin jets
         if self.upscale_pdf > 1:
-            bins = [subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins]
+            bins = [
+                subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins
+            ]
         else:
             bins = self.config.flat_bins
 
@@ -223,7 +105,9 @@ class Resampling:
         num_samples = int(len(jets) * component.sampling_fraction)
         ratios = safe_divide(self.target.hist.pbin, component.hist.pbin)
         if self.upscale_pdf > 1:
-            ratios = upscale_array_regionally(ratios, self.upscale_pdf, self.regionlengthsd)
+            ratios = upscale_array_regionally(
+                ratios, self.upscale_pdf, self.regionlengthsd
+            )
         probs = ratios[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
@@ -232,7 +116,9 @@ class Resampling:
         unique, ups_counts = np.unique(idx, return_counts=True)
         component._unique_jets += len(unique)
         max_ups = ups_counts.max()
-        component._ups_max = max_ups if max_ups > component._ups_max else component._ups_max
+        component._ups_max = (
+            max_ups if max_ups > component._ups_max else component._ups_max
+        )
 
     def sample(self, components, stream, progress):
         # loop through input file
@@ -278,7 +164,9 @@ class Resampling:
 
         for c in components:
             if not c._complete:
-                raise ValueError(f"Ran out of {c} jets after writing {c.writer.num_written:,}")
+                raise ValueError(
+                    f"Ran out of {c} jets after writing {c.writer.num_written:,}"
+                )
 
     def run_on_region(self, components, region):
         # compute the target pdf
@@ -291,7 +179,9 @@ class Resampling:
             # make sure all tags equal_jets are the same
             equal_jets_flags = [c.equal_jets for c in cs]
             if len(set(equal_jets_flags)) != 1:
-                raise ValueError("equal_jets must be the same for all components in a sample")
+                raise ValueError(
+                    "equal_jets must be the same for all components in a sample"
+                )
             equal_jets_flag = equal_jets_flags[0]
 
             # setup input stream
@@ -329,8 +219,14 @@ class Resampling:
             )
 
     def set_component_sampling_fractions(self):
-        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
-            log.info("[bold green]Sampling fraction chosen for each component automatically...")
+        if (
+            self.config.sampling_fraction == "auto"
+            or self.config.sampling_fraction is None
+        ):
+            log.info(
+                "[bold green]Sampling fraction chosen for each component"
+                " automatically..."
+            )
             for c in self.components:
                 if c.is_target(self.config.target):
                     c.sampling_fraction = 1
@@ -386,7 +282,10 @@ class Resampling:
 
         # finalise
         unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
-        log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
+        log.info(
+            "[bold green]Finished resampling a total of"
+            f" {self.components.num_jets:,} jets!"
+        )
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
