@@ -59,7 +59,7 @@ class Normalisation:
         return combined
 
     def get_class_dict(self, batch):
-        ignore = ["VertexIndex", 'ftagTruthParentBarcode', 'barcode']
+        ignore = ["VertexIndex", "ftagTruthParentBarcode", "barcode"]
         class_dict = {k: {} for k in self.variables}
         for name, array in batch.items():
             if name != self.variables.jets_name:
