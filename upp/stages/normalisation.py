@@ -59,12 +59,13 @@ class Normalisation:
         return combined
 
     def get_class_dict(self, batch):
+        ignore = ["VertexIndex", 'ftagTruthParentBarcode', 'barcode']
         class_dict = {k: {} for k in self.variables}
         for name, array in batch.items():
             if name != self.variables.jets_name:
                 array = array[array["valid"]]
             for var in self.variables[name].get("labels", []):
-                if not np.issubdtype(array[var].dtype, np.integer) or var == "truthVertexIndex":
+                if not np.issubdtype(array[var].dtype, np.integer) or any(s in var for s in ignore):
                     continue
                 counts = np.unique(array[var], return_counts=True)
                 class_dict[name][var] = counts
