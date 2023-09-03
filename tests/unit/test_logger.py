@@ -1,17 +1,10 @@
 import logging
-import unittest
-from unittest.mock import patch
 
-from rich.console import Console
-
-from upp.logger import ProgressBar, setup_logger
+from upp.logger import setup_logger
 
 
-class TestScript(unittest.TestCase):
-
-    def test_setup_logger(self):
-        logger = setup_logger(level="DEBUG")
-        logger.debug("Debug message")
-
-if __name__ == '__main__':
-    unittest.main()
+def test_setup_logger(caplog):
+    caplog.set_level(logging.DEBUG)
+    logger = setup_logger(level="DEBUG")
+    logger.debug("Debug message")
+    assert "Debug message" in caplog.text
