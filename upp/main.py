@@ -25,7 +25,7 @@ class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelp
 
 
 def parse_args():
-    abool = argparse.BooleanOptionalAction
+    abool = "store_true"
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=HelpFormatter,
