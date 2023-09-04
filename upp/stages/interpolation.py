@@ -28,7 +28,6 @@ def upscale_array(
     upscl: int,
     order: int = 3,
     mode: str = "nearest",
-    normalise: bool = False,
     positive: bool = True,
 ) -> np.array:
     """Upscales an array by a factor of upscl.
@@ -55,7 +54,9 @@ def upscale_array(
     xs = []
     for d in array.shape:
         n_bins = d
-        points = np.linspace(-0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl)
+        points = np.linspace(
+            -0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl
+        )
         xs.append(points)
 
     # return the smoothed array
@@ -72,7 +73,6 @@ def upscale_array_regionally(
     regionlengthsd: list,
     order: int = 3,
     mode: str = "nearest",
-    normalise: bool = False,
     positive: bool = True,
 ) -> np.array:
     """Upscales an array by a factor of upscl separately in each region of the array.
