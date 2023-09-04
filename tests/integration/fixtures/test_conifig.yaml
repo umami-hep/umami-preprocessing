@@ -12,25 +12,25 @@ zprime: &zprime
 
 global_cuts:
   train:
-    - [eventNumber, "%10<=", 7]
+    - [pt_btagJes, ">", 0]
 
   val:
-    - [eventNumber, "%10==", 8]
+    - [pt_btagJes, ">", 0]
 
   test:
-    - [eventNumber, "%10==", 9]
+    - [pt_btagJes, ">", 0]
 
 
 lowpt: &lowpt
   name: lowpt
   cuts:
-    - [pt_btagJes, ">", 0]
-    - [pt_btagJes, "<", 250_000]
+    - [pt, ">", 0]
+    - [pt, "<", 250_000]
 highpt: &highpt
   name: highpt
   cuts:
-    - [pt_btagJes, ">", 250_000]
-    - [pt_btagJes, "<", 6_000_000]
+    - [pt, ">", 250_000]
+    - [pt, "<", 6_000_000]
 
 components:
   - region:
@@ -80,9 +80,9 @@ resampling:
   method: pdf
   sampling_fraction: 1.0
   variables:
-    pt_btagJes:
+    pt:
       bins: [[0, 250000, 5], [250000, 6000000, 5]]
-    eta_btagJes:
+    abs_eta:
       bins: [[0, 2.5, 5]]
 
 global:
@@ -108,5 +108,4 @@ variables:
       - deta
       - qOverP
     labels:
-      - truthOriginLabel
-      - truthVertexIndex
+      - qOverP
