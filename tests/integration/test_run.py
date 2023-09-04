@@ -1,4 +1,5 @@
 import os
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -32,11 +33,11 @@ class TestClass:
 
     def teardown_method(self, method):
         pass
-        # subprocess.run(
-        #     ["rm", "-rf", "tests/integration/temp_workspace"],
-        #     check=True,
-        # )
-        # print("teardown_method   method:%s" % method.__name__)
+        subprocess.run(
+            ["rm", "-rf", "tests/integration/temp_workspace"],
+            check=True,
+        )
+        print("teardown_method   method:%s" % method.__name__)
 
     def test_run(self):
         args = SimpleNamespace(
