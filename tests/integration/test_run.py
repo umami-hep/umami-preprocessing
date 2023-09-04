@@ -32,7 +32,6 @@ class TestClass:
         print("setup_method      method:%s" % method.__name__)
 
     def teardown_method(self, method):
-        pass
         subprocess.run(
             ["rm", "-rf", "tests/integration/temp_workspace"],
             check=True,
