@@ -41,7 +41,6 @@ def test_upscale_array():
     upscl = 2
     order = 1
     mode = "nearest"
-    normalise = False
     positive = True
 
     # Call the upscale_array function
@@ -50,7 +49,6 @@ def test_upscale_array():
         upscl,
         order=order,
         mode=mode,
-        normalise=normalise,
         positive=positive,
     )
 
@@ -135,7 +133,6 @@ def test_upscale_array_regionally():
     upscl = 2
     order = 1
     mode = "nearest"
-    normalise = False
     positive = True
 
     # Call the upscale_array function
@@ -144,7 +141,6 @@ def test_upscale_array_regionally():
         upscl,
         order=order,
         mode=mode,
-        normalise=normalise,
         positive=positive,
         regionlengthsd=[[2, 1], [2, 1]],
     )
