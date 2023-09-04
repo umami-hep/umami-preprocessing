@@ -1,6 +1,7 @@
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
+from typing import List
 
 import numpy as np
 from ftag import Cuts, Flavour, Flavours, Sample
@@ -8,7 +9,6 @@ from ftag.hdf5 import H5Reader, H5Writer
 
 from upp.classes.region import Region
 from upp.stages.hist import Hist
-from typing import List, Union
 
 
 @dataclass
@@ -206,7 +206,7 @@ class Components:
     def __getitem__(self, index):
         if isinstance(index, int):
             return self.components[index]
-        if isinstance(index, str) or isinstance(index, Flavour):
+        if isinstance(index, (str, Flavour)):
             return self.components[self.flavours.index(index)]
 
     def __len__(self):

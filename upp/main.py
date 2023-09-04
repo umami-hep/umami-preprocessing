@@ -31,11 +31,16 @@ def parse_args():
         formatter_class=HelpFormatter,
     )
     parser.add_argument("--config", required=True, type=Path, help="Path to config file")
-    parser.add_argument("--prep", action=abool, help="Estimate and write PDFs")
-    parser.add_argument("--resample", action=abool, help="Run resampling")
-    parser.add_argument("--merge", action=abool, help="Run merging")
-    parser.add_argument("--norm", action=abool, help="Compute normalisations")
-    parser.add_argument("--plot", action=abool, help="Plot resampled distributions")
+    parser.add_argument("--prep", action=abool, default=None, help="Estimate and write PDFs")
+    parser.add_argument("--no-prep", dest="prep", action="store_false")
+    parser.add_argument("--resample", action=abool, default=None, help="Run resampling")
+    parser.add_argument("--no-resample", dest="resample", action="store_false")
+    parser.add_argument("--merge", action=abool, default=None, help="Run merging")
+    parser.add_argument("--no-merge", dest="merge", action="store_false")
+    parser.add_argument("--norm", action=abool, default=None, help="Compute normalisations")
+    parser.add_argument("--no-norm", dest="norm", action="store_false")
+    parser.add_argument("--plot", action=abool, default=None, help="Plot resampled distributions")
+    parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
 

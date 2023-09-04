@@ -1,6 +1,7 @@
 import logging as log
 import random
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import yaml
@@ -10,7 +11,6 @@ from yamlinclude import YamlIncludeConstructor
 from upp.logger import ProgressBar
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
-from typing import List
 
 random.seed(42)
 
