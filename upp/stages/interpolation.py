@@ -28,7 +28,6 @@ def upscale_array(
     upscl: int,
     order: int = 3,
     mode: str = "nearest",
-    normalise: bool = False,
     positive: bool = True,
 ) -> np.array:
     """Upscales an array by a factor of upscl.
@@ -43,8 +42,6 @@ def upscale_array(
         order of the spline polynomial (max 5), by default 3
     mode : str, optional
         extrapolation mode applied at the edges of the array, by default "nearest"
-    normalise : bool, optional
-        divide array by the sum of its elements, by default False
     positive : bool, optional
         set all negative values to 0, by default True
 
@@ -65,8 +62,6 @@ def upscale_array(
     smoothed = ndimage.map_coordinates(array, xy, order=order, mode=mode)
     if positive:
         smoothed[smoothed < 0] = 0
-    if normalise:
-        smoothed = smoothed / smoothed.sum()
     return smoothed
 
 
@@ -76,7 +71,6 @@ def upscale_array_regionally(
     regionlengthsd: list,
     order: int = 3,
     mode: str = "nearest",
-    normalise: bool = False,
     positive: bool = True,
 ) -> np.array:
     """Upscales an array by a factor of upscl separately in each region of the array.
@@ -94,8 +88,6 @@ def upscale_array_regionally(
         order of the spline polynomial (max 5), by default 3
     mode : str, optional
         extrapolation mode applied at the edges of each region, by default "nearest"
-    normalise : bool, optional
-        divide the whole array by the sum of all of its elements, by default False
     positive : bool, optional
         set all negative values to 0, by default True
 
@@ -125,6 +117,4 @@ def upscale_array_regionally(
         up_array[slice_obj_up] = upscale_array(
             array[slice_obj], upscl, order=order, mode=mode, positive=positive
         )
-    if normalise:
-        up_array = up_array / up_array.sum()
     return up_array
