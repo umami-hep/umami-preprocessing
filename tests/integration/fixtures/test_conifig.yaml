@@ -1,22 +1,30 @@
 ttbar: &ttbar
   name: ttbar
-  pattern: dummy_ttbar.h5
+  pattern: data1.h5
 zprime: &zprime
   name: zprime
-  pattern: dummy_zprime.h5
+  pattern: data2.h5
+
+.outlier_cuts: &outlier_cuts
+  - [JetFitterSecondaryVertex_mass, "<", 25000]
+  - [JetFitterSecondaryVertex_energy", "<", 1e8]
+  - [JetFitter_deltaR, "<", 0.6]
 
 global_cuts:
   train:
     - [eventNumber, "%10<=", 7]
+
   val:
     - [eventNumber, "%10==", 8]
+
   test:
     - [eventNumber, "%10==", 9]
+
 
 lowpt: &lowpt
   name: lowpt
   cuts:
-    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, ">", 0]
     - [pt_btagJes, "<", 250_000]
 highpt: &highpt
   name: highpt
@@ -29,51 +37,76 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets, cjets, ujets]
-    num_jets: 10_000
+    flavours: [bjets]
+    num_jets: 7_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [cjets]
+    num_jets: 7_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ ujets]
+    num_jets: 7_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [bjets, cjets, ujets]
-    num_jets: 10_000
+    flavours: [bjets]
+    num_jets: 3_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [cjets]
+    num_jets: 3_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ujets]
+    num_jets: 3_000
 
 resampling:
-  target: cjets
+  target: bjets
   method: pdf
   sampling_fraction: 1.0
   variables:
     pt_btagJes:
-      bins: [[20_000, 6_000_000, 60]]
-    absEta_btagJes:
+      bins: [[0, 250000, 5], [250000, 6000000, 5]]
+    eta_btagJes:
       bins: [[0, 2.5, 5]]
 
 global:
   batch_size: 10_000
-  num_jets_estimate: 10_000
-  base_dir: /unix/atlastracking/samples/gnn_training/martino/v1/
-  out_dir: test_out
-  ntuple_dir: source_data
+  num_jets_estimate: 5000
+  base_dir: "."
+  out_dir: tests/integration/temp_workspace/test_out/
+  ntuple_dir: tests/integration/temp_workspace/ntuples
 
 variables:
   jets:
     inputs:
       - pt_btagJes
-      - absEta_btagJes
-    labels:
-      - HadronConeExclTruthLabelID
       - eta_btagJes
+    labels:
       - pt
       - eta
+      - mass
 
   tracks:
     inputs:
       - dphi
       - deta
       - qOverP
-      - IP3D_signed_d0_significance
-      - IP3D_signed_z0_significance
     labels:
       - truthOriginLabel
       - truthVertexIndex
