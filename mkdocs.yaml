@@ -1,7 +1,7 @@
-site_name: Umami Preprocessing Documentation
+site_name: "UPP: Umami Preprocessing"
 site_description: Documentation for the umami preprocessing framework
 site_author: Umami Team
-#site_url: http://ftag-salt.docs.cern.ch/
+site_url: https://umami-hep.github.io/umami-preprocessing/
 
 repo_name: Github
 repo_url: https://github.com/umami-hep/umami-preprocessing
@@ -16,13 +16,10 @@ theme:
 
 nav:
   - Introduction: "index.md"
-  #- Setup: setup.md
-  #- Preprocessing: preprocessing.md
-  #- Training: training.md
-  #- Configuration: configuration.md
-  #- Evaluation: evaluation.md
-  #- ONNX Export: export.md
-  #- Contributing: contributing.md
+  - Setup: setup.md
+  - Run: run.md
+  - Configuration: configuration.md
+  - Contributing: contributing.md
 
 plugins:
   - search
