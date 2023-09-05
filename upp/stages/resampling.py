@@ -1,6 +1,7 @@
 import logging as log
 import random
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import yaml
@@ -262,7 +263,7 @@ class Resampling:
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
-    def get_regionlengthsd_from_config(self) -> list[list[int]]:
+    def get_regionlengthsd_from_config(self) -> List[List[int]]:
         """Get the lengths of the binning regions in each variable from the config.
 
         Returns

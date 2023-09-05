@@ -38,7 +38,7 @@ class TestClass:
         )
         print("teardown_method   method:%s" % method.__name__)
 
-    def test_1(self):
+    def test_run(self):
         args = SimpleNamespace(
             config=Path("tests/integration/fixtures/test_conifig.yaml"),
             prep=True,
