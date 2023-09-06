@@ -78,6 +78,7 @@ components:
 resampling:
   target: bjets
   method: pdf
+  upscale_pdf: 2
   sampling_fraction: 1.0
   variables:
     pt:

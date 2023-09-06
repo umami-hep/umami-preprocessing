@@ -38,14 +38,38 @@ class TestClass:
         )
         print("teardown_method   method:%s" % method.__name__)
 
-    def test_run(self):
+    def test_run_pdf_auto(self):
         args = SimpleNamespace(
-            config=Path("tests/integration/fixtures/test_conifig.yaml"),
+            config=Path("tests/integration/fixtures/test_conifig_pdf_auto.yaml"),
             prep=True,
             resample=True,
             merge=True,
             norm=True,
             plot=True,
+            split="train",
+        )
+        run_pp(args)
+
+    def test_run_pdf_upscale(self):
+        args = SimpleNamespace(
+            config=Path("tests/integration/fixtures/test_conifig_pdf_upscaled.yaml"),
+            prep=True,
+            resample=True,
+            merge=False,
+            norm=False,
+            plot=False,
+            split="train",
+        )
+        run_pp(args)
+
+    def test_run_countup(self):
+        args = SimpleNamespace(
+            config=Path("tests/integration/fixtures/test_conifig_countup.yaml"),
+            prep=True,
+            resample=True,
+            merge=False,
+            norm=False,
+            plot=False,
             split="train",
         )
         run_pp(args)

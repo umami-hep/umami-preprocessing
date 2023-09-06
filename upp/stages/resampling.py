@@ -116,12 +116,16 @@ class Resampling:
 
                 # apply selections
                 comp_idx, _ = c.flavour.cuts(batch[self.variables.jets_name])
+                if len(comp_idx) == 0:
+                    continue
                 batch_out = select_batch(batch, comp_idx)
 
                 # apply sampling
                 idx = np.arange(len(batch_out[self.variables.jets_name]))
                 if c != self.target and not self.is_test and self.select_func:
                     idx = self.select_func(batch_out[self.variables.jets_name], c)
+                    if len(idx) == 0:
+                        continue
                     batch_out = select_batch(batch_out, idx)
 
                 # check for completion

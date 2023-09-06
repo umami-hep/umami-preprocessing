@@ -71,12 +71,18 @@ class Normalisation:
                 class_dict[name][var] = counts
         return class_dict
 
-    def combine_class_dict(self, class_dict_A, class_dict_B):
+    @staticmethod
+    def combine_class_dict(class_dict_A, class_dict_B):
         for name, var in class_dict_B.items():
             for v, stats in var.items():
                 labels, counts = stats
                 for i, label in enumerate(labels):
-                    counts_A = dict(zip(*class_dict_A[name][v], strict=True))
+                    if len(class_dict_A[name][v][0]) != len(class_dict_A[name][v][1]):
+                        raise ValueError(
+                            "Class dict A has arrays of different lengths for the same"
+                            " variable. This should not happen."
+                        )
+                    counts_A = dict(zip(*class_dict_A[name][v]))
                     counts[i] += counts_A.get(label, 0)
                 var[v] = (labels, counts)
         return class_dict_B
