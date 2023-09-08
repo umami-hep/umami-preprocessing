@@ -31,10 +31,12 @@ Split = Literal["train", "val", "test"]
 @dataclass
 class PreprocessingConfig:
     """
-    Global options for the preprocessing are specified in the config file 
+    Global options for the preprocessing.
+
+    These optons are specified in the config file
     under the `global:` key. They are passed as kwargs to PreprocessingConfig.
     The config file is also copied to the output directory.
-    
+
     For example:
     ```yaml
     global:
@@ -43,7 +45,7 @@ class PreprocessingConfig:
         base_dir: /my/stuff/
         ntuple_dir: h5-inputs # resolved path: /my/stuff/h5-inputs/
     ```
-  
+
     Parameters
     ----------
     base_dir : Path
@@ -60,16 +62,17 @@ class PreprocessingConfig:
     out_fname : Path
         Filename stem for the output files.
     batch_size : int
-        Batch size for the preprocessing. For each batch select 
-        `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes 
-        especially to the `countup` method to achive best agreement of target and resampled 
+        Batch size for the preprocessing. For each batch select
+        `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes
+        especially to the `countup` method to achive best agreement of target and resampled
         distributions.
     num_jets_estimate : int
-        Number of jets of each flavour that are used to construct histograms for probability 
+        Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
     jets_name : str
         Name of the jets dataset in the input file.
     """
+
     config_path: Path
     split: Split
     config: dict
