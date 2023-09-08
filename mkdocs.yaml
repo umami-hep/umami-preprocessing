@@ -27,6 +27,18 @@ plugins:
   - git-revision-date-localized:
       enable_creation_date: true
       type: date
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            line_length: 100
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_root_full_path: false
+            docstring_style: numpy
+            docstring_options:
+              ignore_init_summary: false
+            merge_init_into_class: false
 
 markdown_extensions:
   - admonition

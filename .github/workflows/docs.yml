@@ -20,5 +20,5 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs==1.4.2 mkdocs-material==9.0.5 mkdocs-markdownextradata-plugin>=0.2.5 mkdocs-git-revision-date-localized-plugin
+      - run: pip install mkdocs==1.4.2 mkdocs-material==9.0.5 mkdocstrings mkdocs-markdownextradata-plugin>=0.2.5 mkdocs-git-revision-date-localized-plugin
       - run: mkdocs gh-deploy --force

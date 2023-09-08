@@ -192,21 +192,6 @@ resampling:
 |`sampling_fraction`|`auto`, Null or `float`| The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are prefered. On the other hand eith smaller sampling fractions lead to longer preprocesing times. `auto` option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present. |
 |`variables`|`dict`| The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable prlease provide a `bins` setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut betwenn **regions** takes place to better handle the discontinuities.|
 
-### Global 
+### Global Config 
 
-```
-global:
-  batch_size: 1_000_000
-  num_jets_estimate: 5_000_000
-  base_dir: /home/users/o/oleksiyu/WORK/umami-preprocessing/user/user6/replicate3_pdf_sfauto/
-  out_dir: test_out/
-  ntuple_dir: /srv/beegfs/scratch/groups/dpnc/atlas/FTag/samples/r22/
-```
-
-| Setting | Type | Explanation |
-| ------- | ---- | ----------- |
-|`batch_size`|`int`| The data is pereprocessed in batches. From each batch `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes especially to the `countup` method to achive best agreement of target and resampled distributions|
-|`num_jets_estimate`|`int`| Number of jets of each flavour that are used to construct histograms for probability density function estimation. Larger numbers give a better quality estmate of the pdfs|
-|`base_dir`|`str`| Directory for sabving all the intermedate and final steps  |
-|`out_dir`|`str`| The subdirectory of `base_dir` where all the final results are saved |
-|`ntuple_dir`|`ntuple_dir`| Directory where TDD ntuples are searched for using patterns defined before|
+#### ::: upp.classes.preprocessing_config.PreprocessingConfig
