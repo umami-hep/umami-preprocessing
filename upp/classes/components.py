@@ -59,7 +59,7 @@ class Component:
     def check_num_jets(
         self, num_jets, sampling_frac=None, cuts=None, silent=False, raise_error=True
     ):
-        """Check if num_jets jets are aviailable after the cuts and sampling fraction."""
+        # Check if num_jets jets are aviailable after the cuts and sampling fraction
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:

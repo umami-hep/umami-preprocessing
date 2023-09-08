@@ -7,8 +7,8 @@ import numpy as np
 
 @dataclass
 class ResamplingConfig:
-    variables: dict
     target: str
+    variables: dict
     sampling_fraction: float = 1.0
     method: str | None = None
     upscale_pdf: int | None = None

@@ -1,40 +1,14 @@
 # Configuration
 
-The configuration of the preprocessing is done with a [`.yaml`](https://en.wikipedia.org/wiki/YAML) file which steers the whole preprocessing. A general example of such a file can be found [here](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/blob/master/examples/preprocessing/PFlow-Preprocessing.yaml).
+The configuration of the preprocessing is done with a [`.yaml`](https://en.wikipedia.org/wiki/YAML) file which steers the whole preprocessing.
+Available example config files for UPP can be found in [`upp/configs`]({{repo_url}}tree/main/upp/configs).
 
-Several example config files for UPP can be found in `upp/config`.
+Each aspect of the configuration is described in detail below.
 
-There are 4 main parts of the configs:
-1. TDD Samples
-2. Global cuts
-3. Components
-4. Variables
-5. Resampling
-6. General 
+### Global Cuts
 
-### TDD samples
-
-First of all one has to define the input TDD **samples** to be preprocessed. These are needed to construct the components later on in configs thus one should define them as [anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) `<sample name>: &<sample name>.
-Below we provide an example and a table explaining each setting 
-
-```yaml
-ttbar: &ttbar
-  name: ttbar
-  equal_jets: False
-  pattern:
-    - name1.*.410470.*/*.h5
-    - name2.*.410470.*/*.h5
-```
-
-| Setting | Type | Explanation |
-| ------- | ---- | ----------- |
-|`name`|`str`| The name of the sample to be used in intermediate resampled files|
-|`pattern`|`list` of `str`| one single pattern sring or a list of pattern strings that give all the files from which jets for this components should be read out. |
-|`equal_jets`|`bool`| **Optional (default True)** ?????????????????????????????????????????|
-
-### Global cuts
-
-The **cuts** that should be applied to all the data should be listed under `common:`. For example these could be the outlier cuts.
+The selections that should be applied to all the data should be listed under `common:`.
+For example these could be outlier removal cuts, or a common kinematic selection.
 To do this one first provides the variable name (`str`), then the comparison operator (`str`) and a number to compare to (`int`, `float` or list).
 Possible operators are `"=="`, `"!="`, `"<="`, `">="`, `">"`, `"<"` which work the same as in python, `"in"` and `"notin"` to chek if the value is in the list, and
 `"%{i}=="`, `"%{i}=="`, `"%{i}=="` operators to compare the modulo w.r.t. `i` of an integer number. 
@@ -46,21 +20,45 @@ global_cuts:
   common:
     - [JetFitterSecondaryVertex_mass, "<", 25000]
     - [JetFitter_deltaR, "<", 0.6]
-
   train:
     - [eventNumber, "%10<=", 7]
-
   val:
     - [eventNumber, "%10==", 8]
-
   test:
     - [eventNumber, "%10==", 9]
 ```
 
 
-### Components
-It may be helpful to define the anchors fot the cuts of different resampling **regions** where one plans to use events from different samples. 
-For each region one has to provede the string name and a list of **cuts** (see above).
+### Input H5 Samples
+
+Here we define the input h5 samples which are to be preprocessed.
+The samples are used to define components later on in configs and so one should define them with [anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
+Each sample is defined using one or more DSIDs, which generally come from the [training-dataset-dumper](https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper).
+If a list of DSIDs is provided, jets from each DSID will be merged according to the `equal_jets` flag.
+
+
+Below we provide an example and a table explaining each setting:
+
+```yaml
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - name1.*.410470.*/*.h5
+    - name2.*.410470.*/*.h5
+```
+
+| Setting | Type | Explanation | Default |
+| ------- | ---- | ----------- | ------- |
+|`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
+|`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
+|`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
+
+
+### Resampling Regions
+
+Next we define any kinematic regions which need to be resampled separately, again using anchors as these will also be used in the definition of our components.
+For each region you need to provide a name and a list of cuts (see above).
 Here is an example:
 
 ```yaml
@@ -76,54 +74,45 @@ highpt: &highpt
     - [pt_btagJes, "<", 6_000_000]
 ```
 
-Thereafter one provides settings for a separate `components:` for each **region**, **sample** and flavour (or combination of flavours), and provides the number of jets that should be sampled from each component. Below you can see an example with several components and the description for the settings that one has to define for each component. Notice that we use `<<*` aliasing tool to insert the **region**, **sample** configs that we have defined above.
+Aliasing these just helps to reduce duplication of information when defining the components as can be seen below.
+
+### Components
+
+A component is a combination of a region, a sample and a flavour.
+
+They allow for full flexibility when defining different preprocessing pipelines
+(e.g. single-b versus Xbb).
+An example is provided below.
+Notice that we use `<<*` aliasing tool to insert already defined regions and samples.
 
 ```yaml
 components:
-  - region:
-      <<: *lowpt
+- region:
+    <<: *lowpt
     sample:
-      <<: *ttbar
-    flavours: [bjets, cjets]
-    num_jets: 52_500_000
+    <<: *ttbar
+    flavours: [bjets, cjets, ujets]
+    num_jets: 10_000_000
 
-  - region:
-      <<: *lowpt
+- region:
+    <<: *highpt
     sample:
-      <<: *ttbar
-    flavours: [ujets]
-    num_jets: 105_000_000
-
-  - region:
-      <<: *lowpt
-    sample:
-      <<: *ttbar
-    flavours: [taujets]
-    num_jets: 6_250_000
-
-  - region:
-      <<: *highpt
-    sample:
-      <<: *zprime
-    flavours: [bjets, cjets]
-    num_jets: 21_000_000
-
-  - region:
-      <<: *highpt
-    sample:
-      <<: *zprime
-    flavours: [ujets]
-    num_jets: 42_000_000
+    <<: *zprime
+    flavours: [bjets, cjets, ujets]
+    num_jets: 5_000_000
 ```
+
 
 | Setting | Type | Explanation |
 | ------- | ---- | ----------- |
-|`region`|region conf| `name` of the region and the list of `cuts` to be applied to get the samples from a specific region|
-|`sample`|sample conf| TDD sample configs (see above)|
-|`flavours`|`list` of `str`| list of one or more flavours. If more then one is provided the saparate component will be created foer each flavour in the list but with the same other settings.|
+| `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
+| `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
+| `flavours` | `list[str]` | One or more jet flavours, e.g. `[bjets]` or `[ujets]`. The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each flavour.|
 |`num_jets`|`int`| The number of jets to be sampled from this component in the training split|
-|`num_jets_val`|`int`| **Optional (default `num_jets//10`)** number of jets of this component in validation set.|
-|`num_jets_test`|`int`| **Optional (default `num_jets//10`)** number of jets of this component in a test set.|
+|`num_jets_val`|`int`| **Optional** (default: `num_jets//10`) number of jets of this component in validation set.|
+|`num_jets_test`|`int`| **Optional** (default: `num_jets//10`) number of jets of this component in a test set.|
+
+
 
 ### Variables
 
@@ -169,9 +158,10 @@ variables: !include /<full path to your file>.yaml
 
 ### Resampling
 
-There are currently two ewsampling methods implemented in the package `pdf` and `countup` and they share most of setting. Below is the example of setting up the `pdf` resampling method and a table describitng all the parameters.
+There are currently two resampling methods implemented in the package `pdf` and `countup` and they share most of setting.
+Below is the example of setting up the `pdf` resampling method and a table describitng all the parameters.
 
-```
+```yaml
 resampling:
   target: cjets
   method: pdf

@@ -4,7 +4,7 @@ site_author: Umami Team
 site_url: https://umami-hep.github.io/umami-preprocessing/
 
 repo_name: Github
-repo_url: https://github.com/umami-hep/umami-preprocessing
+repo_url: https://github.com/umami-hep/umami-preprocessing/
 edit_uri: "tree/main/docs"
 
 theme:
