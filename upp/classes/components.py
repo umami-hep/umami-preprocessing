@@ -111,7 +111,7 @@ class Components:
             for name in c["flavours"]:
                 num_jets = c["num_jets"]
                 if pp_cfg.split == "val":
-                    num_jets = num_jets // 10
+                    num_jets = c.get("num_jets_val", num_jets // 10)
                 elif pp_cfg.split == "test":
                     num_jets = c.get("num_jets_test", num_jets // 10)
                 components.append(
@@ -145,8 +145,8 @@ class Components:
         for i, (region, ratio) in enumerate(ratios.items()):
             if i != 0 and not np.allclose(list(ratio.values()), list(ref.values())):
                 raise ValueError(
-                    f"Found inconsistent flavour ratios: \n - {ref_region}: {ref} \n - {region}:"
-                    f" {ratio}"
+                    f"Found inconsistent flavour ratios: \n - {ref_region}: {ref} \n -"
+                    f" {region}: {ratio}"
                 )
 
     @property
