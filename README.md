@@ -1,82 +1,14 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/umami-hep/umami-preprocessing/graph/badge.svg?token=K8MJI20UZO)](https://codecov.io/gh/umami-hep/umami-preprocessing)
+[![docs](https://img.shields.io/badge/info-documentation-informational)](https://umami-hep.github.io/umami-preprocessing//)
+
 
 # UPP: Umami PreProcessing
 
 This is a modular preprocessing pipeline for jet tagging.
 It addresses [several issues](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/?label_name%5B%5D=Preprocessing) with the current umami preprocessing workflow, and uses the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/) package extensively.
 
-This package is work in progress and still needs
-
-- [ ] documentation
-- [ ] integration and unit tests
-- [ ] integration with umami
-
-
-
-### Setup
-
-Get the code:
-
-```bash
-git clone https://github.com/umami-hep/umami-preprocessing.git
-cd umami-preprocessing
-```
-
-Conda environents are a great way to keep organised, but are not essential for installing the code. 
-With a fresh [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) or [mamba](https://github.com/conda-forge/miniforge#install) environment:
-
-```bash
-mamba create -n upp python=3.8.10
-mamba activate upp
-python -m pip install -e .[dev]
-```
-
-See [here](https://abpcomputing.web.cern.ch/guides/python_inst/) for instructions on installing conda on lxplus.
-If you don't want to use conda environments on lxplus, you could probably just install with
-
-```bash
-setupATLAS
-lsetup "python 3.9.11-x86_64-centos7"
-python -m pip install -e .[dev]
-```
-
-You could also consider using Python's [venv](https://docs.python.org/3/library/venv.html).
-
-### Run
-
-Take a look inside the config and modify as necessary.
-To run all preprocessing stages for the train split:
-
-```bash
-preprocess --config configs/test.yaml
-```
-
-To run with only specific steps enabled, include the flag for the required steps.
-For example
-
-```bash
-preprocess --config configs/config.yaml --prep --resample
-```
-
-will run the first two steps.
-
-To run without certain steps, include the corresponding negative flag (`--no-*`).
-For example to run without plotting
-
-```bash
-preprocess --config configs/config.yaml --no-plot
-```
-
-If you want to preprocess the validation or test split, use the `--split` argument:
-
-```bash
-preprocess --config configs/config.yaml --split val
-```
-
-You can also use `split=all` to run each of the train/val/test splits in a single command.
-
-See `preprocess --help` for the full list of flags.
+Documentation is under construction [here](https://umami-hep.github.io/umami-preprocessing/)
 
 
 ### Comparisons with umami
