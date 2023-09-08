@@ -9,9 +9,25 @@ You should make changes inside a [feature branch](https://docs.gitlab.com/ee/git
 
 Remember to keep you fork [up to date](https://about.gitlab.com/blog/2016/12/01/how-to-keep-your-fork-up-to-date-with-its-origin/) with upstream.
 
-#### Code Formatting
+### Code Formatting
 
 It's good practice to document your code with module and function docstrings, and inline comments.
 Consider also providing type hints for the function in/outputs.
 It's also recommended to use [black](https://github.com/psf/black) to format your contributions.
 You can take a look at the [umami docs](https://umami-docs.web.cern.ch/setup/development/) for more guidelines on code style.
+
+For the formatting in this project use pre-commit hooks:
+
+```bash
+pre-commit run --all-files
+```
+
+### Testing
+
+It is highly encoraged to adhere to provide unit and/or integration tests for every new added feature.
+You can test your code and check the coverage using.
+```bash
+coverage run --source ftag -m pytest --show-capture=stdout
+coverage report 
+```
+You may also find the [codecov](https://about.codecov.io/) tool helpful
