@@ -209,4 +209,8 @@ global:
 |`num_jets_estimate`|`int`| Number of jets of each flavour that are used to construct histograms for probability density function estimation. Larger numbers give a better quality estmate of the pdfs|
 |`base_dir`|`str`| Directory for sabving all the intermedate and final steps  |
 |`out_dir`|`str`| The subdirectory of `base_dir` where all the final results are saved |
+<<<<<<< HEAD
 |`ntuple_dir`|`ntuple_dir`| Directory where TDD ntuples are searched for using patterns defined before|
+=======
+|`ntuple_dir`|`ntuple_dir`| Directory where TDD ntuples are searched for using patterns defined before|
+>>>>>>> 12a759c (more or less full text)

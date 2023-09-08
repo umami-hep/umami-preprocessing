@@ -1,8 +1,8 @@
 
 
-### Get the code:
+### Get the code
 
-clone and enter the repository using:
+Clone and enter the repository using:
 
 ```bash
 git clone https://github.com/umami-hep/umami-preprocessing.git
