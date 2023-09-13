@@ -80,7 +80,7 @@ class Component:
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
-        auto_sampling_frac = round(1.05 * num_jets / total, 3) # 1.05 is a tolerance factor
+        auto_sampling_frac = round(1.05 * num_jets / total, 3)  # 1.05 is a tolerance factor
         if not silent:
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
         return auto_sampling_frac
@@ -140,8 +140,8 @@ class Components:
                 this_ratios[f.name] = components[f].num_jets / components.num_jets
             ratios[region] = this_ratios
 
-        ref = list(ratios.values())[0]
-        ref_region = list(ratios.keys())[0]
+        ref = next(iter(ratios.values()))
+        ref_region = next(iter(ratios.keys()))
         for i, (region, ratio) in enumerate(ratios.items()):
             if i != 0 and not np.allclose(list(ratio.values()), list(ref.values())):
                 raise ValueError(
@@ -177,7 +177,7 @@ class Components:
     def out_dir(self):
         out_dir = {c.out_path.parent for c in self}
         assert len(out_dir) == 1
-        return list(out_dir)[0]
+        return next(iter(out_dir))
 
     @property
     def jet_counts(self):
