@@ -4,11 +4,12 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from ftag import get_mock_file
-from ftag.hdf5 import H5Reader, H5Writer
 
 from upp.main import run_pp
 
 this_dir = Path(__file__).parent
+
+
 class TestClass:
     def generate_mock(self, out_file, N=100_000):
         fname, f = get_mock_file(num_jets=N, fname=out_file)
@@ -21,10 +22,7 @@ class TestClass:
         print("setup_method      method:%s" % method.__name__)
 
     def teardown_method(self, method):
-        subprocess.run(
-            ["rm", "-rf", "/tmp/upp-tests/integration"],
-            check=True
-        )
+        subprocess.run(["rm", "-rf", "/tmp/upp-tests/integration"], check=True)
         print("teardown_method   method:%s" % method.__name__)
 
     def test_run_pdf_auto(self):
