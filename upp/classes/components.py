@@ -1,4 +1,3 @@
-import math
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
@@ -64,7 +63,7 @@ class Component:
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:
-            available = math.floor(total * sampling_frac / 1_000) * 1_000
+            available = int(total * sampling_frac)
 
         # check with tolerance to avoid failure midway through preprocessing
         if available < num_jets * 1.01 and raise_error:
@@ -81,9 +80,9 @@ class Component:
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
-        auto_sampling_frac = 1.02 * num_jets / total  # 1.02 is a tolerance
+        auto_sampling_frac = round(1.05 * num_jets / total, 2)
         if not silent:
-            log.debug(f"optimal sampling fraction {auto_sampling_frac:.3e}")
+            log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
         return auto_sampling_frac
 
     def __str__(self):
