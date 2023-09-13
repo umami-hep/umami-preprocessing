@@ -8,12 +8,16 @@ Each aspect of the configuration is described in detail below.
 ### Global Cuts
 
 The selections that should be applied to all the data should be listed under `common:`.
-For example these could be outlier removal cuts, or a common kinematic selection.
-To do this one first provides the variable name (`str`), then the comparison operator (`str`) and a number to compare to (`int`, `float` or list).
-Possible operators are `"=="`, `"!="`, `"<="`, `">="`, `">"`, `"<"` which work the same as in python, `"in"` and `"notin"` to chek if the value is in the list, and
-`"%{i}=="`, `"%{i}=="`, `"%{i}=="` operators to compare the modulo w.r.t. `i` of an integer number. 
+For example these could be outlier removal cuts, or a global kinematic selection.
+To do this one first provides the variable name (`str`), then the comparison operator (`str`) and a number to compare to (`int`, `float` or `list`).
+Possible operators are:
 
-Further one has to specify the cuts that separate `train`, `val` and `test` splits using modulo of `eventNumber`. For example:
+-  `"=="`, `"!="`, `"<="`, `">="`, `">"`, `"<"` which work the same as in python.
+- `"in"` and `"notin"` to check if the value is in the list.
+- `"%{i}=="`, `"%{i}=="`, `"%{i}=="` operators to compare the modulo w.r.t. `i` of an integer. 
+
+Along with the common selection cuts, you should also specify the cuts that separate `train`, `val` and `test` splits using modulo of `eventNumber`.
+For example:
 
 ```yaml
 global_cuts:
@@ -28,6 +32,10 @@ global_cuts:
     - [eventNumber, "%10==", 9]
 ```
 
+???info "More info about cuts"
+
+    The `Cuts` class is defined in the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/cuts.py) package.
+
 
 ### Input H5 Samples
 
@@ -37,16 +45,26 @@ Each sample is defined using one or more DSIDs, which generally come from the [t
 If a list of DSIDs is provided, jets from each DSID will be merged according to the `equal_jets` flag.
 
 
-Below we provide an example and a table explaining each setting:
+Below is an example and a table explaining each setting.
 
-```yaml
-ttbar: &ttbar
-  name: ttbar
-  equal_jets: False
-  pattern:
-    - name1.*.410470.*/*.h5
-    - name2.*.410470.*/*.h5
-```
+=== "Single DSID"
+
+    ```yaml
+    ttbar: &ttbar
+      name: ttbar
+      pattern: name1.*.410470.*/*.h5
+    ```
+
+=== "Multiple DSIDs"
+
+    ```yaml
+    ttbar: &ttbar
+      name: ttbar
+      equal_jets: False
+      pattern:
+        - name1.*.410470.*/*.h5
+        - name2.*.410470.*/*.h5
+    ```
 
 | Setting | Type | Explanation | Default |
 | ------- | ---- | ----------- | ------- |
@@ -74,16 +92,16 @@ highpt: &highpt
     - [pt_btagJes, "<", 6_000_000]
 ```
 
-Aliasing these just helps to reduce duplication of information when defining the components as can be seen below.
+Again, aliasing these just helps to reduce duplication of information when defining the components as can be seen below.
 
 ### Components
 
+The `components` is where all the configuration comes together. 
 A component is a combination of a region, a sample and a flavour.
-
 They allow for full flexibility when defining different preprocessing pipelines
 (e.g. single-b versus Xbb).
-An example is provided below.
-Notice that we use `<<*` aliasing tool to insert already defined regions and samples.
+
+An example `components` block is provided below.
 
 ```yaml
 components:
@@ -102,6 +120,7 @@ components:
     num_jets: 5_000_000
 ```
 
+Notice that we use `<<*` insertion tool to insert already defined regions and samples.
 
 | Setting | Type | Explanation |
 | ------- | ---- | ----------- |
@@ -116,7 +135,10 @@ components:
 
 ### Variables
 
-One needs to provide the variables that would be taken from the TDD samples and written in the resampled dataset. One can siply define them under `variables:` like:
+The next thing you need is to provide the variables that are taken from the TDD files and written in the resampled dataset.
+Selecting only a subset of variables keeps the output files lightweight, and ensures the dataloading does not become a bottleneck during training.
+
+One can simply define them under `variables:` like:
 
 ```yaml
 variables:
@@ -126,7 +148,6 @@ variables:
       - absEta_btagJes
     labels:
       - HadronConeExclTruthLabelID
-      - eta_btagJes
       - pt
       - eta
 
@@ -138,23 +159,34 @@ variables:
       - IP3D_signed_d0_significance
       - IP3D_signed_z0_significance
     labels:
-      - truthOriginLabel
-      - truthVertexIndex
+      - ftagTruthOriginLabel
+      - ftagTruthVertexIndex
 ```
-Where one fist specifies the dataset the same way it is called in TDD h5 file (e.g. `jets`, `tracks`, `hits`). All the variables that should be saved in resampled files should be provided in one of two lists `inputs` or in `labels`, the output file however doent have this structure and the variables from `inputs` and `labels` are mixed in each dataset. 
+Each key under `variables:` corresponds to a dataset name in the TDD h5 file (e.g. `jets`, `tracks`, `hits`).
+The combined set of variables in `inputs` and `labels` are carried over to the output files to a dataset with the same name as the input dataset.
+Internally, UPP will compute normalisation parameters for variables in the `inputs`, and compute class weightings (for categorical labels) for variables in the `labels` block.
 
 Alternatively include the variables from your custom variable config by providing the full path to the file after an include statement.
-The file you provide should have the same structure as shown above but without `variable:` level. Examle:
+The file you provide should have the same structure as shown above but without `variable:` level.
+For example:
 ```yaml
 variables: !include xbb-variables.yaml
 ```
 
-One can also import vaiables configs already provided in this package `upp/config/
-` yaml files using just the yaml file name e.g.:
+One can also import vaiables configs already provided in this package `upp/config/` yaml files using just the yaml file name e.g.:
 
 ```yaml
 variables: !include /<full path to your file>.yaml
 ```
+
+???info "You can choose later which variables in your output files are used for training"
+
+    When it comes to defining your training config, you will be required to [define the variables used for training](https://ftag-salt.docs.cern.ch/configuration/#selecting-training-variables).
+    So it's okay to include here input variables you are not sure whether you will need, for example when testing the importance of different inputs.
+    This is straightforward since we always store data using structured arrays (in the same format as the TDD outputs).
+    
+    
+
 
 ### Resampling
 
