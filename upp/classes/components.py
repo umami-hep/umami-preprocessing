@@ -1,4 +1,3 @@
-import math
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
@@ -58,18 +57,18 @@ class Component:
         return self.reader.load({jn: variables}, num_jets, cuts)[jn]
 
     def check_num_jets(
-        self, num_jets, sampling_frac=None, cuts=None, silent=False, raise_error=True
+        self, num_req, sampling_frac=None, cuts=None, silent=False, raise_error=True
     ):
         # Check if num_jets jets are aviailable after the cuts and sampling fraction
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:
-            available = math.floor(total * sampling_frac / 1_000) * 1_000
+            available = int(total * sampling_frac)
 
         # check with tolerance to avoid failure midway through preprocessing
-        if available < num_jets * 1.01 and raise_error:
+        if available < num_req and raise_error:
             raise ValueError(
-                f"{num_jets:,} jets requested, but only {total:,} are estimated to be"
+                f"{num_req:,} jets requested, but only {total:,} are estimated to be"
                 f" in {self}. With a sampling fraction of {sampling_frac}, at most"
                 f" {available:,} of these are available. You can either reduce the"
                 " number of requested jets or increase the sampling fraction."
@@ -77,13 +76,13 @@ class Component:
 
         if not silent:
             log.debug(f"Sampling fraction {sampling_frac}")
-            log.info(f"Estimated {available:,} {self} jets available - {num_jets:,} requested")
+            log.info(f"Estimated {available:,} {self} jets available - {num_req:,} requested")
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
-        auto_sampling_frac = 1.02 * num_jets / total  # 1.02 is a tolerance
+        auto_sampling_frac = round(1.05 * num_jets / total, 3)  # 1.05 is a tolerance factor
         if not silent:
-            log.debug(f"optimal sampling fraction {auto_sampling_frac:.3e}")
+            log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
         return auto_sampling_frac
 
     def __str__(self):
@@ -141,8 +140,8 @@ class Components:
                 this_ratios[f.name] = components[f].num_jets / components.num_jets
             ratios[region] = this_ratios
 
-        ref = list(ratios.values())[0]
-        ref_region = list(ratios.keys())[0]
+        ref = next(iter(ratios.values()))
+        ref_region = next(iter(ratios.keys()))
         for i, (region, ratio) in enumerate(ratios.items()):
             if i != 0 and not np.allclose(list(ratio.values()), list(ref.values())):
                 raise ValueError(
@@ -178,7 +177,7 @@ class Components:
     def out_dir(self):
         out_dir = {c.out_path.parent for c in self}
         assert len(out_dir) == 1
-        return list(out_dir)[0]
+        return next(iter(out_dir))
 
     @property
     def jet_counts(self):

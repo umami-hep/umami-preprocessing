@@ -5,11 +5,6 @@ zprime: &zprime
   name: zprime
   pattern: data2.h5
 
-.outlier_cuts: &outlier_cuts
-  - [JetFitterSecondaryVertex_mass, "<", 25000]
-  - [JetFitterSecondaryVertex_energy", "<", 1e8]
-  - [JetFitter_deltaR, "<", 0.6]
-
 global_cuts:
   train:
     - [pt_btagJes, ">", 0]
@@ -88,9 +83,8 @@ resampling:
 global:
   batch_size: 10_000
   num_jets_estimate: 5000
-  base_dir: "."
-  out_dir: tests/integration/temp_workspace/test_out/
-  ntuple_dir: tests/integration/temp_workspace/ntuples
+  base_dir: /tmp/upp-tests/integration/temp_workspace/
+  out_dir: test_out
 
 variables:
   jets:

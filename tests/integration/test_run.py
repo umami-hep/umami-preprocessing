@@ -4,43 +4,30 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from ftag import get_mock_file
-from ftag.hdf5 import H5Reader, H5Writer
 
 from upp.main import run_pp
 
+this_dir = Path(__file__).parent
+
 
 class TestClass:
-    def generate_mock(self, out_file, N=100000):
-        fname, f = get_mock_file(num_jets=2 * N)
-        reader = H5Reader(fname, batch_size=10000, shuffle=False)
-        variables = {"jets": None, "tracks": None}  # "None" means "all variables"
-        out_fname = out_file
-        writer = H5Writer(
-            dst=out_fname,
-            dtypes=reader.dtypes(variables),
-            shapes=reader.shapes(N, groups=["jets", "tracks"]),
-            shuffle=True,
-        )
-        for batch in reader.stream(variables=variables, num_jets=N):
-            writer.write(batch)
-        writer.close()
+    def generate_mock(self, out_file, N=100_000):
+        fname, f = get_mock_file(num_jets=N, fname=out_file)
+        f.close()
 
     def setup_method(self, method):
-        os.makedirs("tests/integration/temp_workspace/ntuples", exist_ok=True)
-        self.generate_mock("tests/integration/temp_workspace/ntuples/data1.h5")
-        self.generate_mock("tests/integration/temp_workspace/ntuples/data2.h5")
+        os.makedirs("/tmp/upp-tests/integration/temp_workspace/ntuples", exist_ok=True)
+        self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5")
+        self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data2.h5")
         print("setup_method      method:%s" % method.__name__)
 
     def teardown_method(self, method):
-        subprocess.run(
-            ["rm", "-rf", "tests/integration/temp_workspace"],
-            check=True,
-        )
+        subprocess.run(["rm", "-rf", "/tmp/upp-tests/integration"], check=True)
         print("teardown_method   method:%s" % method.__name__)
 
     def test_run_pdf_auto(self):
         args = SimpleNamespace(
-            config=Path("tests/integration/fixtures/test_conifig_pdf_auto.yaml"),
+            config=Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml"),
             prep=True,
             resample=True,
             merge=True,
@@ -52,7 +39,7 @@ class TestClass:
 
     def test_run_pdf_upscale(self):
         args = SimpleNamespace(
-            config=Path("tests/integration/fixtures/test_conifig_pdf_upscaled.yaml"),
+            config=Path(this_dir / "fixtures/test_conifig_pdf_upscaled.yaml"),
             prep=True,
             resample=True,
             merge=False,
@@ -64,7 +51,7 @@ class TestClass:
 
     def test_run_countup(self):
         args = SimpleNamespace(
-            config=Path("tests/integration/fixtures/test_conifig_countup.yaml"),
+            config=Path(this_dir / "fixtures/test_conifig_countup.yaml"),
             prep=True,
             resample=True,
             merge=False,

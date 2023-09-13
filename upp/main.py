@@ -20,8 +20,7 @@ from upp.stages.normalisation import Normalisation
 from upp.stages.resampling import Resampling
 
 
-class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
-    ...
+class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter): ...
 
 
 def parse_args():
