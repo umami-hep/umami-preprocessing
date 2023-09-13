@@ -1,5 +1,6 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/umami-hep/umami-preprocessing/graph/badge.svg?token=K8MJI20UZO)](https://codecov.io/gh/umami-hep/umami-preprocessing)
+[![PyPI version](https://badge.fury.io/py/umami-preprocessing.svg)](https://badge.fury.io/py/umami-preprocessing)
 [![docs](https://img.shields.io/badge/info-documentation-informational)](https://umami-hep.github.io/umami-preprocessing//)
 
 
