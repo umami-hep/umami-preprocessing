@@ -17,8 +17,8 @@ theme:
 nav:
   - Introduction: "index.md"
   - Setup: setup.md
-  - Run: run.md
   - Configuration: configuration.md
+  - Run: run.md
   - Contributing: contributing.md
 
 plugins:

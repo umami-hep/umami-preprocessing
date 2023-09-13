@@ -5,6 +5,42 @@ Available example config files for UPP can be found in [`upp/configs`]({{repo_ur
 
 Each aspect of the configuration is described in detail below.
 
+
+### Input H5 Samples
+
+Here we define the input h5 samples which are to be preprocessed.
+Each sample is defined using one or more DSIDs, which generally come from the [training-dataset-dumper](https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper).
+If a list of DSIDs is provided, jets from each DSID will be merged according to the `equal_jets` flag (see below).
+The samples are used to define components later on in configs and so one should define them with [anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
+
+Below is an example and a table explaining each setting.
+
+=== "Single DSID"
+
+    ```yaml
+    ttbar: &ttbar
+      name: ttbar
+      pattern: name1.*.410470.*/*.h5
+    ```
+
+=== "Multiple DSIDs"
+
+    ```yaml
+    ttbar: &ttbar
+      name: ttbar
+      equal_jets: False
+      pattern:
+        - name1.*.410470.*/*.h5
+        - name2.*.410470.*/*.h5
+    ```
+
+| Setting | Type | Explanation | Default |
+| ------- | ---- | ----------- | ------- |
+|`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
+|`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
+|`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
+
+
 ### Global Cuts
 
 The selections that should be applied to all the data should be listed under `common:`.
@@ -35,42 +71,6 @@ global_cuts:
 ???info "More info about cuts"
 
     The `Cuts` class is defined in the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/cuts.py) package.
-
-
-### Input H5 Samples
-
-Here we define the input h5 samples which are to be preprocessed.
-The samples are used to define components later on in configs and so one should define them with [anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
-Each sample is defined using one or more DSIDs, which generally come from the [training-dataset-dumper](https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper).
-If a list of DSIDs is provided, jets from each DSID will be merged according to the `equal_jets` flag.
-
-
-Below is an example and a table explaining each setting.
-
-=== "Single DSID"
-
-    ```yaml
-    ttbar: &ttbar
-      name: ttbar
-      pattern: name1.*.410470.*/*.h5
-    ```
-
-=== "Multiple DSIDs"
-
-    ```yaml
-    ttbar: &ttbar
-      name: ttbar
-      equal_jets: False
-      pattern:
-        - name1.*.410470.*/*.h5
-        - name2.*.410470.*/*.h5
-    ```
-
-| Setting | Type | Explanation | Default |
-| ------- | ---- | ----------- | ------- |
-|`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
-|`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
-|`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
 
 
 ### Resampling Regions
