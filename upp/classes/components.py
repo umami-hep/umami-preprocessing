@@ -1,3 +1,4 @@
+import math
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
@@ -63,7 +64,7 @@ class Component:
         total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
         available = total
         if sampling_frac:
-            available = int(total * sampling_frac)
+            available = math.floor(total * sampling_frac / 1_000) * 1_000
 
         # check with tolerance to avoid failure midway through preprocessing
         if available < num_jets * 1.01 and raise_error:
