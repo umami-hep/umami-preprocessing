@@ -20,6 +20,7 @@ nav:
   - Configuration: configuration.md
   - Run: run.md
   - Contributing: contributing.md
+  - Sampling methods: sampling.md
 
 plugins:
   - search

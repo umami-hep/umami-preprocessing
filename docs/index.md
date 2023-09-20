@@ -1,7 +1,7 @@
 # UPP: Umami Preprocessing 
 
 Welcome to the Umami PreProcessing (UPP) package, a modular preprocessing pipeline for jet tagging.
-UPP is used to preparing datasets for training various taggers. 
+UPP is used to prepare datasets for training various taggers. 
 In particular, it handles hybrid sample creation, resampling, normalisation, and shuffling.
 
 The code is hosted on the Github:
@@ -16,7 +16,7 @@ You can find information about tagger training and FTAG software at the central 
 
 
 ## Introduction
-Input ntuples for the preprocessing are produced using the [training-dataset-dumper](https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper) which which converts from ROOT files to HDF5 ntuples.
+Input ntuples for the preprocessing are produced using the [training-dataset-dumper](https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper) which converts from ROOT files to HDF5 ntuples.
 A list of available h5 ntuples is maintained in the central [FTAG documentation pages](https://ftag.docs.cern.ch/software/samples/).
 However, the ntuples listed there are not directly suitable for algorithm training and require preprocessing (handled by this package).
 
@@ -30,7 +30,7 @@ This uniformity in kinematic distributions is crucial to avoid kinematic biases 
 In order to ensure the uniformity in kinematic distributions, resampling techniques are employed.
 These techniques involve removing samples from the majority class (under-sampling) and/or adding more samples from the minority class (over-sampling).
 
-The preprocessing can also be used to control the number of jets of each flavour, to stitch together jets from various samples, and to perform the shuffling an normalisation.
+The preprocessing can also be used to control the number of jets of each flavour, to stitch together jets from various samples, and to perform the shuffling and normalisation.
 
 
 ## Hybrid Samples

@@ -62,7 +62,6 @@ It also handles shuffling.
 The normalise stage (`--norm`) calculates scaling and shifting values for all variables intended for training. The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
 
 #### 5. Plotting 
-`--plot` plotting: Plots histograms (with other binning than used for resmpling) of the resampled variables to validate the resmapling quality. Find the plots in `<tbase_dir>/plots/`
 
 The plotting stage (`--plot`) produces histograms of resampled variables to verify the resampling quality.
-You can find these plots in <tbase_dir>/plots/.
+You can find these plots in `<tbase_dir>/plots/`.
