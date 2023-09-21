@@ -96,7 +96,7 @@ Again, aliasing these just helps to reduce duplication of information when defin
 
 ### Components
 
-The `components` is where all the configuration comes together. 
+The `components` section is where all the configuration comes together. 
 A component is a combination of a region, a sample and a flavour.
 They allow for full flexibility when defining different preprocessing pipelines
 (e.g. single-b versus Xbb).

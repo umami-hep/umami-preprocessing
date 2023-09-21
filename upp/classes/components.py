@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 import numpy as np
 from ftag import Cuts, Flavour, Flavours, Sample
@@ -52,7 +53,7 @@ class Component:
     def is_target(self, target_str):
         return self.flavour.name == target_str
 
-    def get_jets(self, variables: list, num_jets: int, cuts: "Cuts | None" = None):
+    def get_jets(self, variables: list, num_jets: int, cuts: Cuts | None = None):
         jn = self.reader.jets_name
         return self.reader.load({jn: variables}, num_jets, cuts)[jn]
 
@@ -94,7 +95,7 @@ class Component:
 
 
 class Components:
-    def __init__(self, components: List[Component]):
+    def __init__(self, components: list[Component]):
         self.components = components
 
     @classmethod
