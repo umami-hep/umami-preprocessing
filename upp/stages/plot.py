@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging as log
 from pathlib import Path
 
