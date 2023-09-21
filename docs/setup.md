@@ -1,14 +1,5 @@
 This guide will walk you through the process of setting up the Umami-Preprocessing Python package on your system.
 
-### Get the code
-
-Start by cloning the Umami-Preprocessing repository and navigating into the project directory using the following commands in your terminal:
-
-```bash
-git clone https://github.com/umami-hep/umami-preprocessing.git
-cd umami-preprocessing
-```
-
 ### Environment Setup
 
 Creating a virtual environment helps keep your Python environment isolated and organized.
@@ -46,7 +37,25 @@ UPP requires Python 3.8 or later.
 
     !!!info "You can also [set up conda on lxplus](https://abpcomputing.web.cern.ch/guides/python_inst/)"
 
-### Install package 
+
+### PyPi installation 
+
+A simple installation can be done via `pip` from Python Packade Index:
+
+```bash
+pip install umami-preprocessing
+```
+
+### Get the code
+
+Start by cloning the Umami-Preprocessing repository and navigating into the project directory using the following commands in your terminal:
+
+```bash
+git clone https://github.com/umami-hep/umami-preprocessing.git
+cd umami-preprocessing
+```
+
+### Install package from code 
 
 Install the package as in editable mode if you would like to develop the code:
 
