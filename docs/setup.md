@@ -46,6 +46,8 @@ A simple installation can be done via `pip` from Python Packade Index:
 pip install umami-preprocessing
 ```
 
+After this installation all the fuctionality for the user is available. The further steps are only useful for the development of the package.
+
 ### Get the code
 
 Start by cloning the Umami-Preprocessing repository and navigating into the project directory using the following commands in your terminal:
