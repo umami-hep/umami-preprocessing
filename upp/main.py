@@ -22,10 +22,7 @@ from upp.stages.normalisation import Normalisation
 from upp.stages.resampling import Resampling
 
 
-class HelpFormatter(
-    argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
-):
-    ...
+class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter): ...
 
 
 def parse_args():
@@ -34,29 +31,19 @@ def parse_args():
         description=__doc__,
         formatter_class=HelpFormatter,
     )
-    parser.add_argument(
-        "--config", required=True, type=Path, help="Path to config file"
-    )
-    parser.add_argument(
-        "--prep", action=abool, default=None, help="Estimate and write PDFs"
-    )
+    parser.add_argument("--config", required=True, type=Path, help="Path to config file")
+    parser.add_argument("--prep", action=abool, default=None, help="Estimate and write PDFs")
     parser.add_argument("--no-prep", dest="prep", action="store_false")
     parser.add_argument("--resample", action=abool, default=None, help="Run resampling")
     parser.add_argument("--no-resample", dest="resample", action="store_false")
     parser.add_argument("--merge", action=abool, default=None, help="Run merging")
     parser.add_argument("--no-merge", dest="merge", action="store_false")
-    parser.add_argument(
-        "--norm", action=abool, default=None, help="Compute normalisations"
-    )
+    parser.add_argument("--norm", action=abool, default=None, help="Compute normalisations")
     parser.add_argument("--no-norm", dest="norm", action="store_false")
-    parser.add_argument(
-        "--plot", action=abool, default=None, help="Plot resampled distributions"
-    )
+    parser.add_argument("--plot", action=abool, default=None, help="Plot resampled distributions")
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
-    parser.add_argument(
-        "--split", default="train", choices=splits, help="Which file to produce"
-    )
+    parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
 
     args = parser.parse_args()
     d = vars(args)
@@ -100,7 +87,7 @@ def run_pp(args) -> None:
 
     # make plots
     if args.plot:
-        plot.plot_initial(config)
+        # plot.plot_initial(config)
         plot.main(config, args.split)
 
     # print end info
