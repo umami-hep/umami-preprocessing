@@ -85,6 +85,6 @@ pytest tests
 If you want to measure test coverage, first install coverage, and then run tests as follows:
 
 ```bash
-coverage run --source ftag -m pytest --show-capture=stdout
+coverage run --source upp -m pytest tests --show-capture=stdout
 coverage report 
 ```
