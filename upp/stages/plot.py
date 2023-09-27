@@ -3,20 +3,17 @@ from __future__ import annotations
 import logging as log
 from pathlib import Path
 
-import h5py
-import pandas as pd
 from ftag import Flavours
+from ftag.hdf5 import H5Reader
 from puma import Histogram, HistogramPlot
 
 from upp.utils import path_append
 
 
-def load_jets(paths, variable):
-    variables = ["flavour_label", variable]
-    df = pd.DataFrame(columns=variables)
-    for path in paths:
-        with h5py.File(path) as f:
-            df = pd.concat([df, pd.DataFrame(f["jets"].fields(variables)[: int(1e6)])])
+def load_jets(paths, variable, flavour_label="flavour_label"):
+    variables = {"jets": [flavour_label, variable]}
+    reader = H5Reader(paths, batch_size=1000)
+    df = reader.load(variables, num_jets=10000)["jets"]
     return df
 
 
@@ -27,7 +24,7 @@ def make_hist(stage, flavours, variable, in_paths, bins_range=None, suffix=""):
         ylabel="Normalised Number of jets",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
         xlabel=variable,
-        bins=100,
+        bins=50,
         y_scale=1.5,
         logy=True,
         norm=True,
@@ -53,6 +50,93 @@ def make_hist(stage, flavours, variable, in_paths, bins_range=None, suffix=""):
     out_path = out_dir / f"{fname}{suffix}.png"
     plot.savefig(out_path)
     log.info(f"Saved plot {out_path}")
+
+
+def make_hist_initial(
+    stage,
+    flavours,
+    variable,
+    in_paths_list,
+    bins_range=None,
+    suffix="",
+    jets_to_plot=-1,
+    out_dir=None,
+    suffixes=None,
+):
+    # df = load_jets(in_paths, variable)
+
+    plot = HistogramPlot(
+        ylabel="Normalised Number of jets",
+        atlas_second_tag="$\\sqrt{s}=13$ TeV",
+        xlabel=variable,
+        bins=100,
+        y_scale=1.5,
+        logy=True,
+        norm=True,
+        bins_range=bins_range,
+    )
+    if not isinstance(in_paths_list[0], list):
+        in_paths_list = [in_paths_list]
+    if suffixes is None:
+        suffixes = ["" for _ in in_paths_list]
+
+    linestiles = ["-", "--", "-.", ":"]
+    for i, in_paths in enumerate(in_paths_list):
+        reader = H5Reader(in_paths, batch_size=10000)
+        for flavour in flavours:
+            puma_flavour = f"{flavour.label}jets" if len(flavour.label) == 1 else flavour.label
+            if puma_flavour == "qcd":
+                puma_flavour = "dijets"
+            plot.add(
+                Histogram(
+                    reader.load(
+                        {"jets": [variable]},
+                        num_jets=jets_to_plot,
+                        cuts=flavour.cuts,
+                    )[
+                        "jets"
+                    ][variable],
+                    label=flavour.label + " " + suffixes[i],
+                    colour=flavour.colour,
+                    linestyle=linestiles[i],
+                )
+            )
+
+    plot.draw()
+    if out_dir is None:
+        out_dir = Path(in_paths_list[0][0]).parent.parent / "plots"
+    out_dir.mkdir(exist_ok=True)
+    fname = f"{stage}_{variable}"
+    out_path = out_dir / f"{fname}{suffix}.png"
+    plot.savefig(out_path)
+    log.info(f"Saved plot {out_path}")
+
+
+def plot_initial(config):
+    paths = [list(sample.path) for sample in config.components.samples]
+    suffixes = [sample.name for sample in config.components.samples]
+    for var in config.sampl_cfg.vars:
+        make_hist_initial(
+            "initial",
+            config.components.flavours,
+            var,
+            paths,
+            jets_to_plot=100000,
+            out_dir=config.out_dir / "plots",
+            suffixes=suffixes,
+        )
+        if "pt" in var:
+            make_hist_initial(
+                "initial",
+                config.components.flavours,
+                var,
+                paths,
+                (0, 500e3),
+                "low",
+                jets_to_plot=100000,
+                out_dir=config.out_dir / "plots",
+                suffixes=suffixes,
+            )
 
 
 def main(config, stage):

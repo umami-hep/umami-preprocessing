@@ -87,6 +87,7 @@ def run_pp(args) -> None:
 
     # make plots
     if args.plot:
+        plot.plot_initial(config)
         plot.main(config, args.split)
 
     # print end info
