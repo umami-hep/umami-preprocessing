@@ -66,6 +66,9 @@ class Normalisation:
         for name, array in batch.items():
             if name != self.variables.jets_name:
                 array = array[array["valid"]]
+            if name == "jets":  # separate case for flavour_label
+                counts = np.unique(array["flavour_label"], return_counts=True)
+                class_dict[name]["flavour_label"] = counts
             for var in self.variables[name].get("labels", []):
                 if not np.issubdtype(array[var].dtype, np.integer) or any(s in var for s in ignore):
                     continue
@@ -119,7 +122,9 @@ class Normalisation:
         norm_dict = None
         class_dict = None
         total = None
-        stream = reader.stream(self.variables.combined(), self.num_jets)
+        vars = self.variables.combined()
+        vars["jets"].append("flavour_label")
+        stream = reader.stream(vars, self.num_jets)
 
         with ProgressBar() as progress:
             task = progress.add_task(
