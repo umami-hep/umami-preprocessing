@@ -13,6 +13,7 @@ dependencies = [
     "scipy==1.9.3",
     "puma-hep==0.2.8",
     "atlas-ftag-tools==0.1.9",
+    "dotmap==1.3.30"
 ]
 
 [project.optional-dependencies]
