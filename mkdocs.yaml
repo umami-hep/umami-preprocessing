@@ -21,6 +21,7 @@ nav:
   - Run: run.md
   - Contributing: contributing.md
   - Sampling methods: sampling.md
+  - Umami integration: umami_int.md
 
 plugins:
   - search
