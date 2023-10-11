@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import subprocess
 from pathlib import Path
@@ -56,7 +58,7 @@ class TestPreprocessingConfig:
             str(config.get_file_name("resampled"))
             == "/tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5"
         )
-        assert (
-            str(config.get_file_name("resampled_scaled_shuffled"))
-            == "/tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train_resampled_scaled_shuffled.h5"
+        assert str(config.get_file_name("resampled_scaled_shuffled")) == (
+            "/tmp/upp-tests/integration/temp_workspace/test_out"
+            + "/pp_output_train_resampled_scaled_shuffled.h5"
         )
