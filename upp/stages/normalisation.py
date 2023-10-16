@@ -67,7 +67,8 @@ class Normalisation:
         for name, array in batch.items():
             if name != self.variables.jets_name:
                 array = array[array["valid"]]
-            if name == self.variables.jets_name:  # separate case for flavour_label
+            # separate case for flavour_label
+            if name == self.variables.jets_name and "flavour_label" in array.dtype.names:
                 counts = np.unique(array["flavour_label"], return_counts=True)
                 class_dict[name]["flavour_label"] = counts
             for var in self.variables[name].get("labels", []):
