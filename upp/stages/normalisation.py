@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging as log
 
+import h5py
 import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
@@ -66,7 +67,7 @@ class Normalisation:
         for name, array in batch.items():
             if name != self.variables.jets_name:
                 array = array[array["valid"]]
-            if name == "jets":  # separate case for flavour_label
+            if name == self.variables.jets_name:  # separate case for flavour_label
                 counts = np.unique(array["flavour_label"], return_counts=True)
                 class_dict[name]["flavour_label"] = counts
             for var in self.variables[name].get("labels", []):
@@ -123,7 +124,9 @@ class Normalisation:
         class_dict = None
         total = None
         vars = self.variables.combined()
-        vars["jets"].append("flavour_label")
+        with h5py.File(reader.files[0]) as f:
+            if "flavour_label" in f[self.jets_name].dtype.names:
+                vars[self.jets_name].append("flavour_label")
         stream = reader.stream(vars, self.num_jets)
 
         with ProgressBar() as progress:
