@@ -70,6 +70,7 @@ class Merging:
             components[0].reader.dtypes(self.variables.combined()),
             components[0].reader.shapes(components.num_jets, self.variables.keys()),
             add_flavour_label=self.jets_name,
+            jets_name="muons",
         )
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
         self.writer.add_attr("unique_jets", components.unique_jets)

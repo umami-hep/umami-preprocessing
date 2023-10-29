@@ -177,6 +177,7 @@ class Resampling:
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
+                jets_name="muons",
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
             )

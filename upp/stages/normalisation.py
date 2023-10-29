@@ -118,7 +118,7 @@ class Normalisation:
         log.info(f"[bold green]{title:-^100}")
 
         # setup reader
-        reader = H5Reader(self.ppc.out_fname, self.ppc.batch_size, precision="full")
+        reader = H5Reader(self.ppc.out_fname, self.ppc.batch_size, precision="full", jets_name="muons")
         log.debug(f"Setup reader at: {self.ppc.out_fname}")
 
         norm_dict = None

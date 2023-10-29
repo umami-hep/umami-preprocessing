@@ -10,15 +10,15 @@ from puma import Histogram, HistogramPlot
 from upp.utils import path_append
 
 
-def load_jets(paths, variable, flavour_label="flavour_label"):
-    variables = {"jets": [flavour_label, variable]}
-    reader = H5Reader(paths, batch_size=1000)
-    df = reader.load(variables, num_jets=10000)["jets"]
+def load_jets(paths, variable, flavour_label="flavour_label", jets_name="muons"):
+    variables = {jets_name: [flavour_label, variable]}
+    reader = H5Reader(paths, batch_size=1000, jets_name=jets_name)
+    df = reader.load(variables, num_jets=10000)[jets_name]
     return df
 
 
-def make_hist(stage, flavours, variable, in_paths, bins_range=None, suffix=""):
-    df = load_jets(in_paths, variable)
+def make_hist(stage, flavours, variable, in_paths, jets_name="muons", bins_range=None, suffix=""):
+    df = load_jets(in_paths, variable, jets_name=jets_name)
 
     plot = HistogramPlot(
         ylabel="Normalised Number of jets",
@@ -57,6 +57,7 @@ def make_hist_initial(
     flavours,
     variable,
     in_paths_list,
+    jets_name="muons",
     bins_range=None,
     suffix="",
     jets_to_plot=-1,
@@ -82,7 +83,7 @@ def make_hist_initial(
 
     linestiles = ["-", "--", "-.", ":"]
     for i, in_paths in enumerate(in_paths_list):
-        reader = H5Reader(in_paths, batch_size=10000)
+        reader = H5Reader(in_paths, batch_size=10000, jets_name=jets_name)
         for flavour in flavours:
             puma_flavour = f"{flavour.label}jets" if len(flavour.label) == 1 else flavour.label
             if puma_flavour == "qcd":
@@ -90,11 +91,11 @@ def make_hist_initial(
             plot.add(
                 Histogram(
                     reader.load(
-                        {"jets": [variable]},
+                        {jets_name: [variable]},
                         num_jets=jets_to_plot,
                         cuts=flavour.cuts,
                     )[
-                        "jets"
+                        jets_name
                     ][variable],
                     label=flavour.label + " " + suffixes[i],
                     colour=flavour.colour,
@@ -121,6 +122,7 @@ def plot_initial(config):
             config.components.flavours,
             var,
             paths,
+            "muons",
             jets_to_plot=100000,
             out_dir=config.out_dir / "plots",
             suffixes=suffixes,
@@ -131,6 +133,7 @@ def plot_initial(config):
                 config.components.flavours,
                 var,
                 paths,
+                "muons",
                 (0, 500e3),
                 "low",
                 jets_to_plot=100000,
@@ -146,6 +149,6 @@ def main(config, stage):
         paths = [path_append(config.out_fname, sample) for sample in config.components.samples]
 
     for var in config.sampl_cfg.vars:
-        make_hist(stage, config.components.flavours, var, paths)
+        make_hist(stage, config.components.flavours, var, paths, "muons")
         if "pt" in var:
-            make_hist(stage, config.components.flavours, var, paths, (0, 500e3), "low")
+            make_hist(stage, config.components.flavours, var, paths, "muons", (0, 500e3), "low")

@@ -1,0 +1,55 @@
+variables: !include lepton-isolation-variables.yaml
+#transform: !include transform.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  pattern:
+    - "user.pgadow.LD_2023_10_21.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.e6337_s3681_r13144_p5770_TREE/*.h5"
+
+global_cuts:
+  train:
+    - [eventNumber, "%10<=", 7]
+  val:
+    - [eventNumber, "%10==", 8]
+  test:
+    - [eventNumber, "%10==", 9]
+
+muon: &muon
+  name: muon
+  cuts:
+    - [pt_track, ">", 10_000]
+
+components:
+  - region:
+      <<: *muon
+    sample:
+      <<: *ttbar
+    flavours: [promptmuons]
+    num_jets: 15_000_000
+
+  - region:
+      <<: *muon
+    sample:
+      <<: *ttbar
+    flavours: [nonpromptmuons]
+    num_jets: 15_000_000
+
+
+resampling:
+  target: promptmuons
+  method: countup
+  sampling_fraction: auto
+  variables:
+    pt_track:
+      bins: [[10_000, 50_000, 8], [50_000, 100_000, 5], [100_000, 500_000, 20], [500_000, 1_000_000, 5]]
+    eta_track:
+      bins: [[-2.5, 2.5, 40]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: muons
+  batch_size: 1_000_000
+  num_jets_estimate: 5_000_000
+  base_dir: /data/pgadow/atlas/pliv/
+  ntuple_dir: /data/pgadow/atlas/pliv/ntuples/
+  out_dir: /data/pgadow/atlas/pliv/preprocessed/muons_30M

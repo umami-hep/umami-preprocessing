@@ -29,13 +29,13 @@ class Component:
     def setup_reader(self, batch_size, fname=None, **kwargs):
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size, equal_jets=self.equal_jets, **kwargs)
+        self.reader = H5Reader(fname, batch_size, jets_name="muons", equal_jets=self.equal_jets, **kwargs)
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables):
         dtypes = self.reader.dtypes(variables.combined())
         shapes = self.reader.shapes(self.num_jets, variables.keys())
-        self.writer = H5Writer(self.out_path, dtypes, shapes)
+        self.writer = H5Writer(self.out_path, dtypes, shapes, jets_name="muons",)
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property
