@@ -34,7 +34,8 @@ dev = [
 preprocess = "upp.main:main"
 
 [tool.setuptools]
-packages = ["upp"]
+packages = ["upp", "upp.classes", "upp.stages"]
+include-package-data = true
 
 [tool.setuptools.dynamic]
 version = {attr = "upp.__version__"}
