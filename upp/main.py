@@ -16,9 +16,10 @@ from pathlib import Path
 
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.logger import setup_logger
-from upp.stages import hist, plot
+from upp.stages.hist import create_histograms
 from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
+from upp.stages.plot import plot_initial_resampling_dists, plot_resampled_dists
 from upp.stages.resampling import Resampling
 
 
@@ -68,7 +69,7 @@ def run_pp(args) -> None:
 
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":
-        hist.main(config)
+        create_histograms(config)
 
     # run the resampling
     if args.resample:
@@ -87,8 +88,8 @@ def run_pp(args) -> None:
 
     # make plots
     if args.plot:
-        plot.plot_initial(config)
-        plot.main(config, args.split)
+        plot_initial_resampling_dists(config=config)
+        plot_resampled_dists(config=config, stage=args.split)
 
     # print end info
     end = datetime.now()
