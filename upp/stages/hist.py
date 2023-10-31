@@ -14,17 +14,66 @@ from scipy.stats import binned_statistic_dd
 from upp.logger import setup_logger
 
 
-def bin_jets(array, bins) -> np.array:
-    hist, _, bins = binned_statistic_dd(s2u(array), None, "count", bins, expand_binnumbers=True)
-    bins -= 1
-    return hist, bins
+def bin_jets(array: dict, bins: list) -> np.ndarray:
+    """Create the histogram and bins for the given resampling variables.
+
+    Parameters
+    ----------
+    array : dict
+        Dict with the loaded jets and the resampling
+        variables.
+    bins : list
+        Flat list with the bins which are to be used.
+
+    Returns
+    -------
+    hist : np.ndarray, shape(nx1, nx2, nx3,...)
+        The values of the selected statistic in each two-dimensional bin.
+    out_bins : (N,) array of ints or (D,N) ndarray of ints
+        This assigns to each element of `sample` an integer that represents the
+        bin in which this observation falls.  The representation depends on the
+        `expand_binnumbers` argument.  See `Notes` for details.
+    """
+    hist, _, out_bins = binned_statistic_dd(
+        sample=s2u(array),
+        values=None,
+        statistic="count",
+        bins=bins,
+        expand_binnumbers=True,
+    )
+    out_bins -= 1
+    return hist, out_bins
 
 
 @dataclass
 class Hist:
+    """Histogram data class for the preprocessing."""
+
     path: Path
 
-    def write_hist(self, jets, resampling_vars, bins) -> None:
+    def write_hist(
+        self,
+        jets: dict,
+        resampling_vars: list,
+        bins: list,
+    ) -> None:
+        """
+        Write the histogram to file.
+
+        Parameters
+        ----------
+        jets : dict
+            Dict with the loaded jets.
+        resampling_vars : list
+            List of the resampling variables.
+        bins : list
+            Flat list with the bins.
+
+        Raises
+        ------
+        ValueError
+            If the given binning and cuts don't match.
+        """
         # make parent dir
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -44,17 +93,38 @@ class Hist:
 
     @functools.cached_property
     def hist(self) -> np.array:
+        """Return the histogram completely.
+
+        Returns
+        -------
+        np.array
+            Full histogram
+        """
         with h5py.File(self.path) as f:
             return f["hist"][:]
 
     @functools.cached_property
     def pbin(self) -> np.array:
+        """Return the probability rate for each bin.
+
+        Returns
+        -------
+        np.array
+            Probability rates for the different bins.
+        """
         # probability (rate) of each bin
         with h5py.File(self.path) as f:
             return f["pbin"][:]
 
 
-def main(config=None):
+def create_histograms(config) -> None:
+    """Create the virtual datasets and pdf files.
+
+    Parameters
+    ----------
+    config : PreprocessingConfig object
+        PreprocessingConfig object of the current preprocessing.
+    """
     setup_logger()
 
     title = " Writing PDFs "
