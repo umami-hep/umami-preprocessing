@@ -125,3 +125,6 @@ umami:
   parameters:
     sample_path: sample/path/
     file_path: file/path/
+  convert_to_tfrecord:
+    chunk_size: 5000
+    N_add_vars: null
