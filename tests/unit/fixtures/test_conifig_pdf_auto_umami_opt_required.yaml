@@ -1,0 +1,124 @@
+ttbar: &ttbar
+  name: ttbar
+  pattern: data1.h5
+zprime: &zprime
+  name: zprime
+  pattern: data2.h5
+
+global_cuts:
+  train:
+    - [pt_btagJes, ">", 0]
+
+  val:
+    - [pt_btagJes, ">", 0]
+
+  test:
+    - [pt_btagJes, ">", 0]
+
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt, ">", 0]
+    - [pt, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt, ">", 250_000]
+    - [pt, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [bjets]
+    num_jets: 7_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [cjets]
+    num_jets: 7_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ ujets]
+    num_jets: 7_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [bjets]
+    num_jets: 3_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [cjets]
+    num_jets: 3_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ujets]
+    num_jets: 3_000
+
+resampling:
+  target: bjets
+  method: pdf
+  sampling_fraction: "auto"
+  variables:
+    pt:
+      bins: [[0, 250000, 5], [250000, 6000000, 5]]
+    abs_eta:
+      bins: [[0, 2.5, 5]]
+
+global:
+  batch_size: 10_000
+  num_jets_estimate: 5000
+  base_dir: /tmp/upp-tests/integration/temp_workspace/
+  out_dir: test_out
+
+variables:
+  jets:
+    inputs:
+      - pt_btagJes
+      - eta_btagJes
+    labels:
+      - pt
+      - eta
+      - mass
+
+  tracks:
+    inputs:
+      - dphi
+      - deta
+      - qOverP
+    labels:
+      - qOverP
+
+umami:
+  general:
+    dict_file: dict/file/path.json
+    compression: gzip
+    var_file: var/file/path.yaml
+    precision: float32
+    concat_jet_tracks: False
+    plot_type: "pdf"
+    plot_name: PFlow_ext-hybrid
+  sampling:
+    use_validation_samples: false
+    options:
+      n_jets_to_plot: 1e4
+      save_tracks: true
+      save_track_labels: true
+      bool_attach_sample_weights: false
+      tracks_names: ["tracks"]
+      n_jets_scaling: 0
