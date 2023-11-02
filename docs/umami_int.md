@@ -26,16 +26,9 @@ umami:
       bool_attach_sample_weights: false
       tracks_names: ["tracks"]
       n_jets_scaling: 0
-  parameters:
-    sample_path: <base_dir><out_dir>
-    file_path: <base_dir><out_dir>
-  convert_to_tfrecord:
-    chunk_size: 5000
-    N_add_vars: null
 
-```
 This config part mimics the umami config structure. Parameters in `general` mimic ones that are in the root of umami config. Parameters in `sampling`, `sampling.options`, `parameters` and `convert_to_tfrecord` mimic the corresponding structures in umami config. All the parameters given in the example should be given in order for UPP integration in umami to work except `parameters` and `convert_to_tfrecord`. You need to provide `convert_to_tfrecord` if you need to convert dataset to TFrecord and `parameters` oonly if you does not want to saveinto `<base_dir><out_dir>` by default.
-Please refer to umami documentation [] for up-to-date explanation.
+Please refer to umami documentation [https://umami.docs.cern.ch/preprocessing/Overview/] for up-to-date explanation.
 
 ### Running preprocessing
 
