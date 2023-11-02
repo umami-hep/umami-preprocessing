@@ -215,7 +215,14 @@ class PreprocessingConfig:
         self.general = general
         self.sampling = DotMap(self.config["umami"]["sampling"], _dynamic=False)
         self.sampling.class_labels = [flav.name for flav in self.components.flavours]
-        self.parameters = self.config["umami"]["parameters"]
+        if self.config["umami"].get("parameters", None) is not None:
+            self.parameters = self.config["umami"]["parameters"]
+        else:
+            self.parameters = {}
+            self.parameters[""] = self.out_dir
+            self.parameters[""] = self.out_dir
+        if self.config["umami"].get("convert_to_tfrecord", None) is not None:
+            self.general.convert_to_tfrecord = self.config["umami"]["convert_to_tfrecord"]
         return self
 
     def get_file_name(self, option, **_):

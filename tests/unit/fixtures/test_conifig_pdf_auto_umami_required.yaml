@@ -122,9 +122,3 @@ umami:
       bool_attach_sample_weights: false
       tracks_names: ["tracks"]
       n_jets_scaling: 0
-  parameters:
-    sample_path: sample/path/
-    file_path: file/path/
-  convert_to_tfrecord:
-    chunk_size: 5000
-    N_add_vars: null
