@@ -26,15 +26,6 @@ class TestPreprocessingConfig:
         print("teardown_method   method:%s" % method.__name__)
 
     @staticmethod
-    def test_get_umami_general_required():
-        config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami_required.yaml"),
-            "train",
-        )
-        general = config.get_umami_general()
-        assert general["dict_file"] == "dict/file/path.json"
-
-    @staticmethod
     def test_get_umami_general():
         config = PreprocessingConfig.from_file(
             Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
@@ -54,7 +45,18 @@ class TestPreprocessingConfig:
         config.mimic_umami_config(general)
 
         assert config.general.dict_file == "dict/file/path.json"
-        # assert config.sampling.class_labels[0] == "ujet"
+
+    @staticmethod
+    def test_mimic_umami_config_required():
+        config = PreprocessingConfig.from_file(
+            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami_required.yaml"),
+            "train",
+        )
+        general = config.get_umami_general()
+        general = DotMap(general, _dynamic=False)
+        config.mimic_umami_config(general)
+
+        assert config.general.dict_file == "dict/file/path.json"
 
     @staticmethod
     def test_get_file_name():
