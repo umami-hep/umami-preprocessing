@@ -7,6 +7,7 @@ from pathlib import Path
 from dotmap import DotMap
 from ftag import get_mock_file
 
+from upp import __version__
 from upp.classes.preprocessing_config import PreprocessingConfig
 
 
@@ -33,6 +34,17 @@ class TestPreprocessingConfig:
         )
         general = config.get_umami_general()
         assert general["dict_file"] == "dict/file/path.json"
+
+    @staticmethod
+    def test_get_umami_general_no_git():
+        os.rename(".git", ".git_temp")
+        config = PreprocessingConfig.from_file(
+            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            "train",
+        )
+        _ = config.get_umami_general()
+        os.rename(".git_temp", ".git")
+        assert config.git_hash == __version__
 
     @staticmethod
     def test_mimic_umami_config():

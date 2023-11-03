@@ -6,7 +6,7 @@ import logging as log
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from subprocess import check_output
+from subprocess import CalledProcessError, check_output
 from typing import Literal
 
 import yaml
@@ -15,6 +15,7 @@ from ftag import Cuts
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
+from upp import __version__
 from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.variable_config import VariableConfig
@@ -110,9 +111,16 @@ class PreprocessingConfig:
         )
 
         # copy config
-        git_hash = check_output(["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent)
-        self.git_hash = git_hash.decode("ascii").strip()
-        self.config["pp_git_hash"] = self.git_hash
+        try:
+            git_hash = check_output(
+                ["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent
+            )
+            self.git_hash = git_hash.decode("ascii").strip()
+            self.config["pp_git_hash"] = self.git_hash
+        except CalledProcessError:
+            log.warning("Could not get git hash")
+            self.git_hash = __version__
+            self.config["pp_git_hash"] = self.git_hash
         self.copy_config()
 
     @classmethod
