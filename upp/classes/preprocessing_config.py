@@ -110,9 +110,16 @@ class PreprocessingConfig:
         )
 
         # copy config
-        git_hash = check_output(["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent)
-        self.git_hash = git_hash.decode("ascii").strip()
-        self.config["pp_git_hash"] = self.git_hash
+        try:
+            git_hash = check_output(
+                ["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent
+            )
+            self.git_hash = git_hash.decode("ascii").strip()
+            self.config["pp_git_hash"] = self.git_hash
+        except Exception:
+            log.warning("Could not get git hash")
+            self.git_hash = "?"
+            self.config["pp_git_hash"] = self.git_hash
         self.copy_config()
 
     @classmethod
