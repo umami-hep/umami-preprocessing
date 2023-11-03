@@ -7,6 +7,7 @@ from pathlib import Path
 from dotmap import DotMap
 from ftag import get_mock_file
 
+from upp import __version__
 from upp.classes.preprocessing_config import PreprocessingConfig
 
 
@@ -43,7 +44,7 @@ class TestPreprocessingConfig:
         )
         _ = config.get_umami_general()
         os.rename(".git_temp", ".git")
-        assert config.git_hash == "?"
+        assert config.git_hash == __version__
 
     @staticmethod
     def test_mimic_umami_config():

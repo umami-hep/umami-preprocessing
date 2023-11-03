@@ -15,6 +15,7 @@ from ftag import Cuts
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
+from upp import __version__
 from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.variable_config import VariableConfig
@@ -124,7 +125,7 @@ class PreprocessingConfig:
             self.config["pp_git_hash"] = self.git_hash
         except CalledProcessError:
             log.warning("Could not get git hash")
-            self.git_hash = "?"
+            self.git_hash = __version__
             self.config["pp_git_hash"] = self.git_hash
         self.copy_config()
 
