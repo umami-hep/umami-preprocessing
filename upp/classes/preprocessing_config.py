@@ -92,9 +92,7 @@ class PreprocessingConfig:
         # postprocess paths
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname":
-                setattr(
-                    self, field.name, self.get_path(Path(getattr(self, field.name)))
-                )
+                setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
         if not self.ntuple_dir.exists():
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
@@ -104,16 +102,12 @@ class PreprocessingConfig:
         sampl_cfg = copy(self.config["resampling"])
         self.sampl_cfg = ResamplingConfig(sampl_cfg.pop("variables"), **sampl_cfg)
         self.components = Components.from_config(self)
-        self.variables = VariableConfig(
-            self.config["variables"], self.jets_name, self.is_test
-        )
+        self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test)
         self.variables = self.variables.add_jet_vars(
             list(self.config["resampling"]["variables"].keys()), "labels"
         )
         self.transform = (
-            Transform(**self.config["transform"])
-            if "transform" in self.config
-            else None
+            Transform(**self.config["transform"]) if "transform" in self.config else None
         )
 
         # copy config
@@ -132,9 +126,7 @@ class PreprocessingConfig:
     @classmethod
     def from_file(cls, config_path: Path, split: Split):
         if not config_path.exists():
-            raise FileNotFoundError(
-                f"{config_path} does not exist - check your --config arg"
-            )
+            raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
         with open(config_path) as file:
             config = yaml.safe_load(file)
             return cls(config_path, split, config, **config["global"])
@@ -238,9 +230,7 @@ class PreprocessingConfig:
             self.parameters[""] = self.out_dir
             self.parameters[""] = self.out_dir
         if self.config["umami"].get("convert_to_tfrecord", None) is not None:
-            self.general.convert_to_tfrecord = self.config["umami"][
-                "convert_to_tfrecord"
-            ]
+            self.general.convert_to_tfrecord = self.config["umami"]["convert_to_tfrecord"]
         return self
 
     def get_file_name(self, option, **_):
