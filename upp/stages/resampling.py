@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging as log
 import random
 from pathlib import Path
@@ -9,6 +11,7 @@ from yamlinclude import YamlIncludeConstructor
 
 from upp.logger import ProgressBar
 from upp.stages.hist import bin_jets
+from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
 
 random.seed(42)
 
@@ -37,21 +40,31 @@ class Resampling:
         self.batch_size = config.batch_size
         self.is_test = config.is_test
         self.num_jets_estimate = config.num_jets_estimate
-        if self.config.method == "pdf":
-            self.select_func = self.pdf_select_func
-        elif self.config.method == "countup":
-            self.select_func = self.countup_select_func
-        elif not self.config.method or self.config.method == "none":
-            self.select_func = None
-        else:
-            raise ValueError(f"Unsupported resampling method {self.config.method}")
+        self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
+        self.regionlengthsd = self.get_regionlengthsd_from_config()
+        self.methods_map = {
+            "pdf": self.pdf_select_func,
+            "countup": self.countup_select_func,
+            "none": None,
+        }
+        if self.config.method not in self.methods_map:
+            raise ValueError(
+                f"Unsupported resampling method {self.config.method}, choose from"
+                f" {self.methods_map.keys()}"
+            )
+        self.select_func = self.methods_map[self.config.method]
+        self.transform = config.transform
+
         self.rng = np.random.default_rng(42)
 
-    def countup_select_func(self, jets, component):  # noqa: ARG002
-        num_jets = int(len(jets) * self.config.sampling_fraction)
-        target_pdf = self.target.hist.pdf
+    def countup_select_func(self, jets, component):
+        if self.upscale_pdf != 1:
+            raise ValueError("Upscaling of histogrms is not supported for countup method")
+        num_jets = int(len(jets) * component.sampling_fraction)
+        target_pdf = self.target.hist.pbin
         target_hist = target_pdf * num_jets
         target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
+
         _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
         assert target_pdf.shape == _hist.shape
 
@@ -70,14 +83,22 @@ class Resampling:
 
     def pdf_select_func(self, jets, component):
         # bin jets
-        _hist, binnumbers = bin_jets(jets[self.config.vars], self.config.flat_bins)
-        assert self.target.hist.pdf.shape == _hist.shape
+        if self.upscale_pdf > 1:
+            bins = [subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins]
+        else:
+            bins = self.config.flat_bins
+
+        _hist, binnumbers = bin_jets(jets[self.config.vars], bins)
+        # assert target_shape == _hist.shape
         if binnumbers.ndim > 1:
             binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
 
         # importance sample with replacement
-        num_samples = int(len(jets) * self.config.sampling_fraction)
-        probs = safe_divide(self.target.hist.pdf, component.hist.pdf)[binnumbers]
+        num_samples = int(len(jets) * component.sampling_fraction)
+        ratios = safe_divide(self.target.hist.pbin, component.hist.pbin)
+        if self.upscale_pdf > 1:
+            ratios = upscale_array_regionally(ratios, self.upscale_pdf, self.regionlengthsd)
+        probs = ratios[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
 
@@ -96,12 +117,16 @@ class Resampling:
 
                 # apply selections
                 comp_idx, _ = c.flavour.cuts(batch[self.variables.jets_name])
+                if len(comp_idx) == 0:
+                    continue
                 batch_out = select_batch(batch, comp_idx)
 
                 # apply sampling
                 idx = np.arange(len(batch_out[self.variables.jets_name]))
                 if c != self.target and not self.is_test and self.select_func:
                     idx = self.select_func(batch_out[self.variables.jets_name], c)
+                    if len(idx) == 0:
+                        continue
                     batch_out = select_batch(batch_out, idx)
 
                 # check for completion
@@ -141,9 +166,20 @@ class Resampling:
 
         # groupby samples
         for sample, cs in components.groupby_sample():
+            # make sure all tags equal_jets are the same
+            equal_jets_flags = [c.equal_jets for c in cs]
+            if len(set(equal_jets_flags)) != 1:
+                raise ValueError("equal_jets must be the same for all components in a sample")
+            equal_jets_flag = equal_jets_flags[0]
+
             # setup input stream
             variables = self.variables.add_jet_vars(cs.cuts.variables)
-            reader = H5Reader(sample.path, self.batch_size)
+            reader = H5Reader(
+                sample.path,
+                self.batch_size,
+                equal_jets=equal_jets_flag,
+                transform=self.transform,
+            )
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
             # run with progress
@@ -155,7 +191,8 @@ class Resampling:
 
                 for c in cs:
                     c.pbar = progress.add_task(
-                        f"[green]Sampling {c.num_jets:,} jets from {c}...", total=c.num_jets
+                        f"[green]Sampling {c.num_jets:,} jets from {c}...",
+                        total=c.num_jets,
                     )
 
                 # run sampling
@@ -169,6 +206,34 @@ class Resampling:
                 f" Jets are upsampled at most {np.max(c._ups_max):.0f} times"
             )
 
+    def set_component_sampling_fractions(self):
+        if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
+            log.info("[bold green]Sampling fraction chosen for each component automatically...")
+            for c in self.components:
+                if c.is_target(self.config.target):
+                    c.sampling_fraction = 1
+                else:
+                    sam_frac = c.get_auto_sampling_frac(c.num_jets, cuts=c.cuts)
+                    if sam_frac > 1:
+                        if self.config.method == "countup":
+                            raise ValueError(
+                                f"[bold red]Sampling fraction of {sam_frac:.3f}>1 is"
+                                f" needed for component {c} This is not supported for"
+                                " countup method."
+                            )
+                        else:
+                            log.warning(
+                                f"[bold yellow]sampling fraction of {sam_frac:.3f}>1 is"
+                                f" needed for component {c}"
+                            )
+                    c.sampling_fraction = max(sam_frac, 0.1)
+        else:
+            for c in self.components:
+                if c.is_target(self.config.target):
+                    c.sampling_fraction = 1
+                else:
+                    c.sampling_fraction = self.config.sampling_fraction
+
     def run(self):
         title = " Running resampling "
         log.info(f"[bold green]{title:-^100}")
@@ -176,8 +241,12 @@ class Resampling:
 
         # setup i/o
         for c in self.components:
-            c.setup_reader(self.batch_size)
+            # just used for the writer configuration
+            c.setup_reader(self.batch_size, transform=self.transform)
             c.setup_writer(self.variables)
+
+        # set samplig fraction if needed
+        self.set_component_sampling_fractions()
 
         # check samples
         log.info(
@@ -185,8 +254,8 @@ class Resampling:
             f" {self.config.sampling_fraction}..."
         )
         for c in self.components:
-            sampling_frac = 1 if c.is_target(self.config.target) else self.config.sampling_fraction
-            c.check_num_jets(c.num_jets, sampling_frac=sampling_frac, cuts=c.cuts)
+            frac = c.sampling_fraction if not self.is_test else 1
+            c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
 
         # run resampling
         for region, components in self.components.groupby_region():
@@ -198,3 +267,16 @@ class Resampling:
         log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
+
+    def get_regionlengthsd_from_config(self) -> list[list[int]]:
+        """Get the lengths of the binning regions in each variable from the config.
+
+        Returns
+        -------
+        typing.List[typing.List[int]]
+            lengths of the binning regions in each variable from the config
+        """
+        regionlengthsd = []
+        for row in self.config.bins.values():
+            regionlengthsd.append([sub[-1] for sub in row])
+        return regionlengthsd

@@ -6,13 +6,16 @@ import logging as log
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from subprocess import check_output
+from subprocess import CalledProcessError, check_output
 from typing import Literal
 
 import yaml
+from dotmap import DotMap
 from ftag import Cuts
+from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
+from upp import __version__
 from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.variable_config import VariableConfig
@@ -29,6 +32,49 @@ Split = Literal["train", "val", "test"]
 
 @dataclass
 class PreprocessingConfig:
+    """
+    Global options for the preprocessing.
+
+    These optons are specified in the config file
+    under the `global:` key. They are passed as kwargs to PreprocessingConfig.
+    The config file is also copied to the output directory.
+
+    For example:
+    ```yaml
+    global:
+        batch_size: 1_000_000
+        num_jets_estimate: 5_000_000
+        base_dir: /my/stuff/
+        ntuple_dir: h5-inputs # resolved path: /my/stuff/h5-inputs/
+    ```
+
+    Parameters
+    ----------
+    base_dir : Path
+        Base directory for all other paths.
+    ntuple_dir : Path
+        Directory containing the input h5 ntuples. If a relative path is given, it is
+        interpreted as relative to base_dir.
+    components_dir : Path
+        Directory for intermediate component files. If a relative path is given, it is
+        interpreted as relative to base_dir.
+    out_dir : Path
+        Directory for output files. If a relative path is given, it is interpreted as
+        relative to base_dir.
+    out_fname : Path
+        Filename stem for the output files.
+    batch_size : int
+        Batch size for the preprocessing. For each batch select
+        `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes
+        especially to the `countup` method to achive best agreement of target and resampled
+        distributions.
+    num_jets_estimate : int
+        Number of jets of each flavour that are used to construct histograms for probability
+        density function estimation. Larger numbers give a better quality estmate of the pdfs.
+    jets_name : str
+        Name of the jets dataset in the input file.
+    """
+
     config_path: Path
     split: Split
     config: dict
@@ -57,11 +103,24 @@ class PreprocessingConfig:
         self.sampl_cfg = ResamplingConfig(sampl_cfg.pop("variables"), **sampl_cfg)
         self.components = Components.from_config(self)
         self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test)
+        self.variables = self.variables.add_jet_vars(
+            list(self.config["resampling"]["variables"].keys()), "labels"
+        )
+        self.transform = (
+            Transform(**self.config["transform"]) if "transform" in self.config else None
+        )
 
         # copy config
-        git_hash = check_output(["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent)
-        self.git_hash = git_hash.decode("ascii").strip()
-        self.config["pp_git_hash"] = self.git_hash
+        try:
+            git_hash = check_output(
+                ["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent
+            )
+            self.git_hash = git_hash.decode("ascii").strip()
+            self.config["pp_git_hash"] = self.git_hash
+        except CalledProcessError:
+            log.warning("Could not get git hash")
+            self.git_hash = __version__
+            self.config["pp_git_hash"] = self.git_hash
         self.copy_config()
 
     @classmethod
@@ -89,9 +148,124 @@ class PreprocessingConfig:
                 cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
         return Cuts.from_list(cuts_list)
 
-    def copy_config(self):
-        copy_config_path = self.out_dir / path_append(Path(self.config_path.name), self.split)
+    def copy_config(self, suffix=None, out_dir=None):
+        """
+        Copy the configuration file to a new location with an optional suffix and output directory.
+
+        Parameters
+        ----------
+        suffix : str or None, optional
+            A suffix to append to the configuration file name. If None, the current
+            `self.split` value will be used as the suffix (default is None).
+
+        out_dir : str or None, optional
+            The output directory where the copied configuration file will be saved.
+            If None, the current `self.out_dir` value will be used as the output directory
+            (default is None).
+
+        Returns
+        -------
+        None
+        """
+        if suffix is None:
+            suffix = self.split
+        if out_dir is None:
+            out_dir = self.out_dir
+        copy_config_path = out_dir / path_append(Path(self.config_path.name), suffix)
         log.info(f"Copying config to {copy_config_path}")
         copy_config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(copy_config_path, "w") as file:
             yaml.dump(self.config, file, sort_keys=False)
+
+    # following aliases and functins are needed to mimic the umami config structure and behaviour
+    # so that --scaling --write and traing steps from umami are compatible with this config
+    copy_to_out_dir = copy_config
+
+    def get_umami_general(self):
+        """
+        Return the arguments to be fed into GeneralSettings class in umami.
+
+        Notes
+        -----
+        This function provides a workaround to avoid importing 'umami' in 'upp'.
+        Instead, all 'umami' class initialization is
+        performed in 'umami' code, and the resulting objects are passed to 'upp' if needed.
+
+        Returns
+        -------
+        DotMap
+            An instance of 'umami.preprocessing_tools.configuration.GeneralSettings'
+            class configured with the
+            necessary parameters.
+        """
+        self.config["umami"]["general"].update({"outfile_name": str(self.out_fname)})
+        return DotMap(
+            self.config["umami"]["general"],
+            _dynamic=False,
+        )
+
+    def mimic_umami_config(self, general):
+        """
+        Make the config mimic the umami config structure and behaviour.
+
+        Parameters
+        ----------
+        general : umami.preprocessing_tools.configuration.GeneralSettings
+            first initialised in umami.preprocessing_tools.configuration.Configuration
+            class in umami using get_umami_general() for arguments
+            then feed it into mimic_umami_config() to get the rest of the config
+            mimiking the umami config structure and behaviour
+
+        Returns
+        -------
+        self : upp.classes.preprocessing_config.PreprocessingConfig
+        """
+        self.general = general
+        self.sampling = DotMap(self.config["umami"]["sampling"], _dynamic=False)
+        self.sampling.class_labels = [flav.name for flav in self.components.flavours]
+        if self.config["umami"].get("parameters", None) is not None:
+            self.parameters = self.config["umami"]["parameters"]
+        else:
+            self.parameters = {}
+            self.parameters[""] = self.out_dir
+            self.parameters[""] = self.out_dir
+        if self.config["umami"].get("convert_to_tfrecord", None) is not None:
+            self.general.convert_to_tfrecord = self.config["umami"]["convert_to_tfrecord"]
+        return self
+
+    def get_file_name(self, option, **_):
+        """
+        Mimics the 'get_file_name()' function in PreprocessingConfig class in umami.
+
+        Parameters
+        ----------
+        option : str
+            The option specifying the desired file name:
+            - 'resampled': Returns the current output file name.
+            - 'resampled_scaled_shuffled': Returns a modified file name based on the
+            original output file name with '_resampled_scaled_shuffled' appended.
+            This option is used to create a new file name.
+
+        use_val : bool, optional
+            Currently not in use (default is False).
+
+        Returns
+        -------
+        str
+            The resulting file name based on the specified 'option'.
+
+        Raises
+        ------
+        ValueError
+            If 'option' is not one of the recognized options.
+        """
+        if option == "resampled":
+            return self.out_fname
+        elif option == "resampled_scaled_shuffled":
+            return (
+                str(self.out_fname.parent)
+                + "/"
+                + self.out_fname.stem
+                + "_resampled_scaled_shuffled"
+                + self.out_fname.suffix
+            )

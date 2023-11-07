@@ -1,35 +1,48 @@
+"""
+Preprocessing pipeline for jet taggging.
+
+By default all stages for the training split are run.
+To run with only specific stages enabled, include the flag for the required stages.
+To run without certain stages, include the corresponding negative flag.
+
+Note that all stages are required to run the pipeline. If you want to disable resampling,
+you need to set method: none in your config file.
+"""
+from __future__ import annotations
+
 import argparse
 from datetime import datetime
 from pathlib import Path
 
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.logger import setup_logger
-from upp.stages import hist, plot
+from upp.stages.hist import create_histograms
 from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
+from upp.stages.plot import plot_initial_resampling_dists, plot_resampled_dists
 from upp.stages.resampling import Resampling
 
 
-class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
-    ...
+class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter): ...
 
 
 def parse_args():
-    abool = argparse.BooleanOptionalAction
+    abool = "store_true"
     parser = argparse.ArgumentParser(
-        description=(
-            "Jet taggging preprocessing. By default all stages for the training split are run.\n"
-            "To run with only specific stages enabled, include the flag for the required stages.\n"
-            "To run without certain stages, include the corresponding negative flag."
-        ),
+        description=__doc__,
         formatter_class=HelpFormatter,
     )
     parser.add_argument("--config", required=True, type=Path, help="Path to config file")
-    parser.add_argument("--prep", action=abool, help="Estimate and write PDFs")
-    parser.add_argument("--resample", action=abool, help="Run resampling")
-    parser.add_argument("--merge", action=abool, help="Run merging")
-    parser.add_argument("--norm", action=abool, help="Compute normalisations")
-    parser.add_argument("--plot", action=abool, help="Plot resampled distributions")
+    parser.add_argument("--prep", action=abool, default=None, help="Estimate and write PDFs")
+    parser.add_argument("--no-prep", dest="prep", action="store_false")
+    parser.add_argument("--resample", action=abool, default=None, help="Run resampling")
+    parser.add_argument("--no-resample", dest="resample", action="store_false")
+    parser.add_argument("--merge", action=abool, default=None, help="Run merging")
+    parser.add_argument("--no-merge", dest="merge", action="store_false")
+    parser.add_argument("--norm", action=abool, default=None, help="Compute normalisations")
+    parser.add_argument("--no-norm", dest="norm", action="store_false")
+    parser.add_argument("--plot", action=abool, default=None, help="Plot resampled distributions")
+    parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
 
@@ -56,7 +69,7 @@ def run_pp(args) -> None:
 
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":
-        hist.main(config)
+        create_histograms(config)
 
     # run the resampling
     if args.resample:
@@ -75,7 +88,8 @@ def run_pp(args) -> None:
 
     # make plots
     if args.plot:
-        plot.main(config, args.split)
+        plot_initial_resampling_dists(config=config)
+        plot_resampled_dists(config=config, stage=args.split)
 
     # print end info
     end = datetime.now()

@@ -1,7 +1,10 @@
+# In this config, we don't have seperate samples for r2 or r3, we just combine them
 variables: !include variables.yaml
+#transform: !include transform.yaml
 
 ttbar: &ttbar
   name: ttbar
+<<<<<<< HEAD
   pattern: #user.*.410470.*/*.h5
     - user.*.410470.*/*.h5
     - user.*.601230.*/*.h5
@@ -15,6 +18,21 @@ zprime: &zprime
 graviton: &graviton
   name: graviton
   pattern: user.*.504648.*/*.h5
+=======
+  equal_jets: False
+  pattern:
+    - "mc20/user.nekumari.410470.e6337_s3681_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
+    - "mc23/user.nekumari.601229.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
+    - "mc23/user.nekumari.601230.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "mc20/user.nekumari.800030.e7954_s3681_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
+    - "mc20/user.nekumari.800030.e7954_s3797_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
+    - "mc23/user.nekumari.800030.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-21_PFlow_Aug_23_fix_output.h5/*.h5"
+>>>>>>> 27cc10d4e24497db15d9a1e53ad504c56f63e5f0
 
 global_cuts:
   train:
@@ -45,58 +63,58 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [cjets]
-    num_jets: 80_000_000
+    flavours: [bjets, cjets]
+    num_jets: 52_500_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets, ujets]
-    num_jets: 150_000_000
-  
-  - region:
-      <<: *midpt
-    sample:
-      <<: *graviton
-    flavours: [bjets, cjets]
-    num_jets: 3_500_000
+    flavours: [ujets]
+    num_jets: 105_000_000
 
   - region:
-      <<: *midpt
+      <<: *lowpt
     sample:
-      <<: *graviton
-    flavours: [ujets]
-    num_jets: 10_000_000
+      <<: *ttbar
+    flavours: [taujets]
+    num_jets: 6_250_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets, cjets]
-    num_jets: 33_000_000
+    num_jets: 21_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ujets]
-    num_jets: 40_000_000
+    num_jets: 42_000_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [taujets]
+    num_jets: 2_500_000
 
 resampling:
   target: bjets
   method: countup
-  sampling_fraction: 1.5
+  sampling_fraction: auto
   variables:
     pt_btagJes:
-      bins: [[20_000, 400_000, 50], [400_000, 6_000_000, 50]]
-    eta_btagJes:
-      bins: [[-2.5, 2.5, 40]]
+      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 20]]
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   jets_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 3_500_000
-  ntuple_dir: /share/lustre/jbarr/samples_big/ntuples/
-  base_dir: /share/lustre/jbarr/samples_test/
+  num_jets_estimate: 5_000_000
+  base_dir: /home/xzcappon/phd/datasets/combined_run2_run3/p5770/high_stats_320m
+  ntuple_dir: /home/xzcappon/central_dumps/p5770

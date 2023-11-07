@@ -1,8 +1,7 @@
 jets:
   inputs:
     - pt_btagJes
-    - eta_btagJes
-    - actualInteractionsPerCrossing
+    - absEta_btagJes
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclTruthLabelPt
@@ -35,15 +34,22 @@ tracks:
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
     - leptonID
-    - pixeldEdx
   labels:
     - ftagTruthOriginLabel
-    - ftagTruthTypeLabel
     - ftagTruthVertexIndex
-
-#flow:
-#  inputs:
-#    - pt
-#    - energy
-#    - deta
-#    - dphi
+hits:
+  inputs:
+    - x_local
+    - y_local
+    - z_local
+    - j
+    - a
+    - b
+    - dphi
+    - deta
+    - abs_deta
+    - radius
+    - radius_local
+    - layer
+    - splitProbability1
+    - splitProbability2

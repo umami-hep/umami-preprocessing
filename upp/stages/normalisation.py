@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging as log
 
+import h5py
 import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
@@ -59,23 +62,34 @@ class Normalisation:
         return combined
 
     def get_class_dict(self, batch):
+        ignore = ["VertexIndex", "ftagTruthParentBarcode", "barcode"]
         class_dict = {k: {} for k in self.variables}
         for name, array in batch.items():
             if name != self.variables.jets_name:
                 array = array[array["valid"]]
+            # separate case for flavour_label
+            if name == self.variables.jets_name and "flavour_label" in array.dtype.names:
+                counts = np.unique(array["flavour_label"], return_counts=True)
+                class_dict[name]["flavour_label"] = counts
             for var in self.variables[name].get("labels", []):
-                if not np.issubdtype(array[var].dtype, np.integer) or var == "truthVertexIndex":
+                if not np.issubdtype(array[var].dtype, np.integer) or any(s in var for s in ignore):
                     continue
                 counts = np.unique(array[var], return_counts=True)
                 class_dict[name][var] = counts
         return class_dict
 
-    def combine_class_dict(self, class_dict_A, class_dict_B):
+    @staticmethod
+    def combine_class_dict(class_dict_A, class_dict_B):
         for name, var in class_dict_B.items():
             for v, stats in var.items():
                 labels, counts = stats
                 for i, label in enumerate(labels):
-                    counts_A = dict(zip(*class_dict_A[name][v], strict=True))
+                    if len(class_dict_A[name][v][0]) != len(class_dict_A[name][v][1]):
+                        raise ValueError(
+                            "Class dict A has arrays of different lengths for the same"
+                            " variable. This should not happen."
+                        )
+                    counts_A = dict(zip(*class_dict_A[name][v]))
                     counts[i] += counts_A.get(label, 0)
                 var[v] = (labels, counts)
         return class_dict_B
@@ -85,6 +99,9 @@ class Normalisation:
             for var, tf in norms.items():
                 assert not np.isinf(tf["mean"]), f"{var} mean is not finite"
                 assert not np.isinf(tf["std"]), f"{var} std is not finite"
+                assert not np.isnan(tf["mean"]), f"{var} mean is nan"
+                assert not np.isnan(tf["std"]), f"{var} std is nan"
+                assert tf["std"] != 0, f"{var} std is 0"
         with open(self.norm_fname, "w") as file:
             yaml.dump(norm_dict, file, sort_keys=False)
 
@@ -107,7 +124,11 @@ class Normalisation:
         norm_dict = None
         class_dict = None
         total = None
-        stream = reader.stream(self.variables.combined(), self.num_jets)
+        vars = self.variables.combined()
+        with h5py.File(reader.files[0]) as f:
+            if "flavour_label" in f[self.jets_name].dtype.names:
+                vars[self.jets_name].append("flavour_label")
+        stream = reader.stream(vars, self.num_jets)
 
         with ProgressBar() as progress:
             task = progress.add_task(

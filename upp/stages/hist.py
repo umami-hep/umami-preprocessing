@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 import logging as log
 import math
@@ -12,28 +14,77 @@ from scipy.stats import binned_statistic_dd
 from upp.logger import setup_logger
 
 
-def bin_jets(array, bins) -> np.array:
-    hist, _, bins = binned_statistic_dd(s2u(array), None, "count", bins, expand_binnumbers=True)
-    bins -= 1
-    return hist, bins
+def bin_jets(array: dict, bins: list) -> np.ndarray:
+    """Create the histogram and bins for the given resampling variables.
+
+    Parameters
+    ----------
+    array : dict
+        Dict with the loaded jets and the resampling
+        variables.
+    bins : list
+        Flat list with the bins which are to be used.
+
+    Returns
+    -------
+    hist : np.ndarray, shape(nx1, nx2, nx3,...)
+        The values of the selected statistic in each two-dimensional bin.
+    out_bins : (N,) array of ints or (D,N) ndarray of ints
+        This assigns to each element of `sample` an integer that represents the
+        bin in which this observation falls.  The representation depends on the
+        `expand_binnumbers` argument.  See `Notes` for details.
+    """
+    hist, _, out_bins = binned_statistic_dd(
+        sample=s2u(array),
+        values=None,
+        statistic="count",
+        bins=bins,
+        expand_binnumbers=True,
+    )
+    out_bins -= 1
+    return hist, out_bins
 
 
 @dataclass
 class Hist:
+    """Histogram data class for the preprocessing."""
+
     path: Path
 
-    def write_hist(self, jets, resampling_vars, bins) -> None:
+    def write_hist(
+        self,
+        jets: dict,
+        resampling_vars: list,
+        bins: list,
+    ) -> None:
+        """
+        Write the histogram to file.
+
+        Parameters
+        ----------
+        jets : dict
+            Dict with the loaded jets.
+        resampling_vars : list
+            List of the resampling variables.
+        bins : list
+            Flat list with the bins.
+
+        Raises
+        ------
+        ValueError
+            If the given binning and cuts don't match.
+        """
         # make parent dir
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
         # bin jets
         hist = bin_jets(jets[resampling_vars], bins)[0]
-        pdf = hist / len(jets)
-        if not math.isclose(pdf.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
-            raise ValueError(f"{pdf.sum()} != 1, check cuts and binning")
+        pbin = hist / len(jets)  # probability (rate) of each bin
+        if not math.isclose(pbin.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
+            raise ValueError(f"{pbin.sum()} != 1, check cuts and binning")
 
         with h5py.File(self.path, "w") as f:
-            f.create_dataset("pdf", data=pdf)
+            f.create_dataset("pbin", data=pbin)
             f.create_dataset("hist", data=hist)
             f.attrs.create("num_jets", len(jets))
             f.attrs.create("resampling_vars", resampling_vars)
@@ -42,57 +93,38 @@ class Hist:
 
     @functools.cached_property
     def hist(self) -> np.array:
+        """Return the histogram completely.
+
+        Returns
+        -------
+        np.array
+            Full histogram
+        """
         with h5py.File(self.path) as f:
             return f["hist"][:]
 
     @functools.cached_property
-    def pdf(self) -> np.array:
+    def pbin(self) -> np.array:
+        """Return the probability rate for each bin.
+
+        Returns
+        -------
+        np.array
+            Probability rates for the different bins.
+        """
+        # probability (rate) of each bin
         with h5py.File(self.path) as f:
-            return f["pdf"][:]
+            return f["pbin"][:]
 
 
-"""
-    @functools.cached_property
-    def upscaled_pdf(self):
-        upscale = 1
-        # get bins
-        xs = []
-        with h5py.File(self.path) as f:
-            attrs = dict(f.attrs)
+def create_histograms(config) -> None:
+    """Create the virtual datasets and pdf files.
 
-        for var in attrs["resampling_vars"]:
-            var_bins = attrs[f"bins_{var}"]
-            n_bins = len(var_bins) - 1
-            points = np.linspace(0, n_bins - 1 , n_bins * upscale)
-            xs.append(points)
-
-        # return the smoothed pdf
-        xy = np.meshgrid(*xs, indexing="ij")
-        smoothed = ndimage.map_coordinates(self.pdf, xy, order=1)
-        return smoothed / smoothed.sum()
-
-def smooth_weights(weights, path):
-    upscale = 1
-    print(upscale)
-    # get bins
-    xs = []
-    with h5py.File(path) as f:
-        attrs = dict(f.attrs)
-
-    for var in attrs["resampling_vars"]:
-        var_bins = attrs[f"bins_{var}"]
-        n_bins = len(var_bins) - 1
-        points = np.linspace(0, n_bins - 1 , n_bins * upscale)
-        xs.append(points)
-
-    # return the smoothed pdf
-    xy = np.meshgrid(*xs, indexing="ij")
-    smoothed = ndimage.map_coordinates(weights, xy, order=1)
-    return smoothed# / smoothed.sum()
-"""
-
-
-def main(config=None):
+    Parameters
+    ----------
+    config : PreprocessingConfig object
+        PreprocessingConfig object of the current preprocessing.
+    """
     setup_logger()
 
     title = " Writing PDFs "
@@ -104,7 +136,12 @@ def main(config=None):
         log.info(f"Estimating PDF for {c}")
         c.setup_reader(config.batch_size)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
-        c.check_num_jets(config.num_jets_estimate, cuts=cuts_no_split, silent=True)
+        c.check_num_jets(
+            config.num_jets_estimate,
+            cuts=cuts_no_split,
+            silent=False,
+            raise_error=False,
+        )
         jets = c.get_jets(sampl_vars, config.num_jets_estimate, cuts_no_split)
         c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
 

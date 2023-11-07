@@ -1,0 +1,65 @@
+site_name: "UPP: Umami Preprocessing"
+site_description: Documentation for the umami preprocessing framework
+site_author: Umami Team
+site_url: https://umami-hep.github.io/umami-preprocessing/
+
+repo_name: Github
+repo_url: https://github.com/umami-hep/umami-preprocessing/
+edit_uri: "tree/main/docs"
+
+theme:
+  name: material
+  #logo: assets/salt.png
+  #favicon: assets/salt.png
+  features:
+    - content.code.copy
+
+nav:
+  - Introduction: "index.md"
+  - Setup: setup.md
+  - Configuration: configuration.md
+  - Run: run.md
+  - Contributing: contributing.md
+  - Sampling methods: sampling.md
+  - Umami integration: umami_int.md
+
+plugins:
+  - search
+  - markdownextradata
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            line_length: 100
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_root_full_path: false
+            docstring_style: numpy
+            docstring_options:
+              ignore_init_summary: false
+            merge_init_into_class: false
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.arithmatex
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: "!!python/name:mermaid2.fence_mermaid"
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: "#"
+
+extra_javascript:
+  - "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"
+
+copyright: Copyright &copy; 2022 - 2023 CERN for the benefit of the ATLAS collaboration
