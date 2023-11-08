@@ -7,10 +7,11 @@ ttbar: &ttbar
 <<<<<<< HEAD
   pattern: #user.*.410470.*/*.h5
     - user.*.410470.*/*.h5
-    - user.*.601230.*/*.h5
-    - user.*.601229.*/*.h5
+    # - user.*.601230.*/*.h5
+    # - user.*.601229.*/*.h5
 zprime: &zprime
   name: zprime
+<<<<<<< Updated upstream
   pattern: #user.*.800030.*/*.h5
     - user.pgadow.800030*13144*/*.h5
     - user.nekumari.800030*r13144*/*.h5
@@ -33,25 +34,35 @@ zprime: &zprime
     - "mc20/user.nekumari.800030.e7954_s3797_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
     - "mc23/user.nekumari.800030.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-21_PFlow_Aug_23_fix_output.h5/*.h5"
 >>>>>>> 27cc10d4e24497db15d9a1e53ad504c56f63e5f0
+=======
+  pattern: 
+    - user.*.800030.*/*.h5
+    # - user.pgadow.800030*13144*/*.h5
+    # - user.nekumari.800030*r13144*/*.h5
+    # - user.*.800030*r13829*/*.h5
+# graviton: &graviton
+#   name: graviton
+#   pattern: user.*.504648.*/*.h5
+>>>>>>> Stashed changes
 
 global_cuts:
   train:
-    - [eventNumber, "%20<=", 17]
+    - [eventNumber, "%10<=", 7] #17]
   val:
-    - [eventNumber, "%20==", 18]
+    - [eventNumber, "%10==", 8] #18]
   test:
-    - [eventNumber, "%20==", 19]
+    - [eventNumber, "%10==", 9] #19]
 
 lowpt: &lowpt
   name: lowpt
   cuts:
     - [pt_btagJes, ">", 20_000]
     - [pt_btagJes, "<", 250_000]
-midpt: &midpt
-  name: midpt
-  cuts:
-    - [pt_btagJes, ">", 250_000]
-    - [pt_btagJes, "<", 2_000_000]
+# midpt: &midpt
+#   name: midpt
+#   cuts:
+#     - [pt_btagJes, ">", 250_000]
+#     - [pt_btagJes, "<", 2_000_000]
 highpt: &highpt
   name: highpt
   cuts:
@@ -63,13 +74,19 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
+<<<<<<< Updated upstream
     flavours: [bjets, cjets]
     num_jets: 52_500_000
+=======
+    flavours: [cjets]
+    num_jets: 40_000_000
+>>>>>>> Stashed changes
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
+<<<<<<< Updated upstream
     flavours: [ujets]
     num_jets: 105_000_000
 
@@ -79,19 +96,42 @@ components:
       <<: *ttbar
     flavours: [taujets]
     num_jets: 6_250_000
+=======
+    flavours: [bjets, ujets]
+    num_jets: 70_000_000
+  
+  # - region:
+  #     <<: *midpt
+  #   sample:
+  #     <<: *graviton
+  #   flavours: [bjets, cjets]
+  #   num_jets: 3_500_000
+
+  # - region:
+  #     <<: *midpt
+  #   sample:
+  #     <<: *graviton
+  #   flavours: [ujets]
+  #   num_jets: 10_000_000
+>>>>>>> Stashed changes
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets, cjets]
+<<<<<<< Updated upstream
     num_jets: 21_000_000
+=======
+    num_jets: 9_000_000
+>>>>>>> Stashed changes
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ujets]
+<<<<<<< Updated upstream
     num_jets: 42_000_000
 
   - region:
@@ -100,11 +140,18 @@ components:
       <<: *zprime
     flavours: [taujets]
     num_jets: 2_500_000
+=======
+    num_jets: 15_000_000
+>>>>>>> Stashed changes
 
 resampling:
   target: bjets
   method: countup
+<<<<<<< Updated upstream
   sampling_fraction: auto
+=======
+  sampling_fraction: 1.0
+>>>>>>> Stashed changes
   variables:
     pt_btagJes:
       bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
@@ -116,5 +163,9 @@ global:
   jets_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 5_000_000
+<<<<<<< Updated upstream
   base_dir: /home/xzcappon/phd/datasets/combined_run2_run3/p5770/high_stats_320m
   ntuple_dir: /home/xzcappon/central_dumps/p5770
+=======
+  base_dir: /share/lustre/jbarr/training-files/small-flow-Aug-23
+>>>>>>> Stashed changes

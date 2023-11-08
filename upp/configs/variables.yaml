@@ -13,6 +13,64 @@ jets:
     - n_tracks
     - n_truth_promptLepton
 
+overlapRemovalTracks:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - IP3D_signed_d0_significance
+    - IP3D_signed_z0_significance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    - leptonID
+    - pt
+    # - pixeldEdx
+  labels:
+    - truthOriginLabel
+    - truthVertexIndex
+flow:
+  inputs:
+    - flow_pt
+    - flow_energy
+    - flow_deta
+    - flow_dphi
+    - flow_dr
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - IP3D_signed_d0_significance
+    - IP3D_signed_z0_significance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    - pt
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthVertexIndex
+
 tracks:
   inputs:
     - d0
@@ -35,15 +93,8 @@ tracks:
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
     - leptonID
-    - pixeldEdx
+    - pt
+    # - pixeldEdx
   labels:
     - ftagTruthOriginLabel
-    - ftagTruthTypeLabel
     - ftagTruthVertexIndex
-
-#flow:
-#  inputs:
-#    - pt
-#    - energy
-#    - deta
-#    - dphi

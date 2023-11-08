@@ -21,21 +21,46 @@ jets:
     - FoxWolfram2
     - Sphericity
     - Aplanarity
-    - GN2Xv00_phbb
-    - GN2Xv00_phcc
-    - GN2Xv00_ptop
-    - GN2Xv00_pqcd
-    - GN2XWithMassv00_phbb
-    - GN2XWithMassv00_phcc
-    - GN2XWithMassv00_ptop
-    - GN2XWithMassv00_pqcd
+    - GN2Xv01_phbb
+    - GN2Xv01_phcc
+    - GN2Xv01_ptop
+    - GN2Xv01_pqcd
     - Xbb2020v3_Higgs
     - Xbb2020v3_Top
     - Xbb2020v3_QCD
+    - n_tracks
+    # - n_subjets
   labels:
     - R10TruthLabel_R22v1
     - R10TruthLabel_R22v1_TruthJetMass
     - R10TruthLabel_R22v1_TruthJetPt
+
+tracks:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - IP3D_signed_d0_significance
+    - IP3D_signed_z0_significance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    # - subjetIndex
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthVertexIndex
+    # - truthTypeLabel
 
 flow:
   inputs:
@@ -63,24 +88,28 @@ flow:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    - subjetIndex
+    # - subjetIndex
   labels:
-    - truthOriginLabel
-    # - truthTypeLabel
-    - truthVertexIndex
+    - ftagTruthOriginLabel
+    - ftagTruthVertexIndex
 
-subjets:
-  inputs:
-    - pt
-    - eta
-    - mass
-    - deta
-    - dphi
-  labels:
-    - HadronConeExclTruthLabelID
-#flow:
-#  inputs:
-#    - pt
-#    - energy
-#    - deta
-#    - dphi
+# subjets:
+#   inputs:
+#     - pt
+#     - eta
+#     - mass
+#     - deta
+#     - dphi
+#     - dr
+#     - energy
+#     - GN2v00_pb
+#     - GN2v00_pc
+#     - GN2v00_pu
+#     - DL1dv01_VR_pb
+#     - DL1dv01_VR_pc
+#     - DL1dv01_VR_pu
+#     - DL1r_pu
+#     - DL1r_pc
+#     - DL1r_pb
+#   labels:
+#     - HadronConeExclTruthLabelID
