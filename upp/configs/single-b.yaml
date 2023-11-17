@@ -1,30 +1,29 @@
-# In this config, we don't have seperate samples for r2 or r3, we just combine them
 variables: !include variables.yaml
-#transform: !include transform.yaml
 
 ttbar: &ttbar
   name: ttbar
   equal_jets: False
   pattern:
-    - "mc20/user.nekumari.410470.e6337_s3681_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
-    - "mc23/user.nekumari.601229.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
-    - "mc23/user.nekumari.601230.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
+    - "user.svanstro.410470.e6337_s3681_r13144_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
+    - "user.svanstro.601229.e8514_s4162_r14622_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
+    - "user.svanstro.601230.e8514_s4162_r14622_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
 
 zprime: &zprime
   name: zprime
   equal_jets: False
   pattern:
-    - "mc20/user.nekumari.800030.e7954_s3681_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
-    - "mc20/user.nekumari.800030.e7954_s3797_r13144_p5770.tdd.EMPFlow.24_2_14.23-08-14_PFlow_Aug_23_output.h5/*.h5"
-    - "mc23/user.nekumari.800030.e8514_s4162_r14622_p5770.tdd.EMPFlow.24_2_14.23-08-21_PFlow_Aug_23_fix_output.h5/*.h5"
+    - "user.svanstro.800030.e7954_s3681_r13144_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
+    - "user.svanstro.800030.e8514_s4162_r14622_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
 
 global_cuts:
   train:
-    - [eventNumber, "%10<=", 7]
+    - [jetFoldHash, "%4!=", 3]
+    - [eventNumber, "%10<=", 8]
   val:
-    - [eventNumber, "%10==", 8]
-  test:
+    - [jetFoldHash, "%4!=", 3]
     - [eventNumber, "%10==", 9]
+  test:
+    - [jetFoldHash, "%4==", 3]
 
 lowpt: &lowpt
   name: lowpt
@@ -94,6 +93,6 @@ resampling:
 global:
   jets_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 5_000_000
-  base_dir: /home/xzcappon/phd/datasets/combined_run2_run3/p5770/high_stats_320m
-  ntuple_dir: /home/xzcappon/central_dumps/p5770
+  num_jets_estimate: 25_000_000
+  base_dir: /home/xzcappon/phd/datasets/combined_run2_run3/p5922/high_stats/fold1
+  ntuple_dir: /home/xucapsva/data/ftag/h5/gn2_v01/ntuples
