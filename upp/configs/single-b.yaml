@@ -13,6 +13,7 @@ zprime: &zprime
   equal_jets: False
   pattern:
     - "user.svanstro.800030.e7954_s3681_r13144_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
+    - "user.svanstro.800030.e7954_s3797_r13144_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-19_kfoldtrain_output.h5/*.h5"
     - "user.svanstro.800030.e8514_s4162_r14622_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
 
 global_cuts:
@@ -42,14 +43,14 @@ components:
     sample:
       <<: *ttbar
     flavours: [bjets, cjets]
-    num_jets: 52_500_000
+    num_jets: 45_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ujets]
-    num_jets: 105_000_000
+    num_jets: 90_000_000
 
   - region:
       <<: *lowpt
@@ -63,14 +64,14 @@ components:
     sample:
       <<: *zprime
     flavours: [bjets, cjets]
-    num_jets: 21_000_000
+    num_jets: 18_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ujets]
-    num_jets: 42_000_000
+    num_jets: 36_000_000
 
   - region:
       <<: *highpt
