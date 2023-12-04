@@ -32,7 +32,7 @@ UPP requires Python 3.8 or later.
 
     ```bash
     setupATLAS
-    lsetup "python 3.9.11-x86_64-centos7"
+    lsetup "python 3.9.18-x86_64-centos7"
     ```
 
     !!!info "You can also [set up conda on lxplus](https://abpcomputing.web.cern.ch/guides/python_inst/)"
@@ -45,6 +45,8 @@ A simple installation can be done via `pip` from Python Packade Index:
 ```bash
 pip install umami-preprocessing
 ```
+
+!!!info "On lxplus you may have to use ```pip3 install umami-preprocessing``` due to pip otherwise defaulting to an older version of python"
 
 After this installation all the fuctionality for the user is available. The further steps are only useful for the development of the package.
 

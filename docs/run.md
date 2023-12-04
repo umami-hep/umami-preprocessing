@@ -53,6 +53,7 @@ These histograms are stored in `<base_dir>/hists`.
 #### 2. Resample 
 The resample stage (`--resample`) resamples jets to achieve similar $p_T$ and $\eta$ distributions across flavours.
 After execution, resampled samples for each flavor, sample, and split are saved separately in `<base_dir>/components/<split>/`.
+You need to run the resampling stage even if you don't apply any resampling (e.g. you configured with `method: none`).
 
 #### 3. Merge 
 The merge stage (`--merge`) combines the resampled samples into a single file named `<tbase_dir>/<out_dir>/pp_output_<split>.h5`.

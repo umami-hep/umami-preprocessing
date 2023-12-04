@@ -73,6 +73,15 @@ global_cuts:
     The `Cuts` class is defined in the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/cuts.py) package.
 
 
+???info "k-fold training selection"
+
+    If you are training a model that will be used in production, you may need to worry about overtraining.
+    A variable `jetFoldHash` is included in newer h5 dumps which allows you to independent models on different
+    folds of the data.
+    If you are just performing studies, then don't worry about applying any selections on the `jetFoldHash`, 
+    since the train/val/test split will suffice.
+
+
 ### Resampling Regions
 
 Next we define any kinematic regions which need to be resampled separately, again using anchors as these will also be used in the definition of our components.
@@ -193,6 +202,9 @@ variables: !include /<full path to your file>.yaml
 There are currently two resampling methods implemented in the package `pdf` and `countup` and they share most of setting.
 Below is the example of setting up the `pdf` resampling method and a table describitng all the parameters.
 
+In order to run UPP without any kinematic resampling, just set `method: none`. 
+Note you will still need to run the resampling stage of the preprocessing pipeline.
+
 ```yaml
 resampling:
   target: cjets
@@ -209,9 +221,9 @@ resampling:
 | Setting | Type | Explanation |
 | ------- | ---- | ----------- |
 |`target`|`str`| The resampling is done in such a way that the distribution of the kinematic variables matches the distribution of those in one particular flavour given in here. Usually it is the leat populated flavour, as this flavour will not be resampled instead all jets of this flavour are taken.|
-|`method`|`str`| Either  `"pdf"` and `"countup"` depending on the method you would like to use|
-|`upscale_pdf`|`int`| **Optional** only availabe for `"pdf"` preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original|
-|`sampling_fraction`|`auto`, Null or `float`| The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are prefered. On the other hand eith smaller sampling fractions lead to longer preprocesing times. `auto` option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present. |
+|`method`|`str`| Either  `pdf`, `countup` or `none`, depending on the method you would like to use|
+|`upscale_pdf`|`int`| **Optional** only availabe for `pdf` preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original|
+|`sampling_fraction`|`None`, `float` or `auto`| The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are prefered. On the other hand eith smaller sampling fractions lead to longer preprocesing times. `auto` option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present. |
 |`variables`|`dict`| The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable prlease provide a `bins` setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut betwenn **regions** takes place to better handle the discontinuities.|
 
 ### Global Config 
