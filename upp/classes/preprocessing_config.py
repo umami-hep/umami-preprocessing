@@ -14,6 +14,7 @@ from dotmap import DotMap
 from ftag import Cuts
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
+from ftag.git_check import get_git_hash
 
 from upp import __version__
 from upp.classes.components import Components
@@ -110,17 +111,13 @@ class PreprocessingConfig:
             Transform(**self.config["transform"]) if "transform" in self.config else None
         )
 
-        # copy config
-        try:
-            git_hash = check_output(
-                ["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent
-            )
-            self.git_hash = git_hash.decode("ascii").strip()
-            self.config["pp_git_hash"] = self.git_hash
-        except CalledProcessError:
-            log.warning("Could not get git hash")
+        # reproducibility
+        self.git_hash = get_git_hash(Path(__file__).parent)
+        if self.git_hash is None:
             self.git_hash = __version__
-            self.config["pp_git_hash"] = self.git_hash
+        self.config["upp_hash"] = self.git_hash
+
+        # copy config
         self.copy_config()
 
     @classmethod
