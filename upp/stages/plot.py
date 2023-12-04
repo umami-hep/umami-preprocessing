@@ -200,9 +200,7 @@ def make_hist_initial(
                         {"jets": [variable]},
                         num_jets=jets_to_plot,
                         cuts=flavour.cuts,
-                    )[
-                        "jets"
-                    ][variable],
+                    )["jets"][variable],
                     label=flavour.label + " " + suffixes[i],
                     colour=flavour.colour,
                     linestyle=linestiles[i],
