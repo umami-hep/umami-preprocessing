@@ -45,10 +45,6 @@ class Component:
         return f"{self.region.name}_{self.sample.name}_{self.flavour.name}"
 
     @property
-    def jets_name(self):
-        return self.reader.jets_name
-
-    @property
     def cuts(self):
         return self.global_cuts + self.flavour.cuts + self.region.cuts
 
