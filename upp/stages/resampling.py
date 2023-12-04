@@ -39,6 +39,7 @@ class Resampling:
         self.variables = config.variables
         self.batch_size = config.batch_size
         self.is_test = config.is_test
+        self.jets_name = config.jets_name
         self.num_jets_estimate = config.num_jets_estimate
         self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
         self.regionlengthsd = self.get_regionlengthsd_from_config()
@@ -177,7 +178,7 @@ class Resampling:
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
-                jets_name="muons",
+                jets_name=self.jets_name,
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
             )
@@ -243,8 +244,8 @@ class Resampling:
         # setup i/o
         for c in self.components:
             # just used for the writer configuration
-            c.setup_reader(self.batch_size, transform=self.transform)
-            c.setup_writer(self.variables)
+            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
+            c.setup_writer(self.variables, jets_name=self.jets_name)
 
         # set samplig fraction if needed
         self.set_component_sampling_fractions()

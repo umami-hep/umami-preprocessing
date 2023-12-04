@@ -64,7 +64,7 @@ def main(config=None):
     sampl_vars = config.sampl_cfg.vars
     for c in config.components:
         log.info(f"Estimating PDF for {c}")
-        c.setup_reader(config.batch_size)
+        c.setup_reader(config.batch_size, config.jets_name)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(
             config.num_jets_estimate,

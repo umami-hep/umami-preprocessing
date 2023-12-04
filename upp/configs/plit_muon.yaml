@@ -1,10 +1,13 @@
-variables: !include lepton-isolation-variables.yaml
+variables: !include plit_muon_variables.yaml
 #transform: !include transform.yaml
 
 ttbar: &ttbar
   name: ttbar
+  equal_jets: False
   pattern:
-    - "user.pgadow.LD_2023_10_21.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.e6337_s3681_r13144_p5770_TREE/*.h5"
+    - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8547_s3797_r13144_p5934_TREE/*.h5"
+    - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8549_s4159_r14799_p5934_TREE/*.h5"
+    - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8549_s4162_r14622_p5934_TREE/*.h5"
 
 global_cuts:
   train:
@@ -24,23 +27,23 @@ components:
       <<: *muon
     sample:
       <<: *ttbar
-    flavours: [promptmuons]
-    num_jets: 15_000_000
+    flavours: [muxprompt]
+    num_jets: 30_000_000
 
   - region:
       <<: *muon
     sample:
       <<: *ttbar
-    flavours: [nonpromptmuons]
-    num_jets: 15_000_000
+    flavours: [npxall]
+    num_jets: 10_000_000
 
 
 resampling:
-  target: promptmuons
+  target: muxprompt
   method: countup
   sampling_fraction: auto
   variables:
-    pt_track:
+    pt:
       bins: [[10_000, 50_000, 8], [50_000, 100_000, 5], [100_000, 500_000, 20], [500_000, 1_000_000, 5]]
     eta_track:
       bins: [[-2.5, 2.5, 40]]
@@ -50,6 +53,6 @@ global:
   jets_name: muons
   batch_size: 1_000_000
   num_jets_estimate: 5_000_000
-  base_dir: /data/pgadow/atlas/pliv/
-  ntuple_dir: /data/pgadow/atlas/pliv/ntuples/
-  out_dir: /data/pgadow/atlas/pliv/preprocessed/muons_30M
+  base_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/muons_40M
+  ntuple_dir: /nfs/dust/atlas/user/pgadow/plit/data/ntuples
+  out_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/muons_40M

@@ -10,18 +10,18 @@ from puma import Histogram, HistogramPlot
 from upp.utils import path_append
 
 
-def load_jets(paths, variable, flavour_label="flavour_label", jets_name="muons"):
+def load_jets(paths, variable, flavour_label="flavour_label", jets_name="jets"):
     variables = {jets_name: [flavour_label, variable]}
     reader = H5Reader(paths, batch_size=1000, jets_name=jets_name)
     df = reader.load(variables, num_jets=10000)[jets_name]
     return df
 
 
-def make_hist(stage, flavours, variable, in_paths, jets_name="muons", bins_range=None, suffix=""):
+def make_hist(stage, flavours, variable, in_paths, jets_name="jets", bins_range=None, suffix=""):
     df = load_jets(in_paths, variable, jets_name=jets_name)
 
     plot = HistogramPlot(
-        ylabel="Normalised Number of jets",
+        ylabel=f"Normalised Number of {jets_name}",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
         xlabel=variable,
         bins=50,
@@ -57,7 +57,7 @@ def make_hist_initial(
     flavours,
     variable,
     in_paths_list,
-    jets_name="muons",
+    jets_name="jets",
     bins_range=None,
     suffix="",
     jets_to_plot=-1,
@@ -67,7 +67,7 @@ def make_hist_initial(
     # df = load_jets(in_paths, variable)
 
     plot = HistogramPlot(
-        ylabel="Normalised Number of jets",
+        ylabel=f"Normalised Number of {jets_name}",
         atlas_second_tag="$\\sqrt{s}=13$ TeV",
         xlabel=variable,
         bins=100,
@@ -122,7 +122,7 @@ def plot_initial(config):
             config.components.flavours,
             var,
             paths,
-            "muons",
+            config.jets_name,
             jets_to_plot=100000,
             out_dir=config.out_dir / "plots",
             suffixes=suffixes,
@@ -133,7 +133,7 @@ def plot_initial(config):
                 config.components.flavours,
                 var,
                 paths,
-                "muons",
+                config.jets_name,
                 (0, 500e3),
                 "low",
                 jets_to_plot=100000,
@@ -149,6 +149,6 @@ def main(config, stage):
         paths = [path_append(config.out_fname, sample) for sample in config.components.samples]
 
     for var in config.sampl_cfg.vars:
-        make_hist(stage, config.components.flavours, var, paths, "muons")
+        make_hist(stage, config.components.flavours, var, paths, config.jets_name)
         if "pt" in var:
-            make_hist(stage, config.components.flavours, var, paths, "muons", (0, 500e3), "low")
+            make_hist(stage, config.components.flavours, var, paths, config.jets_name, (0, 500e3), "low")

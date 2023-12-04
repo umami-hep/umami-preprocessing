@@ -17,7 +17,7 @@ class Merging:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.jets_name = self.ppc.jets_name
+        self.jets_name = config.jets_name
         self.rng = np.random.default_rng(42)
         self.flavours = self.components.flavours
 
@@ -57,7 +57,7 @@ class Merging:
         # setup inputs
         for c in components:
             batch_size = self.batch_size * c.num_jets // components.num_jets + 1
-            c.setup_reader(batch_size, fname=c.out_path)
+            c.setup_reader(batch_size, fname=c.out_path, jets_name=self.jets_name)
             c.stream = c.reader.stream(self.variables.combined(), c.reader.num_jets)
             c.complete = False
 
@@ -70,7 +70,7 @@ class Merging:
             components[0].reader.dtypes(self.variables.combined()),
             components[0].reader.shapes(components.num_jets, self.variables.keys()),
             add_flavour_label=self.jets_name,
-            jets_name="muons",
+            jets_name=self.jets_name,
         )
         self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
         self.writer.add_attr("unique_jets", components.unique_jets)

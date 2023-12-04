@@ -1,31 +1,29 @@
-muons:
+electrons:
   inputs:
-    - pt_track
-    - eta_track
-    - phi_track
-    - ptvarcone30TTVARel
-    - topoetcone30Rel
-    - ptfrac_track
-    - ptrel_track
-    - dRtrackjet_track
-    - nTracksTrackjet
-  labels:
-    - iffClass
-    - muonType
     - pt
     - eta
     - phi
+    - ptvarcone30Rel
+    - topoetcone30Rel
+    - caloClusterSumEtRel
+    - ptfrac_lepton
+    - ptrel_lepton
+    - dRtrackjet_lepton
+    - nTracksTrackjet
+  labels:
+    - iffClass
 
-muon_tracks:
+electron_tracks:
   inputs:
     - ptfrac
     - dr_trackjet
-    - dr_muon
+    # - dr_lepton # not available right now due to happy little accident in creating the ntuples
     - btagIp_d0
     - btagIp_z0SinTheta
     - btagIp_d0Uncertainty
     - btagIp_z0SinTheta
     - btagIp_d0_significance
+    - btagIp_z0SinTheta_significance
     - numberOfPixelHits
     - numberOfInnermostPixelLayerHits
     - numberOfNextToInnermostPixelLayerHits
@@ -39,10 +37,3 @@ muon_tracks:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
     - ftagTruthVertexIndex
-
-#flow:
-#  inputs:
-#    - pt
-#    - energy
-#    - deta
-#    - dphi
