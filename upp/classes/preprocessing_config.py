@@ -6,15 +6,14 @@ import logging as log
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from subprocess import CalledProcessError, check_output
 from typing import Literal
 
 import yaml
 from dotmap import DotMap
 from ftag import Cuts
+from ftag.git_check import get_git_hash
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
-from ftag.git_check import get_git_hash
 
 from upp import __version__
 from upp.classes.components import Components
