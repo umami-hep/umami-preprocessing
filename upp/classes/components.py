@@ -29,7 +29,9 @@ class Component:
     def setup_reader(self, batch_size, jets_name="jets", fname=None, **kwargs):
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size, jets_name=jets_name, equal_jets=self.equal_jets, **kwargs)
+        self.reader = H5Reader(
+            fname, batch_size, jets_name=jets_name, equal_jets=self.equal_jets, **kwargs
+        )
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables, jets_name="jets"):

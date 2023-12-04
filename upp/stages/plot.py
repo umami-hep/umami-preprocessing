@@ -49,7 +49,7 @@ def make_hist(
     flavours: list,
     variable: str,
     in_paths: str | list,
-    jets_name: str ="jets",
+    jets_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
 ) -> None:
@@ -81,7 +81,7 @@ def make_hist(
     """
     # Load the variable from the jets
     df = load_jets(in_paths, variable, jets_name=jets_name)
-    
+
     # Setup the histogram
     plot = HistogramPlot(
         ylabel=f"Normalised Number of {jets_name}",
@@ -126,7 +126,7 @@ def make_hist_initial(
     flavours: list,
     variable: str,
     in_paths_list: str | list,
-    jets_name: str ="jets",
+    jets_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
     jets_to_plot: int = -1,
@@ -134,7 +134,7 @@ def make_hist_initial(
     suffixes: list | None = None,
     out_format: str = "png",
 ) -> None:
-"""
+    """Make initial distribution plots.
 
     Plot the initial distribution of the given variable
     for multiple different samples (like ttbar, zpext, etc.)
@@ -212,9 +212,7 @@ def make_hist_initial(
                         {jets_name: [variable]},
                         num_jets=jets_to_plot,
                         cuts=flavour.cuts,
-                    )[
-                        jets_name
-                    ][variable],
+                    )[jets_name][variable],
                     label=flavour.label + " " + suffixes[i],
                     colour=flavour.colour,
                     linestyle=linestiles[i],
@@ -309,7 +307,7 @@ def plot_resampled_dists(config, stage: str) -> None:
             flavours=config.components.flavours,
             variable=var,
             in_paths=paths,
-            jets_name=config.jets_name
+            jets_name=config.jets_name,
         )
         if "pt" in var:
             make_hist(
