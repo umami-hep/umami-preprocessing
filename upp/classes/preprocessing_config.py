@@ -42,6 +42,7 @@ class PreprocessingConfig:
     For example:
     ```yaml
     global:
+        jets_name: jets
         batch_size: 1_000_000
         num_jets_estimate: 5_000_000
         base_dir: /my/stuff/

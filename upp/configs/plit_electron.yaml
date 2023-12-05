@@ -1,0 +1,58 @@
+variables: !include plit_electron_variables.yaml
+#transform: !include transform.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8547_s3797_r13144_p5934_TREE/*.h5"
+    - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8549_s4159_r14799_p5934_TREE/*.h5"
+    - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8549_s4162_r14622_p5934_TREE/*.h5"
+
+global_cuts:
+  train:
+    - [eventNumber, "%10<=", 7]
+  val:
+    - [eventNumber, "%10==", 8]
+  test:
+    - [eventNumber, "%10==", 9]
+
+electron: &electron
+  name: electron
+  cuts:
+    - [pt_track, ">", 10_000]
+
+components:
+  - region:
+      <<: *electron
+    sample:
+      <<: *ttbar
+    flavours: [elxprompt]
+    num_jets: 25_000_000
+
+  - region:
+      <<: *electron
+    sample:
+      <<: *ttbar
+    flavours: [npxall]
+    num_jets: 13_000_000
+
+
+resampling:
+  target: elxprompt
+  method: countup
+  sampling_fraction: auto
+  variables:
+    pt_track:
+      bins: [[10_000, 50_000, 8], [50_000, 100_000, 5], [100_000, 500_000, 20], [500_000, 1_000_000, 5]]
+    eta_track:
+      bins: [[-2.47, 2.47, 40]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: electrons
+  batch_size: 1_000_000
+  num_jets_estimate: 5_000
+  base_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/electrons_38M
+  ntuple_dir: /nfs/dust/atlas/user/pgadow/plit/data/ntuples
+  out_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/electrons_38M
