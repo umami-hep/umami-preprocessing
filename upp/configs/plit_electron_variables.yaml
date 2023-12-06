@@ -15,13 +15,16 @@ electrons:
 
 electron_tracks:
   inputs:
+    - pt
+    - eta
+    - phi
     - ptfrac
     - dr_trackjet
     # - dr_lepton # not available right now due to happy little accident in creating the ntuples
     - btagIp_d0
     - btagIp_z0SinTheta
     - btagIp_d0Uncertainty
-    - btagIp_z0SinTheta
+    - btagIp_z0SinThetaUncertainty
     - btagIp_d0_significance
     - btagIp_z0SinTheta_significance
     - numberOfPixelHits
@@ -33,6 +36,7 @@ electron_tracks:
     - numberOfPixelSplitHits
     - numberOfSCTHits
     - numberOfSCTSharedHits
+    - numberOfTRTHits
   labels:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
