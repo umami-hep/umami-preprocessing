@@ -37,8 +37,12 @@ jets:
 
 tracks:
   inputs:
+    - pt
+    - dr
     - d0
+    - IP3D_signed_d0
     - z0SinTheta
+    - d0Uncertainty
     - dphi
     - deta
     - qOverP
@@ -62,36 +66,40 @@ tracks:
     - ftagTruthVertexIndex
     # - truthTypeLabel
 
-flow:
-  inputs:
-    - flow_pt
-    - flow_energy
-    - flow_deta
-    - flow_dphi
-    - flow_dr
-    - d0
-    - z0SinTheta
-    - dphi
-    - deta
-    - qOverP
-    - IP3D_signed_d0_significance
-    - IP3D_signed_z0_significance
-    - phiUncertainty
-    - thetaUncertainty
-    - qOverPUncertainty
-    - numberOfPixelHits
-    - numberOfSCTHits
-    - numberOfInnermostPixelLayerHits
-    - numberOfNextToInnermostPixelLayerHits
-    - numberOfInnermostPixelLayerSharedHits
-    - numberOfInnermostPixelLayerSplitHits
-    - numberOfPixelSharedHits
-    - numberOfPixelSplitHits
-    - numberOfSCTSharedHits
-    # - subjetIndex
-  labels:
-    - ftagTruthOriginLabel
-    - ftagTruthVertexIndex
+# flow:
+#   inputs:
+#     - flow_pt
+#     - flow_energy
+#     - flow_deta
+#     - flow_dphi
+#     - flow_dr
+#     - pt
+#     - dr
+#     - d0
+#     - IP3D_signed_d0
+#     - z0SinTheta
+#     - d0Uncertainty
+#     - dphi
+#     - deta
+#     - qOverP
+#     - IP3D_signed_d0_significance
+#     - IP3D_signed_z0_significance
+#     - phiUncertainty
+#     - thetaUncertainty
+#     - qOverPUncertainty
+#     - numberOfPixelHits
+#     - numberOfSCTHits
+#     - numberOfInnermostPixelLayerHits
+#     - numberOfNextToInnermostPixelLayerHits
+#     - numberOfInnermostPixelLayerSharedHits
+#     - numberOfInnermostPixelLayerSplitHits
+#     - numberOfPixelSharedHits
+#     - numberOfPixelSplitHits
+#     - numberOfSCTSharedHits
+#     # - subjetIndex
+#   labels:
+#     - ftagTruthOriginLabel
+#     - ftagTruthVertexIndex
 
 # subjets:
 #   inputs:

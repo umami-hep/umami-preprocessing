@@ -10,67 +10,30 @@ global_cuts:
 
 hbb: &hbb
   name: hbb # covers 514722 - 514741
-  pattern: #user.jabarr.5147*r13144_p5856**/*.h5  #user.jabarr.801471.e8441_s3681_r13144_p5856.tdd.FatJetsFlow.24_2_4.23-10-20_new_ghh2_output.h5/*.h5
-    - user.jabarr.514722*r13144_p5856*/*.h5
-    - user.jabarr.514723*r13144_p5856*/*.h5
-    - user.jabarr.514724*r13144_p5856*/*.h5
-    - user.jabarr.514725*r13144_p5856*/*.h5
-    - user.jabarr.514726*r13144_p5856*/*.h5
-    - user.jabarr.514727*r13144_p5856*/*.h5
-    - user.jabarr.514728*r13144_p5856*/*.h5
-    - user.jabarr.514729*r13144_p5856*/*.h5
-    - user.jabarr.514730*r13144_p5856*/*.h5
-    - user.jabarr.514731*r13144_p5856*/*.h5
-    - user.jabarr.514732*r13144_p5856*/*.h5
-    - user.jabarr.514733*r13144_p5856*/*.h5
-    - user.jabarr.514734*r13144_p5856*/*.h5
-    - user.jabarr.514735*r13144_p5856*/*.h5
-    - user.jabarr.514736*r13144_p5856*/*.h5
-    - user.jabarr.514737*r13144_p5856*/*.h5
-    - user.jabarr.514738*r13144_p5856*/*.h5
-    - user.jabarr.514739*r13144_p5856*/*.h5
-    - user.jabarr.514740*r13144_p5856*/*.h5
-    - user.jabarr.514741*r13144_p5856*/*.h5
+  pattern: vhbb/mc*.h5
 
 hcc: &hcc
   name: hcc
-  pattern: #user.jabarr.5149*r13144_p5856**/*.h5 #user.jabarr.801472.e8441_s3681_r13144_p5856.tdd.FatJetsFlow.24_2_4.23-10-22_ghh2_output.h5/*.h5
-    - user.jabarr.514933*r13144_p5856*/*.h5
-    - user.jabarr.514934*r13144_p5856*/*.h5
-    - user.jabarr.514935*r13144_p5856*/*.h5
-    - user.jabarr.514936*r13144_p5856*/*.h5
-    - user.jabarr.514937*r13144_p5856*/*.h5
-    - user.jabarr.514938*r13144_p5856*/*.h5
-    - user.jabarr.514939*r13144_p5856*/*.h5
-    - user.jabarr.514940*r13144_p5856*/*.h5
-    - user.jabarr.514941*r13144_p5856*/*.h5
-    - user.jabarr.514942*r13144_p5856*/*.h5
-    - user.jabarr.514943*r13144_p5856*/*.h5
-    - user.jabarr.514944*r13144_p5856*/*.h5
-    - user.jabarr.514945*r13144_p5856*/*.h5
-    - user.jabarr.514946*r13144_p5856*/*.h5
-    - user.jabarr.514947*r13144_p5856*/*.h5
-    - user.jabarr.514948*r13144_p5856*/*.h5
-    - user.jabarr.514949*r13144_p5856*/*.h5
-    - user.jabarr.514950*r13144_p5856*/*.h5
-    - user.jabarr.514951*r13144_p5856*/*.h5
-    - user.jabarr.514952*r13144_p5856*/*.h5
+  pattern: vhcc/mc*.h5
 
 top: &top
   name: top
-  pattern: #user.jabarr.426345*/*.h5
-    - user.jabarr.426345.*r13144_p5856*.tdd.*/*.h5
-    - user.jabarr.426345.*r13145_p5856.tdd.*/*.h5
+  pattern: top/mc*.h5
 qcd: &qcd
   name: qcd
-  pattern: #user.jabarr.36470*/*.h5
-    - user.jabarr.364703.*r13144_p5856*.tdd.*/*.h5
-    - user.jabarr.364704.*r13144_p5856*.tdd.*/*.h5
-    - user.jabarr.364705.*r13144_p5856*.tdd.*/*.h5
+  equal_jets: True
+  pattern:
+        - jz/mc20_jz3.h5
+        - jz/mc20_jz4.h5
+        - jz/mc20_jz5.h5
+        - jz/mc23_jz3.h5
+        - jz/mc23_jz4.h5
+        - jz/mc23_jz5.h5
 
 inclusive: &inclusive
   name: inclusive
-  cuts: []
+  cuts: 
+    - ["mass", ">", 50_000]
 
 components:
   - region:
@@ -78,45 +41,46 @@ components:
     sample:
       <<: *hbb
     flavours: [hbb]
-    num_jets: 14_500_000
+    num_jets: 25_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
     flavours: [hcc]
-    num_jets: 14_500_000
+    num_jets: 25_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
-    flavours: [inclusive_top]
-    num_jets: 10_400_000
+    flavours: [top]
+    num_jets: 15_000_000 #10_400_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 22_000_000
+    num_jets: 30_000_000
+    equal_jets: True
 
 resampling:
   target: hbb
   method: countup
-  sampling_fraction: 1
+  sampling_fraction: auto
   variables:
     pt:
       bins: [[250_000, 1_300_000, 50]]
     abs_eta:
       bins: [[0, 2, 20]]
-    # mass:
-    #   bins: [[50_000, 300_000, 50]]
+    mass:
+      bins: [[50_000, 300_000, 40]]
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   batch_size: 1_000_000 #4_000_000
-  num_jets_estimate: 10_00_000 #1_100_000 #10_00_000
-  #ntuple_dir: /share/lustre/avaitkus/ftag/xbb-samples/tracks/ntuples/*
-  base_dir: /share/lustre/jbarr/training-files/2023-10-26-ghh
+  num_jets_estimate: 15_000_000 #1_100_000 #10_00_000
+  ntuple_dir: /share/rcifdata/jbarr/mc23-GN2X-Training/ntuples
+  base_dir: /share/rcifdata/jbarr/mc23-GN2X-Training
   merge_test_samples: True
