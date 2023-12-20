@@ -1,0 +1,9 @@
+# k-folded split - fold 1 out of 4
+train:
+  - [jetFoldHash, "%4!=", 1] # uncomment to run fold 1
+  - [eventNumber, "%10<=", 8]
+val:
+  - [jetFoldHash, "%4!=", 1] # uncomment to run fold 1
+  - [eventNumber, "%10==", 9]
+test:
+  - [jetFoldHash, "%4==", 1] # uncomment to run fold 1

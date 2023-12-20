@@ -1,12 +1,5 @@
 variables: !include xbb-variables.yaml
-
-global_cuts:
-  train:
-    - [eventNumber, "%10<=", 7]
-  val:
-    - [eventNumber, "%10==", 8]
-  test:
-    - [eventNumber, "%10==", 9]
+global_cuts: !include splits/simple-split.yaml
 
 hbb: &hbb
   name: hbb
