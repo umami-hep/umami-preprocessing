@@ -104,8 +104,8 @@ def make_hist(
         plot.add(
             Histogram(
                 df[df["flavour_label"] == label_value][variable],
-                label=Flavours[label_string].label,
-                colour=Flavours[label_string].colour,
+                label=flavour_cont[label_string].label,
+                colour=flavour_cont[label_string].colour,
             )
         )
 
