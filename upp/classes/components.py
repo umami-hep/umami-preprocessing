@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from ftag import Cuts, Flavour, Flavours, Sample
+from ftag import Cuts, Flavour, Sample
 from ftag.hdf5 import H5Reader, H5Writer
 
 from upp.classes.region import Region
@@ -121,7 +121,7 @@ class Components:
                     Component(
                         region,
                         sample,
-                        Flavours[name],
+                        pp_cfg.flavour_cont[name],
                         pp_cfg.global_cuts,
                         pp_cfg.components_dir,
                         num_jets,
