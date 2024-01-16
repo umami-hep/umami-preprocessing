@@ -53,7 +53,7 @@ def make_hist(
     jets_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
-    flavour_cont: FlavourContainer = Flavours
+    flavour_cont: FlavourContainer = Flavours,
 ) -> None:
     """
     Create and plot the histogram and save it to disk.
