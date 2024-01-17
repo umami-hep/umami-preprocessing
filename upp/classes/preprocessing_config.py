@@ -97,7 +97,7 @@ class PreprocessingConfig:
     def __post_init__(self):
         # postprocess paths
         if self.num_jets_estimate_norm is None:
-            self.num_jets_estimate_norm = num_jets_estimate
+            self.num_jets_estimate_norm = self.num_jets_estimate
 
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname":
