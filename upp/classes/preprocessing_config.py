@@ -72,6 +72,10 @@ class PreprocessingConfig:
     num_jets_estimate : int
         Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
+    num_jets_estimate_norm : int
+        Number of jets of each flavour that are used to estimate shifting and scaling during
+        normalisation step. Larger numbers give a better quality estmates. Is equal to
+        num_jets_estimate by default.
     jets_name : str
         Name of the jets dataset in the input file.
     """
@@ -86,11 +90,15 @@ class PreprocessingConfig:
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
     num_jets_estimate: int = 1_000_000
+    num_jets_estimate_norm: int = None
     merge_test_samples: bool = False
     jets_name: str = "jets"
 
     def __post_init__(self):
         # postprocess paths
+        if self.num_jets_estimate_norm is None:
+            self.num_jets_estimate_norm = num_jets_estimate
+
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
