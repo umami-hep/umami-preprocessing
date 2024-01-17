@@ -90,7 +90,7 @@ class PreprocessingConfig:
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
     num_jets_estimate: int = 1_000_000
-    num_jets_estimate_norm: int = None
+    num_jets_estimate_norm: int | None = None
     merge_test_samples: bool = False
     jets_name: str = "jets"
 
