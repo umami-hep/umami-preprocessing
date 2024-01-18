@@ -56,8 +56,8 @@ class TestClass:
             config=Path(this_dir / "fixtures/test_conifig_countup.yaml"),
             prep=True,
             resample=True,
-            merge=False,
-            norm=False,
+            merge=True,
+            norm=True,
             plot=False,
             split="train",
         )

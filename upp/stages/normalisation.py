@@ -16,7 +16,7 @@ class Normalisation:
         self.components = config.components
         self.variables = config.variables
         self.jets_name = self.ppc.jets_name
-        self.num_jets = config.num_jets_estimate
+        self.num_jets = config.num_jets_estimate_norm
         self.norm_fname = config.out_dir / config.config.get("norm_fname", "norm_dict.yaml")
         self.class_fname = config.out_dir / config.config.get("class_fname", "class_dict.yaml")
 

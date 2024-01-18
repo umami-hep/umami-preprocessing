@@ -60,7 +60,7 @@ The merge stage (`--merge`) combines the resampled samples into a single file na
 It also handles shuffling.
 
 #### 4. Normalise 
-The normalise stage (`--norm`) calculates scaling and shifting values for all variables intended for training. The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
+The normalise stage (`--norm`) calculates scaling and shifting values for all variables intended for training based on (`num_jets_estimate_norm`). The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
 
 #### 5. Plotting 
 
