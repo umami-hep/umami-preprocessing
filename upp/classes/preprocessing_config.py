@@ -11,6 +11,7 @@ from typing import Literal
 import yaml
 from dotmap import DotMap
 from ftag import Cuts
+from ftag.flavour import FlavourContainer
 from ftag.git_check import get_git_hash
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
@@ -93,6 +94,7 @@ class PreprocessingConfig:
     num_jets_estimate_norm: int | None = None
     merge_test_samples: bool = False
     jets_name: str = "jets"
+    flavour_config: Path | None = None
 
     def __post_init__(self):
         # postprocess paths
@@ -106,6 +108,7 @@ class PreprocessingConfig:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
         self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
+        self.flavour_cont = FlavourContainer.from_yaml(self.flavour_config)
 
         # configure classes
         sampl_cfg = copy(self.config["resampling"])
