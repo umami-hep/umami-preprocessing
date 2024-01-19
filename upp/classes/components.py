@@ -20,7 +20,7 @@ class Component:
     global_cuts: Cuts
     dirname: Path
     num_jets: int
-    num_jets_estimate: int
+    num_jets_estimate_num: int
     equal_jets: bool = True
 
     def __post_init__(self):
@@ -31,6 +31,10 @@ class Component:
             fname = self.sample.path
         self.reader = H5Reader(
             fname, batch_size, jets_name=jets_name, equal_jets=self.equal_jets, **kwargs
+        )
+        self.reader_replicate_kwargs = kwargs
+        self.reader_replicate_kwargs.update(
+            {"batch_size": batch_size, "jets_name": jets_name, "fname": fname}
         )
         log.debug(f"Setup component reader at: {fname}")
 
@@ -63,7 +67,12 @@ class Component:
         self, num_req, sampling_frac=None, cuts=None, silent=False, raise_error=True
     ):
         # Check if num_jets jets are aviailable after the cuts and sampling fraction
-        total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
+        if self.num_jets_estimate_num <= 0:
+            self.setup_reader(**self.reader_replicate_kwargs)
+            total = self.reader.estimate_available_jets(cuts, None)
+        else:
+            self.setup_reader(**self.reader_replicate_kwargs)
+            total = total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate_num)
         available = total
         if sampling_frac:
             available = int(total * sampling_frac)
@@ -82,7 +91,12 @@ class Component:
             log.info(f"Estimated {available:,} {self} jets available - {num_req:,} requested")
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
-        total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
+        if self.num_jets_estimate_num <= 0:
+            self.setup_reader(**self.reader_replicate_kwargs)
+            total = self.reader.estimate_available_jets(cuts, None)
+        else:
+            self.setup_reader(**self.reader_replicate_kwargs)
+            total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate_num)
         auto_sampling_frac = round(1.05 * num_jets / total, 3)  # 1.05 is a tolerance factor
         if not silent:
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
@@ -125,7 +139,7 @@ class Components:
                         pp_cfg.global_cuts,
                         pp_cfg.components_dir,
                         num_jets,
-                        pp_cfg.num_jets_estimate,
+                        pp_cfg.num_jets_estimate_num,
                         equal_jets,
                     )
                 )

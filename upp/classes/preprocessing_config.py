@@ -70,7 +70,9 @@ class PreprocessingConfig:
         `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes
         especially to the `countup` method to achive best agreement of target and resampled
         distributions.
-    num_jets_estimate : int
+    num_jets_estimate_num : int | None
+
+    num_jets_estimate_hist : int
         Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
     num_jets_estimate_norm : int
@@ -90,7 +92,9 @@ class PreprocessingConfig:
     out_dir: Path = Path("output")
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
-    num_jets_estimate: int = 1_000_000
+    num_jets_estimate: int | None = 1_000_000
+    num_jets_estimate_num: int | None = None
+    num_jets_estimate_hist: int | None = None
     num_jets_estimate_norm: int | None = None
     merge_test_samples: bool = False
     jets_name: str = "jets"
@@ -98,11 +102,16 @@ class PreprocessingConfig:
 
     def __post_init__(self):
         # postprocess paths
-        if self.num_jets_estimate_norm is None:
-            self.num_jets_estimate_norm = self.num_jets_estimate
+        if self.num_jets_estimate:
+            if self.num_jets_estimate_num is None:
+                self.num_jets_estimate_num = self.num_jets_estimate
+            if self.num_jets_estimate_hist is None:
+                self.num_jets_estimate_hist = self.num_jets_estimate
+            if self.num_jets_estimate_norm is None:
+                self.num_jets_estimate_norm = self.num_jets_estimate
 
         for field in dataclasses.fields(self):
-            if field.type == "Path" and field.name != "out_fname":
+            if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
         if not self.ntuple_dir.exists():
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")

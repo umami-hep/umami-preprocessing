@@ -130,19 +130,19 @@ def create_histograms(config) -> None:
     title = " Writing PDFs "
     log.info(f"[bold green]{title:-^100}")
 
-    log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate:,} jets...")
+    log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate_hist:,} jets...")
     sampl_vars = config.sampl_cfg.vars
     for c in config.components:
         log.info(f"Estimating PDF for {c}")
         c.setup_reader(config.batch_size, config.jets_name)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(
-            config.num_jets_estimate,
+            config.num_jets_estimate_hist,
             cuts=cuts_no_split,
             silent=False,
             raise_error=False,
         )
-        jets = c.get_jets(sampl_vars, config.num_jets_estimate, cuts_no_split)
+        jets = c.get_jets(sampl_vars, config.num_jets_estimate_hist, cuts_no_split)
         c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
 
     log.info(f"[bold green]Saved to {config.components[0].hist.path.parent}/")
