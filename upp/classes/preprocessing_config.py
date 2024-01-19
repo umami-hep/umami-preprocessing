@@ -70,15 +70,22 @@ class PreprocessingConfig:
         `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes
         especially to the `countup` method to achive best agreement of target and resampled
         distributions.
+    num_jets_estimate : int
+        Any of the further three arguments that are not specified will default to this value
+        Is equal to 1_000_000 by default.
     num_jets_estimate_num : int | None
-
+        A sabsample taken from the whole sample to estimate the number of jets after the cuts.
+        Please keep this number high in order to not get poisson error of more then 5%.
+        If time allows you can use -1 to get a precise number of jets and not just an estimate
+        although it will be slow for large datasets. Is equal to num_jets_estimate by default.
     num_jets_estimate_hist : int
         Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
+        Is equal to num_jets_estimate by default.
     num_jets_estimate_norm : int
         Number of jets of each flavour that are used to estimate shifting and scaling during
-        normalisation step. Larger numbers give a better quality estmates. Is equal to
-        num_jets_estimate by default.
+        normalisation step. Larger numbers give a better quality estmates.
+        Is equal to num_jets_estimate by default.
     jets_name : str
         Name of the jets dataset in the input file.
     """
@@ -92,7 +99,7 @@ class PreprocessingConfig:
     out_dir: Path = Path("output")
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
-    num_jets_estimate: int | None = 1_000_000
+    num_jets_estimate: int = 1_000_000
     num_jets_estimate_num: int | None = None
     num_jets_estimate_hist: int | None = None
     num_jets_estimate_norm: int | None = None

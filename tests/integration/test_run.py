@@ -38,26 +38,16 @@ class TestClass:
             split="train",
         )
         run_pp(args)
-        # args = SimpleNamespace(
-        #     config=Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml"),
-        #     prep=True,
-        #     resample=True,
-        #     merge=True,
-        #     norm=True,
-        #     plot=True,
-        #     split="val",
-        # )
-        # run_pp(args)
-        # args = SimpleNamespace(
-        #     config=Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml"),
-        #     prep=True,
-        #     resample=True,
-        #     merge=True,
-        #     norm=True,
-        #     plot=True,
-        #     split="test",
-        # )
-        # run_pp(args)
+        args = SimpleNamespace(
+            config=Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml"),
+            prep=True,
+            resample=True,
+            merge=True,
+            norm=True,
+            plot=True,
+            split="val",
+        )
+        run_pp(args)
 
     def test_run_pdf_upscale(self):
         args = SimpleNamespace(
