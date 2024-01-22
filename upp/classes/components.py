@@ -72,7 +72,7 @@ class Component:
             total = self.reader.estimate_available_jets(cuts, None)
         else:
             self.setup_reader(**self.reader_replicate_kwargs)
-            total = total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate_num)
+            total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate_num)
         available = total
         if sampling_frac:
             available = int(total * sampling_frac)

@@ -47,7 +47,7 @@ preprocess --config configs/config.yaml --no-plot
 The stages are described below.
 
 #### 1. Prepare
-The prepare stage (`--prep`) reads a specified number of jets (`num_jets_estimate`) for each flavor and constructs histograms of the resampling variables.
+The prepare stage (`--prep`) reads a specified number of jets (`num_jets_estimate_hist`) for each flavor and constructs histograms of the resampling variables.
 These histograms are stored in `<base_dir>/hists`.
 
 #### 2. Resample 
