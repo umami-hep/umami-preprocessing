@@ -73,7 +73,7 @@ class PreprocessingConfig:
     num_jets_estimate : int
         Any of the further three arguments that are not specified will default to this value
         Is equal to 1_000_000 by default.
-    num_jets_estimate_num : int | None
+    num_jets_estimate_available : int | None
         A sabsample taken from the whole sample to estimate the number of jets after the cuts.
         Please keep this number high in order to not get poisson error of more then 5%.
         If time allows you can use -1 to get a precise number of jets and not just an estimate
@@ -100,7 +100,7 @@ class PreprocessingConfig:
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
     num_jets_estimate: int = 1_000_000
-    num_jets_estimate_num: int | None = None
+    num_jets_estimate_available: int | None = None
     num_jets_estimate_hist: int | None = None
     num_jets_estimate_norm: int | None = None
     merge_test_samples: bool = False
@@ -110,8 +110,8 @@ class PreprocessingConfig:
     def __post_init__(self):
         # postprocess paths
         if self.num_jets_estimate:
-            if self.num_jets_estimate_num is None:
-                self.num_jets_estimate_num = self.num_jets_estimate
+            if self.num_jets_estimate_available is None:
+                self.num_jets_estimate_available = self.num_jets_estimate
             if self.num_jets_estimate_hist is None:
                 self.num_jets_estimate_hist = self.num_jets_estimate
             if self.num_jets_estimate_norm is None:
