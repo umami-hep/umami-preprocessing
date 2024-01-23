@@ -67,12 +67,11 @@ class Component:
         self, num_req, sampling_frac=None, cuts=None, silent=False, raise_error=True
     ):
         # Check if num_jets jets are aviailable after the cuts and sampling fraction
-        if self.num_jets_estimate_available <= 0:
-            self.setup_reader(**self.reader_replicate_kwargs)
-            total = self.reader.estimate_available_jets(cuts, None)
-        else:
-            self.setup_reader(**self.reader_replicate_kwargs)
-            total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate_available)
+        num_est = (
+            None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
+        )
+        self.setup_reader(**self.reader_replicate_kwargs)
+        total = self.reader.estimate_available_jets(cuts, num_est)
         available = total
         if sampling_frac:
             available = int(total * sampling_frac)
@@ -91,12 +90,11 @@ class Component:
             log.info(f"Estimated {available:,} {self} jets available - {num_req:,} requested")
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
-        if self.num_jets_estimate_available <= 0:
-            self.setup_reader(**self.reader_replicate_kwargs)
-            total = self.reader.estimate_available_jets(cuts, None)
-        else:
-            self.setup_reader(**self.reader_replicate_kwargs)
-            total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate_available)
+        num_est = (
+            None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
+        )
+        self.setup_reader(**self.reader_replicate_kwargs)
+        total = self.reader.estimate_available_jets(cuts, num_est)
         auto_sampling_frac = round(1.1 * num_jets / total, 3)  # 1.1 is a tolerance factor
         if not silent:
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
