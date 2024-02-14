@@ -32,10 +32,6 @@ class Component:
         self.reader = H5Reader(
             fname, batch_size, jets_name=jets_name, equal_jets=self.equal_jets, **kwargs
         )
-        self.reader_replicate_kwargs = kwargs
-        self.reader_replicate_kwargs.update(
-            {"batch_size": batch_size, "jets_name": jets_name, "fname": fname}
-        )
         log.debug(f"Setup component reader at: {fname}")
 
     def setup_writer(self, variables, jets_name="jets"):
@@ -70,7 +66,6 @@ class Component:
         num_est = (
             None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
         )
-        self.setup_reader(**self.reader_replicate_kwargs)
         total = self.reader.estimate_available_jets(cuts, num_est)
         available = total
         if sampling_frac:
@@ -93,7 +88,6 @@ class Component:
         num_est = (
             None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
         )
-        self.setup_reader(**self.reader_replicate_kwargs)
         total = self.reader.estimate_available_jets(cuts, num_est)
         auto_sampling_frac = round(1.1 * num_jets / total, 3)  # 1.1 is a tolerance factor
         if not silent:
