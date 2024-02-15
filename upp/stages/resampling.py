@@ -40,7 +40,6 @@ class Resampling:
         self.batch_size = config.batch_size
         self.is_test = config.is_test
         self.jets_name = config.jets_name
-        self.num_jets_estimate = config.num_jets_estimate
         self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
         self.regionlengthsd = self.get_regionlengthsd_from_config()
         self.methods_map = {
