@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from ftag import Cuts, Flavour, Flavours, Sample
+from ftag import Cuts, Flavour, Sample
 from ftag.hdf5 import H5Reader, H5Writer
 
 from upp.classes.region import Region
@@ -20,22 +20,24 @@ class Component:
     global_cuts: Cuts
     dirname: Path
     num_jets: int
-    num_jets_estimate: int
+    num_jets_estimate_available: int
     equal_jets: bool = True
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
-    def setup_reader(self, batch_size, fname=None, **kwargs):
+    def setup_reader(self, batch_size, jets_name="jets", fname=None, **kwargs):
         if fname is None:
             fname = self.sample.path
-        self.reader = H5Reader(fname, batch_size, equal_jets=self.equal_jets, **kwargs)
+        self.reader = H5Reader(
+            fname, batch_size, jets_name=jets_name, equal_jets=self.equal_jets, **kwargs
+        )
         log.debug(f"Setup component reader at: {fname}")
 
-    def setup_writer(self, variables):
+    def setup_writer(self, variables, jets_name="jets"):
         dtypes = self.reader.dtypes(variables.combined())
         shapes = self.reader.shapes(self.num_jets, variables.keys())
-        self.writer = H5Writer(self.out_path, dtypes, shapes)
+        self.writer = H5Writer(self.out_path, dtypes, shapes, jets_name=jets_name)
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property
@@ -61,7 +63,10 @@ class Component:
         self, num_req, sampling_frac=None, cuts=None, silent=False, raise_error=True
     ):
         # Check if num_jets jets are aviailable after the cuts and sampling fraction
-        total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
+        num_est = (
+            None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
+        )
+        total = self.reader.estimate_available_jets(cuts, num_est)
         available = total
         if sampling_frac:
             available = int(total * sampling_frac)
@@ -80,8 +85,11 @@ class Component:
             log.info(f"Estimated {available:,} {self} jets available - {num_req:,} requested")
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
-        total = self.reader.estimate_available_jets(cuts, self.num_jets_estimate)
-        auto_sampling_frac = round(1.05 * num_jets / total, 3)  # 1.05 is a tolerance factor
+        num_est = (
+            None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
+        )
+        total = self.reader.estimate_available_jets(cuts, num_est)
+        auto_sampling_frac = round(1.1 * num_jets / total, 3)  # 1.1 is a tolerance factor
         if not silent:
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
         return auto_sampling_frac
@@ -119,11 +127,11 @@ class Components:
                     Component(
                         region,
                         sample,
-                        Flavours[name],
+                        pp_cfg.flavour_cont[name],
                         pp_cfg.global_cuts,
                         pp_cfg.components_dir,
                         num_jets,
-                        pp_cfg.num_jets_estimate,
+                        pp_cfg.num_jets_estimate_available,
                         equal_jets,
                     )
                 )

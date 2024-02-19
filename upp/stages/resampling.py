@@ -40,7 +40,7 @@ class Resampling:
         self.variables = config.variables
         self.batch_size = config.batch_size
         self.is_test = config.is_test
-        self.num_jets_estimate = config.num_jets_estimate
+        self.jets_name = config.jets_name
         self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
         self.regionlengthsd = self.get_regionlengthsd_from_config()
         self.methods_map = {
@@ -186,6 +186,7 @@ class Resampling:
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
+                jets_name=self.jets_name,
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
             )
@@ -248,6 +249,7 @@ class Resampling:
         log.info(f"[bold green]{title:-^100}")
         log.info(f"Resampling method: {self.config.method}")
 
+<<<<<<< HEAD
         for region, region_components in self.components.groupby_region():
 
             # compute the target pdf
@@ -308,6 +310,30 @@ class Resampling:
         # for region, components in self.components.groupby_region():
         #     log.info(f"[bold green]Running over region {region}...")
         #     self.run_on_region(components, region)
+=======
+        # setup i/o
+        for c in self.components:
+            # just used for the writer configuration
+            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
+            c.setup_writer(self.variables, jets_name=self.jets_name)
+
+        # set samplig fraction if needed
+        self.set_component_sampling_fractions()
+
+        # check samples
+        log.info(
+            "[bold green]Checking requested num_jets based on a sampling fraction of"
+            f" {self.config.sampling_fraction}..."
+        )
+        for c in self.components:
+            frac = c.sampling_fraction if not self.is_test else 1
+            c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
+
+        # run resampling
+        for region, components in self.components.groupby_region():
+            log.info(f"[bold green]Running over region {region}...")
+            self.run_on_region(components, region)
+>>>>>>> 260859ed7f4f77512d6c9e299ce59c81a5e8d4e0
 
         # finalise
         log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")

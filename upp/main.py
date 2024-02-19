@@ -8,6 +8,7 @@ To run without certain stages, include the corresponding negative flag.
 Note that all stages are required to run the pipeline. If you want to disable resampling,
 you need to set method: none in your config file.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,7 +24,8 @@ from upp.stages.plot import plot_initial_resampling_dists, plot_resampled_dists
 from upp.stages.resampling import Resampling
 
 
-class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter): ...
+class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
+    ...
 
 
 def parse_args():
@@ -89,6 +91,8 @@ def run_pp(args) -> None:
 
     # make plots
     if args.plot:
+        title = " Plotting "
+        log.info(f"[bold green]{title:-^100}")
         plot_initial_resampling_dists(config=config)
         plot_resampled_dists(config=config, stage=args.split)
 

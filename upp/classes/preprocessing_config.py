@@ -6,12 +6,13 @@ import logging as log
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from subprocess import CalledProcessError, check_output
 from typing import Literal
 
 import yaml
 from dotmap import DotMap
 from ftag import Cuts
+from ftag.flavour import FlavourContainer
+from ftag.git_check import get_git_hash
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
@@ -42,6 +43,7 @@ class PreprocessingConfig:
     For example:
     ```yaml
     global:
+        jets_name: jets
         batch_size: 1_000_000
         num_jets_estimate: 5_000_000
         base_dir: /my/stuff/
@@ -69,8 +71,21 @@ class PreprocessingConfig:
         especially to the `countup` method to achive best agreement of target and resampled
         distributions.
     num_jets_estimate : int
+        Any of the further three arguments that are not specified will default to this value
+        Is equal to 1_000_000 by default.
+    num_jets_estimate_available : int | None
+        A sabsample taken from the whole sample to estimate the number of jets after the cuts.
+        Please keep this number high in order to not get poisson error of more then 5%.
+        If time allows you can use -1 to get a precise number of jets and not just an estimate
+        although it will be slow for large datasets. Is equal to num_jets_estimate by default.
+    num_jets_estimate_hist : int
         Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
+        Is equal to num_jets_estimate by default.
+    num_jets_estimate_norm : int
+        Number of jets of each flavour that are used to estimate shifting and scaling during
+        normalisation step. Larger numbers give a better quality estmates.
+        Is equal to num_jets_estimate by default.
     jets_name : str
         Name of the jets dataset in the input file.
     """
@@ -85,18 +100,31 @@ class PreprocessingConfig:
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
     num_jets_estimate: int = 1_000_000
+    num_jets_estimate_available: int | None = None
+    num_jets_estimate_hist: int | None = None
+    num_jets_estimate_norm: int | None = None
     merge_test_samples: bool = False
     jets_name: str = "jets"
+    flavour_config: Path | None = None
 
     def __post_init__(self):
         # postprocess paths
+        if self.num_jets_estimate:
+            if self.num_jets_estimate_available is None:
+                self.num_jets_estimate_available = self.num_jets_estimate
+            if self.num_jets_estimate_hist is None:
+                self.num_jets_estimate_hist = self.num_jets_estimate
+            if self.num_jets_estimate_norm is None:
+                self.num_jets_estimate_norm = self.num_jets_estimate
+
         for field in dataclasses.fields(self):
-            if field.type == "Path" and field.name != "out_fname":
+            if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
         if not self.ntuple_dir.exists():
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
         self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
+        self.flavour_cont = FlavourContainer.from_yaml(self.flavour_config)
 
         # configure classes
         sampl_cfg = copy(self.config["resampling"])
@@ -110,17 +138,13 @@ class PreprocessingConfig:
             Transform(**self.config["transform"]) if "transform" in self.config else None
         )
 
-        # copy config
-        try:
-            git_hash = check_output(
-                ["git", "rev-parse", "--short", "HEAD"], cwd=Path(__file__).parent
-            )
-            self.git_hash = git_hash.decode("ascii").strip()
-            self.config["pp_git_hash"] = self.git_hash
-        except CalledProcessError:
-            log.warning("Could not get git hash")
+        # reproducibility
+        self.git_hash = get_git_hash(Path(__file__).parent)
+        if self.git_hash is None:
             self.git_hash = __version__
-            self.config["pp_git_hash"] = self.git_hash
+        self.config["upp_hash"] = self.git_hash
+
+        # copy config
         self.copy_config()
 
     @classmethod

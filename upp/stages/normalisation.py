@@ -16,7 +16,7 @@ class Normalisation:
         self.components = config.components
         self.variables = config.variables
         self.jets_name = self.ppc.jets_name
-        self.num_jets = config.num_jets_estimate
+        self.num_jets = config.num_jets_estimate_norm
         self.norm_fname = config.out_dir / config.config.get("norm_fname", "norm_dict.yaml")
         self.class_fname = config.out_dir / config.config.get("class_fname", "class_dict.yaml")
 
@@ -62,7 +62,7 @@ class Normalisation:
         return combined
 
     def get_class_dict(self, batch):
-        ignore = ["VertexIndex", "ftagTruthParentBarcode", "barcode"]
+        ignore = ["VertexIndex", "ftagTruthParentBarcode", "barcode", "eventNumber", "jetFoldHash"]
         class_dict = {k: {} for k in self.variables}
         for name, array in batch.items():
             if name != self.variables.jets_name:
@@ -118,7 +118,9 @@ class Normalisation:
         log.info(f"[bold green]{title:-^100}")
 
         # setup reader
-        reader = H5Reader(self.ppc.out_fname, self.ppc.batch_size, precision="full")
+        reader = H5Reader(
+            self.ppc.out_fname, self.ppc.batch_size, precision="full", jets_name=self.jets_name
+        )
         log.debug(f"Setup reader at: {self.ppc.out_fname}")
 
         norm_dict = None

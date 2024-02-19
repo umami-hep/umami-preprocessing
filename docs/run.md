@@ -47,19 +47,20 @@ preprocess --config configs/config.yaml --no-plot
 The stages are described below.
 
 #### 1. Prepare
-The prepare stage (`--prep`) reads a specified number of jets (`num_jets_estimate`) for each flavor and constructs histograms of the resampling variables.
+The prepare stage (`--prep`) reads a specified number of jets (`num_jets_estimate_hist`) for each flavor and constructs histograms of the resampling variables.
 These histograms are stored in `<base_dir>/hists`.
 
 #### 2. Resample 
 The resample stage (`--resample`) resamples jets to achieve similar $p_T$ and $\eta$ distributions across flavours.
 After execution, resampled samples for each flavor, sample, and split are saved separately in `<base_dir>/components/<split>/`.
+You need to run the resampling stage even if you don't apply any resampling (e.g. you configured with `method: none`).
 
 #### 3. Merge 
 The merge stage (`--merge`) combines the resampled samples into a single file named `<tbase_dir>/<out_dir>/pp_output_<split>.h5`.
 It also handles shuffling.
 
 #### 4. Normalise 
-The normalise stage (`--norm`) calculates scaling and shifting values for all variables intended for training. The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
+The normalise stage (`--norm`) calculates scaling and shifting values for all variables intended for training based on (`num_jets_estimate_norm`). The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
 
 #### 5. Plotting 
 

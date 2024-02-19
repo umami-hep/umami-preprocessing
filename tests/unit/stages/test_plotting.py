@@ -16,13 +16,13 @@ class TestClass:
         f.close()
 
     def setup_method(self, method):
-        os.makedirs("/tmp/upp-tests/integration/temp_workspace/ntuples", exist_ok=True)
-        self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5")
-        self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data2.h5")
+        os.makedirs("tmp/upp-tests/integration/temp_workspace/ntuples", exist_ok=True)
+        self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5")
+        self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data2.h5")
         print("setup_method      method:%s" % method.__name__)
 
     def teardown_method(self, method):
-        subprocess.run(["rm", "-rf", "/tmp/upp-tests/ubit"], check=True)
+        subprocess.run(["rm", "-rf", "tmp/upp-tests/ubit"], check=True)
         print("teardown_method   method:%s" % method.__name__)
 
     def test_make_hist_initial(self):
@@ -33,5 +33,5 @@ class TestClass:
             "initial",
             config.components.flavours,
             config.sampl_cfg.vars[0],
-            ["/tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
+            ["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
         )

@@ -1,0 +1,43 @@
+electrons:
+  inputs:
+    - pt
+    - eta
+    - phi
+    - ptvarcone30Rel
+    - topoetcone30Rel
+    - caloClusterSumEtRel
+    - ptfrac_lepton
+    - ptrel_lepton
+    - dRtrackjet_lepton
+    - nTracksTrackjet
+  labels:
+    - iffClass
+
+electron_tracks:
+  inputs:
+    - pt
+    - eta
+    - phi
+    - ptfrac
+    - dr_trackjet
+    # - dr_lepton # not available right now due to happy little accident in creating the ntuples
+    - btagIp_d0
+    - btagIp_z0SinTheta
+    - btagIp_d0Uncertainty
+    - btagIp_z0SinThetaUncertainty
+    - btagIp_d0_significance
+    - btagIp_z0SinTheta_significance
+    - numberOfPixelHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTHits
+    - numberOfSCTSharedHits
+    - numberOfTRTHits
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthVertexIndex
