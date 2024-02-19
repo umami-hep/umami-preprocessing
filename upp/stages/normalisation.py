@@ -95,12 +95,12 @@ class Normalisation:
         return class_dict_B
 
     def write_norm_dict(self, norm_dict):
-        for norms in norm_dict.values():
+        for group, norms in norm_dict.items():
             for var, tf in norms.items():
-                assert not np.isinf(tf["mean"]), f"{var} mean is not finite"
-                assert not np.isinf(tf["std"]), f"{var} std is not finite"
-                assert not np.isnan(tf["mean"]), f"{var} mean is nan"
-                assert not np.isnan(tf["std"]), f"{var} std is nan"
+                assert not np.isinf(tf["mean"]), f"{group} {var} mean is not finite"
+                assert not np.isinf(tf["std"]), f"{group} {var} std is not finite"
+                assert not np.isnan(tf["mean"]), f"{group} {var} mean is nan"
+                assert not np.isnan(tf["std"]), f"{group} {var} std is nan"
                 assert tf["std"] != 0, f"{var} std is 0"
         with open(self.norm_fname, "w") as file:
             yaml.dump(norm_dict, file, sort_keys=False)

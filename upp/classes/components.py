@@ -212,3 +212,12 @@ class Components:
 
     def __len__(self):
         return len(self.components)
+
+    def __repr__(self):
+        grouped = self.groupby_region()
+        region_summaries = ["Components by Region:"]
+        for region, comps in grouped:
+            sample_names = sorted({c.sample.name for c in comps})
+            region_summary = f"  {region.name}: {', '.join(sample_names)}"
+            region_summaries.append(region_summary)
+        return '\n'.join(region_summaries)

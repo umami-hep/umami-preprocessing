@@ -45,6 +45,7 @@ def parse_args():
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
+    parser.add_argument("--select-samples", dest="select", nargs="+", default=[], help="List of sample names to resample")
 
     args = parser.parse_args()
     d = vars(args)
@@ -73,7 +74,7 @@ def run_pp(args) -> None:
 
     # run the resampling
     if args.resample:
-        resampling = Resampling(config)
+        resampling = Resampling(config, args.select)
         resampling.run()
 
     # run the merging
