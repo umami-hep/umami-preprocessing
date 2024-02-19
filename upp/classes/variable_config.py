@@ -18,7 +18,7 @@ class VariableConfig:
         combined = {}
         for name in self.variables:
             if self.keep_all:
-                combined[name] = None #self[name]["inputs"] + self[name].get("labels", []) #None
+                combined[name] = None
             else:
                 combined[name] = self[name]["inputs"] + self[name].get("labels", [])
         return combined

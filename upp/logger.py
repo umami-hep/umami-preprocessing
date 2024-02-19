@@ -23,8 +23,8 @@ ProgressBar = partial(
     TimeRemainingColumn(),
     TextColumn("•"),
     TimeElapsedColumn(),
-    refresh_per_second=1 if is_terminal else 0.01,
-    speed_estimate_period=30 if is_terminal else 600,
+    refresh_per_second=1 if is_terminal else 0.05,
+    speed_estimate_period=30 if is_terminal else 120,
     console=Console(width=100, force_terminal=True),
 )
 
