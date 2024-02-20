@@ -31,6 +31,7 @@ def test_parse_args_with_config(mocker):
         norm=None,
         plot=None,
         split="val",
+        samples=[],
     )
 
     assert parsed_args == expected_args
@@ -51,6 +52,7 @@ def test_parse_args_flags_not_given(mocker):
         norm=True,
         plot=True,
         split="train",
+        samples=[],
     )
 
     assert parsed_args == expected_args
@@ -83,6 +85,7 @@ def test_parse_args_flags_negative(mocker):
         norm=False,
         plot=False,
         split="train",
+        samples=[],
     )
 
     assert parsed_args == expected_args
@@ -115,7 +118,7 @@ def test_parse_args_flags_positive(mocker):
         norm=True,
         plot=True,
         split="train",
-        samples=[]
+        samples=[],
     )
 
     assert parsed_args == expected_args

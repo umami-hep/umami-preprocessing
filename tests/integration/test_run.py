@@ -36,7 +36,7 @@ class TestClass:
             norm=True,
             plot=True,
             split="train",
-            samples=[]
+            samples=[],
         )
         run_pp(args)
         args = SimpleNamespace(
@@ -47,7 +47,7 @@ class TestClass:
             norm=True,
             plot=True,
             split="val",
-            samples=[]
+            samples=[],
         )
         run_pp(args)
 
@@ -60,7 +60,7 @@ class TestClass:
             norm=False,
             plot=False,
             split="train",
-            samples=[]
+            samples=[],
         )
         run_pp(args)
 
@@ -73,6 +73,6 @@ class TestClass:
             norm=True,
             plot=False,
             split="train",
-            samples=[]
+            samples=[],
         )
         run_pp(args)
