@@ -70,4 +70,3 @@ global:
   num_jets_estimate: 10_000_000
   base_dir: /unix/atlastracking/samples/xbb/dumps/p5488_ext/
   merge_test_samples: True
-  

@@ -99,4 +99,3 @@ global:
   num_jets_estimate: 25_000_000
   base_dir: /home/xzcappon/phd/datasets/combined_run2_run3/p5922/high_stats/fold0
   ntuple_dir: /home/xucapsva/data/ftag/h5/gn2_v01/ntuples
-  
