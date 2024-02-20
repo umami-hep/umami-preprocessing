@@ -115,6 +115,7 @@ def test_parse_args_flags_positive(mocker):
         norm=True,
         plot=True,
         split="train",
+        samples=[]
     )
 
     assert parsed_args == expected_args
