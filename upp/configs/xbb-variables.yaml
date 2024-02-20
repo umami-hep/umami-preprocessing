@@ -4,32 +4,6 @@ jets:
     - eta
     - abs_eta
     - mass
-    - Tau1
-    - Tau2
-    - Tau3
-    - Tau4
-    - ECF1
-    - ECF2
-    - ECF3
-    - Angularity
-    - KtDR
-    - PlanarFlow
-    - ThrustMin
-    - ThrustMaj
-    - FoxWolfram0
-    - FoxWolfram1
-    - FoxWolfram2
-    - Sphericity
-    - Aplanarity
-    - GN2Xv01_phbb
-    - GN2Xv01_phcc
-    - GN2Xv01_ptop
-    - GN2Xv01_pqcd
-    - Xbb2020v3_Higgs
-    - Xbb2020v3_Top
-    - Xbb2020v3_QCD
-    - n_tracks
-    # - n_subjets
   labels:
     - R10TruthLabel_R22v1
     - R10TruthLabel_R22v1_TruthJetMass
@@ -37,12 +11,8 @@ jets:
 
 tracks:
   inputs:
-    - pt
-    - dr
     - d0
-    - IP3D_signed_d0
     - z0SinTheta
-    - d0Uncertainty
     - dphi
     - deta
     - qOverP
@@ -60,64 +30,24 @@ tracks:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    # - subjetIndex
+    - subjetIndex
   labels:
-    - ftagTruthOriginLabel
-    - ftagTruthVertexIndex
-    # - truthTypeLabel
+    - truthOriginLabel
+    - truthTypeLabel
+    - truthVertexIndex
 
-# flow:
-#   inputs:
-#     - flow_pt
-#     - flow_energy
-#     - flow_deta
-#     - flow_dphi
-#     - flow_dr
-#     - pt
-#     - dr
-#     - d0
-#     - IP3D_signed_d0
-#     - z0SinTheta
-#     - d0Uncertainty
-#     - dphi
-#     - deta
-#     - qOverP
-#     - IP3D_signed_d0_significance
-#     - IP3D_signed_z0_significance
-#     - phiUncertainty
-#     - thetaUncertainty
-#     - qOverPUncertainty
-#     - numberOfPixelHits
-#     - numberOfSCTHits
-#     - numberOfInnermostPixelLayerHits
-#     - numberOfNextToInnermostPixelLayerHits
-#     - numberOfInnermostPixelLayerSharedHits
-#     - numberOfInnermostPixelLayerSplitHits
-#     - numberOfPixelSharedHits
-#     - numberOfPixelSplitHits
-#     - numberOfSCTSharedHits
-#     # - subjetIndex
-#   labels:
-#     - ftagTruthOriginLabel
-#     - ftagTruthVertexIndex
-
-# subjets:
-#   inputs:
-#     - pt
-#     - eta
-#     - mass
-#     - deta
-#     - dphi
-#     - dr
-#     - energy
-#     - GN2v00_pb
-#     - GN2v00_pc
-#     - GN2v00_pu
-#     - DL1dv01_VR_pb
-#     - DL1dv01_VR_pc
-#     - DL1dv01_VR_pu
-#     - DL1r_pu
-#     - DL1r_pc
-#     - DL1r_pb
-#   labels:
-#     - HadronConeExclTruthLabelID
+subjets:
+  inputs:
+    - pt
+    - eta
+    - mass
+    - deta
+    - dphi
+  labels:
+    - HadronConeExclTruthLabelID
+#flow:
+#  inputs:
+#    - pt
+#    - energy
+#    - deta
+#    - dphi

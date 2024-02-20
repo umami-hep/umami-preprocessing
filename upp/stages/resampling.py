@@ -249,7 +249,6 @@ class Resampling:
         log.info(f"[bold green]{title:-^100}")
         log.info(f"Resampling method: {self.config.method}")
 
-<<<<<<< HEAD
         for region, region_components in self.components.groupby_region():
 
             # compute the target pdf
@@ -257,8 +256,12 @@ class Resampling:
             assert len(target_components) == 1, "Each region must have exactly one target component."
             self.target = target_components[0]
 
+            # setup reader for target pdf regardless of whether we are sampling it
             self.target.setup_reader(self.batch_size, transform=self.transform)
-            self.target.setup_writer(self.variables)
+
+            # only setup target writer if we are sampling from it to prevent locks
+            if not self.selected_samples or self.target.sample.name in self.selected_samples:
+                self.target.setup_writer(self.variables)
 
             if self.selected_samples:
                 filtered_components = [c for c in region_components if c.sample.name in self.selected_samples]
@@ -266,12 +269,13 @@ class Resampling:
             else:
                 filtered_components = region_components
 
-            self.components = Components([c for c in filtered_components if c != self.target])
+            self.components = Components([c for c in filtered_components])
 
             # setup I/O for the remaining filtered components
             for c in self.components:
-                c.setup_reader(self.batch_size, transform=self.transform)
-                c.setup_writer(self.variables)
+                if c != self.target:
+                    c.setup_reader(self.batch_size, transform=self.transform)
+                    c.setup_writer(self.variables)
 
             # set component sampling fractions
             self.set_component_sampling_fractions()
@@ -310,32 +314,10 @@ class Resampling:
         # for region, components in self.components.groupby_region():
         #     log.info(f"[bold green]Running over region {region}...")
         #     self.run_on_region(components, region)
-=======
-        # setup i/o
-        for c in self.components:
-            # just used for the writer configuration
-            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
-            c.setup_writer(self.variables, jets_name=self.jets_name)
 
-        # set samplig fraction if needed
-        self.set_component_sampling_fractions()
-
-        # check samples
-        log.info(
-            "[bold green]Checking requested num_jets based on a sampling fraction of"
-            f" {self.config.sampling_fraction}..."
-        )
-        for c in self.components:
-            frac = c.sampling_fraction if not self.is_test else 1
-            c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
-
-        # run resampling
-        for region, components in self.components.groupby_region():
-            log.info(f"[bold green]Running over region {region}...")
-            self.run_on_region(components, region)
->>>>>>> 260859ed7f4f77512d6c9e299ce59c81a5e8d4e0
 
         # finalise
+        unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
         log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")

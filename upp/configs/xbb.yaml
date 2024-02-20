@@ -2,31 +2,26 @@ variables: !include xbb-variables.yaml
 global_cuts: !include splits/simple-split.yaml
 
 hbb: &hbb
-  name: hbb # covers 514722 - 514741
-  pattern: vhbb/mc*.h5
-
+  name: hbb
+  pattern: user.svanstro.801471.e8441_e7400_s3681_r13144_r13146_p5488.tdd.*/*.h5
 hcc: &hcc
   name: hcc
-  pattern: vhcc/mc*.h5
-
+  pattern: user.svanstro.801472.e8441_e7400_s3681_r13144_r13146_p5488.tdd.*/*.h5
 top: &top
   name: top
-  pattern: top/mc*.h5
+  pattern:
+    - user.svanstro.426345.e6880_s3681_r13144_p5488.tdd.*/*.h5
+    - user.svanstro.426345.e6880_s3681_r13145_p5488.tdd.*/*.h5
 qcd: &qcd
   name: qcd
-  equal_jets: True
   pattern:
-        - jz/mc20_jz3.h5
-        - jz/mc20_jz4.h5
-        - jz/mc20_jz5.h5
-        - jz/mc23_jz3.h5
-        - jz/mc23_jz4.h5
-        - jz/mc23_jz5.h5
+    - user.svanstro.364703.e7142_s3681_r13144_p5488.tdd.*/*.h5
+    - user.svanstro.364704.e7142_s3681_r13144_p5488.tdd.*/*.h5
+    - user.svanstro.364705.e7142_s3681_r13144_p5488.tdd.*/*.h5
 
 inclusive: &inclusive
   name: inclusive
-  cuts: 
-    - ["mass", ">", 50_000]
+  cuts: []
 
 components:
   - region:
@@ -34,46 +29,44 @@ components:
     sample:
       <<: *hbb
     flavours: [hbb]
-    num_jets: 25_000_000
+    num_jets: 14_500_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
     flavours: [hcc]
-    num_jets: 25_000_000
+    num_jets: 14_500_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
     flavours: [top]
-    num_jets: 15_000_000 #10_400_000
+    num_jets: 8_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 30_000_000
-    equal_jets: True
+    num_jets: 22_000_000
 
 resampling:
   target: hbb
   method: countup
-  sampling_fraction: auto
+  sampling_fraction: 1
   variables:
     pt:
       bins: [[250_000, 1_300_000, 50]]
     abs_eta:
       bins: [[0, 2, 20]]
     mass:
-      bins: [[50_000, 300_000, 40]]
+      bins: [[50_000, 300_000, 50]]
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  batch_size: 1_000_000 #4_000_000
-  num_jets_estimate: 15_000_000 #1_100_000 #10_00_000
-  ntuple_dir: /share/rcifdata/jbarr/mc23-GN2X-Training/ntuples
-  base_dir: /share/rcifdata/jbarr/mc23-GN2X-Training
+  batch_size: 4_000_000
+  num_jets_estimate: 10_000_000
+  base_dir: /unix/atlastracking/samples/xbb/dumps/p5488_ext/
   merge_test_samples: True
