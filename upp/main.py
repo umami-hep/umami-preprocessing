@@ -24,8 +24,7 @@ from upp.stages.plot import plot_initial_resampling_dists, plot_resampled_dists
 from upp.stages.resampling import Resampling
 
 
-class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
-    ...
+class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter): ...
 
 
 def parse_args():
@@ -47,7 +46,7 @@ def parse_args():
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
-    parser.add_argument("--select-samples", dest="select", nargs="+", default=[], help="List of sample names to resample")
+    parser.add_argument("--samples", nargs="+", default=[], help="Subset of samples to resample")
 
     args = parser.parse_args()
     d = vars(args)
@@ -76,7 +75,7 @@ def run_pp(args) -> None:
 
     # run the resampling
     if args.resample:
-        resampling = Resampling(config, args.select)
+        resampling = Resampling(config, args.samples)
         resampling.run()
 
     # run the merging

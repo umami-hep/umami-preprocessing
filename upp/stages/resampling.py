@@ -250,10 +250,11 @@ class Resampling:
         log.info(f"Resampling method: {self.config.method}")
 
         for region, region_components in self.components.groupby_region():
-
             # compute the target pdf
             target_components = [c for c in region_components if c.is_target(self.config.target)]
-            assert len(target_components) == 1, "Each region must have exactly one target component."
+            assert (
+                len(target_components) == 1
+            ), "Each region must have exactly one target component."
             self.target = target_components[0]
 
             # setup reader for target pdf regardless of whether we are sampling it
@@ -264,8 +265,13 @@ class Resampling:
                 self.target.setup_writer(self.variables)
 
             if self.selected_samples:
-                filtered_components = [c for c in region_components if c.sample.name in self.selected_samples]
-                log.info(f"Selected for resampling: {', '.join(c.sample.name for c in filtered_components)}")
+                filtered_components = [
+                    c for c in region_components if c.sample.name in self.selected_samples
+                ]
+                log.info(
+                    "Selected for resampling:"
+                    f" {', '.join(c.sample.name for c in filtered_components)}"
+                )
             else:
                 filtered_components = region_components
 
@@ -314,7 +320,6 @@ class Resampling:
         # for region, components in self.components.groupby_region():
         #     log.info(f"[bold green]Running over region {region}...")
         #     self.run_on_region(components, region)
-
 
         # finalise
         unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
