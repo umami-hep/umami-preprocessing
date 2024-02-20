@@ -9,6 +9,7 @@ import yaml
 from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
+from upp.classes.components import Components
 from upp.logger import ProgressBar
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
@@ -33,7 +34,7 @@ def safe_divide(a, b):
 
 
 class Resampling:
-    def __init__(self, config):
+    def __init__(self, config, selected_samples):
         self.config = config.sampl_cfg
         self.components = config.components
         self.variables = config.variables
@@ -54,6 +55,8 @@ class Resampling:
             )
         self.select_func = self.methods_map[self.config.method]
         self.transform = config.transform
+
+        self.selected_samples = selected_samples
 
         self.rng = np.random.default_rng(42)
 
@@ -159,11 +162,6 @@ class Resampling:
                 raise ValueError(f"Ran out of {c} jets after writing {c.writer.num_written:,}")
 
     def run_on_region(self, components, region):
-        # compute the target pdf
-        target = [c for c in components if c.is_target(self.config.target)]
-        assert len(target) == 1, "Should have 1 target component per region"
-        self.target = target[0]
-
         # groupby samples
         for sample, cs in components.groupby_sample():
             # make sure all tags equal_jets are the same
@@ -240,28 +238,54 @@ class Resampling:
         log.info(f"[bold green]{title:-^100}")
         log.info(f"Resampling method: {self.config.method}")
 
-        # setup i/o
-        for c in self.components:
-            # just used for the writer configuration
-            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
-            c.setup_writer(self.variables, jets_name=self.jets_name)
+        for region, region_components in self.components.groupby_region():
+            # compute the target pdf
+            target_components = [c for c in region_components if c.is_target(self.config.target)]
+            assert (
+                len(target_components) == 1
+            ), "Each region must have exactly one target component."
+            self.target = target_components[0]
 
-        # set samplig fraction if needed
-        self.set_component_sampling_fractions()
+            # setup reader for target pdf regardless of whether we are sampling it
+            self.target.setup_reader(self.batch_size, transform=self.transform)
 
-        # check samples
-        log.info(
-            "[bold green]Checking requested num_jets based on a sampling fraction of"
-            f" {self.config.sampling_fraction}..."
-        )
-        for c in self.components:
-            frac = c.sampling_fraction if not self.is_test else 1
-            c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
+            # only setup target writer if we are sampling from it to prevent locks
+            if not self.selected_samples or self.target.sample.name in self.selected_samples:
+                self.target.setup_writer(self.variables)
 
-        # run resampling
-        for region, components in self.components.groupby_region():
-            log.info(f"[bold green]Running over region {region}...")
-            self.run_on_region(components, region)
+            if self.selected_samples:
+                filtered_components = [
+                    c for c in region_components if c.sample.name in self.selected_samples
+                ]
+                log.info(
+                    "Selected for resampling:"
+                    f" {', '.join(c.sample.name for c in filtered_components)}"
+                )
+            else:
+                filtered_components = region_components
+
+            self.components = Components([c for c in filtered_components])
+
+            # setup I/O for the remaining filtered components
+            for c in self.components:
+                if c != self.target:
+                    c.setup_reader(self.batch_size, transform=self.transform)
+                    c.setup_writer(self.variables)
+
+            # set component sampling fractions
+            self.set_component_sampling_fractions()
+
+            log.info(
+                "[bold green]Checking requested num_jets based on a sampling fraction of"
+                f" {self.config.sampling_fraction}..."
+            )
+
+            for c in self.components:
+                frac = c.sampling_fraction if not self.is_test else 1
+                c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
+
+            log.info(f"[bold green]Processing region: {region}...")
+            self.run_on_region(self.components, region)
 
         # finalise
         unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
