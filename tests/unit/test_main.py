@@ -13,14 +13,15 @@ def config_file(tmp_path):
     config_file.write_text("")
     return config_file
 
+
 def test_parse_args_with_config(config_file):
-    args=[
-            "--config",
-            str(config_file),
-            "--resample",
-            "--split",
-            "val",
-        ]
+    args = [
+        "--config",
+        str(config_file),
+        "--resample",
+        "--split",
+        "val",
+    ]
     parsed_args = parse_args(args)
     expected_args = Namespace(
         config=config_file,
@@ -52,14 +53,14 @@ def test_parse_args_flags_not_given(config_file):
 
 def test_parse_args_flags_negative(config_file):
     args = [
-            "--config",
-            str(config_file),
-            "--no-prep",
-            "--no-resample",
-            "--no-merge",
-            "--no-norm",
-            "--no-plot",
-        ]
+        "--config",
+        str(config_file),
+        "--no-prep",
+        "--no-resample",
+        "--no-merge",
+        "--no-norm",
+        "--no-plot",
+    ]
 
     # Call the parse_args function
     parsed_args = parse_args(args)
@@ -80,14 +81,14 @@ def test_parse_args_flags_negative(config_file):
 
 def test_parse_args_flags_positive(config_file):
     args = [
-            "--config",
-            str(config_file),
-            "--prep",
-            "--resample",
-            "--merge",
-            "--norm",
-            "--plot",
-        ]
+        "--config",
+        str(config_file),
+        "--prep",
+        "--resample",
+        "--merge",
+        "--norm",
+        "--plot",
+    ]
 
     parsed_args = parse_args(args)
     expected_args = Namespace(

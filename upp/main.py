@@ -36,7 +36,9 @@ def parse_args(args):
     parser.add_argument("--no-merge", dest="merge", action="store_false")
     parser.add_argument("--norm", action="store_true", default=None, help="Compute normalisations")
     parser.add_argument("--no-norm", dest="norm", action="store_false")
-    parser.add_argument("--plot", action="store_true", default=None, help="Plot resampled distributions")
+    parser.add_argument(
+        "--plot", action="store_true", default=None, help="Plot output distributions"
+    )
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
