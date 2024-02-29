@@ -201,7 +201,7 @@ class Components:
 
     @property
     def dsids(self):
-        return list(set(sum([c.sample.dsid for c in self], [])))
+        return list(set(sum([c.sample.dsid for c in self], [])))  # noqa: RUF017
 
     def groupby_region(self):
         return [(r, Components([c for c in self if c.region == r])) for r in self.regions]

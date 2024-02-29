@@ -13,7 +13,8 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
-from pathlib import Path
+
+from ftag.cli_utils import HelpFormatter, valid_path
 
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.logger import setup_logger
@@ -24,31 +25,24 @@ from upp.stages.plot import plot_initial_resampling_dists, plot_resampled_dists
 from upp.stages.resampling import Resampling
 
 
-class HelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
-    ...
-
-
-def parse_args():
-    abool = "store_true"
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=HelpFormatter,
-    )
-    parser.add_argument("--config", required=True, type=Path, help="Path to config file")
-    parser.add_argument("--prep", action=abool, default=None, help="Estimate and write PDFs")
+def parse_args(args):
+    _st = "store_true"
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=HelpFormatter)
+    parser.add_argument("--config", required=True, type=valid_path, help="Path to config file")
+    parser.add_argument("--prep", action=_st, default=None, help="Estimate and write PDFs")
     parser.add_argument("--no-prep", dest="prep", action="store_false")
-    parser.add_argument("--resample", action=abool, default=None, help="Run resampling")
+    parser.add_argument("--resample", action=_st, default=None, help="Run resampling")
     parser.add_argument("--no-resample", dest="resample", action="store_false")
-    parser.add_argument("--merge", action=abool, default=None, help="Run merging")
+    parser.add_argument("--merge", action=_st, default=None, help="Run merging")
     parser.add_argument("--no-merge", dest="merge", action="store_false")
-    parser.add_argument("--norm", action=abool, default=None, help="Compute normalisations")
+    parser.add_argument("--norm", action=_st, default=None, help="Compute normalisations")
     parser.add_argument("--no-norm", dest="norm", action="store_false")
-    parser.add_argument("--plot", action=abool, default=None, help="Plot resampled distributions")
+    parser.add_argument("--plot", action=_st, default=None, help="Plot output distributions")
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     d = vars(args)
     ignore = ["config", "split"]
     if not any(v for a, v in d.items() if a not in ignore):
@@ -67,7 +61,7 @@ def run_pp(args) -> None:
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
 
     # load config
-    config = PreprocessingConfig.from_file(Path(args.config), args.split)
+    config = PreprocessingConfig.from_file(args.config, args.split)
 
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":
@@ -103,8 +97,8 @@ def run_pp(args) -> None:
     log.info(f"Elapsed time: {str(end - start).split('.')[0]}")
 
 
-def main() -> None:
-    args = parse_args()
+def main(args=None) -> None:
+    args = parse_args(args)
     log = setup_logger()
 
     if args.split == "all":
