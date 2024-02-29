@@ -1,30 +1,29 @@
 from __future__ import annotations
 
 from argparse import Namespace
-from pathlib import Path
+
+from pytest import fixture
 
 from upp.main import parse_args
 
 
-def test_parse_args_with_config(mocker):
-    mocker.patch(
-        "sys.argv",
-        [
-            "preprocess",
+@fixture
+def config_file(tmp_path):
+    config_file = tmp_path / "config.yaml"
+    config_file.write_text("")
+    return config_file
+
+def test_parse_args_with_config(config_file):
+    args=[
             "--config",
-            "config_file.yaml",
+            str(config_file),
             "--resample",
             "--split",
             "val",
-        ],
-    )
-
-    # Call the parse_args function
-    parsed_args = parse_args()
-
-    # Check if the parsed arguments match the expected values
+        ]
+    parsed_args = parse_args(args)
     expected_args = Namespace(
-        config=Path("config_file.yaml"),
+        config=config_file,
         prep=None,
         resample=True,
         merge=None,
@@ -36,15 +35,11 @@ def test_parse_args_with_config(mocker):
     assert parsed_args == expected_args
 
 
-def test_parse_args_flags_not_given(mocker):
-    mocker.patch("sys.argv", ["preprocess", "--config", "config_file.yaml"])
-
-    # Call the parse_args function
-    parsed_args = parse_args()
-
-    # Check if the parsed arguments match the expected values
+def test_parse_args_flags_not_given(config_file):
+    args = ["--config", str(config_file)]
+    parsed_args = parse_args(args)
     expected_args = Namespace(
-        config=Path("config_file.yaml"),
+        config=config_file,
         prep=True,
         resample=True,
         merge=True,
@@ -52,31 +47,26 @@ def test_parse_args_flags_not_given(mocker):
         plot=True,
         split="train",
     )
-
     assert parsed_args == expected_args
 
 
-def test_parse_args_flags_negative(mocker):
-    mocker.patch(
-        "sys.argv",
-        [
-            "preprocess",
+def test_parse_args_flags_negative(config_file):
+    args = [
             "--config",
-            "config_file.yaml",
+            str(config_file),
             "--no-prep",
             "--no-resample",
             "--no-merge",
             "--no-norm",
             "--no-plot",
-        ],
-    )
+        ]
 
     # Call the parse_args function
-    parsed_args = parse_args()
+    parsed_args = parse_args(args)
 
     # Check if the parsed arguments match the expected values
     expected_args = Namespace(
-        config=Path("config_file.yaml"),
+        config=config_file,
         prep=False,
         resample=False,
         merge=False,
@@ -88,27 +78,20 @@ def test_parse_args_flags_negative(mocker):
     assert parsed_args == expected_args
 
 
-def test_parse_args_flags_positive(mocker):
-    mocker.patch(
-        "sys.argv",
-        [
-            "preprocess",
+def test_parse_args_flags_positive(config_file):
+    args = [
             "--config",
-            "config_file.yaml",
+            str(config_file),
             "--prep",
             "--resample",
             "--merge",
             "--norm",
             "--plot",
-        ],
-    )
+        ]
 
-    # Call the parse_args function
-    parsed_args = parse_args()
-
-    # Check if the parsed arguments match the expected values
+    parsed_args = parse_args(args)
     expected_args = Namespace(
-        config=Path("config_file.yaml"),
+        config=config_file,
         prep=True,
         resample=True,
         merge=True,
