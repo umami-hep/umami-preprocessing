@@ -3,18 +3,17 @@ from __future__ import annotations
 import os
 import subprocess
 from pathlib import Path
-from types import SimpleNamespace
 
 from ftag import get_mock_file
 
-from upp.main import run_pp
+from upp.main import main
 
 this_dir = Path(__file__).parent
 
 
 class TestClass:
     def generate_mock(self, out_file, N=100_000):
-        fname, f = get_mock_file(num_jets=N, fname=out_file)
+        _, f = get_mock_file(num_jets=N, fname=out_file)
         f.close()
 
     def setup_method(self, method):
@@ -28,47 +27,39 @@ class TestClass:
         print("teardown_method   method:%s" % method.__name__)
 
     def test_run_pdf_auto(self):
-        args = SimpleNamespace(
-            config=Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml"),
-            prep=True,
-            resample=True,
-            merge=True,
-            norm=True,
-            plot=True,
-            split="train",
-        )
-        run_pp(args)
-        args = SimpleNamespace(
-            config=Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml"),
-            prep=True,
-            resample=True,
-            merge=True,
-            norm=True,
-            plot=True,
-            split="val",
-        )
-        run_pp(args)
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml")),
+            "--split",
+            "train",
+        ]
+        main(args)
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml")),
+            "--split",
+            "val",
+        ]
+        main(args)
 
     def test_run_pdf_upscale(self):
-        args = SimpleNamespace(
-            config=Path(this_dir / "fixtures/test_conifig_pdf_upscaled.yaml"),
-            prep=True,
-            resample=True,
-            merge=False,
-            norm=False,
-            plot=False,
-            split="train",
-        )
-        run_pp(args)
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_conifig_pdf_upscaled.yaml")),
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+        ]
+        main(args)
 
     def test_run_countup(self):
-        args = SimpleNamespace(
-            config=Path(this_dir / "fixtures/test_conifig_countup.yaml"),
-            prep=True,
-            resample=True,
-            merge=True,
-            norm=True,
-            plot=False,
-            split="train",
-        )
-        run_pp(args)
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_conifig_countup.yaml")),
+            "--no-plot",
+            "--split",
+            "train",
+        ]
+        main(args)

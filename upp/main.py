@@ -26,19 +26,18 @@ from upp.stages.resampling import Resampling
 
 
 def parse_args(args):
+    _st = "store_true"
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=HelpFormatter)
     parser.add_argument("--config", required=True, type=valid_path, help="Path to config file")
-    parser.add_argument("--prep", action="store_true", default=None, help="Estimate and write PDFs")
+    parser.add_argument("--prep", action=_st, default=None, help="Estimate and write PDFs")
     parser.add_argument("--no-prep", dest="prep", action="store_false")
-    parser.add_argument("--resample", action="store_true", default=None, help="Run resampling")
+    parser.add_argument("--resample", action=_st, default=None, help="Run resampling")
     parser.add_argument("--no-resample", dest="resample", action="store_false")
-    parser.add_argument("--merge", action="store_true", default=None, help="Run merging")
+    parser.add_argument("--merge", action=_st, default=None, help="Run merging")
     parser.add_argument("--no-merge", dest="merge", action="store_false")
-    parser.add_argument("--norm", action="store_true", default=None, help="Compute normalisations")
+    parser.add_argument("--norm", action=_st, default=None, help="Compute normalisations")
     parser.add_argument("--no-norm", dest="norm", action="store_false")
-    parser.add_argument(
-        "--plot", action="store_true", default=None, help="Plot output distributions"
-    )
+    parser.add_argument("--plot", action=_st, default=None, help="Plot output distributions")
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
