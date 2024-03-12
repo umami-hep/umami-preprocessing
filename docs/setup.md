@@ -32,7 +32,7 @@ UPP requires Python 3.8 or later.
 
     ```bash
     setupATLAS
-    lsetup "python 3.9.18-x86_64-centos7"
+    lsetup "python 3.9.18-x86_64-el9"
     ```
 
     !!!info "You can also [set up conda on lxplus](https://abpcomputing.web.cern.ch/guides/python_inst/)"
@@ -43,10 +43,10 @@ UPP requires Python 3.8 or later.
 A simple installation can be done via `pip` from Python Packade Index:
 
 ```bash
-pip install umami-preprocessing
+python -m pip install umami-preprocessing
 ```
 
-!!!info "On lxplus you may have to use ```pip3 install umami-preprocessing``` due to pip otherwise defaulting to an older version of python"
+!!!info "On lxplus you may have to use ```python3```"
 
 After this installation all the fuctionality for the user is available. The further steps are only useful for the development of the package.
 
@@ -58,6 +58,7 @@ Start by cloning the Umami-Preprocessing repository and navigating into the proj
 git clone https://github.com/umami-hep/umami-preprocessing.git
 cd umami-preprocessing
 ```
+
 
 ### Install package from code 
 
@@ -72,6 +73,30 @@ Or do a simple installation if you only plan to use the provided functionality a
 ```bash
 python -m pip install .
 ```
+
+!!!info "Note for running on lxplus"
+
+    Again, you may have to use ```python3``` here.
+
+    You may also see a warning like this:
+
+    ```
+    WARNING: The script preprocess is installed in '/afs/cern.ch/user/X/Y/.local/bin' which is not on PATH.
+    Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+    ```
+
+    if you do, you can add the directory to your path using
+
+    ```
+    export PATH=$PATH:/afs/cern.ch/user/X/Y/.local/bin
+    ```
+
+    Alternatively, you can just run the scripts by pointing to the `main.py`
+
+    ```bash
+    python3 upp/main.py
+    ```
+
 
 ### Run the tests (Optional)
 

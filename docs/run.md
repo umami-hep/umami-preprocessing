@@ -13,6 +13,8 @@ preprocess --config configs/test.yaml
 
 For a comprehensive list of available flags, refer to `preprocess --help`.
 
+!!!info "If you are running on lxplus you may need to use `python3 upp/main.py` instead of `preprocess`"
+
 ### Splits 
 
 The data is divided into three splits: training (`train`), validation (`val`), and testing (`test`).
