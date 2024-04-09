@@ -37,7 +37,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [D0cjets]
+    flavours: [D0meson]
     num_jets: 12_500_000
     equal_jets: False
 
@@ -45,7 +45,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [nonD0cjets]
+    flavours: [nonD0meson]
     num_jets: 12_500_000
     equal_jets: False
 
@@ -74,7 +74,7 @@ components:
     equal_jets: False
 
 resampling:
-  target: D0cjets
+  target: lepbjets
   method: pdf
   sampling_fraction: auto
   variables:
