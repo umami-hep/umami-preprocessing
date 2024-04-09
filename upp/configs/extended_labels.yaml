@@ -1,0 +1,92 @@
+variables: !include variables.yaml
+global_cuts: !include splits/simple-split.yaml
+
+# for k-folded splits, only required for final trainings of GN2
+# global_cuts: !include splits/fold0.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "user.svanstro.410470.e6337_s3681_r13144_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [lepbjets]
+    num_jets: 12_500_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [hadrbjets]
+    num_jets: 12_500_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [D0cjets]
+    num_jets: 12_500_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [nonD0cjets]
+    num_jets: 12_500_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [lquarkjets]
+    num_jets: 25_000_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [gluonjets]
+    num_jets: 25_000_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [taujets]
+    num_jets: 4_000_000
+    equal_jets: False
+
+resampling:
+  target: D0cjets
+  method: pdf
+  sampling_fraction: auto
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 20]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: nominal_Loose
+  batch_size: 1_000_000
+  num_jets_estimate: 5_000_000
+  base_dir: /nfs/dust/atlas/user/nkumari/UPP_latest/umami-preprocessing/upp/configs/prep
+  ntuple_dir:  /nfs/dust/atlas/user/nkumari/FTAG_tdd
