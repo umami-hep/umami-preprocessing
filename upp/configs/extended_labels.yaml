@@ -49,7 +49,7 @@ components:
     num_jets: 50_000_000
     equal_jets: False
 
-- region:
+  - region:
       <<: *lowpt
     sample:
       <<: *ttbar
