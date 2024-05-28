@@ -58,7 +58,7 @@ components:
     equal_jets: False
 
 resampling:
-  target: lepbjets
+  target: bjets
   method: pdf
   sampling_fraction: auto
   variables:
