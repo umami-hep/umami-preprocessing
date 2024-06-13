@@ -21,16 +21,8 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [lepbjets]
-    num_jets: 12_500_000
-    equal_jets: False
-
-  - region:
-      <<: *lowpt
-    sample:
-      <<: *ttbar
-    flavours: [hadrbjets]
-    num_jets: 12_500_000
+    flavours: [bjets]
+    num_jets: 25_000_000
     equal_jets: False
 
   - region:
@@ -53,16 +45,8 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [lquarkjets]
-    num_jets: 25_000_000
-    equal_jets: False
-
-  - region:
-      <<: *lowpt
-    sample:
-      <<: *ttbar
-    flavours: [gluonjets]
-    num_jets: 25_000_000
+    flavours: [ujets]
+    num_jets: 50_000_000
     equal_jets: False
 
   - region:
@@ -74,7 +58,7 @@ components:
     equal_jets: False
 
 resampling:
-  target: lepbjets
+  target: bjets
   method: pdf
   sampling_fraction: auto
   variables:
