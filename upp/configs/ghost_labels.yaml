@@ -1,6 +1,5 @@
 variables: !include variables.yaml
-global_cuts: !include simple-split.yaml
-
+global_cuts: !include spilts/simple-split.yaml
 
 
 ttbar: &ttbar
