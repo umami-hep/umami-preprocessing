@@ -26,7 +26,10 @@ jobs:
       - name: Run tests
         run: coverage run --source=upp -m pytest --show-capture=stdout
       - name: Report coverage with Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     name: Publish to PyPI
