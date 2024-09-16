@@ -1,0 +1,64 @@
+jets:
+  inputs:
+    - pt_btagJes
+    - eta_btagJes
+  labels:
+    - HadronConeExclTruthLabelID
+    - HadronConeExclExtendedTruthLabelID
+    - HadronConeExclTruthLabelPt
+    - HadronConeExclTruthLabelLxy
+    - HadronConeExclTruthLabelDR
+    - HadronGhostTruthLabelID
+    - HadronGhostExtendedTruthLabelID
+    - HadronGhostTruthLabelPt
+    - HadronGhostTruthLabelLxy
+    - HadronGhostTruthLabelDR
+    - pt
+    - eta
+    - mass
+    - n_tracks
+    - n_truth_promptLepton
+    - eventNumber
+    - jetFoldHash
+    - ptFromTruthJet
+    - matchedToTruthJet
+
+
+tracks:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - IP3D_signed_d0_significance
+    - IP3D_signed_z0_significance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    - leptonID
+    - muon_quality
+    - muon_qOverPratio
+    - muon_momentumBalanceSignificance
+    - muon_scatteringNeighbourSignificance
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthVertexIndex
+
+flow:
+ inputs:
+   - pt
+   - energy
+   - deta
+   - dphi
+   - isCharged

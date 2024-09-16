@@ -1,0 +1,82 @@
+variables: !include ../variables.yaml
+global_cuts: !include spilts/simple-split.yaml
+
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "user.svanstro.601589.e8549_s4162_r14622_p6368.tdd.GN3_dev.25_2_20.24-09-14_GN3v00_output.h5/*.h5"
+    - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_20.24-09-14_GN3v00_output.h5/*.h5"
+    - "user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_20.24-09-14_GN3v00_output.h5/*.h5"
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "user.svanstro.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_20.24-09-14_GN3v00_output.h5/*.h5"
+    - "user.svanstro.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_20.24-09-14_GN3v00_output.h5/*.h5"
+    - "user.svanstro.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_20.24-09-14_GN3v00_output.h5/*.h5"
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [bjets, cjets, ujets]
+    num_jets: 6_000_000
+    equal_jets: False
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [taujets]
+    num_jets: 2_000_000
+    equal_jets: False
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [bjets, cjets, ujets]
+    num_jets: 3_000_000
+    equal_jets: False
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [taujets]
+    num_jets: 1_000_000
+    equal_jets: False
+
+
+resampling:
+  target: cjets
+  method: countup
+  sampling_fraction: auto
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 20]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 10_000_000
+  base_dir: /share/rcifdata/wlai/dataset/p6215/upp_outs/salt_ready_med_stats_pflow_GA_GA
+  ntuple_dir: /share/rcifdata/wlai/dataset/p6215/grid_dump/pflow
