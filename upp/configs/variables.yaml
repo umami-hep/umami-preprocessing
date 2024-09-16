@@ -4,9 +4,15 @@ jets:
     - eta_btagJes
   labels:
     - HadronConeExclTruthLabelID
+    - HadronConeExclExtendedTruthLabelID
     - HadronConeExclTruthLabelPt
     - HadronConeExclTruthLabelLxy
+    - HadronConeExclTruthLabelDR
     - HadronGhostTruthLabelID
+    - HadronGhostExtendedTruthLabelID
+    - HadronGhostTruthLabelPt
+    - HadronGhostTruthLabelLxy
+    - HadronGhostTruthLabelDR
     - pt
     - eta
     - mass
