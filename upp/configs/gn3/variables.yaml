@@ -20,6 +20,9 @@ jets:
     - n_truth_promptLepton
     - eventNumber
     - jetFoldHash
+    - ptFromTruthJet
+    - matchedToTruthJet
+
 
 tracks:
   inputs:
@@ -43,14 +46,19 @@ tracks:
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
     - leptonID
+    - muon_quality
+    - muon_qOverPratio
+    - muon_momentumBalanceSignificance
+    - muon_scatteringNeighbourSignificance
   labels:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
     - ftagTruthVertexIndex
 
-#flow:
-#  inputs:
-#    - pt
-#    - energy
-#    - deta
-#    - dphi
+flow:
+ inputs:
+   - pt
+   - energy
+   - deta
+   - dphi
+   - isCharged
