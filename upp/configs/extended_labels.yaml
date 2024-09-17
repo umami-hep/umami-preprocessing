@@ -23,7 +23,6 @@ components:
       <<: *ttbar
     flavours: [bjets]
     num_jets: 25_000_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -31,7 +30,6 @@ components:
       <<: *ttbar
     flavours: [D0meson]
     num_jets: 12_500_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -39,7 +37,6 @@ components:
       <<: *ttbar
     flavours: [nonD0meson]
     num_jets: 12_500_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -47,7 +44,6 @@ components:
       <<: *ttbar
     flavours: [ujets]
     num_jets: 50_000_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -55,7 +51,6 @@ components:
       <<: *ttbar
     flavours: [taujets]
     num_jets: 4_000_000
-    equal_jets: False
 
 resampling:
   target: bjets

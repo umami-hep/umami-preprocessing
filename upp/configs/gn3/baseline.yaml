@@ -36,7 +36,6 @@ components:
       <<: *ttbar
     flavours: [ghostbjets, ghostcjets, ghostujets]
     num_jets: 6_000_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -44,7 +43,6 @@ components:
       <<: *ttbar
     flavours: [ghosttaujets]
     num_jets: 2_000_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -52,7 +50,6 @@ components:
       <<: *zprime
     flavours: [ghostbjets, ghostcjets, ghostujets]
     num_jets: 3_000_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -60,7 +57,6 @@ components:
       <<: *zprime
     flavours: [ghosttaujets]
     num_jets: 1_000_000
-    equal_jets: False
 
 
 resampling:

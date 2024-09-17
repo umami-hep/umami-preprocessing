@@ -36,7 +36,6 @@ components:
       <<: *ttbar
     flavours: [bjets, cjets, ujets]
     num_jets: 6_000_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -44,7 +43,6 @@ components:
       <<: *ttbar
     flavours: [taujets]
     num_jets: 2_000_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -52,7 +50,6 @@ components:
       <<: *zprime
     flavours: [bjets, cjets, ujets]
     num_jets: 3_000_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -60,7 +57,6 @@ components:
       <<: *zprime
     flavours: [taujets]
     num_jets: 1_000_000
-    equal_jets: False
 
 
 resampling:
@@ -78,5 +74,5 @@ global:
   jets_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 10_000_000
-  base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/gn3_dR_dR
+  base_dir: /unix/atlastracking/samples/gn3v00/dr
   ntuple_dir: /unix/atlastracking/samples/ftag_dumps/p6368
