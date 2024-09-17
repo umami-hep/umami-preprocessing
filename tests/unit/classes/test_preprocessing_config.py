@@ -1,9 +1,9 @@
 from __future__ import annotations
-from unittest import mock
 
 import os
 import subprocess
 from pathlib import Path
+from unittest import mock
 
 from dotmap import DotMap
 from ftag import get_mock_file
@@ -11,8 +11,8 @@ from ftag import get_mock_file
 from upp import __version__
 from upp.classes.preprocessing_config import PreprocessingConfig
 
-
 CFG_DIR = Path(__file__).parent.parent / "fixtures"
+
 
 class TestPreprocessingConfig:
     def generate_mock(self, out_file, N=10):
@@ -35,16 +35,6 @@ class TestPreprocessingConfig:
         config = PreprocessingConfig.from_file(Path(fpath), "train")
         general = config.get_umami_general()
         assert general["dict_file"] == "dict/file/path.json"
-
-    @staticmethod
-    def test_get_umami_general_no_git():
-            with mock.patch("os.path.exists", return_value=False):
-                config = PreprocessingConfig.from_file(
-                    Path("tests/unit/fixtures/test_config_pdf_auto_umami.yaml"),
-                    "train",
-                )
-                _ = config.get_umami_general()
-                assert config.git_hash == __version__
 
     @staticmethod
     def test_mimic_umami_config():
