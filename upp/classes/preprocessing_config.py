@@ -13,6 +13,7 @@ from dotmap import DotMap
 from ftag import Cuts
 from ftag.flavour import FlavourContainer
 from ftag.git_check import get_git_hash
+from ftag.track_selector import TrackSelector
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
@@ -130,7 +131,19 @@ class PreprocessingConfig:
         sampl_cfg = copy(self.config["resampling"])
         self.sampl_cfg = ResamplingConfig(sampl_cfg.pop("variables"), **sampl_cfg)
         self.components = Components.from_config(self)
-        self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test)
+
+        # get track selectors
+        vc = self.config["variables"]
+        selectors = {}
+        for name, groups in vc.items():
+            if selection := groups.get("selection", None):
+                selectors[name] = TrackSelector(Cuts.from_list(selection))
+        print(selectors)
+
+        # configure variables
+        self.variables = VariableConfig(
+            self.config["variables"], self.jets_name, self.is_test, selectors
+        )
         self.variables = self.variables.add_jet_vars(
             list(self.config["resampling"]["variables"].keys()), "labels"
         )

@@ -49,6 +49,13 @@ class Merging:
         if all(c.complete for c in components):
             return False
 
+        # apply track selections
+        for name in self.variables.variables:
+            if name == self.jets_name:
+                continue
+            if selector := self.variables.selectors.get(name):
+                merged[name] = selector(merged[name])
+
         # write
         self.writer.write(merged)
         return len(merged[self.jets_name])

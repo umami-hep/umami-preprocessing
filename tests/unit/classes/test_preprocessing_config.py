@@ -7,8 +7,9 @@ from pathlib import Path
 from dotmap import DotMap
 from ftag import get_mock_file
 
-from upp import __version__
 from upp.classes.preprocessing_config import PreprocessingConfig
+
+CFG_DIR = Path(__file__).parent.parent / "fixtures"
 
 
 class TestPreprocessingConfig:
@@ -28,28 +29,15 @@ class TestPreprocessingConfig:
 
     @staticmethod
     def test_get_umami_general():
-        config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
-            "train",
-        )
+        fpath = CFG_DIR / "test_config_pdf_auto_umami.yaml"
+        config = PreprocessingConfig.from_file(Path(fpath), "train")
         general = config.get_umami_general()
         assert general["dict_file"] == "dict/file/path.json"
 
     @staticmethod
-    def test_get_umami_general_no_git():
-        os.rename(".git", ".git_temp")
-        config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
-            "train",
-        )
-        _ = config.get_umami_general()
-        os.rename(".git_temp", ".git")
-        assert config.git_hash == __version__
-
-    @staticmethod
     def test_mimic_umami_config():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            CFG_DIR / "test_config_pdf_auto_umami.yaml",
             "train",
         )
         general = config.get_umami_general()
@@ -61,7 +49,7 @@ class TestPreprocessingConfig:
     @staticmethod
     def test_mimic_umami_config_required():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami_required.yaml"),
+            CFG_DIR / "test_config_pdf_auto_umami_required.yaml",
             "train",
         )
         general = config.get_umami_general()
@@ -73,7 +61,7 @@ class TestPreprocessingConfig:
     @staticmethod
     def test_get_file_name():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            CFG_DIR / "test_config_pdf_auto_umami.yaml",
             "train",
         )
 

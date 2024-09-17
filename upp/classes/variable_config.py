@@ -3,12 +3,15 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass
 
+from ftag.track_selector import TrackSelector
+
 
 @dataclass(frozen=True)
 class VariableConfig:
     variables: dict[str, dict[str, list[str]]]
     jets_name: str = "jets"
     keep_all: bool = False
+    selectors: dict[str, TrackSelector] | None = None
 
     def __post_init__(self):
         for track_vars in self.tracks.values():
@@ -33,7 +36,7 @@ class VariableConfig:
 
     def add_jet_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
         """Return a new VariableConfig instance."""
-        vc = VariableConfig(deepcopy(self.variables), self.jets_name, self.keep_all)
+        vc = VariableConfig(deepcopy(self.variables), self.jets_name, self.keep_all, self.selectors)
         vc.jets[kind] = list(dict.fromkeys(vc.jets[kind] + variables))
         return vc
 
