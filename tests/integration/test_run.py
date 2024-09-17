@@ -1,9 +1,11 @@
 from __future__ import annotations
-import numpy as np
+
 import os
 import subprocess
 from pathlib import Path
+
 import h5py
+import numpy as np
 from ftag import get_mock_file
 
 from upp.main import main
@@ -74,8 +76,8 @@ class TestClass:
         ]
         main(args)
 
-        fname = 'tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5'
+        fname = "tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5"
         assert os.path.exists(fname)
         with h5py.File(fname, "r") as f:
             tracks = f["tracks"][:]
-        assert np.all(tracks[tracks['valid']]["d0"] < 3.5)
+        assert np.all(tracks[tracks["valid"]]["d0"] < 3.5)

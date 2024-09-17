@@ -13,6 +13,7 @@ from dotmap import DotMap
 from ftag import Cuts
 from ftag.flavour import FlavourContainer
 from ftag.git_check import get_git_hash
+from ftag.track_selector import TrackSelector
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
 
@@ -21,7 +22,6 @@ from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.variable_config import VariableConfig
 from upp.utils import path_append
-from ftag.track_selector import TrackSelector
 
 # support inclusion of yaml files in the config dir
 YamlIncludeConstructor.add_to_loader_class(
@@ -141,7 +141,9 @@ class PreprocessingConfig:
         print(selectors)
 
         # configure variables
-        self.variables = VariableConfig(self.config["variables"], self.jets_name, self.is_test, selectors)
+        self.variables = VariableConfig(
+            self.config["variables"], self.jets_name, self.is_test, selectors
+        )
         self.variables = self.variables.add_jet_vars(
             list(self.config["resampling"]["variables"].keys()), "labels"
         )

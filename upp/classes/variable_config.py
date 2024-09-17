@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+
 from ftag.track_selector import TrackSelector
+
 
 @dataclass(frozen=True)
 class VariableConfig:
