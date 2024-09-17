@@ -27,7 +27,7 @@ class TestClass:
 
     def test_make_hist_initial(self):
         config = PreprocessingConfig.from_file(
-            Path("tests/integration/fixtures/test_conifig_pdf_auto.yaml"), "train"
+            Path("tests/integration/fixtures/test_config_pdf_auto.yaml"), "train"
         )
         make_hist_initial(
             "initial",

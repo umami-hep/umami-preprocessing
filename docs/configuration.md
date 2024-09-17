@@ -195,7 +195,21 @@ variables: !include /<full path to your file>.yaml
     This is straightforward since we always store data using structured arrays (in the same format as the TDD outputs).
     
     
+### Track selections
 
+You can apply on the fly selections to tracks in the preprocessing stage (specifically the merging step).
+
+To do this, include a `selection` key in the variable config block under the tracks, for example:
+
+```
+  tracks:
+    inputs:
+      - d0
+    labels:
+      - ftagTruthOriginLabel
+    selection:
+      - [d0, ">", 0.1]
+```
 
 ### Resampling
 
