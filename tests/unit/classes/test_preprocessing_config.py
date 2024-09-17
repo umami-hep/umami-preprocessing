@@ -3,12 +3,10 @@ from __future__ import annotations
 import os
 import subprocess
 from pathlib import Path
-from unittest import mock
 
 from dotmap import DotMap
 from ftag import get_mock_file
 
-from upp import __version__
 from upp.classes.preprocessing_config import PreprocessingConfig
 
 CFG_DIR = Path(__file__).parent.parent / "fixtures"
