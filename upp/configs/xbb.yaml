@@ -9,11 +9,13 @@ hcc: &hcc
   pattern: user.svanstro.801472.e8441_e7400_s3681_r13144_r13146_p5488.tdd.*/*.h5
 top: &top
   name: top
+  equal_jets: true
   pattern:
     - user.svanstro.426345.e6880_s3681_r13144_p5488.tdd.*/*.h5
     - user.svanstro.426345.e6880_s3681_r13145_p5488.tdd.*/*.h5
 qcd: &qcd
   name: qcd
+  equal_jets: true
   pattern:
     - user.svanstro.364703.e7142_s3681_r13144_p5488.tdd.*/*.h5
     - user.svanstro.364704.e7142_s3681_r13144_p5488.tdd.*/*.h5

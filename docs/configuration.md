@@ -38,7 +38,7 @@ Below is an example and a table explaining each setting.
 | ------- | ---- | ----------- | ------- |
 |`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
 |`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
-|`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
+|`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
 
 
 ### Global Cuts

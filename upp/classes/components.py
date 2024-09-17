@@ -21,7 +21,7 @@ class Component:
     dirname: Path
     num_jets: int
     num_jets_estimate_available: int
-    equal_jets: bool = True
+    equal_jets: bool
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
@@ -110,6 +110,7 @@ class Components:
     def from_config(cls, pp_cfg):
         components = []
         for c in pp_cfg.config["components"]:
+            assert "equal_jets" not in c, "equal_jets flag should be set in the sample config"
             region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
             region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
             pattern = c["sample"]["pattern"]

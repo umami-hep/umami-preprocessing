@@ -138,7 +138,6 @@ class PreprocessingConfig:
         for name, groups in vc.items():
             if selection := groups.get("selection", None):
                 selectors[name] = TrackSelector(Cuts.from_list(selection))
-        print(selectors)
 
         # configure variables
         self.variables = VariableConfig(
