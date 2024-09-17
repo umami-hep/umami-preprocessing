@@ -1,9 +1,9 @@
 from __future__ import annotations
-
+import numpy as np
 import os
 import subprocess
 from pathlib import Path
-
+import h5py
 from ftag import get_mock_file
 
 from upp.main import main
@@ -29,14 +29,14 @@ class TestClass:
     def test_run_pdf_auto(self):
         args = [
             "--config",
-            str(Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml")),
+            str(Path(this_dir / "fixtures/test_config_pdf_auto.yaml")),
             "--split",
             "train",
         ]
         main(args)
         args = [
             "--config",
-            str(Path(this_dir / "fixtures/test_conifig_pdf_auto.yaml")),
+            str(Path(this_dir / "fixtures/test_config_pdf_auto.yaml")),
             "--split",
             "val",
         ]
@@ -45,7 +45,7 @@ class TestClass:
     def test_run_pdf_upscale(self):
         args = [
             "--config",
-            str(Path(this_dir / "fixtures/test_conifig_pdf_upscaled.yaml")),
+            str(Path(this_dir / "fixtures/test_config_pdf_upscaled.yaml")),
             "--no-merge",
             "--no-norm",
             "--no-plot",
@@ -57,9 +57,25 @@ class TestClass:
     def test_run_countup(self):
         args = [
             "--config",
-            str(Path(this_dir / "fixtures/test_conifig_countup.yaml")),
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
             "--no-plot",
             "--split",
             "train",
         ]
         main(args)
+
+    def test_run_track_selector(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_track_selection.yaml")),
+            "--no-plot",
+            "--split",
+            "train",
+        ]
+        main(args)
+
+        fname = 'tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5'
+        assert os.path.exists(fname)
+        with h5py.File(fname, "r") as f:
+            tracks = f["tracks"][:]
+        assert np.all(tracks[tracks['valid']]["d0"] < 3.5)

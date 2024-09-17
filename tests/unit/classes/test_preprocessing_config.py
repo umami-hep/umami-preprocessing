@@ -29,7 +29,7 @@ class TestPreprocessingConfig:
     @staticmethod
     def test_get_umami_general():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            Path("tests/unit/fixtures/test_config_pdf_auto_umami.yaml"),
             "train",
         )
         general = config.get_umami_general()
@@ -39,7 +39,7 @@ class TestPreprocessingConfig:
     def test_get_umami_general_no_git():
         os.rename(".git", ".git_temp")
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            Path("tests/unit/fixtures/test_config_pdf_auto_umami.yaml"),
             "train",
         )
         _ = config.get_umami_general()
@@ -49,7 +49,7 @@ class TestPreprocessingConfig:
     @staticmethod
     def test_mimic_umami_config():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            Path("tests/unit/fixtures/test_config_pdf_auto_umami.yaml"),
             "train",
         )
         general = config.get_umami_general()
@@ -61,7 +61,7 @@ class TestPreprocessingConfig:
     @staticmethod
     def test_mimic_umami_config_required():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami_required.yaml"),
+            Path("tests/unit/fixtures/test_config_pdf_auto_umami_required.yaml"),
             "train",
         )
         general = config.get_umami_general()
@@ -73,7 +73,7 @@ class TestPreprocessingConfig:
     @staticmethod
     def test_get_file_name():
         config = PreprocessingConfig.from_file(
-            Path("tests/unit/fixtures/test_conifig_pdf_auto_umami.yaml"),
+            Path("tests/unit/fixtures/test_config_pdf_auto_umami.yaml"),
             "train",
         )
 
