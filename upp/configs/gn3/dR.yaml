@@ -1,5 +1,5 @@
-variables: !include ../variables.yaml
-global_cuts: !include spilts/simple-split.yaml
+variables: !include variables.yaml
+global_cuts: !include splits/simple-split.yaml
 
 
 ttbar: &ttbar
@@ -78,5 +78,5 @@ global:
   jets_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 10_000_000
-  base_dir: /share/rcifdata/wlai/dataset/p6215/upp_outs/salt_ready_med_stats_pflow_GA_GA
-  ntuple_dir: /share/rcifdata/wlai/dataset/p6215/grid_dump/pflow
+  base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/gn3_dR_dR
+  ntuple_dir: /unix/atlastracking/samples/ftag_dumps/p6368
