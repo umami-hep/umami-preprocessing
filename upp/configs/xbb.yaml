@@ -29,28 +29,28 @@ components:
     sample:
       <<: *hbb
     flavours: [hbb]
-    num_jets: 14_500_000
+    num_jets: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
     flavours: [hcc]
-    num_jets: 14_500_000
+    num_jets: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
     flavours: [top]
-    num_jets: 8_000_000
+    num_jets: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 22_000_000
+    num_jets: 50_000_000
 
 resampling:
   target: hbb
