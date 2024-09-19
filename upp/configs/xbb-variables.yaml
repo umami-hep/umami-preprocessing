@@ -4,6 +4,11 @@ jets:
     - eta
     - abs_eta
     - mass
+    - GN2Xv02_phbb
+    - GN2Xv02_phcc
+    - GN2Xv02_ptop
+    - GN2Xv02_pqcd
+    - n_tracks
   labels:
     - R10TruthLabel_R22v1
     - R10TruthLabel_R22v1_TruthJetMass
@@ -11,8 +16,12 @@ jets:
 
 tracks:
   inputs:
+    - pt
+    - dr
     - d0
+    - IP3D_signed_d0
     - z0SinTheta
+    - d0Uncertainty
     - dphi
     - deta
     - qOverP
@@ -30,24 +39,18 @@ tracks:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
-    - subjetIndex
+    - leptonID
   labels:
-    - truthOriginLabel
-    - truthTypeLabel
-    - truthVertexIndex
+    - ftagTruthOriginLabel
+    - ftagTruthVertexIndex
 
-subjets:
+flow:
   inputs:
-    - pt
-    - eta
-    - mass
-    - deta
-    - dphi
+    - flow_pt
+    - flow_energy
+    - flow_deta
+    - flow_dphi
+    - flow_dr
   labels:
-    - HadronConeExclTruthLabelID
-#flow:
-#  inputs:
-#    - pt
-#    - energy
-#    - deta
-#    - dphi
+    - ftagTruthOriginLabel
+    - ftagTruthVertexIndex
