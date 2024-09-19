@@ -39,7 +39,6 @@ components:
       <<: *ttbar
     flavours: [bjets, cjets]
     num_jets: 45_000_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -47,7 +46,6 @@ components:
       <<: *ttbar
     flavours: [ujets]
     num_jets: 90_000_000
-    equal_jets: False
 
   - region:
       <<: *lowpt
@@ -55,7 +53,6 @@ components:
       <<: *ttbar
     flavours: [taujets]
     num_jets: 6_250_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -63,7 +60,6 @@ components:
       <<: *zprime
     flavours: [bjets, cjets]
     num_jets: 18_000_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -71,7 +67,6 @@ components:
       <<: *zprime
     flavours: [ujets]
     num_jets: 36_000_000
-    equal_jets: False
 
   - region:
       <<: *highpt
@@ -79,7 +74,6 @@ components:
       <<: *zprime
     flavours: [taujets]
     num_jets: 2_500_000
-    equal_jets: False
 
 
 resampling:
