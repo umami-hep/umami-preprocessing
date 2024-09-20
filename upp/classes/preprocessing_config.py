@@ -112,7 +112,7 @@ class PreprocessingConfig:
         # postprocess paths
         if self.num_jets_estimate:
             if self.num_jets_estimate_available is None:
-                self.num_jets_estimate_available = self.num_jets_estimate
+                self.num_jets_estimate_available = max(self.num_jets_estimate, int(1e6))
             if self.num_jets_estimate_hist is None:
                 self.num_jets_estimate_hist = self.num_jets_estimate
             if self.num_jets_estimate_norm is None:

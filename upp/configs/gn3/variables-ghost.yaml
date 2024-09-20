@@ -16,15 +16,14 @@ jets:
     - pt
     - eta
     - mass
-    - n_tracks
+    - n_tracks_ghost
     - n_truth_promptLepton
     - eventNumber
     - jetFoldHash
     - ptFromTruthJet
     - matchedToTruthJet
 
-
-tracks:
+tracks_ghost:
   inputs:
     - d0
     - z0SinTheta
@@ -53,12 +52,49 @@ tracks:
   labels:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
     - ftagTruthVertexIndex
 
-flow:
- inputs:
+flows:
+  inputs:
    - pt
    - energy
    - deta
    - dphi
    - isCharged
+
+electrons:
+  inputs:
+    - pt
+    - ptfrac
+    - ptrel
+    - dr
+    - abs_eta
+    - eta
+    - phi
+    - ftag_et
+    - qOverP
+    - d0RelativeToBeamspotSignificance
+    - ftag_z0AlongBeamspotSignificance
+    - ftag_ptVarCone30OverPt
+    - numberOfPixelHits
+    - numberOfSCTHitsInclDead
+    - ftag_deltaPOverP
+    - eProbabilityHT
+    - deltaEta1
+    - deltaPhiRescaled2
+    - ftag_energyOverP
+    - Rhad
+    - Rhad1
+    - Eratio
+    - weta2
+    - Rphi
+    - Reta
+    - wtots1
+    - f1
+    - f3
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
+    - ftagTruthVertexIndex

@@ -133,7 +133,7 @@ def create_histograms(config) -> None:
     log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate_hist:,} jets...")
     sampl_vars = config.sampl_cfg.vars
     for c in config.components:
-        log.info(f"Estimating PDF for {c}")
+        log.info(f"Estimating {c} PDF using {config.num_jets_estimate_hist:,} samples...")
         c.setup_reader(config.batch_size, config.jets_name)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
         c.check_num_jets(
