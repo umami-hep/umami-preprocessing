@@ -60,11 +60,11 @@ tracks_dr:
 
 flows:
   inputs:
-   - pt
-   - energy
-   - deta
-   - dphi
-   - isCharged
+    - pt
+    - energy
+    - deta
+    - dphi
+    - isCharged
 
 electrons:
   inputs:
