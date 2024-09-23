@@ -16,15 +16,14 @@ jets:
     - pt
     - eta
     - mass
-    - n_tracks
+    - n_tracks_dr
     - n_truth_promptLepton
     - eventNumber
     - jetFoldHash
     - ptFromTruthJet
     - matchedToTruthJet
 
-
-tracks:
+tracks_dr:
   inputs:
     - d0
     - z0SinTheta
@@ -53,12 +52,5 @@ tracks:
   labels:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
     - ftagTruthVertexIndex
-
-flow:
- inputs:
-   - pt
-   - energy
-   - deta
-   - dphi
-   - isCharged

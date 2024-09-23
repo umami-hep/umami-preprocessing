@@ -68,4 +68,4 @@ global:
   batch_size: 1_000_000
   num_jets_estimate: 5_000_000
   base_dir: /nfs/dust/atlas/user/nkumari/UPP_latest/umami-preprocessing/upp/configs/prep
-  ntuple_dir:  /nfs/dust/atlas/user/nkumari/FTAG_tdd
+  ntuple_dir: /nfs/dust/atlas/user/nkumari/FTAG_tdd
