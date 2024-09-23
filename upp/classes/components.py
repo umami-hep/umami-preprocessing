@@ -83,7 +83,8 @@ class Component:
         if not silent:
             log.debug(f"Sampling fraction {sampling_frac}")
             log.info(
-                f"Estimated {available:,} {self} jets available - {num_req:,} requested ({self.reader.num_jets:,} in {self.sample})"
+                f"Estimated {available:,} {self} jets available - {num_req:,} requested"
+                f"({self.reader.num_jets:,} in {self.sample})"
             )
 
     def get_auto_sampling_frac(self, num_jets, cuts=None, silent=False):
