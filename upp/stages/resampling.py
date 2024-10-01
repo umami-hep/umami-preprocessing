@@ -38,14 +38,14 @@ class Resampling:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.is_test = config.is_test
         self.jets_name = config.jets_name
         self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
-        self.regionlengthsd = self.get_regionlengthsd_from_config()
+        self.num_bins = self.get_num_bins_from_config()
         self.methods_map = {
             "pdf": self.pdf_select_func,
             "countup": self.countup_select_func,
             "none": None,
+            None: None,
         }
         if self.config.method not in self.methods_map:
             raise ValueError(
@@ -97,7 +97,7 @@ class Resampling:
         num_samples = int(len(jets) * component.sampling_fraction)
         ratios = safe_divide(self.target.hist.pbin, component.hist.pbin)
         if self.upscale_pdf > 1:
-            ratios = upscale_array_regionally(ratios, self.upscale_pdf, self.regionlengthsd)
+            ratios = upscale_array_regionally(ratios, self.upscale_pdf, self.num_bins)
         probs = ratios[binnumbers]
         idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
         return idx
@@ -123,7 +123,7 @@ class Resampling:
 
                 # apply sampling
                 idx = np.arange(len(batch_out[self.variables.jets_name]))
-                if c != self.target and not self.is_test and self.select_func:
+                if c != self.target and self.select_func:
                     idx = self.select_func(batch_out[self.variables.jets_name], c)
                     if len(idx) == 0:
                         continue
@@ -255,7 +255,7 @@ class Resampling:
             f" {self.config.sampling_fraction}..."
         )
         for c in self.components:
-            frac = c.sampling_fraction if not self.is_test else 1
+            frac = c.sampling_fraction if self.select_func else 1
             c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
 
         # run resampling
@@ -269,7 +269,7 @@ class Resampling:
         log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
         log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
-    def get_regionlengthsd_from_config(self) -> list[list[int]]:
+    def get_num_bins_from_config(self) -> list[list[int]]:
         """Get the lengths of the binning regions in each variable from the config.
 
         Returns
@@ -277,7 +277,7 @@ class Resampling:
         typing.List[typing.List[int]]
             lengths of the binning regions in each variable from the config
         """
-        regionlengthsd = []
+        num_bins = []
         for row in self.config.bins.values():
-            regionlengthsd.append([sub[-1] for sub in row])
-        return regionlengthsd
+            num_bins.append([sub[-1] for sub in row])
+        return num_bins

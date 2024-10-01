@@ -129,7 +129,9 @@ class PreprocessingConfig:
 
         # configure classes
         sampl_cfg = copy(self.config["resampling"])
-        self.sampl_cfg = ResamplingConfig(sampl_cfg.pop("variables"), **sampl_cfg)
+        if self.is_test:
+            sampl_cfg["method"] = None
+        self.sampl_cfg = ResamplingConfig(**sampl_cfg)
         self.components = Components.from_config(self)
 
         # get track selectors
