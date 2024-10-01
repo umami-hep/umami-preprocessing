@@ -43,6 +43,13 @@ class TestClass:
             "val",
         ]
         main(args)
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_pdf_auto.yaml")),
+            "--split",
+            "test",
+        ]
+        main(args)
 
     def test_run_pdf_upscale(self):
         args = [
