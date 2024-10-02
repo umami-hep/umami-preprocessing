@@ -12,7 +12,7 @@ dependencies = [
     "rich==12.6.0",
     "scipy==1.10.1",
     "puma-hep==0.3.0",
-    "atlas-ftag-tools==0.2.3",
+    "atlas-ftag-tools==0.2.5",
     "dotmap==1.3.30"
 ]
 
@@ -53,9 +53,6 @@ required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"  # Accepts: "google", "numpy", or "pep257".
-
-[mypy]
-ignore_missing_imports = "True"
 
 [tool.pytest.ini_options]
 log_cli_level = "debug"

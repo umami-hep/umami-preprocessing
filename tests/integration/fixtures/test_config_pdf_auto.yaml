@@ -15,7 +15,6 @@ global_cuts:
   test:
     - [pt_btagJes, ">", 0]
 
-
 lowpt: &lowpt
   name: lowpt
   cuts:
@@ -46,7 +45,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ ujets]
+    flavours: [ujets]
     num_jets: 7_000
 
   - region:
