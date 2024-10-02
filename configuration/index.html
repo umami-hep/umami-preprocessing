@@ -1,0 +1,1114 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the umami preprocessing framework">
+      
+      
+        <meta name="author" content="Umami Team">
+      
+      
+        <link rel="canonical" href="https://umami-hep.github.io/umami-preprocessing/configuration/">
+      
+      
+        <link rel="prev" href="../sampling/">
+      
+      
+        <link rel="next" href="../run/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.5">
+    
+    
+      
+        <title>Configuration - UPP: Umami Preprocessing</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="UPP: Umami Preprocessing" class="md-header__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            UPP: Umami Preprocessing
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/umami-hep/umami-preprocessing/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="UPP: Umami Preprocessing" class="md-nav__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    UPP: Umami Preprocessing
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/umami-hep/umami-preprocessing/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        Setup
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampling/" class="md-nav__link">
+        Sampling methods
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Configuration
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Configuration
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input-h5-samples" class="md-nav__link">
+    Input H5 Samples
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-cuts" class="md-nav__link">
+    Global Cuts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resampling-regions" class="md-nav__link">
+    Resampling Regions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#components" class="md-nav__link">
+    Components
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#track-selections" class="md-nav__link">
+    Track selections
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resampling" class="md-nav__link">
+    Resampling
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-config" class="md-nav__link">
+    Global Config
+  </a>
+  
+    <nav class="md-nav" aria-label="Global Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="md-nav__link">
+    PreprocessingConfig
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run/" class="md-nav__link">
+        Run
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../umami_int/" class="md-nav__link">
+        Umami integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input-h5-samples" class="md-nav__link">
+    Input H5 Samples
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-cuts" class="md-nav__link">
+    Global Cuts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resampling-regions" class="md-nav__link">
+    Resampling Regions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#components" class="md-nav__link">
+    Components
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#track-selections" class="md-nav__link">
+    Track selections
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resampling" class="md-nav__link">
+    Resampling
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-config" class="md-nav__link">
+    Global Config
+  </a>
+  
+    <nav class="md-nav" aria-label="Global Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="md-nav__link">
+    PreprocessingConfig
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+
+<h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h1>
+<p>The configuration of the preprocessing is done with a <a href="https://en.wikipedia.org/wiki/YAML"><code>.yaml</code></a> file which steers the whole preprocessing.
+Available example config files for UPP can be found in <a href="https://github.com/umami-hep/umami-preprocessing/tree/main/upp/configs"><code>upp/configs</code></a>.</p>
+<p>Each aspect of the configuration is described in detail below.</p>
+<h3 id="input-h5-samples">Input H5 Samples<a class="headerlink" href="#input-h5-samples" title="Permanent link">#</a></h3>
+<p>Here we define the input h5 samples which are to be preprocessed.
+Each sample is defined using one or more DSIDs, which generally come from the <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper">training-dataset-dumper</a>.
+If a list of DSIDs is provided, jets from each DSID will be merged according to the <code>equal_jets</code> flag (see below).
+The samples are used to define components later on in configs and so one should define them with <a href="https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/">anchors</a>.</p>
+<p>Below is an example and a table explaining each setting.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single DSID</label><label for="__tabbed_1_2">Multiple DSIDs</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+<span class="w">  </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1.*.410470.*/*.h5</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+<span class="w">  </span><span class="nt">equal_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">  </span><span class="nt">pattern</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1.*.410470.*/*.h5</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name2.*.410470.*/*.h5</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Type</th>
+<th>Explanation</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td>The name of the sample, used in output filenames.</td>
+<td><em>Required</em></td>
+</tr>
+<tr>
+<td><code>pattern</code></td>
+<td><code>str</code> or <code>list[str]</code></td>
+<td>A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets.</td>
+<td><em>Required</em></td>
+</tr>
+<tr>
+<td><code>equal_jets</code></td>
+<td><code>bool</code></td>
+<td>Only relevant when providing a list of patterns. If <code>True</code>, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If <code>False</code> this is not enforced, allowing for larger numbers of available jets.</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="global-cuts">Global Cuts<a class="headerlink" href="#global-cuts" title="Permanent link">#</a></h3>
+<p>The selections that should be applied to all the data should be listed under <code>common:</code>.
+For example these could be outlier removal cuts, or a global kinematic selection.
+To do this one first provides the variable name (<code>str</code>), then the comparison operator (<code>str</code>) and a number to compare to (<code>int</code>, <code>float</code> or <code>list</code>).
+Possible operators are:</p>
+<ul>
+<li><code>"=="</code>, <code>"!="</code>, <code>"&lt;="</code>, <code>"&gt;="</code>, <code>"&gt;"</code>, <code>"&lt;"</code> which work the same as in python.</li>
+<li><code>"in"</code> and <code>"notin"</code> to check if the value is in the list.</li>
+<li><code>"%{i}=="</code>, <code>"%{i}=="</code>, <code>"%{i}=="</code> operators to compare the modulo w.r.t. <code>i</code> of an integer. </li>
+</ul>
+<p>Along with the common selection cuts, you should also specify the cuts that separate <code>train</code>, <code>val</code> and <code>test</code> splits using modulo of <code>eventNumber</code>.
+For example:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">global_cuts</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">common</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">JetFitterSecondaryVertex_mass</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">25000</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">JetFitter_deltaR</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.6</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">train</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10&lt;=&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">7</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">val</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10==&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10==&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<details class="info">
+<summary>More info about cuts</summary>
+<p>The <code>Cuts</code> class is defined in the <a href="https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/cuts.py"><code>atlas-ftag-tools</code></a> package.</p>
+</details>
+<details class="info">
+<summary>k-fold training selection</summary>
+<p>If you are training a model that will be used in production, you may need to worry about overtraining.
+A variable <code>jetFoldHash</code> is included in newer h5 dumps which allows you to independent models on different
+folds of the data.
+If you are just performing studies, then don't worry about applying any selections on the <code>jetFoldHash</code>, 
+since the train/val/test split will suffice.</p>
+</details>
+<h3 id="resampling-regions">Resampling Regions<a class="headerlink" href="#resampling-regions" title="Permanent link">#</a></h3>
+<p>Next we define any kinematic regions which need to be resampled separately, again using anchors as these will also be used in the definition of our components.
+For each region you need to provide a name and a list of cuts (see above).
+Here is an example:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
+<span class="w">  </span><span class="nt">cuts</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+<span class="nt">highpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;highpt</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">highpt</span>
+<span class="w">  </span><span class="nt">cuts</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Again, aliasing these just helps to reduce duplication of information when defining the components as can be seen below.</p>
+<h3 id="components">Components<a class="headerlink" href="#components" title="Permanent link">#</a></h3>
+<p>The <code>components</code> section is where all the configuration comes together. 
+A component is a combination of a region, a sample and a flavour.
+They allow for full flexibility when defining different preprocessing pipelines
+(e.g. single-b versus Xbb).</p>
+<p>An example <code>components</code> block is provided below.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">components</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
+<span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
+<span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10_000_000</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*highpt</span>
+<span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*zprime</span>
+<span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
+</code></pre></div>
+<p>Notice that we use <code>&lt;&lt;*</code> insertion tool to insert already defined regions and samples.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Type</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>region</code></td>
+<td>anchor</td>
+<td>The pre-defined kinematic region anchor, e.g. <code>lowpt</code> or <code>highpt</code>, or <code>inclusive</code> if not splitting in <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span></td>
+</tr>
+<tr>
+<td><code>sample</code></td>
+<td>anchor</td>
+<td>The pre-defined sample anchor, e.g. <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> or <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span></td>
+</tr>
+<tr>
+<td><code>flavours</code></td>
+<td><code>list[str]</code></td>
+<td>One or more jet flavours, e.g. <code>[bjets]</code> or <code>[ujets]</code>. The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each flavour.</td>
+</tr>
+<tr>
+<td><code>num_jets</code></td>
+<td><code>int</code></td>
+<td>The number of jets to be sampled from this component in the training split</td>
+</tr>
+<tr>
+<td><code>num_jets_val</code></td>
+<td><code>int</code></td>
+<td><strong>Optional</strong> (default: <code>num_jets//10</code>) number of jets of this component in validation set.</td>
+</tr>
+<tr>
+<td><code>num_jets_test</code></td>
+<td><code>int</code></td>
+<td><strong>Optional</strong> (default: <code>num_jets//10</code>) number of jets of this component in a test set.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">#</a></h3>
+<p>The next thing you need is to provide the variables that are taken from the TDD files and written in the resampled dataset.
+Selecting only a subset of variables keeps the output files lightweight, and ensures the dataloading does not become a bottleneck during training.</p>
+<p>One can simply define them under <code>variables:</code> like:</p>
+<p><div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jets</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pt_btagJes</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absEta_btagJes</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HadronConeExclTruthLabelID</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pt</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eta</span>
+
+<span class="w">  </span><span class="nt">tracks</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dphi</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deta</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">qOverP</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP3D_signed_d0_significance</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP3D_signed_z0_significance</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthOriginLabel</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthVertexIndex</span>
+</code></pre></div>
+Each key under <code>variables:</code> corresponds to a dataset name in the TDD h5 file (e.g. <code>jets</code>, <code>tracks</code>, <code>hits</code>).
+The combined set of variables in <code>inputs</code> and <code>labels</code> are carried over to the output files to a dataset with the same name as the input dataset.
+Internally, UPP will compute normalisation parameters for variables in the <code>inputs</code>, and compute class weightings (for categorical labels) for variables in the <code>labels</code> block.</p>
+<p>Alternatively include the variables from your custom variable config by providing the full path to the file after an include statement.
+The file you provide should have the same structure as shown above but without <code>variable:</code> level.
+For example:
+<div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xbb-variables.yaml</span>
+</code></pre></div></p>
+<p>One can also import vaiables configs already provided in this package <code>upp/config/</code> yaml files using just the yaml file name e.g.:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/&lt;full path to your file&gt;.yaml</span>
+</code></pre></div>
+<details class="info">
+<summary>You can choose later which variables in your output files are used for training</summary>
+<p>When it comes to defining your training config, you will be required to <a href="https://ftag-salt.docs.cern.ch/configuration/#selecting-training-variables">define the variables used for training</a>.
+So it's okay to include here input variables you are not sure whether you will need, for example when testing the importance of different inputs.
+This is straightforward since we always store data using structured arrays (in the same format as the TDD outputs).</p>
+</details>
+<h3 id="track-selections">Track selections<a class="headerlink" href="#track-selections" title="Permanent link">#</a></h3>
+<p>You can apply on the fly selections to tracks in the preprocessing stage (specifically the merging step).</p>
+<p>To do this, include a <code>selection</code> key in the variable config block under the tracks, for example:</p>
+<div class="highlight"><pre><span></span><code>  tracks:
+    inputs:
+      - d0
+    labels:
+      - ftagTruthOriginLabel
+    selection:
+      - [d0, &quot;&gt;&quot;, 0.1]
+</code></pre></div>
+<h3 id="resampling">Resampling<a class="headerlink" href="#resampling" title="Permanent link">#</a></h3>
+<p>There are currently two resampling methods implemented in the package <code>pdf</code> and <code>countup</code> and they share most of setting.
+Below is the example of setting up the <code>pdf</code> resampling method and a table describitng all the parameters.</p>
+<p>In order to run UPP without any kinematic resampling, just set <code>method: none</code>. 
+Note you will still need to run the resampling stage of the preprocessing pipeline.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">resampling</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cjets</span>
+<span class="w">  </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+<span class="w">  </span><span class="nt">upscale_pdf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">sampling_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pt_btagJes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">20_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]]</span>
+<span class="w">    </span><span class="nt">absEta_btagJes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]]</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Type</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td><code>str</code></td>
+<td>The resampling is done in such a way that the distribution of the kinematic variables matches the distribution of those in one particular flavour given in here. Usually it is the leat populated flavour, as this flavour will not be resampled instead all jets of this flavour are taken.</td>
+</tr>
+<tr>
+<td><code>method</code></td>
+<td><code>str</code></td>
+<td>Either  <code>pdf</code>, <code>countup</code> or <code>none</code>, depending on the method you would like to use</td>
+</tr>
+<tr>
+<td><code>upscale_pdf</code></td>
+<td><code>int</code></td>
+<td><strong>Optional</strong> only availabe for <code>pdf</code> preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original</td>
+</tr>
+<tr>
+<td><code>sampling_fraction</code></td>
+<td><code>None</code>, <code>float</code> or <code>auto</code></td>
+<td>The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are prefered. On the other hand eith smaller sampling fractions lead to longer preprocesing times. <code>auto</code> option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present.</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td><code>dict</code></td>
+<td>The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable prlease provide a <code>bins</code> setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut betwenn <strong>regions</strong> takes place to better handle the discontinuities.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="global-config">Global Config<a class="headerlink" href="#global-config" title="Permanent link">#</a></h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="upp.classes.preprocessing_config.PreprocessingConfig" class="doc doc-heading">
+              <code class=" language-python"><span class="n">upp</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">preprocessing_config</span><span class="o">.</span><span class="n">PreprocessingConfig</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="headerlink" title="Permanent link">#</a></h4>
+
+
+    <div class="doc doc-contents first">
+
+
+      <p>Global options for the preprocessing.</p>
+<p>These optons are specified in the config file
+under the <code>global:</code> key. They are passed as kwargs to PreprocessingConfig.
+The config file is also copied to the output directory.</p>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="nt">global</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">jets_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
+<span class="w">    </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_000_000</span>
+<span class="w">    </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
+<span class="w">    </span><span class="nt">base_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my/stuff/</span>
+<span class="w">    </span><span class="nt">ntuple_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">h5-inputs</span><span class="w"> </span><span class="c1"># resolved path: /my/stuff/h5-inputs/</span>
+</code></pre></div></p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>base_dir</code></td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Base directory for all other paths.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ntuple_dir</code></td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Directory containing the input h5 ntuples. If a relative path is given, it is
+interpreted as relative to base_dir.</p>
+              </div>
+            </td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;ntuples&#39;)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>components_dir</code></td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Directory for intermediate component files. If a relative path is given, it is
+interpreted as relative to base_dir.</p>
+              </div>
+            </td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;components&#39;)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>out_dir</code></td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Directory for output files. If a relative path is given, it is interpreted as
+relative to base_dir.</p>
+              </div>
+            </td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;output&#39;)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>out_fname</code></td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Filename stem for the output files.</p>
+              </div>
+            </td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;pp_output.h5&#39;)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>batch_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Batch size for the preprocessing. For each batch select
+<code>sampling_fraction*batch_size_after_cuts</code>. It is recommended to choose high batch sizes
+especially to the <code>countup</code> method to achive best agreement of target and resampled
+distributions.</p>
+              </div>
+            </td>
+            <td>
+                  <code>100000</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>num_jets_estimate</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Any of the further three arguments that are not specified will default to this value
+Is equal to 1_000_000 by default.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1000000</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>num_jets_estimate_available</code></td>
+            <td>
+                  <code>int | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A sabsample taken from the whole sample to estimate the number of jets after the cuts.
+Please keep this number high in order to not get poisson error of more then 5%.
+If time allows you can use -1 to get a precise number of jets and not just an estimate
+although it will be slow for large datasets. Is equal to num_jets_estimate by default.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>num_jets_estimate_hist</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of jets of each flavour that are used to construct histograms for probability
+density function estimation. Larger numbers give a better quality estmate of the pdfs.
+Is equal to num_jets_estimate by default.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>num_jets_estimate_norm</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of jets of each flavour that are used to estimate shifting and scaling during
+normalisation step. Larger numbers give a better quality estmates.
+Is equal to num_jets_estimate by default.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>jets_name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the jets dataset in the input file.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;jets&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 2, 2024</span>
+      
+        <br>
+        Created:
+        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 2, 2024</span>
+      
+    
+  </small>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 - 2023 CERN for the benefit of the ATLAS collaboration
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>
