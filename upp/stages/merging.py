@@ -22,6 +22,8 @@ class Merging:
         self.flavours = self.components.flavours
 
     def add_jet_flavour_label(self, jets, component):
+        if "flavour_label" in jets.dtype.names:
+            return jets
         int_label = self.flavours.index(component.flavour)
         label_array = np.full(len(jets), int_label, dtype=[("flavour_label", "i4")])
         return join_structured_arrays([jets, label_array])
