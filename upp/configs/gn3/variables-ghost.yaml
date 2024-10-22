@@ -74,6 +74,8 @@ electrons:
     - phi
     - ftag_et
     - qOverP
+    - ftag_z0AlongBeamspot
+    - d0RelativeToBeamspot
     - d0RelativeToBeamspotSignificance
     - ftag_z0AlongBeamspotSignificance
     - ftag_ptVarCone30OverPt
