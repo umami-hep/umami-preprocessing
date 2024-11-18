@@ -247,7 +247,7 @@ class Resampling:
                 self.batch_size,
                 jets_name=self.jets_name,
                 transform=self.transform,
-                use_weights=True,
+                use_weight=True,
             )
             c.setup_writer(self.variables, jets_name=self.jets_name)
 
