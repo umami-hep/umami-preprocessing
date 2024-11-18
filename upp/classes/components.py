@@ -26,7 +26,7 @@ class Component:
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
-    def setup_reader(self, batch_size, jets_name="jets", fname=None, use_weight = False, **kwargs):
+    def setup_reader(self, batch_size, jets_name="jets", fname=None, use_weight=False, **kwargs):
         if fname is None:
             fname = self.sample.path
         self.reader = H5Reader(
