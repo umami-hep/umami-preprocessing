@@ -31,11 +31,11 @@ class Component:
             fname = self.sample.path
         weights = self.sample.weights if self.sample.weights is not None else None
         self.reader = H5Reader(
-            fname, 
-            batch_size, 
-            jets_name=jets_name, 
-            equal_jets=self.equal_jets, 
-            weights=weights, 
+            fname,
+            batch_size,
+            jets_name=jets_name,
+            equal_jets=self.equal_jets,
+            weights=weights,
             **kwargs,
         )
         log.debug(f"Setup component reader at: {fname}")
@@ -129,7 +129,7 @@ class Components:
                 pattern = tuple(pattern)
             sample = Sample(
                 pattern=pattern,
-                ntuple_dir=pp_cfg.ntuple_dir, 
+                ntuple_dir=pp_cfg.ntuple_dir,
                 name=c["sample"]["name"],
                 weights=weights,
                 )
