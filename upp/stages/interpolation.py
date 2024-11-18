@@ -70,7 +70,7 @@ def upscale_array(
 def upscale_array_regionally(
     array: np.array,
     upscl: int,
-    regionlengthsd: list,
+    num_bins: list,
     order: int = 3,
     mode: str = "nearest",
     positive: bool = True,
@@ -83,7 +83,7 @@ def upscale_array_regionally(
         array to be upscaled
     upscl : int
         upscaling factor
-    regionlengthsd : list
+    num_bins : list
         list of lists of region lengths in each dimension,
         region lengths should sum to the length of the array in that dimension
     order : int, optional
@@ -99,10 +99,10 @@ def upscale_array_regionally(
         Array that is upscaled by a factor of upscl
     """
     up_array = np.empty(shape=[ds * upscl for ds in array.shape])
-    starts = [np.cumsum([0] + regionlengths)[:-1] for regionlengths in regionlengthsd]
+    starts = [np.cumsum([0] + regionlengths)[:-1] for regionlengths in num_bins]
     starts_grid = np.meshgrid(*starts)
     starts_grid = [starts_grid[i].flatten() for i in range(len(starts_grid))]
-    finishes = [np.cumsum(regionlengths) for regionlengths in regionlengthsd]
+    finishes = [np.cumsum(regionlengths) for regionlengths in num_bins]
     finishes_grid = np.meshgrid(*finishes)
     finishes_grid = [finishes_grid[i].flatten() for i in range(len(finishes_grid))]
     d = len(array.shape)
