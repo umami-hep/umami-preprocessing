@@ -4,8 +4,8 @@ import logging as log
 from pathlib import Path
 
 from ftag import Flavours
-from ftag.flavour import FlavourContainer
 from ftag.hdf5 import H5Reader
+from ftag.labels import LabelContainer
 from puma import Histogram, HistogramPlot
 
 from upp.utils import path_append
@@ -53,7 +53,7 @@ def make_hist(
     jets_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
-    flavour_cont: FlavourContainer = Flavours,
+    flavour_cont: LabelContainer = Flavours,
 ) -> None:
     """
     Create and plot the histogram and save it to disk.

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from ftag import Cuts, Flavour, Sample
+from ftag import Cuts, Label, Sample
 from ftag.hdf5 import H5Reader, H5Writer
 
 from upp.classes.region import Region
@@ -16,7 +16,7 @@ from upp.stages.hist import Hist
 class Component:
     region: Region
     sample: Sample
-    flavour: Flavour
+    flavour: Label
     global_cuts: Cuts
     dirname: Path
     num_jets: int
@@ -230,7 +230,7 @@ class Components:
     def __getitem__(self, index):
         if isinstance(index, int):
             return self.components[index]
-        if isinstance(index, (str, Flavour)):
+        if isinstance(index, (str, Label)):
             return self.components[self.flavours.index(index)]
 
     def __len__(self):
