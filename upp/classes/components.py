@@ -29,7 +29,6 @@ class Component:
     def setup_reader(self, batch_size, jets_name="jets", fname=None, **kwargs):
         if fname is None:
             fname = self.sample.path
-        weights = self.sample.weights if self.sample.weights is not None else None
         self.reader = H5Reader(
             fname,
             batch_size,
