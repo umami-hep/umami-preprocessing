@@ -4,8 +4,8 @@ import logging as log
 from pathlib import Path
 
 from ftag import Flavours
-from ftag.flavour import FlavourContainer
 from ftag.hdf5 import H5Reader
+from ftag.labels import FlavourContainer
 from puma import Histogram, HistogramPlot
 
 from upp.utils import path_append

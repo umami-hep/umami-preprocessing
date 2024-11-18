@@ -11,8 +11,8 @@ from typing import Literal
 import yaml
 from dotmap import DotMap
 from ftag import Cuts
-from ftag.flavour import FlavourContainer
 from ftag.git_check import get_git_hash
+from ftag.labels import FlavourContainer
 from ftag.track_selector import TrackSelector
 from ftag.transform import Transform
 from yamlinclude import YamlIncludeConstructor
