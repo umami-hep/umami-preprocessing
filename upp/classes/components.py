@@ -132,7 +132,7 @@ class Components:
                 ntuple_dir=pp_cfg.ntuple_dir,
                 name=c["sample"]["name"],
                 weights=weights,
-                )
+            )
             for name in c["flavours"]:
                 num_jets = c["num_jets"]
                 if pp_cfg.split == "val":
