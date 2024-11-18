@@ -35,7 +35,7 @@ class Component:
             batch_size,
             jets_name=jets_name,
             equal_jets=self.equal_jets,
-            weights=weights,
+            weights=self.sample.weights,
             **kwargs,
         )
         log.debug(f"Setup component reader at: {fname}")
