@@ -122,7 +122,9 @@ class Components:
             weights = c["sample"].get("weights", None)
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
-            sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"],
+            sample = Sample(pattern=pattern, 
+                            ntuple_dir=pp_cfg.ntuple_dir, 
+                            name=c["sample"]["name"],
                             weights=weights if weights is not None else None)
             for name in c["flavours"]:
                 num_jets = c["num_jets"]
