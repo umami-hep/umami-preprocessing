@@ -243,7 +243,7 @@ class Resampling:
         # setup i/o
         for c in self.components:
             # just used for the writer configuration
-            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
+            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform, use_weights=True)
             c.setup_writer(self.variables, jets_name=self.jets_name)
 
         # set samplig fraction if needed
