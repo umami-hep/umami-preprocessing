@@ -180,6 +180,7 @@ class Resampling:
                 jets_name=self.jets_name,
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
+                weights=sample.weights,
             )
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
@@ -247,7 +248,6 @@ class Resampling:
                 self.batch_size,
                 jets_name=self.jets_name,
                 transform=self.transform,
-                use_weight=True,
             )
             c.setup_writer(self.variables, jets_name=self.jets_name)
 
