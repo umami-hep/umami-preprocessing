@@ -180,6 +180,7 @@ class Resampling:
                 jets_name=self.jets_name,
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
+                weights=sample.weights,
             )
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
@@ -243,7 +244,11 @@ class Resampling:
         # setup i/o
         for c in self.components:
             # just used for the writer configuration
-            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
+            c.setup_reader(
+                self.batch_size,
+                jets_name=self.jets_name,
+                transform=self.transform,
+            )
             c.setup_writer(self.variables, jets_name=self.jets_name)
 
         # set samplig fraction if needed
