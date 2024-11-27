@@ -136,6 +136,10 @@ def create_histograms(config) -> None:
         log.info(f"Estimating {c} PDF using {config.num_jets_estimate_hist:,} samples...")
         c.setup_reader(config.batch_size, config.jets_name)
         cuts_no_split = c.cuts.ignore(["eventNumber"])
+
+        ###
+        # TODO: return the number of jets here and pass to the next function to get started
+        ###
         c.check_num_jets(
             config.num_jets_estimate_hist,
             cuts=cuts_no_split,

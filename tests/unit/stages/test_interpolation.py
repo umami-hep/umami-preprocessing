@@ -144,7 +144,7 @@ def test_upscale_array_regionally():
         order=order,
         mode=mode,
         positive=positive,
-        regionlengthsd=[[2, 1], [2, 1]],
+        num_bins=[[2, 1], [2, 1]],
     )
 
     # Check if the result matches the expected output
