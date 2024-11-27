@@ -22,6 +22,8 @@ jets:
     - jetFoldHash
     - ptFromTruthJet
     - matchedToTruthJet
+    - ptFromTruthDressedWZJet
+    - matchedToTruthDressedWZJet
 
 tracks_ghost:
   inputs:
