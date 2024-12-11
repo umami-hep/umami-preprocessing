@@ -4,7 +4,7 @@ description = "Preprocessing for jet tagging"
 dynamic = ["version"]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = "<3.12,>=3.8"
 
 dependencies = [
     "pyyaml-include==1.3",
