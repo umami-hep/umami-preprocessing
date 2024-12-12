@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     # Only run for a tagged commit
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    environment: pypi
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
@@ -50,6 +51,3 @@ jobs:
           python -m build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          username: __token__
-          password: ${{ secrets.PYPI }}
