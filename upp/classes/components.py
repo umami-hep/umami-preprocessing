@@ -22,9 +22,18 @@ class Component:
     num_jets: int
     num_jets_estimate_available: int
     equal_jets: bool
+    complete: bool
+    ups_max: float
+    ups_ratio: float
+    sampling_fraction: float
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
+        self._unique_jets = sum([r.get_attr("unique_jets") for r in self.reader.readers])
+        self._complete = None
+        self._ups_ratio = None
+        self._ups_max = None
+        self.sampling_fraction = None
 
     def setup_reader(self, batch_size, jets_name="jets", fname=None, **kwargs):
         if fname is None:
@@ -102,7 +111,7 @@ class Component:
 
     @property
     def unique_jets(self) -> int:
-        return sum([r.get_attr("unique_jets") for r in self.reader.readers])
+        return self._unique_jets
 
 
 class Components:
