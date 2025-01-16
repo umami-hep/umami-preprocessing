@@ -33,10 +33,8 @@ class Merging:
         for component in components:
             try:
                 # shallow copy is needed since we add a variable
-                batch = copy(next(component.stream)) 
-                batch[self.jets_name] = self.add_jet_flavour_label(
-                    batch[self.jets_name], component
-                )
+                batch = copy(next(component.stream))
+                batch[self.jets_name] = self.add_jet_flavour_label(batch[self.jets_name], component)
 
             except StopIteration:
                 component.complete = True
@@ -67,9 +65,7 @@ class Merging:
         # setup inputs
         for component in components:
             batch_size = self.batch_size * component.num_jets // components.num_jets + 1
-            component.setup_reader(
-                batch_size, fname=component.out_path, jets_name=self.jets_name
-            )
+            component.setup_reader(batch_size, fname=component.out_path, jets_name=self.jets_name)
             component.stream = component.reader.stream(
                 self.variables.combined(), component.reader.num_jets
             )

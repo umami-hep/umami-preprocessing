@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
 
 import numpy as np
 from ftag import Cuts, Label, Sample
 from ftag.hdf5 import H5Reader, H5Writer
+from ftag.labels import LabelContainer
 
 from upp.classes.region import Region
 from upp.stages.hist import Hist
+from upp.types import Split
 
 
 @dataclass
@@ -31,8 +32,8 @@ class Component:
         self,
         batch_size: int,
         jets_name: str = "jets",
-        fname: Optional[Path | str | List[Path | str]] = None,
-        **kwargs
+        fname: Path | str | list[Path | str] | None = None,
+        **kwargs,
     ):
         if fname is None:
             fname = list(self.sample.path)
@@ -128,63 +129,74 @@ class Components:
         self.components = components
 
     @classmethod
-    def from_config(cls, preprocessing_config: "PreprocessingConfig"):
-        components = []
-        for components_config in preprocessing_config.config["components"]:
-            assert "equal_jets" not in components_config, \
-                "equal_jets flag should be set in the sample config"
+    def from_config(
+        cls,
+        components_config: dict,
+        num_jets_estimate_available: int,
+        split: Split,
+        global_cuts: Cuts,
+        ntuple_dir: Path,
+        components_dir: Path,
+        flavour_container: LabelContainer,
+        is_test: bool,
+        check_flavour_ratios: bool,
+    ):
+        components_list = []
+        for component_config in components_config:
+            assert (
+                "equal_jets" not in component_config
+            ), "equal_jets flag should be set in the sample config"
             region_cuts = (
-                Cuts.empty() if preprocessing_config.is_test
-                else Cuts.from_list(components_config["region"]["cuts"])
+                Cuts.empty() if is_test else Cuts.from_list(component_config["region"]["cuts"])
             )
-            region = Region(
-                components_config["region"]["name"],
-                region_cuts + preprocessing_config.global_cuts
-            )
-            pattern = components_config["sample"]["pattern"]
-            equal_jets = components_config["sample"].get("equal_jets", True)
+            region = Region(component_config["region"]["name"], region_cuts + global_cuts)
+            pattern = component_config["sample"]["pattern"]
+            equal_jets = component_config["sample"].get("equal_jets", True)
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
             sample = Sample(
                 pattern=pattern,
-                ntuple_dir=preprocessing_config.ntuple_dir,
-                name=components_config["sample"]["name"]
+                ntuple_dir=ntuple_dir,
+                name=component_config["sample"]["name"],
             )
 
-            num_jets = components_config["num_jets"]
-            if preprocessing_config.split == "val":
-                num_jets = components_config.get("num_jets_val", num_jets // 10)
-            elif preprocessing_config.split == "test":
-                num_jets = components_config.get("num_jets_test", num_jets // 10)
+            num_jets = component_config["num_jets"]
+            if split == "val":
+                num_jets = component_config.get("num_jets_val", num_jets // 10)
+            elif split == "test":
+                num_jets = component_config.get("num_jets_test", num_jets // 10)
 
-            assert preprocessing_config.num_jets_estimate_available is not None
-            if components_config.get("flavours") is None:
-                components.append(Component(
-                    region,
-                    sample,
-                    None,
-                    preprocessing_config.global_cuts,
-                    preprocessing_config.components_dir,
-                    num_jets,
-                    preprocessing_config.num_jets_estimate_available,
-                    equal_jets,
-                ))
-            else:
-                for name in components_config["flavours"]:
-                    components.append(Component(
+            assert num_jets_estimate_available is not None
+            if component_config.get("flavours") is None:
+                components_list.append(
+                    Component(
                         region,
                         sample,
-                        preprocessing_config.flavour_container[name],
-                        preprocessing_config.global_cuts,
-                        preprocessing_config.components_dir,
+                        None,
+                        global_cuts,
+                        components_dir,
                         num_jets,
-                        preprocessing_config.num_jets_estimate_available,
+                        num_jets_estimate_available,
                         equal_jets,
-                    ))
+                    )
+                )
+            else:
+                for name in component_config["flavours"]:
+                    components_list.append(
+                        Component(
+                            region,
+                            sample,
+                            flavour_container[name],
+                            global_cuts,
+                            components_dir,
+                            num_jets,
+                            num_jets_estimate_available,
+                            equal_jets,
+                        )
+                    )
 
-        components = cls(components)
-        if hasattr(preprocessing_config, "resampling_config") \
-            and preprocessing_config.resampling_config.method is not None:
+        components = cls(components_list)
+        if check_flavour_ratios:
             components.check_flavour_ratios()
         return components
 
@@ -195,9 +207,7 @@ class Components:
         for region, components in self.groupby_region():
             this_ratios = {}
             for flavour in self.flavours:
-                this_ratios[flavour.name] = (
-                    components[flavour].num_jets / components.num_jets
-                )
+                this_ratios[flavour.name] = components[flavour].num_jets / components.num_jets
             ratios[region] = this_ratios
 
         ref = next(iter(ratios.values()))
@@ -220,13 +230,16 @@ class Components:
     @property
     def flavours(self) -> list[Label] | None:
         if any(c.flavour is None for c in self):
-            assert all(c.flavour is None for c in self), \
-                "expected to never have mixed components with and without flavours"
+            assert all(
+                c.flavour is None for c in self
+            ), "expected to never have mixed components with and without flavours"
             return None
         else:
             # the if is needed to satisfy type checkers, c.flavour should never be None
             # due to the if-statement here
-            return list(set(component.flavour for component in self if component.flavour is not None))
+            return list(
+                set(component.flavour for component in self if component.flavour is not None)
+            )
 
     @property
     def cuts(self):
@@ -274,11 +287,12 @@ class Components:
         if isinstance(index_or_label, int):
             return self.components[index_or_label]
         elif isinstance(index_or_label, Label):
-            assert self.flavours is not None, \
-                "expected to only index components by label when flavours are available"
+            assert (
+                self.flavours is not None
+            ), "expected to only index components by label when flavours are available"
             return self.components[self.flavours.index(index_or_label)]
         else:
-            assert False
+            raise AssertionError()
 
     def __len__(self):
         return len(self.components)

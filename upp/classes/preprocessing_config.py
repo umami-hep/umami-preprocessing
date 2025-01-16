@@ -6,7 +6,6 @@ import logging as log
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
 
 import yaml
 from dotmap import DotMap
@@ -21,15 +20,13 @@ from upp import __version__
 from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.variable_config import VariableConfig
+from upp.types import Split
 from upp.utils import path_append
 
 # support inclusion of yaml files in the config dir
 YamlIncludeConstructor.add_to_loader_class(
     loader_class=yaml.SafeLoader, base_dir=Path(__file__).parent.parent / "configs"
 )
-
-
-Split = Literal["train", "val", "test"]
 
 
 @dataclass
@@ -134,7 +131,18 @@ class PreprocessingConfig:
                 resampling_config["method"] = None
             self.resampling_config = ResamplingConfig(**resampling_config)
 
-        self.components = Components.from_config(self)
+        assert self.num_jets_estimate_available is not None
+        self.components = Components.from_config(
+            self.config["components"],
+            self.num_jets_estimate_available,
+            self.split,
+            self.global_cuts,
+            self.ntuple_dir,
+            self.components_dir,
+            self.flavour_container,
+            self.is_test,
+            check_flavour_ratios=hasattr(self, "resampling_config"),
+        )
 
         # get track selectors
         vc = self.config["variables"]
