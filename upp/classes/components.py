@@ -25,7 +25,7 @@ class Component:
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
-        self._unique_jets = 0
+        self._unique_jets = -1
         self._complete = None
         self._ups_ratio = None
         self._ups_max = None
@@ -107,7 +107,10 @@ class Component:
 
     @property
     def unique_jets(self) -> int:
-        return sum([r.get_attr("unique_jets") for r in self.reader.readers])
+        if self._unique_jets == -1:
+            self._unique_jets = sum([r.get_attr("unique_jets") for r in self.reader.readers])
+
+        return self._unique_jets
 
 
 class Components:
