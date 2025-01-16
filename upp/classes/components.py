@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging as log
 from dataclasses import dataclass
 from pathlib import Path
+from typing import List, Optional
 
 import numpy as np
 from ftag import Cuts, Label, Sample
@@ -16,7 +17,7 @@ from upp.stages.hist import Hist
 class Component:
     region: Region
     sample: Sample
-    flavour: Label
+    flavour: Label | None
     global_cuts: Cuts
     dirname: Path
     num_jets: int
@@ -26,9 +27,16 @@ class Component:
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
 
-    def setup_reader(self, batch_size, jets_name="jets", fname=None, **kwargs):
+    def setup_reader(
+        self,
+        batch_size: int,
+        jets_name: str = "jets",
+        fname: Optional[Path | str | List[Path | str]] = None,
+        **kwargs
+    ):
         if fname is None:
-            fname = self.sample.path
+            fname = list(self.sample.path)
+
         self.reader = H5Reader(
             fname, batch_size, jets_name=jets_name, equal_jets=self.equal_jets, **kwargs
         )
@@ -42,17 +50,27 @@ class Component:
 
     @property
     def name(self):
-        return f"{self.region.name}_{self.sample.name}_{self.flavour.name}"
+        if self.flavour is None:
+            return f"{self.region.name}_{self.sample.name}"
+        else:
+            return f"{self.region.name}_{self.sample.name}_{self.flavour.name}"
 
     @property
     def cuts(self):
-        return self.global_cuts + self.flavour.cuts + self.region.cuts
+        if self.flavour is None:
+            return self.global_cuts + self.region.cuts
+        else:
+            return self.global_cuts + self.flavour.cuts + self.region.cuts
 
     @property
-    def out_path(self):
+    def out_path(self) -> Path:
         return self.dirname / f"{self.name}.h5"
 
     def is_target(self, target_str):
+        assert self.flavour is not None, (
+            "expected is_target to only be called"
+            " in resampling code, when self.flavour is expected to be set"
+        )
         return self.flavour.name == target_str
 
     def get_jets(self, variables: list, num_jets: int, cuts: Cuts | None = None):
@@ -110,47 +128,76 @@ class Components:
         self.components = components
 
     @classmethod
-    def from_config(cls, pp_cfg):
+    def from_config(cls, preprocessing_config: "PreprocessingConfig"):
         components = []
-        for c in pp_cfg.config["components"]:
-            assert "equal_jets" not in c, "equal_jets flag should be set in the sample config"
-            region_cuts = Cuts.empty() if pp_cfg.is_test else Cuts.from_list(c["region"]["cuts"])
-            region = Region(c["region"]["name"], region_cuts + pp_cfg.global_cuts)
-            pattern = c["sample"]["pattern"]
-            equal_jets = c["sample"].get("equal_jets", True)
+        for components_config in preprocessing_config.config["components"]:
+            assert "equal_jets" not in components_config, \
+                "equal_jets flag should be set in the sample config"
+            region_cuts = (
+                Cuts.empty() if preprocessing_config.is_test
+                else Cuts.from_list(components_config["region"]["cuts"])
+            )
+            region = Region(
+                components_config["region"]["name"],
+                region_cuts + preprocessing_config.global_cuts
+            )
+            pattern = components_config["sample"]["pattern"]
+            equal_jets = components_config["sample"].get("equal_jets", True)
             if isinstance(pattern, list):
                 pattern = tuple(pattern)
-            sample = Sample(pattern=pattern, ntuple_dir=pp_cfg.ntuple_dir, name=c["sample"]["name"])
-            for name in c["flavours"]:
-                num_jets = c["num_jets"]
-                if pp_cfg.split == "val":
-                    num_jets = c.get("num_jets_val", num_jets // 10)
-                elif pp_cfg.split == "test":
-                    num_jets = c.get("num_jets_test", num_jets // 10)
-                components.append(
-                    Component(
+            sample = Sample(
+                pattern=pattern,
+                ntuple_dir=preprocessing_config.ntuple_dir,
+                name=components_config["sample"]["name"]
+            )
+
+            num_jets = components_config["num_jets"]
+            if preprocessing_config.split == "val":
+                num_jets = components_config.get("num_jets_val", num_jets // 10)
+            elif preprocessing_config.split == "test":
+                num_jets = components_config.get("num_jets_test", num_jets // 10)
+
+            assert preprocessing_config.num_jets_estimate_available is not None
+            if components_config.get("flavours") is None:
+                components.append(Component(
+                    region,
+                    sample,
+                    None,
+                    preprocessing_config.global_cuts,
+                    preprocessing_config.components_dir,
+                    num_jets,
+                    preprocessing_config.num_jets_estimate_available,
+                    equal_jets,
+                ))
+            else:
+                for name in components_config["flavours"]:
+                    components.append(Component(
                         region,
                         sample,
-                        pp_cfg.flavour_cont[name],
-                        pp_cfg.global_cuts,
-                        pp_cfg.components_dir,
+                        preprocessing_config.flavour_container[name],
+                        preprocessing_config.global_cuts,
+                        preprocessing_config.components_dir,
                         num_jets,
-                        pp_cfg.num_jets_estimate_available,
+                        preprocessing_config.num_jets_estimate_available,
                         equal_jets,
-                    )
-                )
+                    ))
+
         components = cls(components)
-        if pp_cfg.sampl_cfg.method is not None:
+        if hasattr(preprocessing_config, "resampling_config") \
+            and preprocessing_config.resampling_config.method is not None:
             components.check_flavour_ratios()
         return components
 
     def check_flavour_ratios(self):
+        assert self.flavours is not None, "expected "
+
         ratios = {}
-        flavours = self.flavours
         for region, components in self.groupby_region():
             this_ratios = {}
-            for f in flavours:
-                this_ratios[f.name] = components[f].num_jets / components.num_jets
+            for flavour in self.flavours:
+                this_ratios[flavour.name] = (
+                    components[flavour].num_jets / components.num_jets
+                )
             ratios[region] = this_ratios
 
         ref = next(iter(ratios.values()))
@@ -164,15 +211,22 @@ class Components:
 
     @property
     def regions(self):
-        return list(dict.fromkeys(c.region for c in self))
+        return list(set(c.region for c in self))
 
     @property
     def samples(self):
-        return list(dict.fromkeys(c.sample for c in self))
+        return list(set(c.sample for c in self))
 
     @property
-    def flavours(self):
-        return list(dict.fromkeys(c.flavour for c in self))
+    def flavours(self) -> list[Label] | None:
+        if any(c.flavour is None for c in self):
+            assert all(c.flavour is None for c in self), \
+                "expected to never have mixed components with and without flavours"
+            return None
+        else:
+            # the if is needed to satisfy type checkers, c.flavour should never be None
+            # due to the if-statement here
+            return list(set(component.flavour for component in self if component.flavour is not None))
 
     @property
     def cuts(self):
@@ -207,7 +261,7 @@ class Components:
     def dsids(self):
         return list(set(sum([c.sample.dsid for c in self], [])))  # noqa: RUF017
 
-    def groupby_region(self):
+    def groupby_region(self) -> list[tuple[Region, Components]]:
         return [(r, Components([c for c in self if c.region == r])) for r in self.regions]
 
     def groupby_sample(self):
@@ -216,11 +270,15 @@ class Components:
     def __iter__(self):
         yield from self.components
 
-    def __getitem__(self, index):
-        if isinstance(index, int):
-            return self.components[index]
-        if isinstance(index, (str, Label)):
-            return self.components[self.flavours.index(index)]
+    def __getitem__(self, index_or_label: int | Label):
+        if isinstance(index_or_label, int):
+            return self.components[index_or_label]
+        elif isinstance(index_or_label, Label):
+            assert self.flavours is not None, \
+                "expected to only index components by label when flavours are available"
+            return self.components[self.flavours.index(index_or_label)]
+        else:
+            assert False
 
     def __len__(self):
         return len(self.components)

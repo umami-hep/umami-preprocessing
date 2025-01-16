@@ -30,15 +30,16 @@ class Merging:
 
     def write_chunk(self, components):
         merged = {}
-        for c in components:
+        for component in components:
             try:
-                batch = copy(next(c.stream))  # shallow copy is needed since we add a variable
-                batch[self.jets_name] = self.add_jet_flavour_label(batch[self.jets_name], c)
+                # shallow copy is needed since we add a variable
+                batch = copy(next(component.stream)) 
+                batch[self.jets_name] = self.add_jet_flavour_label(
+                    batch[self.jets_name], component
+                )
 
             except StopIteration:
-                c.complete = True
-
-            if c.complete:
+                component.complete = True
                 continue
 
             # merge components
@@ -48,7 +49,7 @@ class Merging:
                 else:
                     merged[name] = np.concatenate([merged[name], array])
 
-        if all(c.complete for c in components):
+        if all(component.complete for component in components):
             return False
 
         # apply track selections
@@ -64,11 +65,15 @@ class Merging:
 
     def write_components(self, sample, components):
         # setup inputs
-        for c in components:
-            batch_size = self.batch_size * c.num_jets // components.num_jets + 1
-            c.setup_reader(batch_size, fname=c.out_path, jets_name=self.jets_name)
-            c.stream = c.reader.stream(self.variables.combined(), c.reader.num_jets)
-            c.complete = False
+        for component in components:
+            batch_size = self.batch_size * component.num_jets // components.num_jets + 1
+            component.setup_reader(
+                batch_size, fname=component.out_path, jets_name=self.jets_name
+            )
+            component.stream = component.reader.stream(
+                self.variables.combined(), component.reader.num_jets
+            )
+            component.complete = False
 
         # setup outputs
         fname = self.ppc.out_fname
@@ -81,7 +86,9 @@ class Merging:
             add_flavour_label=self.jets_name,
             jets_name=self.jets_name,
         )
-        self.writer.add_attr("flavour_label", [f.name for f in self.flavours], self.jets_name)
+        self.writer.add_attr(
+            "flavour_label", [flavour.name for flavour in self.flavours], self.jets_name
+        )
         self.writer.add_attr("unique_jets", components.unique_jets)
         self.writer.add_attr("jet_counts", json.dumps(components.jet_counts))
         self.writer.add_attr("dsids", str(components.dsids))

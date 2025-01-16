@@ -32,6 +32,6 @@ class TestClass:
         make_hist_initial(
             "initial",
             config.components.flavours,
-            config.sampl_cfg.vars[0],
+            config.resampling_config.vars[0],
             ["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
         )
