@@ -22,10 +22,6 @@ class Component:
     num_jets: int
     num_jets_estimate_available: int
     equal_jets: bool
-    complete: bool
-    ups_max: float
-    ups_ratio: float
-    sampling_fraction: float
 
     def __post_init__(self):
         self.hist = Hist(self.dirname.parent.parent / "hists" / f"hist_{self.name}.h5")
