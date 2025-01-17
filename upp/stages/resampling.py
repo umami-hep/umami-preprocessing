@@ -375,7 +375,7 @@ class Resampling:
                     component.sampling_fraction = 1
 
                 else:
-                    sam_frac = component.get_auto_sampling_frac(
+                    sam_frac = component.get_auto_sampling_fraction(
                         num_jets=component.num_jets,
                         cuts=component.cuts,
                     )
@@ -434,7 +434,7 @@ class Resampling:
             frac = component.sampling_fraction if self.select_func else 1
             component.check_num_jets(
                 component.num_jets,
-                sampling_frac=frac,
+                sampling_fraction=frac,
                 cuts=component.cuts,
             )
 
