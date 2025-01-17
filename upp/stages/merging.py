@@ -11,7 +11,7 @@ from ftag.hdf5 import H5Writer, join_structured_arrays
 from upp.logger import ProgressBar
 from upp.utils import path_append
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.components import Component, Components
     from upp.classes.preprocessing_config import PreprocessingConfig
 

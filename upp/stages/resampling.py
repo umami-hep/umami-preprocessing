@@ -14,7 +14,7 @@ from upp.logger import ProgressBar
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Any, Generator
 
     from rich.progress import Progress

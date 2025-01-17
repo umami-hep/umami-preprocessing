@@ -12,7 +12,7 @@ from ftag.hdf5 import H5Reader, H5Writer
 from upp.classes.region import Region
 from upp.stages.hist import Hist
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
     from upp.classes.variable_config import VariableConfig
 
