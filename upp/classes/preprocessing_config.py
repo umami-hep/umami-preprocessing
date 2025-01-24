@@ -318,3 +318,6 @@ class PreprocessingConfig:
                 + "_resampled_scaled_shuffled"
                 + self.out_fname.suffix
             )
+
+    def run_resampling(self) -> bool:
+        return hasattr(self, "resampling_config")

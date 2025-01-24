@@ -256,7 +256,7 @@ def plot_initial_resampling_dists(config) -> None:
     suffixes = [sample.name for sample in config.components.samples]
 
     # Loop over the resamling variables
-    for var in config.sampl_cfg.vars:
+    for var in config.resampling_config.vars:
         make_hist_initial(
             stage="initial",
             flavours=config.components.flavours,
@@ -303,7 +303,7 @@ def plot_resampled_dists(config, stage: str) -> None:
         paths = [path_append(config.out_fname, sample) for sample in config.components.samples]
 
     # Loop over the variables to plot them
-    for var in config.sampl_cfg.vars:
+    for var in config.resampling_config.vars:
         make_hist(
             stage=stage,
             flavours=config.components.flavours,

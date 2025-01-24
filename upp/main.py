@@ -64,16 +64,18 @@ def run_pp(args) -> None:
     config = PreprocessingConfig.from_file(args.config, args.split)
 
     # create virtual datasets and pdf files
-    if args.prep and args.split == "train":
+    # TODO: we might want to write histograms even if we don't have bins
+    # from the resampling config
+    if args.prep and args.split == "train" and hasattr(config, "resampling_config"):
         create_histograms(config)
 
     # run the resampling
-    if args.resample:
+    if args.resample and config.run_resampling():
         resampling = Resampling(config)
         resampling.run()
 
     # run the merging
-    if args.merge:
+    if args.merge and config.run_resampling():
         merging = Merging(config)
         merging.run()
 
@@ -83,7 +85,7 @@ def run_pp(args) -> None:
         norm.run()
 
     # make plots
-    if args.plot:
+    if args.plot and config.run_resampling():
         title = " Plotting "
         log.info(f"[bold green]{title:-^100}")
         plot_initial_resampling_dists(config=config)
