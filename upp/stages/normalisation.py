@@ -119,7 +119,11 @@ class Normalisation:
 
         # setup reader
         reader = H5Reader(
-            self.ppc.out_fname, self.ppc.batch_size, precision="full", jets_name=self.jets_name
+            self.ppc.out_fname if self.ppc.run_resampling()
+            else [sample.path for sample in self.components.samples],
+            self.ppc.batch_size,
+            precision="full",
+            jets_name=self.jets_name
         )
         log.debug(f"Setup reader at: {self.ppc.out_fname}")
 
@@ -130,7 +134,11 @@ class Normalisation:
         with h5py.File(reader.files[0]) as f:
             if "flavour_label" in f[self.jets_name].dtype.names:
                 vars[self.jets_name].append("flavour_label")
-        stream = reader.stream(vars, self.num_jets)
+        stream = reader.stream(
+            vars,
+            self.num_jets,
+            cuts=None if self.ppc.run_resampling() else self.components[0].global_cuts
+        )
 
         with ProgressBar() as progress:
             task = progress.add_task(

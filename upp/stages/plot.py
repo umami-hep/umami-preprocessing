@@ -53,7 +53,7 @@ def make_hist(
     jets_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
-    flavour_cont: LabelContainer = Flavours,
+    flavour_container: LabelContainer = Flavours,
 ) -> None:
     """
     Create and plot the histogram and save it to disk.
@@ -104,8 +104,8 @@ def make_hist(
         plot.add(
             Histogram(
                 df[df["flavour_label"] == label_value][variable],
-                label=flavour_cont[label_string].label,
-                colour=flavour_cont[label_string].colour,
+                label=flavour_container[label_string].label,
+                colour=flavour_container[label_string].colour,
             )
         )
 
@@ -256,7 +256,7 @@ def plot_initial_resampling_dists(config) -> None:
     suffixes = [sample.name for sample in config.components.samples]
 
     # Loop over the resamling variables
-    for var in config.sampl_cfg.vars:
+    for var in config.resampling_config.vars:
         make_hist_initial(
             stage="initial",
             flavours=config.components.flavours,
@@ -303,11 +303,11 @@ def plot_resampled_dists(config, stage: str) -> None:
         paths = [path_append(config.out_fname, sample) for sample in config.components.samples]
 
     # Loop over the variables to plot them
-    for var in config.sampl_cfg.vars:
+    for var in config.resampling_config.vars:
         make_hist(
             stage=stage,
             flavours=config.components.flavours,
-            flavour_cont=config.flavour_cont,
+            flavour_container=config.flavour_container,
             variable=var,
             in_paths=paths,
             jets_name=config.jets_name,
@@ -316,7 +316,7 @@ def plot_resampled_dists(config, stage: str) -> None:
             make_hist(
                 stage=stage,
                 flavours=config.components.flavours,
-                flavour_cont=config.flavour_cont,
+                flavour_container=config.flavour_container,
                 variable=var,
                 in_paths=paths,
                 jets_name=config.jets_name,

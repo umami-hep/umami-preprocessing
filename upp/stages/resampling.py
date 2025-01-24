@@ -160,7 +160,7 @@ class Resampling:
 
     def run_on_region(self, components, region):
         # compute the target pdf
-        target = [c for c in components if c.is_target(self.config.target)]
+        target = [component for component in components if component.is_target(self.config.target)]
         assert len(target) == 1, "Should have 1 target component per region"
         self.target = target[0]
 
@@ -241,10 +241,12 @@ class Resampling:
         log.info(f"Resampling method: {self.config.method}")
 
         # setup i/o
-        for c in self.components:
+        for component in self.components:
             # just used for the writer configuration
-            c.setup_reader(self.batch_size, jets_name=self.jets_name, transform=self.transform)
-            c.setup_writer(self.variables, jets_name=self.jets_name)
+            component.setup_reader(
+                self.batch_size, jets_name=self.jets_name, transform=self.transform
+            )
+            component.setup_writer(self.variables, jets_name=self.jets_name)
 
         # set samplig fraction if needed
         self.set_component_sampling_fractions()
@@ -254,14 +256,14 @@ class Resampling:
             "[bold green]Checking requested num_jets based on a sampling fraction of"
             f" {self.config.sampling_fraction}..."
         )
-        for c in self.components:
-            frac = c.sampling_fraction if self.select_func else 1
-            c.check_num_jets(c.num_jets, sampling_frac=frac, cuts=c.cuts)
+        for component in self.components:
+            frac = component.sampling_fraction if self.select_func else 1
+            component.check_num_jets(component.num_jets, sampling_frac=frac, cuts=component.cuts)
 
         # run resampling
-        for region, components in self.components.groupby_region():
+        for region, component in self.components.groupby_region():
             log.info(f"[bold green]Running over region {region}...")
-            self.run_on_region(components, region)
+            self.run_on_region(component, region)
 
         # finalise
         unique = sum(c.writer.get_attr("unique_jets") for c in self.components)
