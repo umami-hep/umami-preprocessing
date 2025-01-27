@@ -37,7 +37,7 @@ class PreprocessingConfig:
     """
     Global options for the preprocessing.
 
-    These optons are specified in the config file
+    These options are specified in the config file
     under the `global:` key. They are passed as kwargs to PreprocessingConfig.
     The config file is also copied to the output directory.
 
