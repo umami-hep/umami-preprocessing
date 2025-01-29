@@ -2,6 +2,9 @@
 
 ### [Latest]
 
+### [v0.2.2]
+
+- Upgrade atlas-ftag-tools version and bump version for new release by @afroch in [#83](https://github.com/umami-hep/umami-preprocessing/pull/83)
 - Adding new docstrings/inline comments + Clean Up some variable names by @afroch in [#82](https://github.com/umami-hep/umami-preprocessing/pull/82)
 
 ### [v0.2.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.1) (13.01.2025)
