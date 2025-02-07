@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Adding parallel processing for prepare and resample steps [#84](https://github.com/umami-hep/umami-preprocessing/pull/84)
+
 ### [v0.2.2]
 
 - Upgrade atlas-ftag-tools version and bump version for new release by @afroch in [#83](https://github.com/umami-hep/umami-preprocessing/pull/83)
