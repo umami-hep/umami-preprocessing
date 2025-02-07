@@ -41,6 +41,12 @@ def parse_args(args):
     parser.add_argument("--no-plot", dest="plot", action="store_false")
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
+    parser.add_argument(
+        "--component", default=None, help="Component which is processed during --prep"
+    )
+    parser.add_argument(
+        "--region", default=None, help="Region which is processed during --resample"
+    )
 
     args = parser.parse_args(args)
     d = vars(args)
@@ -65,12 +71,15 @@ def run_pp(args) -> None:
 
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":
-        create_histograms(config)
+        create_histograms(
+            config=config,
+            component_to_run=args.component,
+        )
 
     # run the resampling
     if args.resample:
         resampling = Resampling(config)
-        resampling.run()
+        resampling.run(region=args.region)
 
     # run the merging
     if args.merge:
