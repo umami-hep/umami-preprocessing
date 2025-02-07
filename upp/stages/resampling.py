@@ -433,6 +433,10 @@ class Resampling:
 
         # Setup the different components and readers/writers and their sampling fraction
         for component in self.components:
+            # Check if the component is needed for the region
+            if region and region not in component.name:
+                continue
+
             # just used for the writer configuration
             component.setup_reader(
                 self.batch_size, jets_name=self.jets_name, transform=self.transform
@@ -455,7 +459,7 @@ class Resampling:
             )
 
         # Create check variable to ensure at least one region was processed
-        region_processed = False
+        region_processed = not region
 
         # Run resampling
         for iter_region, iter_components in self.components.groupby_region():
@@ -475,10 +479,25 @@ class Resampling:
             )
 
         # Finalise the resampling
-        unique = sum(component.writer.get_attr("unique_jets") for component in self.components)
-        log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
-        log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
-        log.info(f"[bold green]Saved to {self.components.out_dir}/")
+        if region:
+            unique = 0
+            for component in self.components:
+                if region in component.name:
+                    unique += component.writer.get_attr("unique_jets")
+            log.info(
+                f"[bold green]Finished resampling of region {region}. "
+                f"A total of {self.components.num_jets:,} jets!"
+            )
+            log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
+            log.info(f"[bold green]Saved to {self.components.out_dir}/")
+
+        else:
+            unique = sum(component.writer.get_attr("unique_jets") for component in self.components)
+            log.info(
+                f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!"
+            )
+            log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
+            log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
     def get_num_bins_from_config(self) -> list[list[int]]:
         """Get the lengths of the binning regions in each variable from the config.

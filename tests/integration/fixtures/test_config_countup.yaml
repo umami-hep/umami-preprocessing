@@ -46,7 +46,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ ujets]
+    flavours: [ujets]
     num_jets: 7_000
 
   - region:

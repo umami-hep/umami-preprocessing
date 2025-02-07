@@ -28,6 +28,21 @@ class TestClass:
         subprocess.run(["rm", "-r", "tmp"], check=True)
         print("teardown_method   method:%s" % method.__name__)
 
+    def test_run_prep_lowpt_ttbar_bjets(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-resample",
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--component",
+            "lowpt_ttbar_ujets",
+        ]
+        main(args)
+
     def test_run_pdf_auto(self):
         args = [
             "--config",
@@ -88,3 +103,17 @@ class TestClass:
         with h5py.File(fname, "r") as f:
             tracks = f["tracks"][:]
         assert np.all(tracks[tracks["valid"]]["d0"] < 3.5)
+
+    def test_run_countup_region_lowpt(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--region",
+            "lowpt",
+        ]
+        main(args)

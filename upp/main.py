@@ -50,7 +50,7 @@ def parse_args(args):
 
     args = parser.parse_args(args)
     d = vars(args)
-    ignore = ["config", "split"]
+    ignore = ["config", "split", "component", "region"]
     if not any(v for a, v in d.items() if a not in ignore):
         for v in d:
             if v not in ignore and d[v] is None:

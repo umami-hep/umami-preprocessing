@@ -143,6 +143,9 @@ def create_histograms(
     log.info(f"[bold green]{title:-^100}")
     log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate_hist:,} jets...")
 
+    # Create check variable to ensure at least one component was processed
+    component_processed = not component_to_run
+
     # Process the different components
     for component in config.components:
         # Check if only one component should be processed
@@ -175,6 +178,16 @@ def create_histograms(
             jets=jets,
             resampling_vars=sampl_vars,
             bins=config.sampl_cfg.flat_bins,
+        )
+
+        # Set the check variable to true
+        component_processed = True
+
+    # Raise error of no region was processed
+    if component_processed is False:
+        raise ValueError(
+            "No component processed during resampling! Check that you correctly spelled "
+            "the component name when running with --component!"
         )
 
     log.info(f"[bold green]Saved to {config.components[0].hist.path.parent}/")
