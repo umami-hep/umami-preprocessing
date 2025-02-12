@@ -4,11 +4,17 @@ jets:
     - eta
     - abs_eta
     - mass
+    - n_tracks
     - GN2Xv02_phbb
     - GN2Xv02_phcc
     - GN2Xv02_ptop
     - GN2Xv02_pqcd
-    - n_tracks
+    - C2
+    - D2
+    - L2
+    - M2
+    - N2 
+    - Tau21
   labels:
     - R10TruthLabel_R22v1
     - R10TruthLabel_R22v1_TruthJetMass
@@ -17,7 +23,6 @@ jets:
 tracks:
   inputs:
     - pt
-    - dr
     - d0
     - IP3D_signed_d0
     - z0SinTheta
@@ -44,13 +49,37 @@ tracks:
     - ftagTruthOriginLabel
     - ftagTruthVertexIndex
 
-flow:
-  inputs:
-    - flow_pt
-    - flow_energy
-    - flow_deta
-    - flow_dphi
-    - flow_dr
+
+truth_hadrons:
   labels:
-    - ftagTruthOriginLabel
-    - ftagTruthVertexIndex
+    - pt
+    - mass
+    - energy
+    - eta
+    - phi
+    - deta
+    - dphi
+    - dr
+    - Lxy
+    - charge
+    - pdgId
+    - barcode
+    - ftagTruthParentBarcode
+  inputs: 
+    - pt
+    - mass
+    - energy
+    - eta
+    - phi
+    - deta
+    - dphi
+    - dr
+    - Lxy
+    - charge
+
+flow:
+ inputs:
+   - flow_pt
+   - flow_energy
+   - flow_deta
+   - flow_dphi
