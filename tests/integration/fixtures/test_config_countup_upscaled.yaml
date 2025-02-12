@@ -71,7 +71,7 @@ components:
     num_jets: 30_000
 
 resampling:
-  target: bjets
+  target: cjets
   method: countup
   sampling_fraction: auto
   variables:
