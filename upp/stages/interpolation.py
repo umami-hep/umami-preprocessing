@@ -27,18 +27,18 @@ def subdivide_bins(bins: np.array, n: int = 2) -> np.array:
 
 def upscale_array(
     array: np.array,
-    upscl: int,
+    upscaling_factor: int,
     order: int = 3,
     mode: str = "nearest",
     positive: bool = True,
 ) -> np.array:
-    """Upscales an array by a factor of upscl.
+    """Upscales an array by the upscaling factor.
 
     Parameters
     ----------
     array : np.array
         The array to be upscaled
-    upscl : int
+    upscaling_factor : int
         The upscaling factor
     order : int, optional
         order of the spline polynomial (max 5), by default 3
@@ -50,13 +50,17 @@ def upscale_array(
     Returns
     -------
     np.array
-        Array that is upscaled by a factor of upscl
+        Array that is upscaled by a factor of upscaling_factor
     """
-    # upscl must be integer
+    # upscaling_factor must be integer
     xs = []
     for d in array.shape:
         n_bins = d
-        points = np.linspace(-0.5 + 1 / 2 / upscl, n_bins - 0.5 - 1 / 2 / upscl, n_bins * upscl)
+        points = np.linspace(
+            -0.5 + 1 / 2 / upscaling_factor,
+            n_bins - 0.5 - 1 / 2 / upscaling_factor,
+            n_bins * upscaling_factor,
+        )
         xs.append(points)
 
     # return the smoothed array
@@ -69,19 +73,19 @@ def upscale_array(
 
 def upscale_array_regionally(
     array: np.array,
-    upscl: int,
+    upscaling_factor: int,
     num_bins: list,
     order: int = 3,
     mode: str = "nearest",
     positive: bool = True,
 ) -> np.array:
-    """Upscales an array by a factor of upscl separately in each region of the array.
+    """Upscales an array by the upscaling factor separately in each region of the array.
 
     Parameters
     ----------
     array : np.array
         array to be upscaled
-    upscl : int
+    upscaling_factor : int
         upscaling factor
     num_bins : list
         list of lists of region lengths in each dimension,
@@ -96,9 +100,9 @@ def upscale_array_regionally(
     Returns
     -------
     np.array
-        Array that is upscaled by a factor of upscl
+        Array that is upscaled by a factor of upscaling_factor
     """
-    up_array = np.empty(shape=[ds * upscl for ds in array.shape])
+    up_array = np.empty(shape=[ds * upscaling_factor for ds in array.shape])
     starts = [np.cumsum([0] + regionlengths)[:-1] for regionlengths in num_bins]
     starts_grid = np.meshgrid(*starts)
     starts_grid = [starts_grid[i].flatten() for i in range(len(starts_grid))]
@@ -112,11 +116,18 @@ def upscale_array_regionally(
         for j in range(d):
             slice_bounds.append(slice(starts_grid[j][i], finishes_grid[j][i]))
             slice_obj_up_bounds.append(
-                slice(starts_grid[j][i] * upscl, finishes_grid[j][i] * upscl)
+                slice(
+                    starts_grid[j][i] * upscaling_factor,
+                    finishes_grid[j][i] * upscaling_factor,
+                )
             )
         slice_obj = tuple(slice_bounds)
         slice_obj_up = tuple(slice_obj_up_bounds)
         up_array[slice_obj_up] = upscale_array(
-            array[slice_obj], upscl, order=order, mode=mode, positive=positive
+            array[slice_obj],
+            upscaling_factor,
+            order=order,
+            mode=mode,
+            positive=positive,
         )
     return up_array

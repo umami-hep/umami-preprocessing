@@ -9,8 +9,6 @@ edit_uri: "tree/main/docs"
 
 theme:
   name: material
-  #logo: assets/salt.png
-  #favicon: assets/salt.png
   features:
     - content.code.copy
 

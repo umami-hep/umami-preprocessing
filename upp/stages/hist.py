@@ -132,21 +132,21 @@ def create_histograms(config) -> None:
 
     log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate_hist:,} jets...")
     sampl_vars = config.sampl_cfg.vars
-    for c in config.components:
-        log.info(f"Estimating {c} PDF using {config.num_jets_estimate_hist:,} samples...")
-        c.setup_reader(config.batch_size, config.jets_name)
-        cuts_no_split = c.cuts.ignore(["eventNumber"])
+    for component in config.components:
+        log.info(f"Estimating {component} PDF using {config.num_jets_estimate_hist:,} samples...")
+        component.setup_reader(config.batch_size, config.jets_name)
+        cuts_no_split = component.cuts.ignore(["eventNumber"])
 
         ###
         # TODO: return the number of jets here and pass to the next function to get started
         ###
-        c.check_num_jets(
+        component.check_num_jets(
             config.num_jets_estimate_hist,
             cuts=cuts_no_split,
             silent=False,
             raise_error=False,
         )
-        jets = c.get_jets(sampl_vars, config.num_jets_estimate_hist, cuts_no_split)
-        c.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
+        jets = component.get_jets(sampl_vars, config.num_jets_estimate_hist, cuts_no_split)
+        component.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
 
     log.info(f"[bold green]Saved to {config.components[0].hist.path.parent}/")
