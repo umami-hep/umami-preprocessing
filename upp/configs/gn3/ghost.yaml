@@ -5,16 +5,17 @@ ttbar: &ttbar
   name: ttbar
   equal_jets: False
   pattern:
-    - "user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
+    - "user.wlai.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23a
+    - "user.wlai.601589.e8549_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23c
 
 zprime: &zprime
   name: zprime
   equal_jets: False
   pattern:
-    - "user.svanstro.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
+    - "user.wlai.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-11-14_GN3v00_output.h5/*.h5" # mc23a
 
 lowpt: &lowpt
   name: lowpt
@@ -50,7 +51,7 @@ components:
       <<: *zprime
     flavours: [ghostbjets, ghostcjets, ghostujets]
     num_jets: 3_000_000
-    num_jets_test: 500_000
+    num_jets_test: 2_000_000
 
   - region:
       <<: *highpt
@@ -75,5 +76,5 @@ global:
   jets_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 2_000_000
-  base_dir: /unix/atlastracking/samples/gn3v00/ghost/
-  ntuple_dir: /unix/atlastracking/samples/gn3v00/ntuples/
+  base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/ghost_correct
+  ntuple_dir: /unix/atlas2/weilai/datasets/atlas/ntuples/gn3v00
