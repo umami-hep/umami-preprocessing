@@ -33,47 +33,47 @@ components:
     sample:
       <<: *ttbar
     flavours: [bjets]
-    num_jets: 7_000
+    num_jets: 70_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [cjets]
-    num_jets: 7_000
+    num_jets: 70_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ujets]
-    num_jets: 7_000
+    num_jets: 70_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets]
-    num_jets: 3_000
+    num_jets: 30_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [cjets]
-    num_jets: 3_000
+    num_jets: 30_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ujets]
-    num_jets: 3_000
+    num_jets: 30_000
 
 resampling:
-  target: bjets
+  target: cjets
   method: countup
-  sampling_fraction: 1.0
+  sampling_fraction: auto
   variables:
     pt:
       bins: [[0, 250000, 5], [250000, 6000000, 5]]

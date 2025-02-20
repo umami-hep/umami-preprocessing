@@ -356,8 +356,13 @@ class Resampling:
                 f" Jets are upsampled at most {np.max(component._ups_max):.0f} times"
             )
 
-    def set_component_sampling_fractions(self):
+    def set_component_sampling_fractions(self, component: Component):
         """Automatically set the sampling fraction for each of the components.
+
+        Parameters
+        ----------
+        component : Component
+            Component for which the sampling fraction is set.
 
         Raises
         ------
@@ -366,71 +371,86 @@ class Resampling:
         """
         # Check that the sampling fraction must be found automatically
         if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
-            log.info("[bold green]Sampling fraction chosen for each component automatically...")
+            log.info(
+                "[bold green]Sampling fraction will be chosen "
+                f"automatically for {component.name}..."
+            )
 
-            # Loop over each component
-            for component in self.components:
-                # Target component always gets one as sampling fraction
-                if component.is_target(self.config.target):
-                    component.sampling_fraction = 1
+            # Target component always gets one as sampling fraction
+            if component.is_target(self.config.target):
+                component.sampling_fraction = 1
 
-                else:
-                    sam_frac = component.get_auto_sampling_fraction(
-                        num_jets=component.num_jets,
-                        cuts=component.cuts,
-                    )
+            else:
+                sam_frac = component.get_auto_sampling_fraction(
+                    num_jets=component.num_jets,
+                    cuts=component.cuts,
+                )
 
-                    # Raise an error/warning if the sampling fraction is above one
-                    # for the countup/pdf method
-                    if sam_frac > 1:
-                        if self.config.method == "countup":
-                            raise ValueError(
-                                f"[bold red]Sampling fraction of {sam_frac:.3f}>1 is"
-                                f" needed for component {component} This is not supported for"
-                                " countup method."
-                            )
-                        else:
-                            log.warning(
-                                f"[bold yellow]sampling fraction of {sam_frac:.3f}>1 is"
-                                f" needed for component {component}"
-                            )
+                # Raise an error/warning if the sampling fraction is above one
+                # for the countup/pdf method
+                if sam_frac > 1:
+                    if self.config.method == "countup":
+                        raise ValueError(
+                            f"[bold red]Sampling fraction of {sam_frac:.3f}>1 is"
+                            f" needed for component {component} This is not supported for"
+                            " countup method."
+                        )
+                    else:
+                        log.warning(
+                            f"[bold yellow]sampling fraction of {sam_frac:.3f}>1 is"
+                            f" needed for component {component}"
+                        )
 
-                    # Ensure the sampling fraction is at least above 0.1
-                    component.sampling_fraction = max(sam_frac, 0.1)
+                # Ensure the sampling fraction is at least above 0.1
+                component.sampling_fraction = max(sam_frac, 0.1)
 
         else:
-            # Set the sampling fraction for each component to the value defined
+            # Set the sampling fraction for the component to the value defined
             # in the config
-            for component in self.components:
-                if component.is_target(self.config.target):
-                    component.sampling_fraction = 1
+            if component.is_target(self.config.target):
+                component.sampling_fraction = 1
 
-                else:
-                    component.sampling_fraction = self.config.sampling_fraction
+            else:
+                component.sampling_fraction = self.config.sampling_fraction
 
-    def run(self):
-        """Execute the resampling."""
+    def run(self, region: str | None = None):
+        """Execute the resampling.
+
+        Parameters
+        ----------
+        region : str | None, optional
+            Define which region is to be resampled, by default None
+            which works through the regions sequentially
+
+        Raises
+        ------
+        ValueError
+            If no region was processed during resampling
+        """
         title = " Running resampling "
         log.info(f"[bold green]{title:-^100}")
         log.info(f"Resampling method: {self.config.method}")
 
-        # Setup the different components and readers/writers
+        # Setup the different components and readers/writers and their sampling fraction
         for component in self.components:
+            # Check if the component is needed for the region
+            if region and region not in component.name:
+                continue
+
             # just used for the writer configuration
             component.setup_reader(
                 self.batch_size, jets_name=self.jets_name, transform=self.transform
             )
             component.setup_writer(self.variables, jets_name=self.jets_name)
 
-        # Set samplig fraction if needed
-        self.set_component_sampling_fractions()
+            # Set sampling fraction
+            self.set_component_sampling_fractions(component=component)
 
-        # Check samples
-        log.info(
-            "[bold green]Checking requested num_jets based on a sampling fraction of"
-            f" {self.config.sampling_fraction}..."
-        )
-        for component in self.components:
+            # Check that enough jets are available
+            log.info(
+                "[bold green]Checking requested num_jets based on a sampling fraction of"
+                f" {self.config.sampling_fraction}..."
+            )
             frac = component.sampling_fraction if self.select_func else 1
             component.check_num_jets(
                 component.num_jets,
@@ -438,16 +458,46 @@ class Resampling:
                 cuts=component.cuts,
             )
 
+        # Create check variable to ensure at least one region was processed
+        region_processed = not region
+
         # Run resampling
-        for region, components in self.components.groupby_region():
+        for iter_region, iter_components in self.components.groupby_region():
+            # Check if a specific region for resampling was chosen
+            if region and region != iter_region.name:
+                continue
+
             log.info(f"[bold green]Running over region {region}...")
-            self.run_on_region(components, region)
+            self.run_on_region(components=iter_components, region=iter_region)
+            region_processed = True
+
+        # Raise error of no region was processed
+        if region_processed is False:
+            raise ValueError(
+                "No region processed during resampling! Check that you correctly spelled "
+                "the region name when running with --region!"
+            )
 
         # Finalise the resampling
-        unique = sum(component.writer.get_attr("unique_jets") for component in self.components)
-        log.info(f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!")
-        log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
-        log.info(f"[bold green]Saved to {self.components.out_dir}/")
+        if region:
+            unique = 0
+            for component in self.components:
+                if region in component.name:
+                    unique += component.writer.get_attr("unique_jets")
+            log.info(
+                f"[bold green]Finished resampling of region {region}. "
+                f"A total of {self.components.num_jets:,} jets!"
+            )
+            log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
+            log.info(f"[bold green]Saved to {self.components.out_dir}/")
+
+        else:
+            unique = sum(component.writer.get_attr("unique_jets") for component in self.components)
+            log.info(
+                f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!"
+            )
+            log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
+            log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
     def get_num_bins_from_config(self) -> list[list[int]]:
         """Get the lengths of the binning regions in each variable from the config.

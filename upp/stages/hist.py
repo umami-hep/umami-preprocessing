@@ -5,6 +5,7 @@ import logging as log
 import math
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import h5py
 import numpy as np
@@ -12,6 +13,9 @@ from numpy.lib.recfunctions import structured_to_unstructured as s2u
 from scipy.stats import binned_statistic_dd
 
 from upp.logger import setup_logger
+
+if TYPE_CHECKING:  # pragma: no cover
+    from upp.classes.preprocessing_config import PreprocessingConfig
 
 
 def bin_jets(array: dict, bins: list) -> np.ndarray:
@@ -117,24 +121,39 @@ class Hist:
             return f["pbin"][:]
 
 
-def create_histograms(config) -> None:
+def create_histograms(
+    config: PreprocessingConfig,
+    component_to_run: str | None = None,
+) -> None:
     """Create the virtual datasets and pdf files.
 
     Parameters
     ----------
     config : PreprocessingConfig object
         PreprocessingConfig object of the current preprocessing.
+    component_to_run : str | None
+        Component which should be run. By default (None), all components
+        are processed sequentially.
     """
+    # Setup the logger and load the variables used for resampling
     setup_logger()
+    sampl_vars = config.sampl_cfg.vars
 
     title = " Writing PDFs "
     log.info(f"[bold green]{title:-^100}")
-
     log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate_hist:,} jets...")
-    sampl_vars = config.sampl_cfg.vars
+
+    # Create check variable to ensure at least one component was processed
+    component_processed = not component_to_run
+
+    # Process the different components
     for component in config.components:
+        # Check if only one component should be processed
+        if isinstance(component_to_run, str) and component_to_run != component.name:
+            continue
+
         log.info(f"Estimating {component} PDF using {config.num_jets_estimate_hist:,} samples...")
-        component.setup_reader(config.batch_size, config.jets_name)
+        component.setup_reader(batch_size=config.batch_size, jets_name=config.jets_name)
         cuts_no_split = component.cuts.ignore(["eventNumber"])
 
         ###
@@ -146,7 +165,29 @@ def create_histograms(config) -> None:
             silent=False,
             raise_error=False,
         )
-        jets = component.get_jets(sampl_vars, config.num_jets_estimate_hist, cuts_no_split)
-        component.hist.write_hist(jets, sampl_vars, config.sampl_cfg.flat_bins)
+
+        # Load the jets from file used for resampling
+        jets = component.get_jets(
+            variables=sampl_vars,
+            num_jets=config.num_jets_estimate_hist,
+            cuts=cuts_no_split,
+        )
+
+        # Write out the hist used for resampling
+        component.hist.write_hist(
+            jets=jets,
+            resampling_vars=sampl_vars,
+            bins=config.sampl_cfg.flat_bins,
+        )
+
+        # Set the check variable to true
+        component_processed = True
+
+    # Raise error of no region was processed
+    if component_processed is False:
+        raise ValueError(
+            "No component processed during resampling! Check that you correctly spelled "
+            "the component name when running with --component!"
+        )
 
     log.info(f"[bold green]Saved to {config.components[0].hist.path.parent}/")

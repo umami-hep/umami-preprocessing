@@ -19,6 +19,7 @@ conda/
 bin/
 plots/
 run/
+python_install/
 
 **user**
 **temp**
