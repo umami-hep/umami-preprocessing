@@ -77,7 +77,6 @@ truth_hadrons:
     - Lxy
     - charge
     
-
 flow:
   inputs:
     - flow_pt
