@@ -13,7 +13,7 @@ jets:
     - D2
     - L2
     - M2
-    - N2 
+    - N2
     - Tau21
   labels:
     - R10TruthLabel_R22v1
@@ -65,7 +65,7 @@ truth_hadrons:
     - pdgId
     - barcode
     - ftagTruthParentBarcode
-  inputs: 
+  inputs:
     - pt
     - mass
     - energy
@@ -78,8 +78,8 @@ truth_hadrons:
     - charge
 
 flow:
- inputs:
-   - flow_pt
-   - flow_energy
-   - flow_deta
-   - flow_dphi
+  inputs:
+    - flow_pt
+    - flow_energy
+    - flow_deta
+    - flow_dphi
