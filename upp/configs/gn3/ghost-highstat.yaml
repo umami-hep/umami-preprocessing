@@ -5,16 +5,17 @@ ttbar: &ttbar
   name: ttbar
   equal_jets: False
   pattern:
-    - "user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
+    - "user.wlai.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23a
+    - "user.wlai.601589.e8549_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23c
 
 zprime: &zprime
   name: zprime
   equal_jets: False
   pattern:
-    - "user.svanstro.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
+    - "user.wlai.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-11-14_GN3v00_output.h5/*.h5" # mc23a
 
 lowpt: &lowpt
   name: lowpt
@@ -33,7 +34,7 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostsplitbjets]
-    num_jets: 22_000_000
+    num_jets: 79_000_000
     num_jets_test: 2_000_000
 
   - region:
@@ -41,7 +42,7 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostsplitcjets]
-    num_jets: 20_000_000
+    num_jets: 26_500_000
     num_jets_test: 2_000_000
 
   - region:
@@ -49,7 +50,7 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostsplitsjets]
-    num_jets: 6_000_000
+    num_jets: 21_000_000
     num_jets_test: 1_000_000
 
   - region:
@@ -57,7 +58,7 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostsplitudjets]
-    num_jets: 17_000_000
+    num_jets: 54_000_000
     num_jets_test: 1_000_000
 
   - region:
@@ -65,7 +66,7 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostsplitgjets]
-    num_jets: 13_000_000
+    num_jets: 46_000_000
     num_jets_test: 1_000_000
 
   - region:
@@ -73,7 +74,7 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostsplittaujets]
-    num_jets: 2_000_000
+    num_jets: 9_000_000
     num_jets_test: 500_000
 
   - region:
@@ -81,7 +82,7 @@ components:
     sample:
       <<: *zprime
     flavours: [ghostsplitbjets]
-    num_jets: 22_000_000
+    num_jets: 39_500_000
     num_jets_test: 2_000_000
 
   - region:
@@ -89,7 +90,7 @@ components:
     sample:
       <<: *zprime
     flavours: [ghostsplitcjets]
-    num_jets: 20_000_000
+    num_jets: 13_250_000
     num_jets_test: 2_000_000
 
   - region:
@@ -97,7 +98,7 @@ components:
     sample:
       <<: *zprime
     flavours: [ghostsplitsjets]
-    num_jets: 6_000_000
+    num_jets: 10_500_000
     num_jets_test: 1_000_000
 
   - region:
@@ -105,7 +106,7 @@ components:
     sample:
       <<: *zprime
     flavours: [ghostsplitudjets]
-    num_jets: 17_000_000
+    num_jets: 27_000_000
     num_jets_test: 1_000_000
 
   - region:
@@ -113,7 +114,7 @@ components:
     sample:
       <<: *zprime
     flavours: [ghostsplitgjets]
-    num_jets: 13_000_000
+    num_jets: 23_000_000
     num_jets_test: 1_000_000
 
   - region:
@@ -121,7 +122,7 @@ components:
     sample:
       <<: *zprime
     flavours: [ghostsplittaujets]
-    num_jets: 2_000_000
+    num_jets: 4_500_000
     num_jets_test: 200_000
 
 resampling:
@@ -138,6 +139,6 @@ resampling:
 global:
   jets_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 2_000_000
-  base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/ghost_high_stat
-  ntuple_dir: /unix/atlastracking/samples/gn3v00/ntuples/
+  num_jets_estimate: 25_000_000
+  base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/ghost_high_stat_full
+  ntuple_dir: /unix/atlas2/weilai/datasets/atlas/ntuples/gn3v00
