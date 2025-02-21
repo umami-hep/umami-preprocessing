@@ -1,0 +1,138 @@
+variables: !include xbb-variables.yaml
+global_cuts: !include splits/simple-split.yaml
+
+hbb: &hbb
+  name: hbb
+  equal_jets: False
+  pattern:
+    - group.perf-flavtag.801471.e8441_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801972.e8514_s4159_r15224_p6453.tdd.*/*.h5
+hcc: &hcc
+  name: hcc
+  equal_jets: False
+  pattern:
+    - group.perf-flavtag.801472.e8441_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801973.e8514_s4159_r15224_p6453.tdd.*/*.h5
+top: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - group.perf-flavtag.410470.e6337_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.410471.e6337_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.426345.e6880_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.426345.e6880_s3681_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.601229.e8514_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.601230.e8514_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.601237.e8514_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802423.e8514_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802423.e8514_s4162_r15540_p6453.tdd.*/*.h5
+
+
+qcd: &qcd
+  name: qcd
+  equal_jets: False
+  pattern:
+    - group.perf-flavtag.364703.e7142_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.364704.e7142_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.364705.e7142_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.364706.e7142_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.364707.e7142_s3681_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800286.e8547_s3797_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800286.e8547_s3797_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800286.e8547_s3797_r13167_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800287.e8547_s3797_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800287.e8547_s3797_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800287.e8547_s3797_r13167_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802068.e8547_s3797_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802068.e8547_s3797_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802068.e8547_s3797_r13167_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802069.e8547_s3797_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802069.e8547_s3797_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802069.e8547_s3797_r13167_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802070.e8547_s3797_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802070.e8547_s3797_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802070.e8547_s3797_r13167_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800286.e8564_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.800287.e8564_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801168.e8514_s4159_r15224_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801169.e8514_s4159_r15224_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801170.e8514_s4159_r15224_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801171.e8514_s4159_r15224_p6453.tdd.*/*.h5
+    - group.perf-flavtag.801172.e8514_s4159_r15224_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802068.e8564_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802069.e8564_s4159_r15530_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802070.e8564_s4159_r15530_p6453.tdd.*/*.h5
+
+
+W: &W
+  name: W
+  equal_jets: False
+  pattern:
+    - group.perf-flavtag.802017.e8482_s3797_r13144_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802017.e8482_s3797_r13145_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802017.e8482_s3797_r13167_p6453.tdd.*/*.h5
+    - group.perf-flavtag.802017.e8557_s4159_r15224_p6453.tdd.*/*.h5
+
+
+inclusive: &inclusive
+  name: inclusive
+  cuts: []
+
+components:
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *hbb
+    flavours: [hbb]
+    num_jets: 30_000_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *hcc
+    flavours: [hcc]
+    num_jets: 30_000_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *ttbar
+    flavours: [top]
+    num_jets: 30_000_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *qcd
+    flavours: [qcd]
+    num_jets: 50_000_000
+
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *W
+    flavours: [W]
+    num_jets: 10_000_000
+
+
+resampling:
+  target: hbb
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt:
+      bins: [[250_000, 1_300_000, 50], [1_300_000, 2_100_000, 10]]
+    abs_eta:
+      bins: [[0, 2, 20]]
+    mass:
+      bins: [[50_000, 300_000, 50]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  batch_size: 5_000_000
+  num_jets_estimate: 20_000_000
+  base_dir: /share/lustre/ecritelli/xbb_preprocessing_gn3xv00/base_dir
+  ntuple_dir: /share/lustre/ecritelli/ntuples/gn3xv00
+  out_dir: /share/lustre/ecritelli/xbb_preprocessing_gn3xv00/output
+  merge_test_samples: True
