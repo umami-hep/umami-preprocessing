@@ -9,6 +9,8 @@ jets:
     - GN2Xv02_phcc
     - GN2Xv02_ptop
     - GN2Xv02_pqcd
+    - GhostBHadronsFinalCount
+    - GhostCHadronsFinalCount
     - C2
     - D2
     - L2
