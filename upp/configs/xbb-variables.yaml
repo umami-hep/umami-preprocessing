@@ -17,7 +17,6 @@ jets:
 tracks:
   inputs:
     - pt
-    - dr
     - d0
     - lifetimeSignedD0
     - z0SinTheta
