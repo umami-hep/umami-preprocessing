@@ -1,8 +1,8 @@
 variables: !include xbb-variables.yaml
 global_cuts: !include splits/simple-split.yaml
 
-htautauhad: &htautauhad
-  name: htautauhad
+htauhad: &htauhad
+  name: htauhad
   pattern: /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.802168.e8558_s4159_r15530_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
 hbb: &hbb
   name: hbb
@@ -30,8 +30,8 @@ components:
   - region:
       <<: *inclusive
     sample:
-      <<: *htautauhad
-    flavours: [htautauhad]
+      <<: *htauhad
+    flavours: [htauhad]
     num_jets: 5_000_000
 
   - region:
