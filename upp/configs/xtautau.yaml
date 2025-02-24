@@ -77,5 +77,5 @@ resampling:
 global:
   batch_size: 4_000_000
   num_jets_estimate: 5_000_000
-  base_dir: /atlas_cloud/fujimoto/samplesMC20d/
+  base_dir: /atlas_cloud/fujimoto/samplesMC23d/
   merge_test_samples: True
