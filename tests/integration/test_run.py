@@ -6,6 +6,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+import pytest
 from ftag import get_mock_file
 
 from upp.main import main
@@ -27,6 +28,38 @@ class TestClass:
     def teardown_method(self, method):
         subprocess.run(["rm", "-r", "tmp"], check=True)
         print("teardown_method   method:%s" % method.__name__)
+
+    def test_run_prep_lowpt_ttbar_bjets(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-resample",
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--component",
+            "lowpt_ttbar_ujets",
+        ]
+        main(args)
+
+    def test_run_prep_error(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-resample",
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--component",
+            "fail",
+        ]
+
+        with pytest.raises(ValueError):
+            main(args)
 
     def test_run_pdf_auto(self):
         args = [
@@ -88,3 +121,45 @@ class TestClass:
         with h5py.File(fname, "r") as f:
             tracks = f["tracks"][:]
         assert np.all(tracks[tracks["valid"]]["d0"] < 3.5)
+
+    def test_run_countup_region_lowpt(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--region",
+            "lowpt",
+        ]
+        main(args)
+
+    def test_run_countup_region_error(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--region",
+            "fail",
+        ]
+
+        with pytest.raises(ValueError):
+            main(args)
+
+    def test_run_countup_upscaled_error(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup_upscaled.yaml")),
+            "--no-plot",
+            "--split",
+            "train",
+        ]
+
+        with pytest.raises(ValueError):
+            main(args)
