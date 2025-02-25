@@ -1,0 +1,81 @@
+variables: !include xbb-variables.yaml
+global_cuts: !include splits/simple-split.yaml
+
+htauhad: &htauhad
+  name: htauhad
+  pattern: /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.802168.e8558_s4159_r15530_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+hbb: &hbb
+  name: hbb
+  pattern: /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801972.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+hcc: &hcc
+  name: hcc
+  pattern: /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801973.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+top: &top
+  name: top
+  pattern: /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.802423.e8514_s4159_r15530_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+qcd: &qcd
+  name: qcd
+  equal_jets: true
+  pattern:
+    - /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801168.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+    - /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801169.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+    - /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801170.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
+
+inclusive: &inclusive
+  name: inclusive
+  cuts: []
+
+components:
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *htauhad
+    flavours: [htauhad]
+    num_jets: 5_000_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *hbb
+    flavours: [hbb]
+    num_jets: 14_500_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *hcc
+    flavours: [hcc]
+    num_jets: 14_500_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *top
+    flavours: [top]
+    num_jets: 8_000_000
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *qcd
+    flavours: [qcd]
+    num_jets: 22_000_000
+
+resampling:
+  target: hbb
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt:
+      bins: [[250_000, 1_300_000, 50]]
+    abs_eta:
+      bins: [[0, 2, 20]]
+    mass:
+      bins: [[50_000, 300_000, 50]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  batch_size: 4_000_000
+  num_jets_estimate: 5_000_000
+  base_dir: /atlas_cloud/fujimoto/samplesMC23d/
+  merge_test_samples: True
