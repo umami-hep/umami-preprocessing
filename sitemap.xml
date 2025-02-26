@@ -2,37 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/configuration/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/contributing/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/run/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/sampling/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/setup/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://umami-hep.github.io/umami-preprocessing/umami_int/</loc>
-         <lastmod>2025-02-24</lastmod>
+         <lastmod>2025-02-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

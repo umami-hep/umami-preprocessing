@@ -549,10 +549,49 @@ For example to run without plotting</p>
 <h4 id="1-prepare">1. Prepare<a class="headerlink" href="#1-prepare" title="Permanent link">#</a></h4>
 <p>The prepare stage (<code>--prep</code>) reads a specified number of jets (<code>num_jets_estimate_hist</code>) for each flavor and constructs histograms of the resampling variables.
 These histograms are stored in <code>&lt;base_dir&gt;/hists</code>.</p>
+<details class="info">
+<summary>Paralellisation</summary>
+<p>This step can be paralellised to speed up the histogram creation. To do so, you need to provide the additional <code>--component</code> flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the <code>components</code> part of the config file. As an example, we take the <code>ghost-highstat.yaml</code> config file from the <code>gn3</code> folder in <code>configs/</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
+<span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
+<span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ghostsplitbjets</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22_000_000</span>
+<span class="w">    </span><span class="nt">num_jets_test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2_000_000</span>
+</code></pre></div>
+<p>The argument for the component flag can be constructed by taking the name of the region (this is defined in the definition of <code>lowpt</code>)</p>
+<div class="highlight"><pre><span></span><code><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
+<span class="nt">cuts</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>plus the name of the sample which is used (this is defined in the definition of <code>ttbar</code>)</p>
+<div class="highlight"><pre><span></span><code><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+<span class="nt">equal_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">pattern</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5&quot;</span><span class="w"> </span><span class="c1"># mc20d</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5&quot;</span><span class="w"> </span><span class="c1"># mc23a</span>
+</code></pre></div>
+<p>and finally the flavour that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
+<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_bjets
+</code></pre></div>
+<p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. </p>
+</details>
 <h4 id="2-resample">2. Resample<a class="headerlink" href="#2-resample" title="Permanent link">#</a></h4>
 <p>The resample stage (<code>--resample</code>) resamples jets to achieve similar <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span> distributions across flavours.
 After execution, resampled samples for each flavor, sample, and split are saved separately in <code>&lt;base_dir&gt;/components/&lt;split&gt;/</code>.
 You need to run the resampling stage even if you don't apply any resampling (e.g. you configured with <code>method: none</code>).</p>
+<details class="info">
+<summary>Paralellisation</summary>
+<p>Similar to the <code>--prep</code> step, the resampling step is also able to run in parallel, but only for the different region (e.g. <code>lowpt</code> &amp; <code>highpt</code>). To do so, you need to run with the command line argument <code>--region</code> which takes as input the region on which to run. Please ensure that all components for this region were prepared in the <code>--prep</code> step before running this!</p>
+<p>The command to run the specific region would look like this:</p>
+<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
+</code></pre></div>
+<p>Similar to the <code>--prep</code> step, it is discouraged to run this multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
+</details>
 <h4 id="3-merge">3. Merge<a class="headerlink" href="#3-merge" title="Permanent link">#</a></h4>
 <p>The merge stage (<code>--merge</code>) combines the resampled samples into a single file named <code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/pp_output_&lt;split&gt;.h5</code>.
 It also handles shuffling.</p>
@@ -567,11 +606,11 @@ You can find these plots in <code>&lt;tbase_dir&gt;/plots/</code>.</p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 24, 2025</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 25, 2025</span>
       
         <br>
         Created:
-        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 24, 2025</span>
+        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 5, 2023</span>
       
     
   </small>
