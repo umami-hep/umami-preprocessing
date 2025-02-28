@@ -2,10 +2,15 @@
 
 ### [Latest]
 
+### [v0.2.3](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.3) (28.02.2025)
+
 - Fixing markdown autorefs version [#88](https://github.com/umami-hep/umami-preprocessing/pull/88)
 - Adding parallel processing for prepare and resample steps [#84](https://github.com/umami-hep/umami-preprocessing/pull/84)
+- Add config for the GN2XTau [#87](https://github.com/umami-hep/umami-preprocessing/pull/87)
+- GN3Xv00 latest UPP config [#85](https://github.com/umami-hep/umami-preprocessing/pull/85)
+- Update GN3v00 full stat resampling config [#86](https://github.com/umami-hep/umami-preprocessing/pull/86)
 
-### [v0.2.2]
+### [v0.2.2](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.2) (29.01.2025)
 
 - Upgrade atlas-ftag-tools version and bump version for new release by @afroch in [#83](https://github.com/umami-hep/umami-preprocessing/pull/83)
 - Adding new docstrings/inline comments + Clean Up some variable names by @afroch in [#82](https://github.com/umami-hep/umami-preprocessing/pull/82)
