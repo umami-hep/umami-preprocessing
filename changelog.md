@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Removing redundent plotting code / Making labels nicer [#89](https://github.com/umami-hep/umami-preprocessing/pull/89)
+
 ### [v0.2.3](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.3) (28.02.2025)
 
 - Fixing markdown autorefs version [#88](https://github.com/umami-hep/umami-preprocessing/pull/88)

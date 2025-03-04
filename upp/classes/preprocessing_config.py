@@ -87,6 +87,10 @@ class PreprocessingConfig:
         Number of jets of each flavour that are used to estimate shifting and scaling during
         normalisation step. Larger numbers give a better quality estmates.
         Is equal to num_jets_estimate by default.
+    num_jets_estimate_plotting : int
+        Number of jets of each flavour used for plotting the initial and the final resampling
+        variable distributions. Larger numbers give a better estimate of the full distributions.
+        Is equal to num_jets_estimate by default.
     jets_name : str
         Name of the jets dataset in the input file.
     """
@@ -104,6 +108,7 @@ class PreprocessingConfig:
     num_jets_estimate_available: int | None = None
     num_jets_estimate_hist: int | None = None
     num_jets_estimate_norm: int | None = None
+    num_jets_estimate_plotting: int | None = None
     merge_test_samples: bool = False
     jets_name: str = "jets"
     flavour_config: Path | None = None
@@ -117,6 +122,8 @@ class PreprocessingConfig:
                 self.num_jets_estimate_hist = self.num_jets_estimate
             if self.num_jets_estimate_norm is None:
                 self.num_jets_estimate_norm = self.num_jets_estimate
+            if self.num_jets_estimate_plotting is None:
+                self.num_jets_estimate_plotting = self.num_jets_estimate
 
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":

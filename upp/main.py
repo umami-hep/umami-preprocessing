@@ -21,7 +21,7 @@ from upp.logger import setup_logger
 from upp.stages.hist import create_histograms
 from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
-from upp.stages.plot import plot_initial_resampling_dists, plot_resampled_dists
+from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
 
 
@@ -95,8 +95,8 @@ def run_pp(args) -> None:
     if args.plot:
         title = " Plotting "
         log.info(f"[bold green]{title:-^100}")
-        plot_initial_resampling_dists(config=config)
-        plot_resampled_dists(config=config, stage=args.split)
+        plot_resampling_dists(config=config, stage="initial")
+        plot_resampling_dists(config=config, stage=args.split)
 
     # print end info
     end = datetime.now()
