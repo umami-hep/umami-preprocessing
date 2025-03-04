@@ -35,3 +35,14 @@ class TestClass:
             variable=config.sampl_cfg.vars[0],
             in_paths_list=["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
         )
+
+    def test_make_hist_initial_no_pt(self):
+        config = PreprocessingConfig.from_file(
+            Path("tests/integration/fixtures/test_config_pdf_auto.yaml"), "train"
+        )
+        make_hist(
+            stage="initial",
+            flavours=config.components.flavours,
+            variable="mass",
+            in_paths_list=["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
+        )
