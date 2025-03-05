@@ -467,7 +467,7 @@ class Resampling:
             if region and region != iter_region.name:
                 continue
 
-            log.info(f"[bold green]Running over region {region}...")
+            log.info(f"[bold green]Running over region {iter_region.name}...")
             self.run_on_region(components=iter_components, region=iter_region)
             region_processed = True
 
@@ -488,7 +488,7 @@ class Resampling:
                 f"[bold green]Finished resampling of region {region}. "
                 f"A total of {self.components.num_jets:,} jets!"
             )
-            log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
+            log.info(f"[bold green]Estimated unique jets: {unique:,.0f}")
             log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
         else:
@@ -496,7 +496,7 @@ class Resampling:
             log.info(
                 f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!"
             )
-            log.info(f"[bold green]Estimated unqiue jets: {unique:,.0f}")
+            log.info(f"[bold green]Estimated unique jets: {unique:,.0f}")
             log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
     def get_num_bins_from_config(self) -> list[list[int]]:
