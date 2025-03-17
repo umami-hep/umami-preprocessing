@@ -100,7 +100,6 @@ class TestClass:
         args = [
             "--config",
             str(Path(this_dir / "fixtures/test_config_countup.yaml")),
-            "--no-plot",
             "--split",
             "train",
         ]

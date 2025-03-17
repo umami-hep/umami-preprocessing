@@ -7,7 +7,7 @@ from pathlib import Path
 from ftag import get_mock_file
 
 from upp.classes.preprocessing_config import PreprocessingConfig
-from upp.stages.plot import make_hist_initial
+from upp.stages.plot import make_hist
 
 
 class TestClass:
@@ -29,9 +29,20 @@ class TestClass:
         config = PreprocessingConfig.from_file(
             Path("tests/integration/fixtures/test_config_pdf_auto.yaml"), "train"
         )
-        make_hist_initial(
-            "initial",
-            config.components.flavours,
-            config.sampl_cfg.vars[0],
-            ["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
+        make_hist(
+            stage="initial",
+            flavours=config.components.flavours,
+            variable=config.sampl_cfg.vars[0],
+            in_paths_list=["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
+        )
+
+    def test_make_hist_initial_no_pt(self):
+        config = PreprocessingConfig.from_file(
+            Path("tests/integration/fixtures/test_config_pdf_auto.yaml"), "train"
+        )
+        make_hist(
+            stage="initial",
+            flavours=config.components.flavours,
+            variable="mass",
+            in_paths_list=["tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5"],
         )
