@@ -8,22 +8,22 @@ requires-python = "<3.12,>=3.8"
 
 dependencies = [
     "pyyaml-include==1.3",
-    "PyYAML==6.0.1",
+    "PyYAML>=6.0.1",
     "rich==12.6.0",
-    "scipy==1.10.1",
-    "puma-hep==0.4.2",
-    "atlas-ftag-tools==0.2.8",
+    "scipy>=1.15.2",
+    "puma-hep==0.4.5",
+    "atlas-ftag-tools==0.2.10",
     "dotmap==1.3.30"
 ]
 
 [project.optional-dependencies]
 dev = [
-  "ruff==0.1.6",
-  "mypy==1.5.1",
+  "ruff==0.6.2",
+  "mypy==1.11.2",
   "pre-commit==3.5.0",
-  "pytest>=7.0.1",
+  "pytest>=7.2.2",
+  "pytest-cov>=4.0.0",
   "pytest-mock==3.11.1",
-  "pytest-cov>=3.0.0",
 ]
 
 [project.urls]
