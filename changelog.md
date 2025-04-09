@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Updating atlas-ftag-tools and puma versions [#91](https://github.com/umami-hep/umami-preprocessing/pull/91)
 - Removing redundent plotting code / Making labels nicer [#89](https://github.com/umami-hep/umami-preprocessing/pull/89)
 
 ### [v0.2.3](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.3) (28.02.2025)
