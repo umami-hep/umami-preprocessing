@@ -27,7 +27,9 @@ class TestClass:
 
     def test_make_hist_initial(self):
         config = PreprocessingConfig.from_file(
-            Path("tests/integration/fixtures/test_config_pdf_auto.yaml"), "train"
+            Path(__file__).parent.parent.parent.resolve()
+            / Path("integration/fixtures/test_config_pdf_auto.yaml"),
+            "train",
         )
         make_hist(
             stage="initial",
@@ -38,7 +40,9 @@ class TestClass:
 
     def test_make_hist_initial_no_pt(self):
         config = PreprocessingConfig.from_file(
-            Path("tests/integration/fixtures/test_config_pdf_auto.yaml"), "train"
+            Path(__file__).parent.parent.parent.resolve()
+            / Path("integration/fixtures/test_config_pdf_auto.yaml"),
+            "train",
         )
         make_hist(
             stage="initial",
