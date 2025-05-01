@@ -89,7 +89,7 @@ These histograms are stored in `<base_dir>/hists`.
     and finally the flavour that is used. In this case, `ghostsplitbjets`. The full name of the component is therefore: `lowpt_ttbar_ghostsplitbjets`. The full command would look like this:
 
     ```bash
-    preprocess --config configs/config.yaml --prep --component lowpt_ttbar_bjets
+    preprocess --config configs/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets
     ```
 
     It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. 
@@ -108,7 +108,17 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
     preprocess --config configs/config.yaml --resample --region lowpt
     ```
 
-    Similar to the `--prep` step, it is discouraged to run this multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all regions are resampled, you can continue with the following steps.
+    Similar to the `--prep` step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all regions are resampled, you can continue with the following steps.
+
+    If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the `--region` command line argument together with the `--component` command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the paralellisation chapter of the Prepare stage.
+
+    The command to run the specific region would look like this:
+
+    ```bash
+    preprocess --config configs/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets
+    ```
+
+    Similar to the `--prep` step and the previous `--region` explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps.
 
 #### 3. Merge 
 The merge stage (`--merge`) combines the resampled samples into a single file named `<tbase_dir>/<out_dir>/pp_output_<split>.h5`.
