@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Enable componentwise Resampling [#93](https://github.com/umami-hep/umami-preprocessing/pull/93)
 - Updating atlas-ftag-tools and puma versions [#91](https://github.com/umami-hep/umami-preprocessing/pull/91)
 - Removing redundent plotting code / Making labels nicer [#89](https://github.com/umami-hep/umami-preprocessing/pull/89)
 
