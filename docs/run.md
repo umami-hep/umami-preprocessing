@@ -92,7 +92,7 @@ These histograms are stored in `<base_dir>/hists`.
     preprocess --config configs/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets
     ```
 
-    It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. 
+    It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
 
 #### 2. Resample 
 The resample stage (`--resample`) resamples jets to achieve similar $p_T$ and $\eta$ distributions across flavours.
@@ -118,7 +118,7 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
     preprocess --config configs/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets
     ```
 
-    Similar to the `--prep` step and the previous `--region` explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps.
+    Similar to the `--prep` step and the previous `--region` explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
 
 #### 3. Merge 
 The merge stage (`--merge`) combines the resampled samples into a single file named `<tbase_dir>/<out_dir>/pp_output_<split>.h5`.
