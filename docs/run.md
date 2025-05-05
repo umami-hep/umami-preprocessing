@@ -119,6 +119,7 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
     ```
 
     Similar to the `--prep` step and the previous `--region` explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
+    Also, please do NOT use this functionality if you don't have fast I/O (Harddrives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.
 
 #### 3. Merge 
 The merge stage (`--merge`) combines the resampled samples into a single file named `<tbase_dir>/<out_dir>/pp_output_<split>.h5`.
