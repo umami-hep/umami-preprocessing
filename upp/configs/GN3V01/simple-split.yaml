@@ -1,0 +1,8 @@
+# simple split on event number: 80/10/10 train/val/test
+# no k-folding
+train:
+  - [eventNumber, "%10<=", 7]
+val:
+  - [eventNumber, "%10==", 8]
+test:
+  - [eventNumber, "%10==", 9]
