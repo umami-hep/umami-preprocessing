@@ -1,20 +1,21 @@
-variables: !include gn3/variables-dr.yaml
+variables: !include GN3V00/variables-ghost.yaml
 global_cuts: !include splits/simple-split.yaml
 
 ttbar: &ttbar
   name: ttbar
   equal_jets: False
   pattern:
-    - "user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
+    - "user.wlai.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23a
+    - "user.wlai.601589.e8549_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23c
 
 zprime: &zprime
   name: zprime
   equal_jets: False
   pattern:
-    - "user.svanstro.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
-    - "user.svanstro.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
+    - "user.wlai.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
+    - "user.wlai.800030.e8514_s4162_r14622_p6368.tdd.GN3_dev.25_2_27.24-11-14_GN3v00_output.h5/*.h5" # mc23a
 
 lowpt: &lowpt
   name: lowpt
@@ -32,7 +33,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets, cjets, ujets]
+    flavours: [ghostbjets, ghostcjets, ghostujets]
     num_jets: 6_000_000
     num_jets_test: 2_000_000
 
@@ -40,7 +41,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [taujets]
+    flavours: [ghosttaujets]
     num_jets: 2_000_000
     num_jets_test: 500_000
 
@@ -48,20 +49,20 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [bjets, cjets, ujets]
+    flavours: [ghostbjets, ghostcjets, ghostujets]
     num_jets: 3_000_000
-    num_jets_test: 500_000
+    num_jets_test: 2_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [taujets]
+    flavours: [ghosttaujets]
     num_jets: 1_000_000
     num_jets_test: 200_000
 
 resampling:
-  target: cjets
+  target: ghostcjets
   method: countup
   sampling_fraction: 1
   variables:
@@ -75,5 +76,5 @@ global:
   jets_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 2_000_000
-  base_dir: /unix/atlastracking/samples/gn3v00/dr/
-  ntuple_dir: /unix/atlastracking/samples/gn3v00/ntuples/
+  base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/ghost_correct
+  ntuple_dir: /unix/atlas2/weilai/datasets/atlas/ntuples/gn3v00
