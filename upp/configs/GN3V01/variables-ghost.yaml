@@ -1,0 +1,112 @@
+jets:
+  inputs:
+    - pt_btagJes
+    - eta_btagJes
+  labels:
+    - HadronConeExclTruthLabelID
+    - HadronConeExclExtendedTruthLabelID
+    - HadronConeExclTruthLabelPt
+    - HadronConeExclTruthLabelLxy
+    - HadronConeExclTruthLabelDR
+    - HadronGhostTruthLabelID
+    - HadronGhostExtendedTruthLabelID
+    - HadronGhostTruthLabelPt
+    - HadronGhostTruthLabelLxy
+    - HadronGhostTruthLabelDR
+    - HadronGhostInitialTruthLabelID
+    - HadronGhostInitialTruthLabelPdgId
+    - HadronGhostInitialExtendedTruthLabelID
+    - PartonExtendedTruthLabelID
+    - pt
+    - eta
+    - mass
+    - n_tracks_ghost
+    - n_truth_promptLepton
+    - eventNumber
+    - jetFoldHash
+    - ptFromTruthJet
+    - matchedToTruthJet
+    - ptFromTruthDressedWZJet
+    - matchedToTruthDressedWZJet
+    - decayModeFromTruthTaus
+    - matchedToTruthTaus
+    - pt_visFromTruthTaus
+    - matchedToTauJet
+    - ptFinalCalibFromTauJet
+
+tracks_ghost:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - lifetimeSignedD0Significance
+    - lifetimeSignedZ0SinThetaSignificance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    - leptonID
+    - muon_quality
+    - muon_qOverPratio
+    - muon_momentumBalanceSignificance
+    - muon_scatteringNeighbourSignificance
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
+    - ftagTruthVertexIndex
+
+flows:
+  inputs:
+    - pt
+    - energy
+    - deta
+    - dphi
+    - isCharged
+
+electrons:
+  inputs:
+    - pt
+    - ptfrac
+    - ptrel
+    - dr
+    - abs_eta
+    - eta
+    - phi
+    - ftag_et
+    - qOverP
+    - d0RelativeToBeamspot
+    - d0RelativeToBeamspotSignificance
+    - ftag_ptVarCone30OverPt
+    - numberOfPixelHits
+    - numberOfSCTHitsInclDead
+    - ftag_deltaPOverP
+    - eProbabilityHT
+    - deltaEta1
+    - deltaPhiRescaled2
+    - ftag_energyOverP
+    - Rhad
+    - Rhad1
+    - Eratio
+    - weta2
+    - Rphi
+    - Reta
+    - wtots1
+    - f1
+    - f3
+
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
+    - ftagTruthVertexIndex

@@ -1,4 +1,4 @@
-variables: !include gn3/variables-ghost.yaml
+variables: !include GN3V00/variables-ghost.yaml
 global_cuts: !include splits/simple-split.yaml
 
 ttbar: &ttbar
