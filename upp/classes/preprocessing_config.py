@@ -53,46 +53,56 @@ class PreprocessingConfig:
 
     Parameters
     ----------
+    config_path : Path
+        Path to the config yaml file that is used. Does not need to be set in config.
+    split : Split
+        For which part the preprocessing is run. Either train, val or test. This needs
+        to be set as a command line argument when running the programm. Does not need
+        to be set in config.
+    config : dict
+        Dict with the loaded config. Does not need to be set in config.
     base_dir : Path
         Base directory for all other paths.
-    ntuple_dir : Path
+    ntuple_dir : Path, optional
         Directory containing the input h5 ntuples. If a relative path is given, it is
-        interpreted as relative to base_dir.
-    components_dir : Path
+        interpreted as relative to base_dir. By default Path("ntuples")
+    components_dir : Path, optional
         Directory for intermediate component files. If a relative path is given, it is
-        interpreted as relative to base_dir.
-    out_dir : Path
+        interpreted as relative to base_dir. By default Path("components")
+    out_dir : Path, optional
         Directory for output files. If a relative path is given, it is interpreted as
-        relative to base_dir.
-    out_fname : Path
-        Filename stem for the output files.
-    batch_size : int
+        relative to base_dir. By default Path("output")
+    out_fname : Path, optional
+        Filename stem for the output files. By default Path("pp_output.h5")
+    batch_size : int, optional
         Batch size for the preprocessing. For each batch select
         `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes
         especially to the `countup` method to achive best agreement of target and resampled
-        distributions.
-    num_jets_estimate : int
+        distributions. By default 100_000
+    num_jets_estimate : int, optional
         Any of the further three arguments that are not specified will default to this value
         Is equal to 1_000_000 by default.
-    num_jets_estimate_available : int | None
+    num_jets_estimate_available : int, optional
         A sabsample taken from the whole sample to estimate the number of jets after the cuts.
         Please keep this number high in order to not get poisson error of more then 5%.
         If time allows you can use -1 to get a precise number of jets and not just an estimate
         although it will be slow for large datasets. Is equal to num_jets_estimate by default.
-    num_jets_estimate_hist : int
+    num_jets_estimate_hist : int, optional
         Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
         Is equal to num_jets_estimate by default.
-    num_jets_estimate_norm : int
+    num_jets_estimate_norm : int, optional
         Number of jets of each flavour that are used to estimate shifting and scaling during
         normalisation step. Larger numbers give a better quality estmates.
         Is equal to num_jets_estimate by default.
-    num_jets_estimate_plotting : int
+    num_jets_estimate_plotting : int, optional
         Number of jets of each flavour used for plotting the initial and the final resampling
         variable distributions. Larger numbers give a better estimate of the full distributions.
         Is equal to num_jets_estimate by default.
-    jets_name : str
-        Name of the jets dataset in the input file.
+    merge_test_samples : bool, optional
+        Merge the test samples of the different processes into one file. By default False.
+    jets_name : str, optional
+        Name of the jets dataset in the input file. By default "jets".
     """
 
     config_path: Path
@@ -112,6 +122,7 @@ class PreprocessingConfig:
     merge_test_samples: bool = False
     jets_name: str = "jets"
     flavour_config: Path | None = None
+    num_jets_per_output_file: int | None = None
 
     def __post_init__(self):
         # postprocess paths
