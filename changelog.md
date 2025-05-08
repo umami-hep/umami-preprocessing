@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Rewrite Plotting Code to Enhance Speed [#96](https://github.com/umami-hep/umami-preprocessing/pull/96)
 - Add example config for open dataset [#92](https://github.com/umami-hep/umami-preprocessing/pull/92)
 - Adding GN3V01 Configs & renaming old Folder [#95](https://github.com/umami-hep/umami-preprocessing/pull/95)
 - Improving logger to correctly detect HPC jobs [#94](https://github.com/umami-hep/umami-preprocessing/pull/94)
