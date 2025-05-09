@@ -188,3 +188,44 @@ def test_write_chunk_splits(monkeypatch):
     # First writer closed & second opened
     assert merge._file_idx == 1
     assert merge.writer.num_written == 3
+
+
+def test_write_chunk_rollover(monkeypatch):
+    """Check the rollover behaviour.
+
+    When the current MemWriter is already full (capacity_left == 0)
+    `write_chunk` must
+
+    1. close that writer,
+    2. open a fresh one (file_idx increments),
+    3. write the incoming batch into the new file,
+    4. update jets_written.
+    """
+    # Create a merger with 5 jets / file
+    merge = _minimal_merging(monkeypatch, jets_per_file=5)
+
+    # Incoming batch: 3 jets
+    batch = {"jets": _jets_struct(3)}
+    comp = DummyComponent("bjets", [batch])
+    comps = [comp]
+
+    # Fake the bookkeeping exactly as write_components() would
+    merge.dtypes = {"jets": batch["jets"].dtype}
+    merge.base_shapes = {"jets": (8,)}
+    merge.total_jets = 8
+    merge.jets_written = 5
+    merge._file_idx = 0
+    merge._sample = None
+    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+
+    # Open the first writer with capacity 5 and mark it as "full"
+    merge._open_writer(None, 5, 0, merge.current_components)
+    merge.writer.num_written = 5
+
+    # Call write_chunk
+    n = merge.write_chunk(comps)
+
+    assert n == 3
+    assert merge._file_idx == 1
+    assert merge.writer.num_written == 3
+    assert merge.jets_written == 8
