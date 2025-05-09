@@ -229,3 +229,37 @@ def test_write_chunk_rollover(monkeypatch):
     assert merge._file_idx == 1
     assert merge.writer.num_written == 3
     assert merge.jets_written == 8
+
+
+def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
+    """Check early exit."""
+    merge = _minimal_merging(monkeypatch, jets_per_file=4)
+
+    # One dummy component that would supply more jets
+    jets_batch = {"jets": _jets_struct(3)}
+    comp = DummyComponent("bjets", [jets_batch])
+    comps = [comp]
+
+    # Mimic state after everything has already been written
+    merge.total_jets = 4
+    merge.jets_written = 4
+    merge._file_idx = 0
+    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+    merge._sample = None
+
+    # We still need valid dtypes / shapes for _open_writer
+    merge.dtypes = {"jets": jets_batch["jets"].dtype}
+    merge.base_shapes = {"jets": (4,)}
+
+    # Open a writer that is already full (num_written == num_jets)
+    merge._open_writer(None, 4, 0, merge.current_components)
+    merge.writer.num_written = merge.writer.num_jets
+
+    n_written = merge.write_chunk(comps)
+
+    # it must early-return with 0 and NOT raise or open new writers
+    assert n_written == 0
+
+    # _file_idx is incremented once, but _open_writer was not called again
+    assert merge._file_idx == 1
+    assert merge.writer.num_written == merge.writer.num_jets
