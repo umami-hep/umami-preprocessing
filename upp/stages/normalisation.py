@@ -241,14 +241,21 @@ class Normalisation:
         title = " Computing Normalisations "
         log.info(f"[bold green]{title:-^100}")
 
+        # Get the correct output names if multiple output files were written
+        if self.config.num_jets_per_output_file:
+            fname = self.config.out_fname.parent / f"{self.config.out_fname.stem}*.h5"
+
+        else:
+            fname = self.config.out_fname
+
         # Setup reader
         reader = H5Reader(
-            self.config.out_fname,
+            fname,
             self.config.batch_size,
             precision="full",
             jets_name=self.jets_name,
         )
-        log.debug(f"Setup reader at: {self.config.out_fname}")
+        log.debug(f"Setup reader at: {fname}")
 
         norm_dict = None
         class_dict = None
