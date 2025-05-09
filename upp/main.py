@@ -79,7 +79,7 @@ def run_pp(args) -> None:
     # run the resampling
     if args.resample:
         resampling = Resampling(config)
-        resampling.run(region=args.region)
+        resampling.run(region=args.region, component=args.component)
 
     # run the merging
     if args.merge:

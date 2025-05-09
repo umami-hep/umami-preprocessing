@@ -135,6 +135,51 @@ class TestClass:
         ]
         main(args)
 
+    def test_run_countup_component_lowpt_ttbar_cjets(self):
+        prep_args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-resample",
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--component",
+            "lowpt_ttbar_bjets",
+        ]
+        main(prep_args)
+        resample_args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--region",
+            "lowpt",
+            "--component",
+            "lowpt_ttbar_cjets",
+        ]
+        main(resample_args)
+
+    def test_run_countup_component_error(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_countup.yaml")),
+            "--no-merge",
+            "--no-norm",
+            "--no-plot",
+            "--split",
+            "train",
+            "--component",
+            "lowpt_ttbar_cjets",
+        ]
+
+        with pytest.raises(ValueError):
+            main(args)
+
     def test_run_countup_region_error(self):
         args = [
             "--config",

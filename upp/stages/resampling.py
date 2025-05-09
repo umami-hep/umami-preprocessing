@@ -198,6 +198,7 @@ class Resampling:
         components: Components,
         stream: Generator[Any, None, None],
         progress: Progress,
+        selected_component: str | None = None,
     ) -> None:
         """Sample the jets by the given selected indicies from the resampling function.
 
@@ -209,6 +210,9 @@ class Resampling:
             Generator of the jets which are to be resampled.
         progress : Progress
             Progress bar instance for updating the shown progress bar.
+        selected_component : str, optional
+            Compontent name that is to be resampled. By default None and all given
+            components are resampled.
 
         Raises
         ------
@@ -219,6 +223,10 @@ class Resampling:
         for batch in stream:
             # Loop over the different components
             for component in components:
+                # If a selected component is given, skip all components that are not selected
+                if selected_component and selected_component != component.name:
+                    continue
+
                 # Check if the resampling is already completed for this component
                 if component._complete:
                     continue
@@ -284,7 +292,12 @@ class Resampling:
                     f"Ran out of {component} jets after writing {component.writer.num_written:,}"
                 )
 
-    def run_on_region(self, components: Components, region: Region) -> None:
+    def run_on_region(
+        self,
+        components: Components,
+        region: Region,
+        selected_component: str | None = None,
+    ) -> None:
         """Run the resampling for a complete region and all components in it.
 
         Parameters
@@ -293,6 +306,9 @@ class Resampling:
             Components instance of all the components which are to be used.
         region : Region
             Region instance of the region which is to be resampled.
+        selected_component : str, optional
+            Compontent name that is to be resampled. By default None and all given
+            components are resampled.
 
         Raises
         ------
@@ -333,28 +349,49 @@ class Resampling:
             with ProgressBar() as progress:
                 # Setup metadata for each component before resampling
                 for component in components:
-                    component._complete = False
-                    component._ups_max = 1.0
-                    component._unique_jets = 0
+                    # If a selected component is given, set all not-selected components to ready
+                    # to ensure that they are not processed or shown
+                    if selected_component and selected_component != component.name:
+                        component._complete = True
+                        component._ups_max = 0.0
+                        component._unique_jets = 0
+
+                    else:
+                        component._complete = False
+                        component._ups_max = 1.0
+                        component._unique_jets = 0
 
                 # Add each component to the progress bar
                 for component in components:
+                    # If a selected component is given, skip all components that are not selected
+                    if selected_component and selected_component != component.name:
+                        continue
+
                     component.pbar = progress.add_task(
                         f"[green]Sampling {component.num_jets:,} jets from {component}...",
                         total=component.num_jets,
                     )
 
                 # Run the actual resampling sampling
-                self.sample(components=components, stream=stream, progress=progress)
+                self.sample(
+                    components=components,
+                    stream=stream,
+                    progress=progress,
+                    selected_component=selected_component,
+                )
 
         # Print upsampling factors
         for component in components:
-            log.info(
-                f"{component} usampling ratio is {np.mean(component._ups_ratio):.3f}, with"
-                f" {component.num_jets/np.mean(component._ups_ratio):,.0f}/{component.num_jets:,}"
-                " unique jets."
-                f" Jets are upsampled at most {np.max(component._ups_max):.0f} times"
-            )
+            # Log only the selected component or all if not selected component is given
+            if (selected_component and component.name == selected_component) or (
+                not selected_component
+            ):
+                log.info(
+                    f"{component} usampling ratio is {np.mean(component._ups_ratio):.3f}, with"
+                    f" {component.num_jets/np.mean(component._ups_ratio):,.0f}/"
+                    f"{component.num_jets:,} unique jets."
+                    f" Jets are upsampled at most {np.max(component._ups_max):.0f} times"
+                )
 
     def set_component_sampling_fractions(self, component: Component):
         """Automatically set the sampling fraction for each of the components.
@@ -413,7 +450,7 @@ class Resampling:
             else:
                 component.sampling_fraction = self.config.sampling_fraction
 
-    def run(self, region: str | None = None):
+    def run(self, region: str | None = None, component: str | None = None):
         """Execute the resampling.
 
         Parameters
@@ -421,41 +458,62 @@ class Resampling:
         region : str | None, optional
             Define which region is to be resampled, by default None
             which works through the regions sequentially
+        component : str | None, optional
+            Define which component is to be resampled, by default None
+            which works through the regions/components sequentially
 
         Raises
         ------
         ValueError
             If no region was processed during resampling
         """
+        # Check that component is only given together with region
+        if component and not region:
+            raise ValueError("Can't define component for resampling without region!")
+
         title = " Running resampling "
         log.info(f"[bold green]{title:-^100}")
         log.info(f"Resampling method: {self.config.method}")
 
         # Setup the different components and readers/writers and their sampling fraction
-        for component in self.components:
-            # Check if the component is needed for the region
-            if region and region not in component.name:
+        for iter_component in self.components:
+            # Check if the component is in the region that is to be processed
+            if region and region not in iter_component.name:
                 continue
 
-            # just used for the writer configuration
-            component.setup_reader(
+            # Check if the component is either the to-be-resampled component or the target
+            if component and (
+                component != iter_component.name
+                and not iter_component.is_target(self.config.target)
+            ):
+                continue
+
+            # Setup the reader for the components
+            iter_component.setup_reader(
                 self.batch_size, jets_name=self.jets_name, transform=self.transform
             )
-            component.setup_writer(self.variables, jets_name=self.jets_name)
+
+            # If only one component is run, stop here for the target that needs to be
+            # read but not written.
+            if component and component != iter_component.name:
+                continue
+
+            # Setup the writer for the component
+            iter_component.setup_writer(self.variables, jets_name=self.jets_name)
 
             # Set sampling fraction
-            self.set_component_sampling_fractions(component=component)
+            self.set_component_sampling_fractions(component=iter_component)
 
             # Check that enough jets are available
             log.info(
                 "[bold green]Checking requested num_jets based on a sampling fraction of"
                 f" {self.config.sampling_fraction}..."
             )
-            frac = component.sampling_fraction if self.select_func else 1
-            component.check_num_jets(
-                component.num_jets,
+            frac = iter_component.sampling_fraction if self.select_func else 1
+            iter_component.check_num_jets(
+                iter_component.num_jets,
                 sampling_fraction=frac,
-                cuts=component.cuts,
+                cuts=iter_component.cuts,
             )
 
         # Create check variable to ensure at least one region was processed
@@ -468,7 +526,11 @@ class Resampling:
                 continue
 
             log.info(f"[bold green]Running over region {iter_region.name}...")
-            self.run_on_region(components=iter_components, region=iter_region)
+            self.run_on_region(
+                components=iter_components,
+                region=iter_region,
+                selected_component=component,
+            )
             region_processed = True
 
         # Raise error of no region was processed
@@ -481,9 +543,13 @@ class Resampling:
         # Finalise the resampling
         if region:
             unique = 0
-            for component in self.components:
-                if region in component.name:
-                    unique += component.writer.get_attr("unique_jets")
+            for iter_component in self.components:
+                # If a region is given, skip all regions that are not selected
+                if region in iter_component.name:
+                    # If a component is given, skip all components that are not selected
+                    if component and iter_component.name != component:
+                        continue
+                    unique += iter_component.writer.get_attr("unique_jets")
             log.info(
                 f"[bold green]Finished resampling of region {region}. "
                 f"A total of {self.components.num_jets:,} jets!"
@@ -492,7 +558,9 @@ class Resampling:
             log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
         else:
-            unique = sum(component.writer.get_attr("unique_jets") for component in self.components)
+            unique = sum(
+                iter_component.writer.get_attr("unique_jets") for iter_component in self.components
+            )
             log.info(
                 f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!"
             )
