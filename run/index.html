@@ -576,9 +576,9 @@ These histograms are stored in <code>&lt;base_dir&gt;/hists</code>.</p>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5&quot;</span><span class="w"> </span><span class="c1"># mc23a</span>
 </code></pre></div>
 <p>and finally the flavour that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_bjets
+<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
 </code></pre></div>
-<p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. </p>
+<p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.</p>
 </details>
 <h4 id="2-resample">2. Resample<a class="headerlink" href="#2-resample" title="Permanent link">#</a></h4>
 <p>The resample stage (<code>--resample</code>) resamples jets to achieve similar <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span> distributions across flavours.
@@ -590,7 +590,13 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
 <p>The command to run the specific region would look like this:</p>
 <div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
 </code></pre></div>
-<p>Similar to the <code>--prep</code> step, it is discouraged to run this multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
+<p>Similar to the <code>--prep</code> step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
+<p>If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the <code>--region</code> command line argument together with the <code>--component</code> command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the paralellisation chapter of the Prepare stage.</p>
+<p>The command to run the specific region would look like this:</p>
+<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
+</code></pre></div>
+<p>Similar to the <code>--prep</code> step and the previous <code>--region</code> explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
+Also, please do NOT use this functionality if you don't have fast I/O (Harddrives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.</p>
 </details>
 <h4 id="3-merge">3. Merge<a class="headerlink" href="#3-merge" title="Permanent link">#</a></h4>
 <p>The merge stage (<code>--merge</code>) combines the resampled samples into a single file named <code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/pp_output_&lt;split&gt;.h5</code>.
@@ -606,7 +612,7 @@ You can find these plots in <code>&lt;tbase_dir&gt;/plots/</code>.</p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 25, 2025 15:18:23">February 25, 2025</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2025 10:31:59">May 13, 2025</span>
       
         <br>
         Created:
