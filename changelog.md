@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Enable componentwise Resampling [#93](https://github.com/umami-hep/umami-preprocessing/pull/93)
 - Enable Writing of Multiple Output Files in Merging [#97](https://github.com/umami-hep/umami-preprocessing/pull/97)
 - Rewrite Plotting Code to Enhance Speed [#96](https://github.com/umami-hep/umami-preprocessing/pull/96)
 - Add example config for open dataset [#92](https://github.com/umami-hep/umami-preprocessing/pull/92)
