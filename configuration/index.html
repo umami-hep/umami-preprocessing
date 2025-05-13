@@ -856,6 +856,50 @@ The config file is also copied to the output directory.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code>config_path</code></td>
+            <td>
+                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to the config yaml file that is used. Does not need to be set in config.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>split</code></td>
+            <td>
+                  <code>upp.<span title="upp.classes">classes</span>.<span title="upp.classes.preprocessing_config">preprocessing_config</span>.<span title="upp.classes.preprocessing_config.Split">Split</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>For which part the preprocessing is run. Either train, val or test. This needs
+to be set as a command line argument when running the programm. Does not need
+to be set in config.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dict with the loaded config. Does not need to be set in config.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code>base_dir</code></td>
             <td>
                   <code>pathlib.<span title="pathlib.Path">Path</span></code>
@@ -877,7 +921,7 @@ The config file is also copied to the output directory.</p>
             <td>
               <div class="doc-md-description">
                 <p>Directory containing the input h5 ntuples. If a relative path is given, it is
-interpreted as relative to base_dir.</p>
+interpreted as relative to base_dir. By default Path("ntuples")</p>
               </div>
             </td>
             <td>
@@ -892,7 +936,7 @@ interpreted as relative to base_dir.</p>
             <td>
               <div class="doc-md-description">
                 <p>Directory for intermediate component files. If a relative path is given, it is
-interpreted as relative to base_dir.</p>
+interpreted as relative to base_dir. By default Path("components")</p>
               </div>
             </td>
             <td>
@@ -907,7 +951,7 @@ interpreted as relative to base_dir.</p>
             <td>
               <div class="doc-md-description">
                 <p>Directory for output files. If a relative path is given, it is interpreted as
-relative to base_dir.</p>
+relative to base_dir. By default Path("output")</p>
               </div>
             </td>
             <td>
@@ -921,7 +965,7 @@ relative to base_dir.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Filename stem for the output files.</p>
+                <p>Filename stem for the output files. By default Path("pp_output.h5")</p>
               </div>
             </td>
             <td>
@@ -938,7 +982,7 @@ relative to base_dir.</p>
                 <p>Batch size for the preprocessing. For each batch select
 <code>sampling_fraction*batch_size_after_cuts</code>. It is recommended to choose high batch sizes
 especially to the <code>countup</code> method to achive best agreement of target and resampled
-distributions.</p>
+distributions. By default 100_000</p>
               </div>
             </td>
             <td>
@@ -963,7 +1007,7 @@ Is equal to 1_000_000 by default.</p>
           <tr class="doc-section-item">
             <td><code>num_jets_estimate_available</code></td>
             <td>
-                  <code>int | None</code>
+                  <code>int</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1026,13 +1070,27 @@ Is equal to num_jets_estimate by default.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code>merge_test_samples</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Merge the test samples of the different processes into one file. By default False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code>jets_name</code></td>
             <td>
                   <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the jets dataset in the input file.</p>
+                <p>Name of the jets dataset in the input file. By default "jets".</p>
               </div>
             </td>
             <td>
