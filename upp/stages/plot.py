@@ -139,7 +139,15 @@ def plot_resampling_dists(config: PreprocessingConfig, stage: str) -> None:
             vars_to_load += list(set(iter_flav.cuts.variables))
 
     elif stage != "test" or config.merge_test_samples:
-        paths = [[config.out_fname]]
+        paths = [
+            [
+                (
+                    config.out_fname.parent / f"{config.out_fname.stem}*.h5"
+                    if config.num_jets_per_output_file
+                    else config.out_fname
+                )
+            ]
+        ]
         suffixes = ["" for _ in paths]
         vars_to_load += ["flavour_label"]
 
