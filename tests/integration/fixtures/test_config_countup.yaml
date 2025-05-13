@@ -82,9 +82,10 @@ resampling:
 
 global:
   batch_size: 10_000
-  num_jets_estimate: 5000
+  num_jets_estimate: 5_000
   num_jets_estimate_norm: 100
   num_jets_estimate_available: -1
+  num_jets_per_output_file: 15_000
   base_dir: tmp/upp-tests/integration/temp_workspace/
   out_dir: test_out
   ntuple_dir: ntuples
