@@ -13,7 +13,6 @@ jets:
     - mass
     - n_tracks
     - eventNumber
-    - jetFoldHash
 
 tracks:
   inputs:
