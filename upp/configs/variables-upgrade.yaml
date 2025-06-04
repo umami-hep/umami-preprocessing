@@ -8,18 +8,11 @@ jets:
     - HadronConeExclTruthLabelPt
     - HadronConeExclTruthLabelLxy
     - HadronConeExclTruthLabelDR
-    - HadronGhostTruthLabelID
-    - HadronGhostExtendedTruthLabelID
-    - HadronGhostTruthLabelPt
-    - HadronGhostTruthLabelLxy
-    - HadronGhostTruthLabelDR
     - pt
     - eta
     - mass
     - n_tracks
-    - n_truth_promptLepton
     - eventNumber
-    - jetFoldHash
 
 tracks:
   inputs:
