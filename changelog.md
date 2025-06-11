@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- updated pre-processing configs for upgrade [#98](https://github.com/umami-hep/umami-preprocessing/pull/98)
+
 ### [v0.2.4](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.4) (13.05.2025)
 
 - Enable componentwise Resampling [#93](https://github.com/umami-hep/umami-preprocessing/pull/93)

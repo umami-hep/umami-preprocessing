@@ -1,0 +1,95 @@
+variables: !include variables-upgrade.yaml
+global_cuts: !include splits/simple-split.yaml
+
+# for k-folded splits, only required for final trainings of GN2
+# global_cuts: !include splits/fold0.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "/atlas_cloud/triglion/data/TDD_ttbar_DiLep/user.tstreble.601230.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562989._*.output.h5"
+    - "/atlas_cloud/triglion/data/TDD_ttbar_SingleLep/user.tstreble.601229.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562988._*.output.h5"
+
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "/atlas_cloud/triglion/data/TDD_Zprime/user.tstreble.800030.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562987._*.output.h5"
+
+
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [bjets, cjets]
+    num_jets: 14_500_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ujets]
+    num_jets: 29_000_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [taujets]
+    num_jets: 2_013_889
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [bjets, cjets]
+    num_jets: 5_800_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ujets]
+    num_jets: 11_600_000
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [taujets]
+    num_jets: 805_555
+
+
+
+resampling:
+  target: cjets
+  method: pdf #countup
+  sampling_fraction: auto
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
+    absEta_btagJes:
+      bins: [[0, 4, 40]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 25_000_000
+  base_dir: /atlas_cloud/triglion/preprocessing
+  ntuple_dir: /atlas_cloud/triglion/preprocessing
