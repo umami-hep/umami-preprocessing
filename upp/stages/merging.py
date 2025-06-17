@@ -103,6 +103,7 @@ class Merging:
             shapes,
             add_flavour_label=self.jets_name,
             jets_name=self.jets_name,
+            num_jets=jets_in_file,
         )
 
         # Copy the metadata attributes
