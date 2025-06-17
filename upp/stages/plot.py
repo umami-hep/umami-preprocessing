@@ -68,12 +68,8 @@ def make_hist(
     plot = HistogramPlot(
         ylabel=f"Normalised Number of {jets_name}",
         xlabel=xlabel,
-        bins=50,
         y_scale=1.5,
         logy=True,
-        norm=True,
-        bins_range=bins_range,
-        underoverflow=False,
     )
 
     # Define different linestyles for the different samples
@@ -89,19 +85,28 @@ def make_hist(
             else:
                 cuts = Cuts.from_list([f"flavour_label == {label_value}"])
 
-            # Add to histogram
-            plot.add(
-                Histogram(
-                    values=(
-                        cuts(values).values[variable] / 1e3
-                        if "pt" in variable
-                        else cuts(values).values[variable]
-                    ),
-                    label=flavour.label + " " + values_key,
-                    colour=flavour.colour,
-                    linestyle=linestiles[counter],
-                )
+            # Get the histogram object
+            histo = Histogram(
+                values=(
+                    cuts(values).values[variable] / 1e3
+                    if "pt" in variable
+                    else cuts(values).values[variable]
+                ),
+                bins=50,
+                bins_range=bins_range,
+                norm=True,
+                label=flavour.label + " " + values_key,
+                colour=flavour.colour,
+                linestyle=linestiles[counter],
+                underoverflow=True,
             )
+
+            # Add to histogram
+            plot.add(histogram=histo)
+
+            # Set bin_edges
+            if bins_range is None:
+                bins_range = (histo.bin_edges[0], histo.bin_edges[-1])
 
     # Draw plot
     plot.draw()
