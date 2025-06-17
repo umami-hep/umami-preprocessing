@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Fix bug where num jets is not passed to the writer + version updates [#99](https://github.com/umami-hep/umami-preprocessing/pull/99/)
 - updated pre-processing configs for upgrade [#98](https://github.com/umami-hep/umami-preprocessing/pull/98)
 
 ### [v0.2.4](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.4) (13.05.2025)
