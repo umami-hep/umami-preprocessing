@@ -12,7 +12,7 @@ dependencies = [
     "rich==12.6.0",
     "scipy>=1.15.2",
     "puma-hep==0.4.5",
-    "atlas-ftag-tools==0.2.10",
+    "atlas-ftag-tools==0.2.12",
     "dotmap==1.3.30"
 ]
 
