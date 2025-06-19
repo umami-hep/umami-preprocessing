@@ -8,7 +8,7 @@ requires-python = "<3.12,>=3.8"
 
 dependencies = [
     "atlas-ftag-tools==0.2.13",
-    "dotmap==1.3.30"
+    "dotmap==1.3.30",
     "puma-hep==0.4.8",
     "pyyaml-include==1.3",
     "PyYAML>=6.0.1",
