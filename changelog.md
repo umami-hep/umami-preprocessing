@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Updated config for gn3xv00 [#102](https://github.com/umami-hep/umami-preprocessing/pull/102)
 - Update atlas-ftag-tools and puma [#101](https://github.com/umami-hep/umami-preprocessing/pull/101)
 - Fix bug where num jets is not passed to the writer + version updates [#99](https://github.com/umami-hep/umami-preprocessing/pull/99/)
 - updated pre-processing configs for upgrade [#98](https://github.com/umami-hep/umami-preprocessing/pull/98)
