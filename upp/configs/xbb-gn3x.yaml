@@ -4,21 +4,21 @@ global_cuts: !include splits/simple-split.yaml
 htautauhad: &htautauhad
   name: htautauhad
   equal_jets: False
-  pattern: 
+  pattern:
     - user.edcritel.802168.e8558_s3797_r13144_p6453.tdd.*/*.h5
     - user.edcritel.802168.e8558_s4159_r15530_p6453.tdd.*/*.h5
 
 hbb: &hbb
   name: hbb
   equal_jets: False
-  pattern: 
+  pattern:
     - group.perf-flavtag.801471.e8441_s3681_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.801972.e8514_s4159_r15224_p6453.tdd.*/*.h5
 
 hcc: &hcc
   name: hcc
   equal_jets: False
-  pattern: 
+  pattern:
     - group.perf-flavtag.801472.e8441_s3681_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.801973.e8514_s4159_r15224_p6453.tdd.*/*.h5
 
@@ -83,14 +83,14 @@ components:
     sample:
       <<: *Zprime
     flavours: [top]
-    num_jets: 35_000_000 
+    num_jets: 35_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 80_000_000 
+    num_jets: 80_000_000
 
   - region:
       <<: *inclusive
@@ -106,7 +106,7 @@ resampling:
   sampling_fraction: 1
   variables:
     pt:
-      bins: [[250_000, 2_100_000, 70]] 
+      bins: [[250_000, 2_100_000, 70]]
     abs_eta:
       bins: [[0, 2, 20]]
     mass:
