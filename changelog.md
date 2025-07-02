@@ -2,6 +2,9 @@
 
 ### [Latest]
 
+
+### [v0.2.5](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.5) (02.07.2025)
+
 - Updating underlying ATLAS packages [#103](https://github.com/umami-hep/umami-preprocessing/pull/103)
 - Update atlas-ftag-tools and puma [#101](https://github.com/umami-hep/umami-preprocessing/pull/101)
 - Fix bug where num jets is not passed to the writer + version updates [#99](https://github.com/umami-hep/umami-preprocessing/pull/99/)
