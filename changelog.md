@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Update Repository Metadata [#104](https://github.com/umami-hep/umami-preprocessing/pull/104)
 
 ### [v0.2.5](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.5) (02.07.2025)
 
