@@ -203,9 +203,9 @@ def main():
         print("No containers found in the file.")
         return
 
-    # if not run_download(split_containers, output_dir, args.n_threads):
-    #     print("Failed to download one or more containers.")
-    #     return
+    if not run_download(split_containers, output_dir, args.n_threads):
+        print("Failed to download one or more containers.")
+        return
 
     create_all_vds_files(
         split_containers,
