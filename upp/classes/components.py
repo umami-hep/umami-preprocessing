@@ -318,9 +318,9 @@ class Components:
         component_list = []
         for component in config.config["components"]:
             # Ensure equal_jets flag is correctly set
-            assert (
-                "equal_jets" not in component
-            ), "equal_jets flag should be set in the sample config"
+            assert "equal_jets" not in component, (
+                "equal_jets flag should be set in the sample config"
+            )
 
             # Get the region cuts
             region_cuts = (
@@ -341,6 +341,7 @@ class Components:
                 pattern=pattern,
                 ntuple_dir=config.ntuple_dir,
                 name=component["sample"]["name"],
+                skip_checks=config.skip_checks,
             )
 
             # Create the Component instances for the different flavours
@@ -365,7 +366,7 @@ class Components:
         components = cls(component_list)
 
         # Check the flavour ratios
-        if config.sampl_cfg.method is not None:
+        if config.sampl_cfg and config.sampl_cfg.method is not None:
             components.check_flavour_ratios()
 
         return components
