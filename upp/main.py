@@ -23,6 +23,9 @@ from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
 from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
+from upp.stages.reweight import Reweight
+from upp.stages.rw_merge import RWMerge
+from upp.stages.split_containers import SplitContainers
 
 
 def parse_args(args):
@@ -42,10 +45,31 @@ def parse_args(args):
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
     parser.add_argument(
+        "--split-components", action=_st, default=None, help="Split containers into components"
+    )
+    parser.add_argument(
+        "--reweight", "--rw", action=_st, default=None, help="Run the reweighting stage"
+    )
+    parser.add_argument(
+        "--rw-merge", "--rwm", action=_st, default=None, help="Run the reweighting stage"
+    )
+    parser.add_argument(
         "--component", default=None, help="Component which is processed during --prep"
     )
     parser.add_argument(
         "--region", default=None, help="Region which is processed during --resample"
+    )
+    parser.add_argument("--grid", action=_st, help="Use when running the split stage on the grid. ")
+    parser.add_argument(
+        "--container",
+        default=None,
+        help="Container to use during the 'split-containers' stage. "
+        "If not specified, all containers in the config will be used.",
+    )
+    parser.add_argument(
+        "--files",
+        default=None,
+        help="comma-separated list of files to use during the 'split-containers' stage ",
     )
 
     args = parser.parse_args(args)
@@ -65,10 +89,24 @@ def run_pp(args) -> None:
     log.info("[bold green]Starting preprocessing...")
     start = datetime.now()
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
-
     # load config
-    config = PreprocessingConfig.from_file(args.config, args.split)
+    config = PreprocessingConfig.from_file(args.config, args.split, skip_checks=args.grid)
 
+    if args.split_components:
+        log.info("Splitting containers...")
+        split = SplitContainers(args.config)
+        split.run(
+            args.container,
+            args.files,
+            "." if args.grid else None,  # Use current directory if not on grid
+        )
+        # If we aren't running on the grid, we create the metadata after splitting
+        if not args.grid:
+            split.create_meta_data()
+    if args.reweight:
+        log.info("Running reweighting...")
+        reweight = Reweight(config)
+        reweight.run()
     # create virtual datasets and pdf files
     if args.prep and args.split == "train":
         create_histograms(
@@ -85,6 +123,9 @@ def run_pp(args) -> None:
     if args.merge:
         merging = Merging(config)
         merging.run()
+    if args.rw_merge:
+        rw_merge = RWMerge(config)
+        rw_merge.run()
 
     # run the normalisation
     if args.norm and args.split == "train":
@@ -114,10 +155,10 @@ def main(args=None) -> None:
         d = vars(args)
         for split in ["train", "val", "test"]:
             d["split"] = split
-            log.info(f"[bold blue]{'-'*100}")
+            log.info(f"[bold blue]{'-' * 100}")
             title = f" {args.split} "
             log.info(f"[bold blue]{title:-^100}")
-            log.info(f"[bold blue]{'-'*100}")
+            log.info(f"[bold blue]{'-' * 100}")
             run_pp(args)
     else:
         run_pp(args)

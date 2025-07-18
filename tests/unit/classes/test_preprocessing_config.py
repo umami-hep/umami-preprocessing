@@ -21,6 +21,7 @@ class TestPreprocessingConfig:
         os.makedirs("/tmp/upp-tests/integration/temp_workspace/ntuples", exist_ok=True)
         self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5")
         self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data2.h5")
+        self.generate_mock("/tmp/upp-tests/integration/temp_workspace/ntuples/data3.h5")
         print("setup_method      method:%s" % method.__name__)
 
     def teardown_method(self, method):
@@ -72,4 +73,19 @@ class TestPreprocessingConfig:
         assert str(config.get_file_name("resampled_scaled_shuffled")) == (
             "/tmp/upp-tests/integration/temp_workspace/test_out"
             + "/pp_output_train_resampled_scaled_shuffled.h5"
+        )
+
+    @staticmethod
+    def test_get_input_files_with_split_components():
+
+        config = PreprocessingConfig.from_file(
+            CFG_DIR / "test_config_rw.yaml",
+            "train",
+        )
+
+        containers_with_cuts = config.get_input_files_with_split_components()
+        # TODO do the full check
+
+        assert all(
+            c in containers_with_cuts for c in ['data1.h5', 'data2.h5', 'data3.h5']
         )
