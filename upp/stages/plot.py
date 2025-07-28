@@ -36,6 +36,8 @@ def make_hist(
     stage : str
         The stage in which the preprocessing is currently in.
         Mainly used for the ouput name string.
+    values_dict : dict
+        Dict with the loaded values.
     flavours : list
         List of the flavours that are to be plotted. The list
         needs to contain the Flavour class instances from the
@@ -47,12 +49,14 @@ def make_hist(
     jets_name: str, optional
         Name of the jet dataset / the global objects
         by default "jets"
-    bins_range : tuple, optional
+    bins_range : tuple | None, optional
         bins_range argument from from puma.HistogramPlot,
         by default None
     suffix : str, optional
         A string suffix which is added to the plot
         output name, by default "".
+    out_format : str, optional
+        Output format of the plot. By default "png"
     """
     # Get the correct name of the xlabel
     if "pt" in variable:
@@ -131,6 +135,8 @@ def plot_resampling_dists(config: PreprocessingConfig, stage: str) -> None:
     ----------
     config : PreprocessingConfig
         PreprocessingConfig object of the current preprocessing.
+    stage : str
+        Stage that is to be run.
     """
     log.info("Plotting initial plots for the resampling variables...")
     # Get all the variables that need to be loaded

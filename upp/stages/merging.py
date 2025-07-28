@@ -21,13 +21,6 @@ class Merging:
     """Merging Class to merge different components/regions."""
 
     def __init__(self, config: PreprocessingConfig):
-        """Init the Merging class instance.
-
-        Parameters
-        ----------
-        config : PreprocessingConfig
-            Loaded preprocessing config as a PreprocessingConfig instance
-        """
         self.config = config
         self.components = config.components
         self.variables = config.variables
@@ -74,13 +67,13 @@ class Merging:
 
         Parameters
         ----------
-        sample
+        sample : str | None
             Sample name (``None`` for the "train/val test" merge).
-        jets_in_file
+        jets_in_file : int
             Capacity of the new file (= leading dimension of every dataset).
-        file_idx
+        file_idx : int
             Running part index (0, 1, 2, …); used only for the filename suffix.
-        components
+        components : Components
             The `Components` object we are currently merging needed for `jet_counts`, etc.
         """
         # Construct the filename
@@ -127,6 +120,11 @@ class Merging:
         Read one batch from every active component, merge them and write
         them to disk. If the batch does not fit into the current file it is
         split across files transparently.
+
+        Parameters
+        ----------
+        components : Components
+            Components that are to be written.
 
         Returns
         -------

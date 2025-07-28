@@ -129,11 +129,16 @@ def create_histograms(
 
     Parameters
     ----------
-    config : PreprocessingConfig object
+    config : PreprocessingConfig
         PreprocessingConfig object of the current preprocessing.
     component_to_run : str | None
         Component which should be run. By default (None), all components
         are processed sequentially.
+
+    Raises
+    ------
+    ValueError
+        If no region was processed during histogram creation
     """
     # Setup the logger and load the variables used for resampling
     setup_logger()

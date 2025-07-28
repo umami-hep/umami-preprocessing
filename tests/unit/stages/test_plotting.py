@@ -49,11 +49,11 @@ class TestClass:
                 }
             )[self.config.jets_name]
         }
-        print("setup_method      method:%s" % method.__name__)
+        print(f"setup_method, method: {method.__name__}")
 
     def teardown_method(self, method):
         subprocess.run(["rm", "-rf", "tmp/upp-tests/ubit"], check=True)
-        print("teardown_method   method:%s" % method.__name__)
+        print(f"teardown_method, method: {method.__name__}")
 
     def test_make_hist_initial(self):
         """Run the make_hist for the inital pT distribution."""

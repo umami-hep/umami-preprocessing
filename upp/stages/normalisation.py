@@ -18,13 +18,6 @@ class Normalisation:
     """Normalisation class to get the scaling/shifting of the variables used in training."""
 
     def __init__(self, config: PreprocessingConfig):
-        """Init the Normalisation class.
-
-        Parameters
-        ----------
-        config : PreprocessingConfig
-            PreprocessingConfig instance with the loaded config file.
-        """
         self.config = config
         self.components = config.components
         self.variables = config.variables
