@@ -46,18 +46,6 @@ class Resampling:
     """Class for resampling of the different flavours/classes."""
 
     def __init__(self, config: PreprocessingConfig):
-        """Init of the Resampling class.
-
-        Parameters
-        ----------
-        config : PreprocessingConfig
-            Configured PreprocessingConfig class instance.
-
-        Raises
-        ------
-        ValueError
-            If the chosen resampling method is not supported.
-        """
         self.config = config.sampl_cfg
         self.components = config.components
         self.variables = config.variables
@@ -210,7 +198,7 @@ class Resampling:
             Generator of the jets which are to be resampled.
         progress : Progress
             Progress bar instance for updating the shown progress bar.
-        selected_component : str, optional
+        selected_component : str | None, optional
             Compontent name that is to be resampled. By default None and all given
             components are resampled.
 
@@ -306,7 +294,7 @@ class Resampling:
             Components instance of all the components which are to be used.
         region : Region
             Region instance of the region which is to be resampled.
-        selected_component : str, optional
+        selected_component : str | None, optional
             Compontent name that is to be resampled. By default None and all given
             components are resampled.
 

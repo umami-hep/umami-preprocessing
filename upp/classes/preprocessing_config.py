@@ -6,7 +6,7 @@ import logging as log
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import yaml
 from dotmap import DotMap
@@ -51,7 +51,7 @@ class PreprocessingConfig:
         ntuple_dir: h5-inputs # resolved path: /my/stuff/h5-inputs/
     ```
 
-    Parameters
+    Attributes
     ----------
     config_path : Path
         Path to the config yaml file that is used. Does not need to be set in config.
@@ -82,20 +82,20 @@ class PreprocessingConfig:
     num_jets_estimate : int, optional
         Any of the further three arguments that are not specified will default to this value
         Is equal to 1_000_000 by default.
-    num_jets_estimate_available : int, optional
+    num_jets_estimate_available : int | None, optional
         A sabsample taken from the whole sample to estimate the number of jets after the cuts.
         Please keep this number high in order to not get poisson error of more then 5%.
         If time allows you can use -1 to get a precise number of jets and not just an estimate
         although it will be slow for large datasets. Is equal to num_jets_estimate by default.
-    num_jets_estimate_hist : int, optional
+    num_jets_estimate_hist : int | None, optional
         Number of jets of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
         Is equal to num_jets_estimate by default.
-    num_jets_estimate_norm : int, optional
+    num_jets_estimate_norm : int | None, optional
         Number of jets of each flavour that are used to estimate shifting and scaling during
         normalisation step. Larger numbers give a better quality estmates.
         Is equal to num_jets_estimate by default.
-    num_jets_estimate_plotting : int, optional
+    num_jets_estimate_plotting : int | None, optional
         Number of jets of each flavour used for plotting the initial and the final resampling
         variable distributions. Larger numbers give a better estimate of the full distributions.
         Is equal to num_jets_estimate by default.
@@ -103,6 +103,13 @@ class PreprocessingConfig:
         Merge the test samples of the different processes into one file. By default False.
     jets_name : str, optional
         Name of the jets dataset in the input file. By default "jets".
+    flavour_config : Path | None, optional
+        Flavour config yaml file which is to be used. By default None
+    num_jets_per_output_file : int | None, optional
+        Number of jets per final output file. If the number of total jets is larger
+        than this number, the final h5 output files are splitted in multiple smaller
+        files with this number of jets per file. By default None which produces one
+        huge output file.
     """
 
     config_path: Path
@@ -204,24 +211,19 @@ class PreprocessingConfig:
                 cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
         return Cuts.from_list(cuts_list)
 
-    def copy_config(self, suffix=None, out_dir=None):
-        """
-        Copy the configuration file to a new location with an optional suffix and output directory.
+    def copy_config(self, suffix: str | None = None, out_dir: str | Path | None = None) -> None:
+        """Copy the configuration file to a new location with an optional suffix and out directory.
 
         Parameters
         ----------
-        suffix : str or None, optional
+        suffix : str | None, optional
             A suffix to append to the configuration file name. If None, the current
             `self.split` value will be used as the suffix (default is None).
 
-        out_dir : str or None, optional
+        out_dir : str | Path | None, optional
             The output directory where the copied configuration file will be saved.
             If None, the current `self.out_dir` value will be used as the output directory
             (default is None).
-
-        Returns
-        -------
-        None
         """
         if suffix is None:
             suffix = self.split
@@ -232,10 +234,6 @@ class PreprocessingConfig:
         copy_config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(copy_config_path, "w") as file:
             yaml.dump(self.config, file, sort_keys=False)
-
-    # following aliases and functins are needed to mimic the umami config structure and behaviour
-    # so that --scaling --write and traing steps from umami are compatible with this config
-    copy_to_out_dir = copy_config
 
     def get_umami_general(self):
         """
@@ -260,13 +258,12 @@ class PreprocessingConfig:
             _dynamic=False,
         )
 
-    def mimic_umami_config(self, general):
-        """
-        Make the config mimic the umami config structure and behaviour.
+    def mimic_umami_config(self, general: Any) -> PreprocessingConfig:
+        """Make the config mimic the umami config structure and behaviour.
 
         Parameters
         ----------
-        general : umami.preprocessing_tools.configuration.GeneralSettings
+        general : Any
             first initialised in umami.preprocessing_tools.configuration.Configuration
             class in umami using get_umami_general() for arguments
             then feed it into mimic_umami_config() to get the rest of the config
@@ -274,7 +271,8 @@ class PreprocessingConfig:
 
         Returns
         -------
-        self : upp.classes.preprocessing_config.PreprocessingConfig
+        PreprocessingConfig
+            Mimicing PreprocessingConfig instance
         """
         self.general = general
         self.sampling = DotMap(self.config["umami"]["sampling"], _dynamic=False)
@@ -289,9 +287,8 @@ class PreprocessingConfig:
             self.general.convert_to_tfrecord = self.config["umami"]["convert_to_tfrecord"]
         return self
 
-    def get_file_name(self, option, **_):
-        """
-        Mimics the 'get_file_name()' function in PreprocessingConfig class in umami.
+    def get_file_name(self, option: str):
+        """Mimics the 'get_file_name()' function in PreprocessingConfig class in umami.
 
         Parameters
         ----------
@@ -302,18 +299,10 @@ class PreprocessingConfig:
             original output file name with '_resampled_scaled_shuffled' appended.
             This option is used to create a new file name.
 
-        use_val : bool, optional
-            Currently not in use (default is False).
-
         Returns
         -------
         str
             The resulting file name based on the specified 'option'.
-
-        Raises
-        ------
-        ValueError
-            If 'option' is not one of the recognized options.
         """
         if option == "resampled":
             return self.out_fname
