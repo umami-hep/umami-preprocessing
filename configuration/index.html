@@ -844,19 +844,18 @@ The config file is also copied to the output directory.</p>
 </code></pre></div></p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>config_path</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.config_path">config_path</span></code></td>
             <td>
                   <code>pathlib.<span title="pathlib.Path">Path</span></code>
             </td>
@@ -865,12 +864,9 @@ The config file is also copied to the output directory.</p>
                 <p>Path to the config yaml file that is used. Does not need to be set in config.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>split</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.split">split</span></code></td>
             <td>
                   <code>upp.<span title="upp.classes">classes</span>.<span title="upp.classes.preprocessing_config">preprocessing_config</span>.<span title="upp.classes.preprocessing_config.Split">Split</span></code>
             </td>
@@ -881,12 +877,9 @@ to be set as a command line argument when running the programm. Does not need
 to be set in config.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>config</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.config">config</span></code></td>
             <td>
                   <code>dict</code>
             </td>
@@ -895,12 +888,9 @@ to be set in config.</p>
                 <p>Dict with the loaded config. Does not need to be set in config.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>base_dir</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.base_dir">base_dir</span></code></td>
             <td>
                   <code>pathlib.<span title="pathlib.Path">Path</span></code>
             </td>
@@ -909,14 +899,11 @@ to be set in config.</p>
                 <p>Base directory for all other paths.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>ntuple_dir</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.ntuple_dir">ntuple_dir</span></code></td>
             <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -924,14 +911,11 @@ to be set in config.</p>
 interpreted as relative to base_dir. By default Path("ntuples")</p>
               </div>
             </td>
-            <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;ntuples&#39;)</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>components_dir</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.components_dir">components_dir</span></code></td>
             <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -939,14 +923,11 @@ interpreted as relative to base_dir. By default Path("ntuples")</p>
 interpreted as relative to base_dir. By default Path("components")</p>
               </div>
             </td>
-            <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;components&#39;)</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>out_dir</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.out_dir">out_dir</span></code></td>
             <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -954,28 +935,22 @@ interpreted as relative to base_dir. By default Path("components")</p>
 relative to base_dir. By default Path("output")</p>
               </div>
             </td>
-            <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;output&#39;)</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>out_fname</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.out_fname">out_fname</span></code></td>
             <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>Filename stem for the output files. By default Path("pp_output.h5")</p>
               </div>
             </td>
-            <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span>(&#39;pp_output.h5&#39;)</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>batch_size</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.batch_size">batch_size</span></code></td>
             <td>
-                  <code>int</code>
+                  <code>(int, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -985,14 +960,11 @@ especially to the <code>countup</code> method to achive best agreement of target
 distributions. By default 100_000</p>
               </div>
             </td>
-            <td>
-                  <code>100000</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_jets_estimate</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate">num_jets_estimate</span></code></td>
             <td>
-                  <code>int</code>
+                  <code>(int, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1000,14 +972,11 @@ distributions. By default 100_000</p>
 Is equal to 1_000_000 by default.</p>
               </div>
             </td>
-            <td>
-                  <code>1000000</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_jets_estimate_available</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_available">num_jets_estimate_available</span></code></td>
             <td>
-                  <code>int</code>
+                  <code>(int | None, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1017,14 +986,11 @@ If time allows you can use -1 to get a precise number of jets and not just an es
 although it will be slow for large datasets. Is equal to num_jets_estimate by default.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_jets_estimate_hist</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_hist">num_jets_estimate_hist</span></code></td>
             <td>
-                  <code>int</code>
+                  <code>(int | None, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1033,14 +999,11 @@ density function estimation. Larger numbers give a better quality estmate of the
 Is equal to num_jets_estimate by default.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_jets_estimate_norm</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_norm">num_jets_estimate_norm</span></code></td>
             <td>
-                  <code>int</code>
+                  <code>(int | None, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1049,14 +1012,11 @@ normalisation step. Larger numbers give a better quality estmates.
 Is equal to num_jets_estimate by default.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_jets_estimate_plotting</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_plotting">num_jets_estimate_plotting</span></code></td>
             <td>
-                  <code>int</code>
+                  <code>(int | None, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1065,36 +1025,52 @@ variable distributions. Larger numbers give a better estimate of the full distri
 Is equal to num_jets_estimate by default.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>merge_test_samples</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.merge_test_samples">merge_test_samples</span></code></td>
             <td>
-                  <code>bool</code>
+                  <code>(bool, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>Merge the test samples of the different processes into one file. By default False.</p>
               </div>
             </td>
-            <td>
-                  <code>False</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>jets_name</code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.jets_name">jets_name</span></code></td>
             <td>
-                  <code>str</code>
+                  <code>(str, optional)</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>Name of the jets dataset in the input file. By default "jets".</p>
               </div>
             </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.flavour_config">flavour_config</span></code></td>
             <td>
-                  <code>&#39;jets&#39;</code>
+                  <code>(pathlib.<span title="pathlib.Path">Path</span> | None, optional)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Flavour config yaml file which is to be used. By default None</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_per_output_file">num_jets_per_output_file</span></code></td>
+            <td>
+                  <code>(int | None, optional)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of jets per final output file. If the number of total jets is larger
+than this number, the final h5 output files are splitted in multiple smaller
+files with this number of jets per file. By default None which produces one
+huge output file.</p>
+              </div>
             </td>
           </tr>
       </tbody>
