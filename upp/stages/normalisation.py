@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
 
-from upp.logger import ProgressBar
+from upp.utils import ProgressBar
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig

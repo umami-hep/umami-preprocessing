@@ -23,4 +23,4 @@ repos:
     rev: 0.6.6
     hooks:
       - id: pydoclint
-        args: [--style=numpy, --check-return-types=False]
+        args: [--style=numpy]
