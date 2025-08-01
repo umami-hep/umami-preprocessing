@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+from typing import Any
 
 from ftag.cli_utils import HelpFormatter, valid_path
 
@@ -25,7 +26,19 @@ from upp.stages.resampling import Resampling
 from upp.utils import setup_logger
 
 
-def parse_args(args):
+def parse_args(args: Any) -> argparse.Namespace:
+    """Parse the command line arguments.
+
+    Parameters
+    ----------
+    args : Any
+        Command line arguments.
+
+    Returns
+    -------
+    argparse.Namespace
+        Namespace with the parsed command line arguments
+    """
     _st = "store_true"
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=HelpFormatter)
     parser.add_argument("--config", required=True, type=valid_path, help="Path to config file")
@@ -58,7 +71,14 @@ def parse_args(args):
     return args
 
 
-def run_pp(args) -> None:
+def run_pp(args: argparse.Namespace) -> None:
+    """Run the preprocessing.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed command line arguments
+    """
     log = setup_logger()
 
     # print start info
@@ -106,7 +126,7 @@ def run_pp(args) -> None:
     log.info(f"Elapsed time: {str(end - start).split('.')[0]}")
 
 
-def main(args=None) -> None:
+def main(args: Any | None = None) -> None:
     args = parse_args(args)
     log = setup_logger()
 
