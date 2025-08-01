@@ -17,12 +17,12 @@ from datetime import datetime
 from ftag.cli_utils import HelpFormatter, valid_path
 
 from upp.classes.preprocessing_config import PreprocessingConfig
-from upp.logger import setup_logger
 from upp.stages.hist import create_histograms
 from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
 from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
+from upp.utils import setup_logger
 
 
 def parse_args(args):

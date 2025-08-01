@@ -235,7 +235,7 @@ class PreprocessingConfig:
         with open(copy_config_path, "w") as file:
             yaml.dump(self.config, file, sort_keys=False)
 
-    def get_umami_general(self):
+    def get_umami_general(self) -> DotMap:
         """
         Return the arguments to be fed into GeneralSettings class in umami.
 
@@ -287,7 +287,7 @@ class PreprocessingConfig:
             self.general.convert_to_tfrecord = self.config["umami"]["convert_to_tfrecord"]
         return self
 
-    def get_file_name(self, option: str):
+    def get_file_name(self, option: str) -> Path | str:
         """Mimics the 'get_file_name()' function in PreprocessingConfig class in umami.
 
         Parameters
@@ -301,8 +301,13 @@ class PreprocessingConfig:
 
         Returns
         -------
-        str
+        Path | str
             The resulting file name based on the specified 'option'.
+
+        Raises
+        ------
+        ValueError
+            If the option value is not supported
         """
         if option == "resampled":
             return self.out_fname
@@ -313,4 +318,9 @@ class PreprocessingConfig:
                 + self.out_fname.stem
                 + "_resampled_scaled_shuffled"
                 + self.out_fname.suffix
+            )
+        else:
+            raise ValueError(
+                f"Option value {option} is not supported! "
+                "Only resampled and resampled_scaled_shuffled are."
             )
