@@ -13,7 +13,7 @@ from yamlinclude import YamlIncludeConstructor
 from upp.classes.components import Component
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
-from upp.utils import ProgressBar
+from upp.utils.logger import ProgressBar
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any, Generator

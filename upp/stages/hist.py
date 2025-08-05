@@ -12,7 +12,7 @@ import numpy as np
 from numpy.lib.recfunctions import structured_to_unstructured as s2u
 from scipy.stats import binned_statistic_dd
 
-from upp.utils import setup_logger
+from upp.utils.logger import setup_logger
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig

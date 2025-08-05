@@ -23,7 +23,7 @@ from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
 from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
-from upp.utils import setup_logger
+from upp.utils.logger import setup_logger
 
 
 def parse_args(args: Any) -> argparse.Namespace:

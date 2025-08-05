@@ -10,7 +10,8 @@ import numpy as np
 from ftag.hdf5 import H5Writer, join_structured_arrays
 
 from upp.classes.components import Components
-from upp.utils import ProgressBar, path_append
+from upp.utils.logger import ProgressBar
+from upp.utils.tools import path_append
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.components import Component
