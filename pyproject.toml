@@ -33,7 +33,7 @@ dev = [
 preprocess = "upp.main:main"
 
 [tool.setuptools]
-packages = ["upp", "upp.classes", "upp.stages"]
+packages = ["upp", "upp.classes", "upp.stages", "upp.utils"]
 include-package-data = true
 
 [tool.setuptools.dynamic]
@@ -45,7 +45,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 lint.select = ["I", "E", "W", "F", "B", "UP", "ARG", "SIM", "TID", "RUF", "D2", "D3", "D4"]
-lint.ignore = ["D211", "D213", "RUF005"]
+lint.ignore = ["RUF005"]
 line-length = 100
 
 [tool.ruff.lint.isort]
