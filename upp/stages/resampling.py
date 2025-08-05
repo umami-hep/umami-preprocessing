@@ -10,6 +10,7 @@ import yaml
 from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
+from upp.classes.components import Component
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
 from upp.utils import ProgressBar
@@ -19,7 +20,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from rich.progress import Progress
 
-    from upp.classes.components import Component, Components
+    from upp.classes.components import Components
     from upp.classes.preprocessing_config import PreprocessingConfig
     from upp.classes.region import Region
 
