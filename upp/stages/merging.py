@@ -4,13 +4,13 @@ import json
 import logging as log
 from copy import copy
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 from ftag.hdf5 import H5Writer, join_structured_arrays
 
-from upp.logger import ProgressBar
-from upp.utils import path_append
+from upp.utils.logger import ProgressBar
+from upp.utils.tools import path_append
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.components import Component, Components
@@ -30,6 +30,22 @@ class Merging:
         self.flavours = self.components.flavours
         self.num_jets_per_output_file = config.num_jets_per_output_file
         self.file_tag = "split"
+
+        # perfectly valid, no union necessary
+        self.dtypes: dict[str, np.dtype] = {}
+        self.base_shapes: dict[str, tuple[int, ...]] = {}
+
+        # Setup all the jet counters
+        self._file_idx: int = 0
+        self.total_jets: int = 0
+        self.jets_written: int = 0
+
+        # Setup the sample string
+        self._sample: str | None = None
+
+        # Use cast because we cannot init Components/H5Writer
+        self.current_components = cast("Components", None)
+        self.writer = cast(H5Writer, None)
 
     def add_jet_flavour_label(self, jets: np.ndarray, component: Component) -> np.ndarray:
         """Add the jet flavour label to the jets.

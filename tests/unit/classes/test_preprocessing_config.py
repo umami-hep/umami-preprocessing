@@ -4,6 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
 from dotmap import DotMap
 from ftag import get_mock_file
 
@@ -65,11 +66,17 @@ class TestPreprocessingConfig:
             "train",
         )
 
+        # Valid cases
         assert (
             str(config.get_file_name("resampled"))
             == "/tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5"
         )
+
         assert str(config.get_file_name("resampled_scaled_shuffled")) == (
             "/tmp/upp-tests/integration/temp_workspace/test_out"
             + "/pp_output_train_resampled_scaled_shuffled.h5"
         )
+
+        # Invalid case: should raise ValueError
+        with pytest.raises(ValueError):
+            config.get_file_name("invalid_stage")

@@ -12,13 +12,13 @@ import numpy as np
 from numpy.lib.recfunctions import structured_to_unstructured as s2u
 from scipy.stats import binned_statistic_dd
 
-from upp.logger import setup_logger
+from upp.utils.logger import setup_logger
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
 
 
-def bin_jets(array: dict, bins: list) -> np.ndarray:
+def bin_jets(array: dict, bins: list) -> tuple[np.ndarray, np.ndarray]:
     """Create the histogram and bins for the given resampling variables.
 
     Parameters
@@ -31,12 +31,15 @@ def bin_jets(array: dict, bins: list) -> np.ndarray:
 
     Returns
     -------
-    hist : np.ndarray, shape(nx1, nx2, nx3,...)
-        The values of the selected statistic in each two-dimensional bin.
-    out_bins : (N,) array of ints or (D,N) ndarray of ints
-        This assigns to each element of `sample` an integer that represents the
-        bin in which this observation falls.  The representation depends on the
-        `expand_binnumbers` argument.  See `Notes` for details.
+    tuple[np.ndarray, np.ndarray]
+        Returns a tuple of two np.ndarrays, which are the following:
+
+        hist : np.ndarray, shape(nx1, nx2, nx3,...)
+            The values of the selected statistic in each two-dimensional bin.
+        out_bins : (N,) array of ints or (D,N) ndarray of ints
+            This assigns to each element of `sample` an integer that represents the
+            bin in which this observation falls.  The representation depends on the
+            `expand_binnumbers` argument.  See `Notes` for details.
     """
     hist, _, out_bins = binned_statistic_dd(
         sample=s2u(array),

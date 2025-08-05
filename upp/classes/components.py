@@ -418,7 +418,7 @@ class Components:
 
         Returns
         -------
-        list[str]
+        list[Label]
             List of flavours
         """
         return list(dict.fromkeys(c.flavour for c in self))
@@ -429,8 +429,8 @@ class Components:
 
         Returns
         -------
-        list
-            List with all the cuts
+        Cuts
+            Cuts object with all cuts
         """
         return sum((c.cuts for c in self), Cuts.from_list([]))
 

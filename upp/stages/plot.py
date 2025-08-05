@@ -8,7 +8,7 @@ from ftag import Cuts
 from ftag.hdf5 import H5Reader
 from puma import Histogram, HistogramPlot
 
-from upp.utils import path_append
+from upp.utils.tools import path_append
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
