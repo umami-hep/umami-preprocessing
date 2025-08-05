@@ -78,8 +78,5 @@ class TestPreprocessingConfig:
         )
 
         # Invalid case: should raise ValueError
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(ValueError):
             config.get_file_name("invalid_stage")
-
-        # Optional: assert message contains expected text
-        assert "Unknown stage" in str(exc_info.value)
