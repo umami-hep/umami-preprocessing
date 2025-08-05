@@ -9,12 +9,11 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 from ftag.hdf5 import H5Writer, join_structured_arrays
 
-from upp.classes.components import Components
 from upp.utils.logger import ProgressBar
 from upp.utils.tools import path_append
 
 if TYPE_CHECKING:  # pragma: no cover
-    from upp.classes.components import Component
+    from upp.classes.components import Component, Components
     from upp.classes.preprocessing_config import PreprocessingConfig
 
 
@@ -45,7 +44,7 @@ class Merging:
         self._sample: str | None = None
 
         # Use cast because we cannot init Components/H5Writer
-        self.current_components = cast(Components, None)
+        self.current_components = cast("Components", None)
         self.writer = cast(H5Writer, None)
 
     def add_jet_flavour_label(self, jets: np.ndarray, component: Component) -> np.ndarray:

@@ -10,7 +10,6 @@ import yaml
 from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
-from upp.classes.components import Component
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
 from upp.utils.logger import ProgressBar
@@ -20,7 +19,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from rich.progress import Progress
 
-    from upp.classes.components import Components
+    from upp.classes.components import Component, Components
     from upp.classes.preprocessing_config import PreprocessingConfig
     from upp.classes.region import Region
 
@@ -71,7 +70,7 @@ class Resampling:
         self.rng = np.random.default_rng(42)
 
         # Define what type self.target will be
-        self.target = cast(Component, None)
+        self.target = cast("Component", None)
 
     def countup_select_func(self, jets: dict, component: Component) -> np.ndarray:
         """Countup resampling function.
