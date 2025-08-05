@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from upp.utils import path_append
+from upp.utils.tools import path_append
 
 
 def test_path_append():
