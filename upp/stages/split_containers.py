@@ -23,7 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 # TODO move these to some util place
-def get_all_groups(file) -> dict[str, None]:
+def get_all_datasets(file) -> dict[str, None]:
     """Returns a dictionary with all the groups in the h5 file.
 
     Parameters
@@ -38,8 +38,7 @@ def get_all_groups(file) -> dict[str, None]:
         such that h5read.stream(all_groups) will return all the groups in the file.
     """
     with h5py.File(file, "r") as f:
-        groups = list(f.keys())
-        return dict.fromkeys(groups)
+        return {dset: None for dset in f if isinstance(f[dset], h5py.Dataset)}
 
 
 def get_all_vars(file) -> list[str]:
@@ -58,9 +57,12 @@ def get_all_vars(file) -> list[str]:
     """
     with h5py.File(file, "r") as f:
         all_vars = []
-        for group in f.keys():
-            group_vars = list(f[group].dtype.names)
-            all_vars.extend(group_vars)
+        for dset in f.keys():
+            # For now, we ignore groups, we only want datasets
+            if isinstance(f[dset], h5py.Group):
+                continue
+            dset_vars = list(f[dset].dtype.names)
+            all_vars.extend(dset_vars)
         return all_vars
 
 
@@ -128,7 +130,8 @@ class SplitContainers:
             input_file = Path(input_file)
         add_flavour_label = flavour_label_list is not None
         # All variables for test file
-        all_variables = get_all_groups(input_file)
+        all_variables = get_all_datasets(input_file)
+        print("All variables: ", all_variables, flush=True)
         # Subset of variables for train/val files
         variables = parse_variables(variables) if variables is not None else all_variables
         print("parsed variables: ", variables, flush=True)
@@ -282,7 +285,7 @@ class SplitContainers:
         files=None,
         output_dir: Path | str = None,
     ):
-        all_flavours = self.config.components.flavours
+        all_flavours = [f.name for f in self.config.components.flavours]
 
         containers_with_split_cuts = PreprocessingConfig.get_input_files_with_split_components(
             self.config_path
@@ -336,7 +339,9 @@ class SplitContainers:
     def create_meta_data(self):
         #
         output_dir = Path(self.config.base_dir) / "split-components"
-        flavours = self.config.components.flavours
+        flavours = [f.name for f in self.config.components.flavours]
+
+        print("THE FLAVOURS ARE", flavours, flush=True)
         files = {split: {f: [] for f in flavours} for split in ["train", "val", "test"]}
         for container in output_dir.glob("*"):
             if not container.is_dir():
@@ -345,10 +350,8 @@ class SplitContainers:
                 for flavour in flavours:
                     file = list(container.glob(f"*{split}*{flavour}*.h5"))
                     if len(file) == 0:
-                        raise FileNotFoundError(
-                            f"Could not find file for {container} {split} {flavour}. "
-                            "Please check the output directory."
-                        )
+                        print("Could not find file for", container, split, flavour, flush=True)
+                        continue
 
                     if len(file) > 1:
                         raise FileExistsError(
