@@ -164,8 +164,17 @@ def run_input_sample_check(
         if verbose:
             log.info(f"Checking sample {sample_type}...")
 
+        # Extract the patterns and ensure it's a list or a string
+        patterns = sample_list.get("pattern", [])
+        if isinstance(patterns, str):
+            patterns = [patterns]
+
+        elif not isinstance(patterns, list):
+            log.error(f"Unsupported type for 'pattern' in {sample_type}: {type(patterns)}")
+            continue
+
         # Loop over the different samples in the category
-        for sample in sample_list["pattern"]:
+        for sample in patterns:
             # Log the status
             if verbose:
                 log.info(f"{sample}")
