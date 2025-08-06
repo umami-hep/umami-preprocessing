@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable, Union
+from typing import Callable
 
 import numpy as np
 
@@ -29,10 +29,10 @@ class SingleReweightConfig:
     reweight_vars: list[str]  # The variables we want to reweight
     bins: list[np.ndarray]  # The bins we want to use for the reweighting
     class_var: str  # The variable which contains the label we resample over, e.g. flavour
-    class_target: int | tuple | str = None
+    class_target: int | tuple | str | None = None
     add_overflow: bool = True  # Whether to add overflow bins
 
-    target_hist_func: Union[Callable, None] = None
+    target_hist_func: Callable | None = None
     target_hist_func_name: str | None = None
 
     # TODO - this is the same as in resampling, maybe can cleanup
@@ -53,14 +53,16 @@ class SingleReweightConfig:
         return [self.get_bins_x(self.bins[k]) for k in self.reweight_vars]
 
     def __post_init__(self):
-        if isinstance(self.class_target, str):
-            # TODO also target mean etc?
-            if self.class_target not in ["mean", "min", "max", "uniform"]:
-                raise ValueError("class_target must be either 'mean', 'min', 'max' or an integer")
+        if isinstance(self.class_target, str) and self.class_target not in [
+            "mean",
+            "min",
+            "max",
+            "uniform",
+        ]:
+            raise ValueError("class_target must be either 'mean', 'min', 'max' or an integer")
 
-        if self.target_hist_func is not None:
-            if self.target_hist_func_name is None:
-                self.target_hist_func_name = self.target_hist_func.__name__
+        if self.target_hist_func is not None and self.target_hist_func_name is None:
+            self.target_hist_func_name = self.target_hist_func.__name__
 
     def __repr__(self):
         target_str = "target_"

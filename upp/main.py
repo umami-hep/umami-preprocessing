@@ -45,20 +45,23 @@ def parse_args(args):
     splits = ["train", "val", "test", "all"]
     parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
     parser.add_argument(
-        "--split-components", action=_st, default=None, help="Split containers into components"
+        "--split-components", action=_st, default=False, help="Split containers into components"
     )
     parser.add_argument(
-        "--reweight", "--rw", action=_st, default=None, help="Run the reweighting stage"
+        "--reweight", "--rw", action=_st, default=False, help="Run the reweighting stage"
     )
     parser.add_argument(
-        "--rw-merge", "--rwm", action=_st, default=None, help="Run the reweighting stage"
+        "--rw-merge", "--rwm", action=_st, default=False, help="Run the reweighting stage"
     )
     parser.add_argument(
         "--rw-merge-idx",
         "--rwm-idx",
         type=str,
         default=None,
-        help="Commar seperated pair of indices representing the range of output files to create, e.g '0,10' will create files 0 to 9",
+        help=(
+            "Commar seperated pair of indices representing the range of output "
+            "files to create, e.g '0,10' will create files 0 to 9"
+        ),
     )
     parser.add_argument(
         "--component", default=None, help="Component which is processed during --prep"
@@ -70,6 +73,7 @@ def parse_args(args):
     parser.add_argument(
         "--container",
         default=None,
+        type=str,
         help="Container to use during the 'split-containers' stage. "
         "If not specified, all containers in the config will be used.",
     )
@@ -81,7 +85,19 @@ def parse_args(args):
 
     args = parser.parse_args(args)
     d = vars(args)
-    ignore = ["config", "split", "component", "region"]
+    ignore = [
+        "config",
+        "split",
+        "component",
+        "region",
+        "container",
+        "files",
+        "grid",
+        "split_components",
+        "reweight",
+        "rw_merge",
+        "rw_merge_idx",
+    ]
     if not any(v for a, v in d.items() if a not in ignore):
         for v in d:
             if v not in ignore and d[v] is None:
@@ -98,7 +114,7 @@ def run_pp(args) -> None:
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
     # load config
     config = PreprocessingConfig.from_file(args.config, args.split, skip_checks=args.grid)
-
+    print(args)
     if args.split_components:
         log.info("Splitting containers...")
         split = SplitContainers(args.config)

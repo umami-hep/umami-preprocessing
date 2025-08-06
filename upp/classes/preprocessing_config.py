@@ -355,8 +355,7 @@ class PreprocessingConfig:
     # Static because otherwise config paths end up getting messed up
     @staticmethod
     def get_input_files_with_split_components(config_path):
-        """
-        Returns a nested dictionary of the form:
+        """Return a nested dictionary of the form.
 
         {
             "container_1" : {

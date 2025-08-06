@@ -14,7 +14,7 @@ print("Base dir:", BASE_DIR)
 
 
 class NoAliasDumper(yaml.SafeDumper):
-    def ignore_aliases(self, data):
+    def ignore_aliases(self, _data):
         return True
 
 
@@ -96,7 +96,7 @@ def get_output_ds_name(
         tags = "no_tag"
     else:
         try:
-            dsid = int(input_ds.split(".")[2])
+            dsid = str(int(input_ds.split(".")[2]))
         except ValueError:
             print(
                 "Expected input dataset format: user.{user}.{dsid}.{tags}.name "
@@ -136,7 +136,7 @@ def submit(
         print("Using ntuple directory:", ntuple_dir)
         # Search all second level objects for a key 'pattern'
         all_patterns = []
-        for key, value in loaded_config.items():
+        for _key, value in loaded_config.items():
             if isinstance(value, dict) and "pattern" in value:
                 all_patterns.append(value["pattern"])
             elif isinstance(value, list):
@@ -160,11 +160,11 @@ def submit(
     for dataset, cuts_by_component in containers_with_cuts.items():
         print(f"Submitting dataset: {dataset}")
         # Create a config file for each dataset
-        outputs = ",".join([f"output_{split}.h5" for split in cuts_by_component.keys()])
+        outputs = ",".join([f"output_{split}.h5" for split in cuts_by_component])
         final_output_ds = get_output_ds_name(dataset, rucio_user, output_name, output_ds)
 
         all_output_datasets.extend(
-            [f"{final_output_ds}_output_{split}.h5" for split in cuts_by_component.keys()]
+            [f"{final_output_ds}_output_{split}.h5" for split in cuts_by_component]
         )
 
         exec = " ".join(
@@ -199,7 +199,11 @@ def submit(
             "--exec",
             exec,
             # The merge didn't seem to work for me
-            # "--mergeScript", "./myenv/bin/python ftag_rw/split/merge-diff-files-components.py --config {} --files %IN".format(config_file),
+            # "--mergeScript",
+            # (
+            #     "./myenv/bin/python ftag_rw/split/merge-diff-files-components.py "
+            #     "--config {} --files %IN"
+            # ).format(config_file),
             "--mergeScript",
             "hdf5-merge-nolock -o %OUT -i %IN",
             # "--athenaTag=Athena,main,latest",
@@ -262,7 +266,7 @@ def main():
         subprocess.run(
             ["prun", "--version"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
-    except:
+    except subprocess.CalledProcessError:
         print("prun command not found. Please setup with `lsetup panda`")
         return
     submit(

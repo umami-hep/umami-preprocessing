@@ -8,9 +8,9 @@ import h5py
 import numpy as np
 from ftag.mock import JET_VARS, get_mock_file
 
-JET_VARS += [("eventNumber", "i4")]
-
 from upp.main import main
+
+JET_VARS += [("eventNumber", "i4")]
 
 this_dir = Path(__file__).parent
 
@@ -32,44 +32,54 @@ class TestRunRW:
         subprocess.run(["rm", "-r", "tmp"], check=True)
         print("teardown_method   method:%s" % method.__name__)
 
-    def _run_split(self):
-        args = [
-            "--config",
-            str(Path(this_dir / "fixtures/test_config_rw.yaml")),
+    @property
+    def no(self):
+        return [
             "--no-resample",
             "--no-merge",
             "--no-norm",
             "--no-plot",
+            "--no-prep",
+        ]
+
+    def _run_split(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_rw.yaml")),
             "--split",
             "train",
             "--split-components",
+            *self.no,
         ]
         main(args)
         outpath = Path("tmp/upp-tests/integration/temp_workspace/split-components")
 
-        assert (
-            outpath / "organised-components.yaml"
-        ).exists(), "Organised components file not found"
+        assert (outpath / "organised-components.yaml").exists(), (
+            "Organised components file not found"
+        )
 
         for container in ["data1.h5", "data2.h5", "data3.h5"]:
             assert (outpath / container).exists()
             component = "highpt_zprime" if container == "data3.h5" else "lowpt_ttbar"
-            # We expect S * F number of output files, where S is the number of splits and F is the number of flavours
+            # We expect S * F number of output files, where S is the number of
+            # splits and F is the number of flavours
             exp_files = [
                 f"output_{split}_{component}_{flavour}.h5"
                 for split in ["train", "val", "test"]
                 for flavour in ["bjets", "cjets", "ujets", "taujets"]
             ]
             for exp_file in exp_files:
-                assert (
-                    outpath / container / exp_file
-                ).exists(), f"Expected file {exp_file} not found in {outpath} : Contains {os.listdir(outpath / container)}"
+                assert (outpath / container / exp_file).exists(), (
+                    f"Expected file {exp_file} not found in {outpath} : "
+                    f"Contains {os.listdir(outpath / container)}"
+                )
 
     def _calculate_weights(self):
         args = [
             "--config",
             str(Path(this_dir / "fixtures/test_config_rw.yaml")),
             "--rw",
+            *self.no,
         ]
         main(args)
         outpath = Path("tmp/upp-tests/integration/temp_workspace/test_out")
@@ -90,11 +100,21 @@ class TestRunRW:
                 "--rwm",
                 "--split",
                 split,
+                *self.no,
             ]
             main(args)
             outpath = Path("tmp/upp-tests/integration/temp_workspace/test_out")
             assert (outpath / split).exists(), f"Output directory for split {split} not found"
-            assert (outpath / f"pp_output_{split}_vds.h5").exists()
+            outfile = outpath / f"pp_output_{split}_vds.h5"
+            assert outfile.exists()
+            with h5py.File(outfile, "r") as f:
+                assert "jets" in f, "Expected 'jets' group in output file"
+                print("LOL", f.attrs, f["jets"].attrs, f["jets"].attrs.keys())
+
+                assert "flavour_label" in f["jets"].attrs, (
+                    "Expected 'flavour_label' attribute in 'jets' group of output file"
+                )
+                assert "flavour_label" in f["jets"].dtype.names
 
     def test_rw(self):
         self._run_split()

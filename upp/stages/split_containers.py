@@ -24,7 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 # TODO move these to some util place
 def get_all_datasets(file) -> dict[str, None]:
-    """Returns a dictionary with all the groups in the h5 file.
+    """Return a dictionary with all the groups in the h5 file.
 
     Parameters
     ----------
@@ -42,7 +42,7 @@ def get_all_datasets(file) -> dict[str, None]:
 
 
 def get_all_vars(file) -> list[str]:
-    """Returns a dictionary with all the groups in the h5 file.
+    """Return a dictionary with all the groups in the h5 file.
 
     Parameters
     ----------
@@ -57,7 +57,7 @@ def get_all_vars(file) -> list[str]:
     """
     with h5py.File(file, "r") as f:
         all_vars = []
-        for dset in f.keys():
+        for dset in f:
             # For now, we ignore groups, we only want datasets
             if isinstance(f[dset], h5py.Group):
                 continue
@@ -67,7 +67,8 @@ def get_all_vars(file) -> list[str]:
 
 
 def get_all_fp_vars(file):
-    """
+    """Return a list of all the variables in the file that should be kept at full precision.
+
     Returns a list of all the variables in the file that should be kept at full precision -
     this is done by finding variables that contain 'pt', 'energy', or 'mass' in their names.
 
@@ -96,9 +97,9 @@ def parse_variables(variables: dict[str, dict[str, list[str]]]) -> dict[str, lis
 
     for group, group_vars in variables.items():
         vars_list = []
-        if "inputs" in group_vars.keys():
+        if "inputs" in group_vars:
             vars_list += group_vars["inputs"]
-        if "labels" in group_vars.keys():
+        if "labels" in group_vars:
             vars_list += group_vars["labels"]
         vars_lists[group] = vars_list
 
@@ -119,7 +120,7 @@ class SplitContainers:
         output_dir: Path,
         cuts_by_component: dict[str, list[str]],
         batch_size: int = 1_00_000,
-        limit_num_batches: int = None,
+        limit_num_batches: int | None = None,
         verbose_freq: int = 1,
         overwrite: bool = False,
         output_name=None,
@@ -133,8 +134,10 @@ class SplitContainers:
         all_variables = get_all_datasets(input_file)
         print("All variables: ", all_variables, flush=True)
         # Subset of variables for train/val files
-        variables = parse_variables(variables) if variables is not None else all_variables
-        print("parsed variables: ", variables, flush=True)
+        parsed_variables: dict[str, list[str]] | dict[str, None] = (
+            parse_variables(variables) if variables is not None else all_variables
+        )
+        print("parsed variables: ", parsed_variables, flush=True)
         start = time.time()
         reader = H5Reader(input_file, batch_size=batch_size, shuffle=False)
         if output_name is None:
@@ -166,7 +169,7 @@ class SplitContainers:
                 precision="half",
                 full_precision_vars=fp_vars,
                 shuffle=False,
-                variables=all_variables if "test" in split else variables,
+                variables=all_variables if "test" in split else parsed_variables,
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
             )
@@ -175,6 +178,7 @@ class SplitContainers:
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
 
         if add_flavour_label:
+            assert flavour_label_list is not None  # for mypy
             flavour_label_by_component = {
                 component: [
                     i for i, label in enumerate(flavour_label_list) if f"_{label}" in component
@@ -224,9 +228,11 @@ class SplitContainers:
                 writer.write(sel_batch)
 
             if (i + 1) % verbose_freq == 0:
-                message = f"File {input_file.name} batch {i + 1}/{num_batches} [{time.time() - start:.2f}s]"
+                message = (
+                    f"File {input_file.name} batch {i + 1}/{num_batches} "
+                    f"[{time.time() - start:.2f}s]"
+                )
                 print(message, flush=True)
-
             if limit_num_batches is not None and i > limit_num_batches:
                 break
 

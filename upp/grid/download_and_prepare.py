@@ -48,7 +48,8 @@ def run_download(containers: list[str], output_dir: Path | None = None, max_para
         return False
 
     print(
-        f"Downloading {len(containers)} containers to {output_dir if output_dir else 'current directory'}"
+        f"Downloading {len(containers)} containers to "
+        f"{output_dir if output_dir else 'current directory'}"
     )
     try:
         with ThreadPoolExecutor(max_workers=max_parallel) as executor:
