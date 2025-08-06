@@ -60,20 +60,22 @@ components:
     flavours: [bjets, cjets, ujets, taujets]
     num_jets: -1
 
-resampling:
-  target: ghostcjets
-  method: countup
-  sampling_fraction: 1
-  variables:
-    pt:
+reweighting:
+  num_jets_estimate: 100
+  merge_num_proc: 20
+  reweights:
+    - group: jets
+      reweight_vars: [pt, eta]
       bins:
-        [
-          [20_000, 250_000, 46],
-          [250_000, 1_000_000, 30],
-          [1_000_000, 6_000_000, 20],
-        ]
-    eta:
-      bins: [[-2.5, 2.5, 10]]
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: mean
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
