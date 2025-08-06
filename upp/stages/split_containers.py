@@ -283,7 +283,7 @@ class SplitContainers:
         self,
         container=None,
         files=None,
-        output_dir: Path | str = None,
+        output_dir: Path | str | None = None,
     ):
         all_flavours = [f.name for f in self.config.components.flavours]
 

@@ -108,13 +108,13 @@ def create_meta_data(
     if output_dir is None:
         output_dir = Path.cwd()
 
-    config = PreprocessingConfig.from_file(config, split="train", skip_checks=True)
+    pp_config = PreprocessingConfig.from_file(config, split="train", skip_checks=True)
 
-    files_by_component = {}
-    print(list(output_dir.glob("*")))
+    files_by_component: dict[str, dict] = {}
+
     for split in ["train", "val", "test"]:
         files_by_component[split] = {}
-        for flavour in config.components.flavours:
+        for flavour in pp_config.components.flavours:
             sel_containers = [
                 Path(output_dir) / c for c in containers if split in c and flavour.name in c
             ]

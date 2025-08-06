@@ -112,7 +112,7 @@ def do_merge_with_weights(
 
     # reader = H5Reader(input_file)
     # num_jets = reader.num_jets if N == -1 else N
-    writer = None
+    writer: H5Writer = None
     additional_vars = {}
 
     for group, reweight in weights.items():
@@ -198,9 +198,9 @@ class RWMerge:
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert self.organised_components_config.exists(), (
-            f"Organised components config file not found: {self.organised_components_config}"
-        )
+        assert (
+            self.organised_components_config.exists()
+        ), f"Organised components config file not found: {self.organised_components_config}"
 
     def run(self):
         weights = Reweight.load_weights_hdf5(self.hists_file)
@@ -225,8 +225,11 @@ class RWMerge:
         output_dir = self.config.out_dir / self.config.split
         output_dir.mkdir(parents=True, exist_ok=True)
         num_jets_per_file = self.config.num_jets_per_output_file or total_jets
-        batches_per_file = num_jets_per_file // batch_size
-        num_batches = total_jets // batch_size + (1 if total_jets % num_jets_per_file != 0 else 0)
+
+        batches_per_file = num_jets_per_file // batch_size or 1
+        num_batches = (
+            total_jets // batch_size + (1 if total_jets % num_jets_per_file != 0 else 0)
+        ) or 1
 
         variables = self.config.variables.combined() if self.config.split != "test" else None
         if variables and "flavour_label" not in variables:
@@ -248,7 +251,6 @@ class RWMerge:
                 )
             )
         print("Running with ", self.rw_config.merge_num_proc, "processes")
-
         start_mp(
             do_merge_with_weights,
             args_list,

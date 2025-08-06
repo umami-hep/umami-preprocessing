@@ -115,7 +115,7 @@ def submit(
     output_name: str = "FTag_RW",
     output_ds: str = "user.{user}.{dsid}.{tags}.{name}_split.h5",
     dryrun: bool = True,
-    prun_args: list[str] = None,
+    prun_args: list[str] | None = None,
 ):
     submision_dir = Path("submission")
     if not create_submission_dir(

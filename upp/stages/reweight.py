@@ -20,15 +20,15 @@ class Reweight:
         self.config = config
         self.rw_config = config.rw_config
         self.flavours = [f.name for f in config.components.flavours]
-        assert self.rw_config is not None, (
-            "Reweighting configuration is not set in the preprocessing config"
-        )
+        assert (
+            self.rw_config is not None
+        ), "Reweighting configuration is not set in the preprocessing config"
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert self.organised_components_config.exists(), (
-            f"Organised components config file not found: {self.organised_components_config}"
-        )
+        assert (
+            self.organised_components_config.exists()
+        ), f"Organised components config file not found: {self.organised_components_config}"
 
     @property
     def hists_path(self):
@@ -52,9 +52,9 @@ class Reweight:
             for f in files_by_flavour
         }
         for f, r in input_readers.items():
-            assert r.num_jets >= self.num_jets_estimate, (
-                f"Requested {self.num_jets_estimate} jets per flavour, but found {r.num_jets} jets in {f}."
-            )
+            assert (
+                r.num_jets >= self.num_jets_estimate
+            ), f"Requested {self.num_jets_estimate} jets per flavour, but found {r.num_jets} jets in {f}."
             print(
                 f"Flavour {f} has {r.num_jets} jets, reading in batches of {self.config.batch_size}."
             )
@@ -84,9 +84,9 @@ class Reweight:
         print(f"Calculating weights for {len(reweights)} reweights")
         readers = self.get_input_readers()
         for reader in readers:
-            assert reader.batch_size == readers[0].batch_size, (
-                "All readers must have the same batch size"
-            )
+            assert (
+                reader.batch_size == readers[0].batch_size
+            ), "All readers must have the same batch size"
         batch_size_per_file = readers[0].batch_size
         all_vars = {}
         existing_vars = {}
