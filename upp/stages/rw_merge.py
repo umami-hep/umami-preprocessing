@@ -30,9 +30,9 @@ class RWMerge:
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert self.organised_components_config.exists(), (
-            f"Organised components config file not found: {self.organised_components_config}"
-        )
+        assert (
+            self.organised_components_config.exists()
+        ), f"Organised components config file not found: {self.organised_components_config}"
 
         with open(self.organised_components_config) as f:
             organised_components = yaml.safe_load(f)
@@ -196,20 +196,21 @@ class RWMerge:
         skip_batches: int = 0,
         writer_id=0,
         limit_batches=False,
-        attrs={},
+        attrs=None,
     ):
         """Take a series of input files and merge them into a single final output file.
 
         Takes a series of input files, merges them into a single final output file,
         while also adding in the relevent weights.
         """
+        if attrs is None:
+            attrs = {}
         print("Writing weights to ", output_file, flush=True)
         print("The attrs are ", attrs)
         reader = H5Reader(
             **reader_kwargs,
         )
         batch_size = reader.batch_size
-
         # reader = H5Reader(input_file)
         # num_jets = reader.num_jets if N == -1 else N
         writer: H5Writer = None
@@ -220,7 +221,7 @@ class RWMerge:
 
         dtypes = {k: v.descr for k, v in reader.dtypes(variables).items()}
         if variables is None:
-            variables = {k: None for k in dtypes}
+            variables = {k: None for k in dtypes}  # type: ignore[misc]
 
         for group, rw_output_names in additional_vars.items():
             for rw_name in rw_output_names:

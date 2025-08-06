@@ -54,9 +54,9 @@ class TestRunRW:
         main(args)
         outpath = Path("tmp/upp-tests/integration/temp_workspace/split-components")
 
-        assert (outpath / "organised-components.yaml").exists(), (
-            "Organised components file not found"
-        )
+        assert (
+            outpath / "organised-components.yaml"
+        ).exists(), "Organised components file not found"
 
         for container in ["data1.h5", "data2.h5", "data3.h5"]:
             assert (outpath / container).exists()
@@ -111,9 +111,9 @@ class TestRunRW:
                 assert "jets" in f, "Expected 'jets' group in output file"
                 print("LOL", f.attrs, f["jets"].attrs, f["jets"].attrs.keys())
 
-                assert "flavour_label" in f["jets"].attrs, (
-                    "Expected 'flavour_label' attribute in 'jets' group of output file"
-                )
+                assert (
+                    "flavour_label" in f["jets"].attrs
+                ), "Expected 'flavour_label' attribute in 'jets' group of output file"
                 assert "flavour_label" in f["jets"].dtype.names
 
     def test_rw(self):

@@ -6,11 +6,12 @@ import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
 
 import h5py
 import numpy as np
 import yaml
+from ftag import Cuts
 from ftag.hdf5 import H5Reader
 from ftag.hdf5.h5writer import H5Writer
 from ftag.vds import create_virtual_file
@@ -174,12 +175,12 @@ class SplitContainers:
                 add_flavour_label=add_flavour_label,
             )
 
-            cuts_by_sample_components[split] = component_cuts
+            cuts_by_sample_components[split] = Cuts.from_list(component_cuts)
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
 
         if add_flavour_label:
             assert flavour_label_list is not None  # for mypy
-            flavour_label_by_component = {
+            _flavour_label_by_component = {
                 component: [
                     i for i, label in enumerate(flavour_label_list) if f"_{label}" in component
                 ]
@@ -187,11 +188,11 @@ class SplitContainers:
             }
 
             assert all(
-                len(flavour_label_by_component[component]) == 1 for component in sample_components
-            ), f"Each component must have exactly 1 flavour label not {flavour_label_by_component}"
-            flavour_label_by_component = {
-                component: flavour_label_by_component[component][0]
-                for component in flavour_label_by_component
+                len(_flavour_label_by_component[component]) == 1 for component in sample_components
+            ), f"Each component must have exactly 1 flavour label not {_flavour_label_by_component}"
+            flavour_label_by_component: dict[str, int] = {  # noqa: no-redef
+                component: _flavour_label_by_component[component][0]
+                for component in _flavour_label_by_component
             }
 
         for i, batch in enumerate(reader.stream(all_variables)):
@@ -263,7 +264,7 @@ class SplitContainers:
         print(message, flush=True)
 
     @contextmanager
-    def _make_tmp_vds(self, files: list[str] | str | Path) -> Path:
+    def _make_tmp_vds(self, files: list[str] | str | Path) -> Generator[Path, None, None]:
         with tempfile.TemporaryDirectory() as tmp:
             if not isinstance(files, list):
                 yield Path(files)
@@ -272,7 +273,8 @@ class SplitContainers:
             # Create a sum link for each h5 file such that we ensure they all exist in the same
             # directory
             for file in files:
-                (tmp_dir / file.name).symlink_to(file.resolve())
+                file_path = Path(file)
+                (tmp_dir / file_path.name).symlink_to(file_path.resolve())
 
             tmp_out_path = tmp_dir / "combined.h5"
             create_virtual_file(str(tmp_dir / "*.h5"), tmp_out_path, overwrite=True)
@@ -331,7 +333,6 @@ class SplitContainers:
 
             # Create a virtual dataset of all input files
             with self._make_tmp_vds(this_files) as input_file:
-                print(list(Path("/tmp/").glob("*")))
                 self.split_file(
                     input_file=input_file,
                     output_dir=this_out_dir,
