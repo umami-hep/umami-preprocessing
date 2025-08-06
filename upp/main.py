@@ -54,6 +54,13 @@ def parse_args(args):
         "--rw-merge", "--rwm", action=_st, default=None, help="Run the reweighting stage"
     )
     parser.add_argument(
+        "--rw-merge-idx",
+        "--rwm-idx",
+        type=str,
+        default=None,
+        help="Commar seperated pair of indices representing the range of output files to create, e.g '0,10' will create files 0 to 9",
+    )
+    parser.add_argument(
         "--component", default=None, help="Component which is processed during --prep"
     )
     parser.add_argument(
@@ -124,7 +131,14 @@ def run_pp(args) -> None:
         merging = Merging(config)
         merging.run()
     if args.rw_merge:
-        rw_merge = RWMerge(config)
+        if args.rw_merge_idx:
+            rw_merge_idx = args.rw_merge_idx
+            assert "," in rw_merge_idx, "rw-merge-idx must be a comma-separated pair of indices"
+            rw_merge_idx = tuple(map(int, rw_merge_idx.split(",")))
+            assert len(rw_merge_idx) == 2, "rw-merge-idx must be a pair of indices"
+        else:
+            rw_merge_idx = None
+        rw_merge = RWMerge(config, rw_merge_idx)
         rw_merge.run()
 
     # run the normalisation

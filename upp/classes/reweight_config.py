@@ -45,7 +45,7 @@ class SingleReweightConfig:
                 b = b[1:]
             flat_bins.append(b)
         if self.add_overflow:
-            flat_bins = [np.concatenate(([-np.inf], b, [np.inf])) for b in flat_bins]
+            flat_bins = [np.array([(-np.inf)])] + flat_bins + [np.array([(np.inf)])]
         return np.concatenate(flat_bins)
 
     @property
