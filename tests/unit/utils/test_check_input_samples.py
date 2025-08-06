@@ -22,10 +22,7 @@ def test_parse_args_defaults(tmp_path):
 
 class TestCheckWithinFactor:
     def test_ok_small_spread(self):
-        groups = {
-            "grp": {"a": 100, "b": 120, "c": 110},
-        }
-        # Should not raise with a relaxed factor
+        groups = {"grp": {"a": 100, "b": 120, "c": 110}}
         cis.check_within_factor(groups, factor=2.0)
 
     def test_zero_raises(self):
@@ -42,7 +39,6 @@ class TestCheckWithinFactor:
 
 
 def test_run_input_sample_check_builds_groups_and_reads(monkeypatch, tmp_path):
-    # Fake logger with no-ops
     class _Log:
         def info(self, *_a, **_k):
             pass
@@ -52,19 +48,21 @@ def test_run_input_sample_check_builds_groups_and_reads(monkeypatch, tmp_path):
 
     monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
 
-    # Fake H5Reader that returns a configurable num_jets
     class _H5:
-        def __init__(self, fname, _batch_size, _jets_name):
-            # keep args to inspect if desired
-            self.fname = fname
-            self.num_jets = 100 if "000001" in str(fname) else 110 if "000002" in str(fname) else 50
+        def __init__(self, **kwargs):
+            fname = kwargs["fname"]
+            # Distinguish by filename
+            if "000001" in str(fname):
+                self.num_jets = 100
+            elif "000002" in str(fname):
+                self.num_jets = 110
+            else:
+                self.num_jets = 50
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
-    # Build a minimal fake PreprocessingConfig
     class _Cfg:
         def __init__(self, ntuple_dir: Path):
-            # config structure with a single block containing patterns
             self.config = {
                 "blockA": {
                     "pattern": [
@@ -78,8 +76,6 @@ def test_run_input_sample_check_builds_groups_and_reads(monkeypatch, tmp_path):
             self.jets_name = "jets"
 
     cfg = _Cfg(tmp_path)
-
-    # Should not raise with a generous factor
     cis.run_input_sample_check(config=cfg, deviation_factor=5.0, verbose=True)
 
 
@@ -94,8 +90,8 @@ def test_run_input_sample_check_raises_on_spread(monkeypatch, tmp_path):
     monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
 
     class _H5:
-        def __init__(self, fname, _batch_size, _jets_name):
-            # Create a big spread
+        def __init__(self, **kwargs):
+            fname = kwargs["fname"]
             self.num_jets = 1 if "low" in str(fname) else 1000
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
@@ -115,7 +111,6 @@ def test_run_input_sample_check_raises_on_spread(monkeypatch, tmp_path):
             self.jets_name = "jets"
 
     cfg = _Cfg(tmp_path)
-
     with pytest.raises(ValueError):
         cis.run_input_sample_check(config=cfg, deviation_factor=2.0, verbose=False)
 
@@ -131,7 +126,7 @@ def test_run_input_sample_check_accepts_string_pattern(monkeypatch, tmp_path):
     monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
 
     class _H5:
-        def __init__(self, _fname, _batch_size, _jets_name):
+        def __init__(self, **_kwargs):
             self.num_jets = 42
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
