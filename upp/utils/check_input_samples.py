@@ -30,7 +30,7 @@ def parse_args(args: Any) -> argparse.Namespace:
         formatter_class=HelpFormatter,
     )
     parser.add_argument(
-        "--config",
+        "--config_path",
         required=True,
         type=valid_path,
         help="Path to config file",
@@ -168,9 +168,11 @@ def run_input_sample_check(
         patterns = sample_list.get("pattern", [])
         if isinstance(patterns, str):
             patterns = [patterns]
-
-        elif not isinstance(patterns, list):
+        elif isinstance(patterns, list):
+            pass
+        else:
             log.error(f"Unsupported type for 'pattern' in {sample_type}: {type(patterns)}")
+            sample_type_dict[sample_type] = {}
             continue
 
         # Loop over the different samples in the category

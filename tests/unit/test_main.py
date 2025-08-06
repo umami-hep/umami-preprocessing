@@ -33,6 +33,7 @@ def test_parse_args_with_config(config_file):
         split="val",
         component=None,
         region=None,
+        skip_sample_check=False,
     )
 
     assert parsed_args == expected_args
@@ -51,6 +52,7 @@ def test_parse_args_flags_not_given(config_file):
         split="train",
         component=None,
         region=None,
+        skip_sample_check=False,
     )
     assert parsed_args == expected_args
 
@@ -80,6 +82,7 @@ def test_parse_args_flags_negative(config_file):
         split="train",
         component=None,
         region=None,
+        skip_sample_check=False,
     )
 
     assert parsed_args == expected_args
@@ -107,6 +110,7 @@ def test_parse_args_flags_positive(config_file):
         split="train",
         component=None,
         region=None,
+        skip_sample_check=False,
     )
 
     assert parsed_args == expected_args
@@ -136,6 +140,7 @@ def test_parse_args_component(config_file):
         split="train",
         component="lowpt_ttbar_ujets",
         region=None,
+        skip_sample_check=False,
     )
 
     assert parsed_args == expected_args
@@ -165,6 +170,7 @@ def test_parse_args_region(config_file):
         split="train",
         component=None,
         region="lowpt",
+        skip_sample_check=False,
     )
 
     assert parsed_args == expected_args

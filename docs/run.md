@@ -49,8 +49,9 @@ preprocess --config configs/config.yaml --no-plot
 The stages are described below.
 
 #### 1. Prepare
-The prepare stage (`--prep`) reads a specified number of jets (`num_jets_estimate_hist`) for each flavor and constructs histograms of the resampling variables.
-These histograms are stored in `<base_dir>/hists`.
+The prepare stage (`--prep`) checks first the number of inital jets that are available per group/sample. For each of the entries in the `pattern` of the group, it checks how many jets are in total available. If this differs too much between the entries in `pattern`, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in `pattern` are different MC campaigns and by using drastically different numbers of initial jets, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument `--skip-sample-check`. If you run the script the first time and you want to run the prepare stage in parallel, please let this script run first! It creates virtual datasets for each entry in `pattern` which could become corrupted if you do run this script in parallel multiple times! Instructions on how to run this check stand-alone can be found in [here](#additional-scripts-initial-sample-check).
+
+Afterwards, the prepare stage reads a specified number of jets (`num_jets_estimate_hist`) for each flavor and constructs histograms of the resampling variables. These histograms are stored in `<base_dir>/hists`.
 
 ???info "Paralellisation"
     This step can be paralellised to speed up the histogram creation. To do so, you need to provide the additional `--component` flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the `components` part of the config file. As an example, we take the `ghost-highstat.yaml` config file from the `gn3` folder in `configs/`:
@@ -132,3 +133,14 @@ The normalise stage (`--norm`) calculates scaling and shifting values for all va
 
 The plotting stage (`--plot`) produces histograms of resampled variables to verify the resampling quality.
 You can find these plots in `<tbase_dir>/plots/`.
+
+### Additional Scripts: Initial Sample Check
+
+The check for the inital samples from the prepare stage can also be run stand-alone. This is important if you plan to run in parallel mode. To do so, you can simply use the following command:
+
+```bash
+check_input_samples --config_path <path/to/your/config>
+```
+
+You can also add the `--deviation-factor`, which is by default `10.0` and the `--verbose` flags. The latter will print the number of inital jets to your terminal.
+
