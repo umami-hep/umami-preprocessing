@@ -23,6 +23,7 @@ from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
 from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
+from upp.utils.check_input_samples import run_input_sample_check
 from upp.utils.logger import setup_logger
 
 
@@ -90,11 +91,19 @@ def run_pp(args: argparse.Namespace) -> None:
     config = PreprocessingConfig.from_file(args.config, args.split)
 
     # create virtual datasets and pdf files
-    if args.prep and args.split == "train":
-        create_histograms(
+    if args.prep:
+        # Check the input samples sizes
+        run_input_sample_check(
             config=config,
-            component_to_run=args.component,
+            deviation_factor=10.0,
+            verbose=True,
         )
+
+        if args.split == "train":
+            create_histograms(
+                config=config,
+                component_to_run=args.component,
+            )
 
     # run the resampling
     if args.resample:
