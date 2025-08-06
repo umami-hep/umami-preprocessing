@@ -92,7 +92,8 @@ class Reweight:
         existing_vars = {}
         with h5py.File(readers[0].fname[0], "r") as f:
             for group in f.keys():
-                existing_vars[group] = list(f[group].dtype.names)
+                if isinstance(f[group], h5py.Dataset):
+                    existing_vars[group] = list(f[group].dtype.names)
 
         rw_groups = list(set([rw.group for rw in reweights]))
         print("Found rw groups : ", rw_groups)

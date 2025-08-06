@@ -120,9 +120,9 @@ def create_meta_data(
             ]
 
             vds = [f / "vds/vds.h5" for f in sel_containers]
-            assert all(f.exists() for f in vds), (
-                f"Not all VDS files exist for {split} {flavour}. Found: {vds}"
-            )
+            assert all(
+                f.exists() for f in vds
+            ), f"Not all VDS files exist for {split} {flavour}. Found: {vds}"
 
             files_by_component[split][flavour.name] = [str(f) for f in vds]
 

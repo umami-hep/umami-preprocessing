@@ -348,7 +348,7 @@ class SplitContainers:
                 continue
             for split in ["train", "val", "test"]:
                 for flavour in flavours:
-                    file = list(container.glob(f"*{split}*{flavour}*.h5"))
+                    file = list(container.glob(f"*{split}*_{flavour}*.h5"))
                     if len(file) == 0:
                         print("Could not find file for", container, split, flavour, flush=True)
                         continue
@@ -356,7 +356,7 @@ class SplitContainers:
                     if len(file) > 1:
                         raise FileExistsError(
                             f"Found multiple files for {container} {split} {flavour}. "
-                            "Please check the output directory."
+                            f"Please check the output directory. : {file}"
                         )
 
                     files[split][flavour].append(str(file[0]))
