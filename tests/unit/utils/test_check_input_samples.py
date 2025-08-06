@@ -1,6 +1,10 @@
 # === add to tests/unit/utils/test_check_input_samples.py ===
 from __future__ import annotations
 
+import argparse
+import runpy
+import sys
+import types
 from argparse import Namespace
 from pathlib import Path
 
@@ -135,3 +139,160 @@ def test_main_calls_pipeline_with_parsed_args(monkeypatch, tmp_path):
     assert isinstance(called["cfg"], _Cfg)
     assert called["df"] == 3.0
     assert called["v"] is True
+
+
+def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
+    """Covers line 198: entry_name = f"{dsid} / {rtag_to_campaign_dict.get(rtag)}"."""
+    import upp.utils.check_input_samples as cis
+
+    class _Log:
+        def info(self, *_a, **_k):
+            pass
+
+        def error(self, *_a, **_k):
+            pass
+
+    monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
+
+    # H5Reader stub
+    class _H5:
+        def __init__(self, **_kwargs):
+            self.num_jets = 10
+
+    monkeypatch.setattr(cis, "H5Reader", _H5)
+
+    # Spy to capture the fully built groups dict passed to the checker
+    captured = {}
+
+    def _spy_check_within_factor(*, groups, **_kwargs):
+        captured.update(groups)
+
+    monkeypatch.setattr(cis, "check_within_factor", _spy_check_within_factor)
+
+    # Pattern has DSID and rtag -> should map r13167 -> MC20a
+    class _Cfg:
+        def __init__(self, ntuple_dir: Path):
+            self.config = {"block": {"pattern": ["x.123456.y_r13167.z.h5"]}}
+            self.ntuple_dir = ntuple_dir
+            self.batch_size = 1
+            self.jets_name = "jets"
+
+    cfg = _Cfg(tmp_path)
+    cis.run_input_sample_check(config=cfg, deviation_factor=10.0, verbose=False)
+
+    # Assert the constructed key used the r-tag mapping
+    keys = list(captured["block"].keys())
+    assert len(keys) == 1
+    assert keys[0].startswith("123456 / MC20a")
+
+
+def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
+    """Covers line 201: entry_name = f"{sample} / {rtag_to_campaign_dict.get(rtag)}"."""
+    import upp.utils.check_input_samples as cis
+
+    class _Log:
+        def info(self, *_a, **_k):
+            pass
+
+        def error(self, *_a, **_k):
+            pass
+
+    monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
+
+    class _H5:
+        def __init__(self, **_kwargs):
+            self.num_jets = 10
+
+    monkeypatch.setattr(cis, "H5Reader", _H5)
+
+    captured = {}
+
+    def _spy_check_within_factor(*, groups, **_kwargs):
+        captured.update(groups)
+
+    monkeypatch.setattr(cis, "check_within_factor", _spy_check_within_factor)
+
+    # Pattern has rtag but no 6-digit DSID between dots
+    sample = "user.sample.no_dsid_r13167.h5"
+
+    class _Cfg:
+        def __init__(self, ntuple_dir: Path):
+            self.config = {"block": {"pattern": [sample]}}
+            self.ntuple_dir = ntuple_dir
+            self.batch_size = 1
+            self.jets_name = "jets"
+
+    cfg = _Cfg(tmp_path)
+    cis.run_input_sample_check(config=cfg, deviation_factor=10.0, verbose=False)
+
+    keys = list(captured["block"].keys())
+    assert len(keys) == 1
+    # Key should start with the original sample name + mapped campaign
+    assert keys[0].startswith(f"{sample} / MC20a")
+
+
+def test_script_entry_point_executes_main(tmp_path):
+    """Executes the module as a script to cover the `if __name__ == '__main__': main()` line."""
+    # Build fake external modules the script imports
+    fake_cli_utils = types.ModuleType("ftag.cli_utils")
+    fake_cli_utils.valid_path = lambda p: Path(p)
+    fake_cli_utils.HelpFormatter = argparse.HelpFormatter
+
+    fake_hdf5 = types.ModuleType("ftag.hdf5")
+
+    class _H5:
+        def __init__(self, **_kwargs):
+            self.num_jets = 1
+
+    fake_hdf5.H5Reader = _H5
+
+    fake_ppcfg = types.ModuleType("upp.classes.preprocessing_config")
+
+    class _Cfg:
+        def __init__(self):
+            self.config = {}
+            self.ntuple_dir = tmp_path
+            self.batch_size = 1
+            self.jets_name = "jets"
+
+        @classmethod
+        def from_file(cls, *_a, **_k):  # signature compatible
+            return _Cfg()
+
+    fake_ppcfg.PreprocessingConfig = _Cfg
+
+    fake_logger = types.ModuleType("upp.utils.logger")
+
+    class _Log:
+        def info(self, *_a, **_k):
+            pass
+
+        def error(self, *_a, **_k):
+            pass
+
+    fake_logger.setup_logger = lambda: _Log()
+
+    # Inject fakes into sys.modules so the script can import them
+    sys.modules["ftag"] = types.ModuleType("ftag")  # namespace package placeholder
+    sys.modules["ftag.cli_utils"] = fake_cli_utils
+    sys.modules["ftag.hdf5"] = fake_hdf5
+    sys.modules["upp"] = types.ModuleType("upp")
+    sys.modules["upp.classes"] = types.ModuleType("upp.classes")
+    sys.modules["upp.classes.preprocessing_config"] = fake_ppcfg
+    sys.modules["upp.utils"] = types.ModuleType("upp.utils")
+    sys.modules["upp.utils.logger"] = fake_logger
+
+    # Provide a fake parse_args inside the script execution context
+    # We'll override it via init_globals after the file loads.
+    # Easiest is to point runpy at the actual file and intercept parse_args after import.
+    file_path = Path(cis.__file__)  # path to the current module file
+    # Run the file as __main__ so the guard executes
+    # The module defines parse_args itself, so we also seed argv via sys.argv
+    old_argv = sys.argv[:]
+    try:
+        cfg_path = tmp_path / "cfg.yaml"
+        cfg_path.write_text("")  # valid file for valid_path
+        sys.argv = [str(file_path), "--config_path", str(cfg_path)]
+        runpy.run_path(str(file_path), run_name="__main__")
+    finally:
+        sys.argv = old_argv
