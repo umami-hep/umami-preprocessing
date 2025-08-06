@@ -19,7 +19,7 @@ class Reweight:
     def __init__(self, config: PreprocessingConfig):
         self.config = config
         self.rw_config = config.rw_config
-        self.flavours = config.components.flavours
+        self.flavours = [f.name for f in config.components.flavours]
         assert self.rw_config is not None, (
             "Reweighting configuration is not set in the preprocessing config"
         )
@@ -334,8 +334,18 @@ class Reweight:
 
                         var1_bin_idx = rw_vars.index(var1)
                         var2_bin_idx = rw_vars.index(var2)
-                        var1_bin_edges = bins[f"bin_{var1_bin_idx}"][:]
-                        var2_bin_edges = bins[f"bin_{var2_bin_idx}"][:]
+
+                        def sanitize_edges(edges, eps=1e-3):
+                            """Replace -inf and inf in bin edges with finite values."""
+                            edges = np.array(edges, dtype=np.float64)
+                            if np.isneginf(edges[0]):
+                                edges[0] = edges[1] - eps * abs(edges[1])
+                            if np.isposinf(edges[-1]):
+                                edges[-1] = edges[-2] + eps * abs(edges[-2])
+                            return edges
+
+                        var1_bin_edges = sanitize_edges(bins[f"bin_{var1_bin_idx}"][:])
+                        var2_bin_edges = sanitize_edges(bins[f"bin_{var2_bin_idx}"][:])
 
                         w = weights[cls]
                         w = np.moveaxis(w, [var1_bin_idx, var2_bin_idx], [0, 1])

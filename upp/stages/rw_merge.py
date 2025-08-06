@@ -108,7 +108,6 @@ def do_merge_with_weights(
     reader = H5Reader(
         **reader_kwargs,
     )
-    print(reader)
     batch_size = reader.batch_size
 
     # reader = H5Reader(input_file)
@@ -187,9 +186,12 @@ def start_mp(
 
 
 class RWMerge:
-    def __init__(self, config: PreprocessingConfig):
+    def __init__(self, config, outfile_idx_range=None):
         self.config = config
         self.rw_config = config.rw_config
+        if outfile_idx_range is not None:
+            assert isinstance(outfile_idx_range, tuple) and len(outfile_idx_range) == 2
+        self.outfile_idx_range = outfile_idx_range
 
         self.hists_file = self.config.out_dir / "histograms.h5"
         assert self.hists_file.exists(), f"Histograms file not found: {self.hists_file}"
@@ -214,7 +216,7 @@ class RWMerge:
         )
         total_jets = sum(num_jets_per_flavours.values())
 
-        batch_size = 5000
+        batch_size = 250_000
         reader_kwargs = {
             "fname": all_files,
             "batch_size": batch_size,
@@ -227,7 +229,8 @@ class RWMerge:
         num_batches = total_jets // batch_size + (1 if total_jets % num_jets_per_file != 0 else 0)
 
         variables = self.config.variables.combined() if self.config.split != "test" else None
-
+        if variables and "flavour_label" not in variables:
+            variables["jets"] += ["flavour_label"]
         args_list = []
         for i, bi in enumerate(range(0, num_batches, batches_per_file)):
             args_list.append(
@@ -244,6 +247,7 @@ class RWMerge:
                     else (num_batches - bi),
                 )
             )
+        print("Running with ", self.rw_config.merge_num_proc, "processes")
 
         start_mp(
             do_merge_with_weights,
