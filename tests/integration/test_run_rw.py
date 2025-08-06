@@ -47,9 +47,9 @@ class TestRunRW:
         main(args)
         outpath = Path("tmp/upp-tests/integration/temp_workspace/split-components")
 
-        assert (outpath / "organised-components.yaml").exists(), (
-            "Organised components file not found"
-        )
+        assert (
+            outpath / "organised-components.yaml"
+        ).exists(), "Organised components file not found"
 
         for container in ["data1.h5", "data2.h5", "data3.h5"]:
             assert (outpath / container).exists()
@@ -61,9 +61,9 @@ class TestRunRW:
                 for flavour in ["bjets", "cjets", "ujets", "taujets"]
             ]
             for exp_file in exp_files:
-                assert (outpath / container / exp_file).exists(), (
-                    f"Expected file {exp_file} not found in {outpath} : Contains {os.listdir(outpath / container)}"
-                )
+                assert (
+                    outpath / container / exp_file
+                ).exists(), f"Expected file {exp_file} not found in {outpath} : Contains {os.listdir(outpath / container)}"
 
     def _calculate_weights(self):
         args = [
