@@ -77,7 +77,6 @@ class TestPreprocessingConfig:
 
     @staticmethod
     def test_get_input_files_with_split_components():
-
         config = PreprocessingConfig.from_file(
             CFG_DIR / "test_config_rw.yaml",
             "train",
@@ -86,6 +85,4 @@ class TestPreprocessingConfig:
         containers_with_cuts = config.get_input_files_with_split_components()
         # TODO do the full check
 
-        assert all(
-            c in containers_with_cuts for c in ['data1.h5', 'data2.h5', 'data3.h5']
-        )
+        assert all(c in containers_with_cuts for c in ["data1.h5", "data2.h5", "data3.h5"])

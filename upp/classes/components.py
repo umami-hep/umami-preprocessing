@@ -318,9 +318,9 @@ class Components:
         component_list = []
         for component in config.config["components"]:
             # Ensure equal_jets flag is correctly set
-            assert "equal_jets" not in component, (
-                "equal_jets flag should be set in the sample config"
-            )
+            assert (
+                "equal_jets" not in component
+            ), "equal_jets flag should be set in the sample config"
 
             # Get the region cuts
             region_cuts = (
