@@ -198,15 +198,8 @@ def submit(
             get_output_ds_name(dataset, rucio_user, output_name, output_ds),
             "--exec",
             exec,
-            # The merge didn't seem to work for me
-            # "--mergeScript",
-            # (
-            #     "./myenv/bin/python ftag_rw/split/merge-diff-files-components.py "
-            #     "--config {} --files %IN"
-            # ).format(config_file),
             "--mergeScript",
             "hdf5-merge-nolock -o %OUT -i %IN",
-            # "--athenaTag=Athena,main,latest",
             "--forceStaged",
             "--forceStagedSecondary",
             "--useAthenaPackages",
