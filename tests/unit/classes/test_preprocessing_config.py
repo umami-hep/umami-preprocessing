@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from dotmap import DotMap
-from ftag import get_mock_file
+from ftag import Extended_Flavours, Flavours, LabelContainer, get_mock_file
 
 from upp.classes.preprocessing_config import PreprocessingConfig
 
@@ -84,3 +84,63 @@ class TestPreprocessingConfig(unittest.TestCase):
         # Invalid case
         with self.assertRaises(ValueError):
             config.get_file_name("invalid_stage")
+
+    def test_not_existing_dir(self) -> None:
+        with self.assertRaises(FileNotFoundError) as ctx:
+            PreprocessingConfig(
+                config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+                split="train",
+                config={
+                    "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                    "components": [],
+                    "variables": {"jets": {"labels": ["test"]}},
+                },
+                base_dir=Path("/tmp/error/"),
+            )
+
+        self.assertEqual("Path /tmp/error/ntuples does not exist", str(ctx.exception))
+
+    def test_standard_flavour_config(self) -> None:
+        config = PreprocessingConfig(
+            config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+            split="train",
+            config={
+                "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+            flavour_category="standard",
+        )
+        self.assertEqual(config.flavour_cont, Flavours)
+
+    def test_extended_flavour_config(self) -> None:
+        config = PreprocessingConfig(
+            config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+            split="train",
+            config={
+                "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+            flavour_category="extended",
+        )
+        self.assertEqual(config.flavour_cont, Extended_Flavours)
+
+    def test_separate_flavour_config(self) -> None:
+        config = PreprocessingConfig(
+            config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+            split="train",
+            config={
+                "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+            flavour_config=self.CFG_DIR / "test_flavour_config.yaml",
+        )
+        self.assertEqual(
+            config.flavour_cont,
+            LabelContainer.from_yaml(yaml_path=self.CFG_DIR / "test_flavour_config.yaml"),
+        )
