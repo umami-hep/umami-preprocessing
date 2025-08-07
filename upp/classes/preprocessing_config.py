@@ -10,7 +10,7 @@ from typing import Any, Literal
 
 import yaml
 from dotmap import DotMap
-from ftag import Cuts
+from ftag import Cuts, Extended_Flavours, Flavours
 from ftag.git_check import get_git_hash
 from ftag.labels import LabelContainer
 from ftag.track_selector import TrackSelector
@@ -105,6 +105,10 @@ class PreprocessingConfig:
         Name of the jets dataset in the input file. By default "jets".
     flavour_config : Path | None, optional
         Flavour config yaml file which is to be used. By default None
+    flavour_category : str, optional
+        Flavour categories that are to be used. By default, the "standard" (non-extended)
+        labels are loaded. The extended labels can be used by setting this value to "extended".
+        By default "standard". To use this option, flavour_config must be None.
     num_jets_per_output_file : int | None, optional
         Number of jets per final output file. If the number of total jets is larger
         than this number, the final h5 output files are splitted in multiple smaller
@@ -131,6 +135,7 @@ class PreprocessingConfig:
     merge_test_samples: bool = False
     jets_name: str = "jets"
     flavour_config: Path | None = None
+    flavour_category: str = "standard"
     num_jets_per_output_file: int | None = None
     skip_config_copy: bool = False
 
@@ -153,7 +158,25 @@ class PreprocessingConfig:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
         self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
-        self.flavour_cont = LabelContainer.from_yaml(self.flavour_config)
+
+        # Define the content of the flavour label container
+        if self.flavour_config:
+            self.flavour_cont = LabelContainer.from_yaml(
+                yaml_path=self.flavour_config,
+            )
+
+        elif self.flavour_category == "standard":
+            self.flavour_cont = Flavours
+
+        elif self.flavour_category == "extended":
+            self.flavour_cont = Extended_Flavours
+
+        else:
+            raise ValueError(
+                f"flavour_category {self.flavour_category} is not supported in the default "
+                "flavours! If you want to use your own flavour config yaml file, please "
+                "provide flavour_config!"
+            )
 
         # configure classes
         sampl_cfg = copy(self.config["resampling"])

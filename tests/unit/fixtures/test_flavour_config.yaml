@@ -1,0 +1,25 @@
+# single b-tagging
+- name: bjets
+  label: $b$-jets
+  cuts: ["HadronConeExclTruthLabelID == 5"]
+  colour: tab:blue
+  category: single-btag
+  _px: pb
+- name: cjets
+  label: $c$-jets
+  cuts: ["HadronConeExclTruthLabelID == 4"]
+  colour: tab:orange
+  category: single-btag
+  _px: pc
+- name: ujets
+  label: Light-jets
+  cuts: ["HadronConeExclTruthLabelID == 0"]
+  colour: tab:green
+  category: single-btag
+  _px: pu
+- name: taujets
+  label: $\tau$-jets
+  cuts: ["HadronConeExclTruthLabelID == 15"]
+  colour: tab:purple
+  category: single-btag
+  _px: ptau
