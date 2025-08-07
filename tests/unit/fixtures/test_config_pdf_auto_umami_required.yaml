@@ -32,35 +32,35 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets]
+    flavours: [singlebjets]
     num_jets: 7_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [cjets]
+    flavours: [singlecjets]
     num_jets: 7_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ ujets]
+    flavours: [ujets]
     num_jets: 7_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [bjets]
+    flavours: [singlebjets]
     num_jets: 3_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [cjets]
+    flavours: [singlecjets]
     num_jets: 3_000
 
   - region:
@@ -71,7 +71,7 @@ components:
     num_jets: 3_000
 
 resampling:
-  target: bjets
+  target: singlebjets
   method: pdf
   sampling_fraction: "auto"
   variables:
@@ -85,6 +85,7 @@ global:
   num_jets_estimate: 5000
   base_dir: /tmp/upp-tests/integration/temp_workspace/
   out_dir: test_out
+  flavour_category: extended
 
 variables:
   jets:
