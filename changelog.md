@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+### [v0.2.6](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.6) (07.08.2025)
+
 - Update atlas-ftag-tools and puma [#109](https://github.com/umami-hep/umami-preprocessing/pull/109)
 - Adding Sample Check in prepare Stage [#108](https://github.com/umami-hep/umami-preprocessing/pull/108)
 - Adding init functions and general clean-up [#107](https://github.com/umami-hep/umami-preprocessing/pull/107)
