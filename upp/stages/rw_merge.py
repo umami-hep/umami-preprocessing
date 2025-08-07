@@ -125,18 +125,32 @@ class RWMerge:
         return this_weights
 
     @staticmethod
-    def get_sample_weights(batch, calculated_weights):
+    def get_sample_weights(
+        batch: dict[str, np.ndarray], calculated_weights: dict[str, dict]
+    ) -> dict[str, np.ndarray]:
         """Get sample weights.
 
         Parameters
         ----------
-        batch : dict
+        batch : dict[str, np.ndarray]
             A dictionary of numpy arrays, where the keys are the group names
             and the values are the structured arrays of the data
-        calculated_weights : dict
+        calculated_weights : dict[str, dict]
             A dictionary of the calculated weights, as returned by `calculate_weights`
+
+        Returns
+        -------
+        dict[str, np.ndarray]
+            A dictionary of numpy arrays, where the keys are the group names
+            and the values are the structured arrays of the weights
+
+        Raises
+        ------
+        Exception
+            If there is an error in the calculation of the weights.
+
         """
-        sample_weights = {}
+        sample_weights: dict[str, dict] = {}
         for group, reweights in calculated_weights.items():
             if group not in sample_weights:
                 sample_weights[group] = {}

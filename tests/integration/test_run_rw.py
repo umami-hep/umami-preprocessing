@@ -26,11 +26,11 @@ class TestRunRW:
         self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5")
         self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data2.h5")
         self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data3.h5")
-        print("setup_method      method:%s" % method.__name__)
+        print(f"setup_method method: {method.__name__}")
 
     def teardown_method(self, method):
         subprocess.run(["rm", "-r", "tmp"], check=True)
-        print("teardown_method   method:%s" % method.__name__)
+        print(f"teardown_method method: {method.__name__}")
 
     @property
     def no(self):

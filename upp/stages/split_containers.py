@@ -24,7 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 # TODO move these to some util place
-def get_all_datasets(file) -> dict[str, None]:
+def get_all_datasets(file: Path | str) -> dict[str, None]:
     """Return a dictionary with all the groups in the h5 file.
 
     Parameters
@@ -42,8 +42,8 @@ def get_all_datasets(file) -> dict[str, None]:
         return {dset: None for dset in f if isinstance(f[dset], h5py.Dataset)}
 
 
-def get_all_vars(file) -> list[str]:
-    """Return a dictionary with all the groups in the h5 file.
+def get_all_vars(file: Path | str) -> list[str]:
+    """Return a list with all the variables in all datasets in the h5 file.
 
     Parameters
     ----------
@@ -52,9 +52,8 @@ def get_all_vars(file) -> list[str]:
 
     Returns
     -------
-    dict[str, None]
-        A dictionary with all the groups in the h5 file as keys and None as values,
-        such that h5read.stream(all_groups) will return all the groups in the file.
+    list[str]
+        A list with all the variables in all datasets in the h5 file.
     """
     with h5py.File(file, "r") as f:
         all_vars = []
@@ -67,7 +66,7 @@ def get_all_vars(file) -> list[str]:
         return all_vars
 
 
-def get_all_fp_vars(file):
+def get_all_fp_vars(file: Path | str) -> list[str]:
     """Return a list of all the variables in the file that should be kept at full precision.
 
     Returns a list of all the variables in the file that should be kept at full precision -
