@@ -7,9 +7,9 @@ readme = "README.md"
 requires-python = "<3.12,>=3.8"
 
 dependencies = [
-  "atlas-ftag-tools==0.2.14",
+  "atlas-ftag-tools==0.2.15",
   "dotmap==1.3.30",
-  "puma-hep==0.4.9",
+  "puma-hep==0.4.10",
   "pyyaml-include==1.3",
   "PyYAML>=6.0.1",
   "rich==12.6.0",
