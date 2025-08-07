@@ -3,16 +3,16 @@ from __future__ import annotations
 import logging as log
 import random
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
-from upp.logger import ProgressBar
 from upp.stages.hist import bin_jets
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
+from upp.utils.logger import ProgressBar
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any, Generator
@@ -46,18 +46,6 @@ class Resampling:
     """Class for resampling of the different flavours/classes."""
 
     def __init__(self, config: PreprocessingConfig):
-        """Init of the Resampling class.
-
-        Parameters
-        ----------
-        config : PreprocessingConfig
-            Configured PreprocessingConfig class instance.
-
-        Raises
-        ------
-        ValueError
-            If the chosen resampling method is not supported.
-        """
         self.config = config.sampl_cfg
         self.components = config.components
         self.variables = config.variables
@@ -80,6 +68,9 @@ class Resampling:
         self.transform = config.transform
 
         self.rng = np.random.default_rng(42)
+
+        # Define what type self.target will be
+        self.target = cast("Component", None)
 
     def countup_select_func(self, jets: dict, component: Component) -> np.ndarray:
         """Countup resampling function.
@@ -210,7 +201,7 @@ class Resampling:
             Generator of the jets which are to be resampled.
         progress : Progress
             Progress bar instance for updating the shown progress bar.
-        selected_component : str, optional
+        selected_component : str | None, optional
             Compontent name that is to be resampled. By default None and all given
             components are resampled.
 
@@ -306,7 +297,7 @@ class Resampling:
             Components instance of all the components which are to be used.
         region : Region
             Region instance of the region which is to be resampled.
-        selected_component : str, optional
+        selected_component : str | None, optional
             Compontent name that is to be resampled. By default None and all given
             components are resampled.
 
@@ -572,7 +563,7 @@ class Resampling:
 
         Returns
         -------
-        typing.List[typing.List[int]]
+        list[list[int]]
             lengths of the binning regions in each variable from the config
         """
         num_bins = []
