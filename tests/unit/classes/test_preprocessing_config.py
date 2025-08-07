@@ -128,6 +128,27 @@ class TestPreprocessingConfig(unittest.TestCase):
         )
         self.assertEqual(config.flavour_cont, Extended_Flavours)
 
+    def test_unsupported_flavour_config(self) -> None:
+        with self.assertRaises(ValueError) as ctx:
+            PreprocessingConfig(
+                config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+                split="train",
+                config={
+                    "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                    "components": [],
+                    "variables": {"jets": {"labels": ["test"]}},
+                },
+                base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+                flavour_category="error",
+            )
+
+        self.assertEqual(
+            "flavour_category error is not supported in the default "
+            + "flavours! If you want to use your own flavour config yaml file, please "
+            + "provide flavour_config!",
+            str(ctx.exception),
+        )
+
     def test_separate_flavour_config(self) -> None:
         config = PreprocessingConfig(
             config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
