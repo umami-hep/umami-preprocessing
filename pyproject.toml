@@ -31,6 +31,7 @@ dev = [
 
 [project.scripts]
 preprocess = "upp.main:main"
+check_input_samples = "upp.utils.check_input_samples:main"
 
 [tool.setuptools]
 packages = ["upp", "upp.classes", "upp.stages", "upp.utils"]

@@ -21,7 +21,7 @@ from upp import __version__
 from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.variable_config import VariableConfig
-from upp.utils import path_append
+from upp.utils.tools import path_append
 
 # support inclusion of yaml files in the config dir
 YamlIncludeConstructor.add_to_loader_class(
@@ -110,6 +110,8 @@ class PreprocessingConfig:
         than this number, the final h5 output files are splitted in multiple smaller
         files with this number of jets per file. By default None which produces one
         huge output file.
+    skip_config_copy : bool, optional
+        Decide, if the config copying is skipped or not. By default False
     """
 
     config_path: Path
@@ -130,6 +132,7 @@ class PreprocessingConfig:
     jets_name: str = "jets"
     flavour_config: Path | None = None
     num_jets_per_output_file: int | None = None
+    skip_config_copy: bool = False
 
     def __post_init__(self):
         # postprocess paths
@@ -184,15 +187,22 @@ class PreprocessingConfig:
         self.config["upp_hash"] = self.git_hash
 
         # copy config
-        self.copy_config()
+        if not self.skip_config_copy:
+            self.copy_config()
 
     @classmethod
-    def from_file(cls, config_path: Path, split: Split):
+    def from_file(cls, config_path: Path, split: Split, skip_config_copy: bool = False):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
         with open(config_path) as file:
             config = yaml.safe_load(file)
-            return cls(config_path, split, config, **config["global"])
+            return cls(
+                config_path=config_path,
+                split=split,
+                config=config,
+                skip_config_copy=skip_config_copy,
+                **config["global"],
+            )
 
     def get_path(self, path: Path):
         return path if path.is_absolute() else (self.base_dir / path).absolute()
