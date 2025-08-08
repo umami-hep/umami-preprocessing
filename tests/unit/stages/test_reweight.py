@@ -29,16 +29,10 @@ class TestReweight:
                 "train": {
                     "bjets": [str(tmp_path / "bjets1.h5"), str(tmp_path / "bjets2.h5")],
                     "cjets": [str(tmp_path / "cjets1.h5"), str(tmp_path / "cjets2.h5")],
-                    "ujets": [str(tmp_path / "ujets1.h5"), str(tmp_path / "ujets2.h5")]
+                    "ujets": [str(tmp_path / "ujets1.h5"), str(tmp_path / "ujets2.h5")],
                 }
             },
-            "num_jets": {
-                "train": {
-                    "bjets": 10000,
-                    "cjets": 8000,
-                    "ujets": 12000
-                }
-            }
+            "num_jets": {"train": {"bjets": 10000, "cjets": 8000, "ujets": 12000}},
         }
 
         components_dir = tmp_path / "split-components"
@@ -54,10 +48,7 @@ class TestReweight:
     def mock_config(self, test_config_path, organised_components_file, tmp_path):
         """Create a real preprocessing config from test fixture."""
         config = PreprocessingConfig.from_file(
-            test_config_path,
-            "train",
-            skip_checks=True,
-            skip_config_copy=True
+            test_config_path, "train", skip_checks=True, skip_config_copy=True
         )
         # Override paths to use our temp directory
         config.base_dir = organised_components_file.parent.parent
@@ -76,10 +67,7 @@ class TestReweight:
     def test_init_no_rw_config(self, test_config_path, organised_components_file):
         """Test initialization fails when reweight config is None."""
         config = PreprocessingConfig.from_file(
-            test_config_path,
-            "train",
-            skip_checks=True,
-            skip_config_copy=True
+            test_config_path, "train", skip_checks=True, skip_config_copy=True
         )
         config.base_dir = organised_components_file.parent.parent
         config.rw_config = None
@@ -90,10 +78,7 @@ class TestReweight:
     def test_init_no_organised_components(self, test_config_path):
         """Test initialization fails when organised components file doesn't exist."""
         config = PreprocessingConfig.from_file(
-            test_config_path,
-            "train",
-            skip_checks=True,
-            skip_config_copy=True
+            test_config_path, "train", skip_checks=True, skip_config_copy=True
         )
         config.base_dir = Path("/nonexistent")
 
@@ -118,16 +103,13 @@ class TestReweight:
         weights_dict = {
             "jets": {
                 "weight_test": {
-                    "bins": [
-                        np.array([0, 1, 2, 3]),
-                        np.array([-1, 0, 1])
-                    ],
+                    "bins": [np.array([0, 1, 2, 3]), np.array([-1, 0, 1])],
                     "weights": {
                         "0": np.array([[1.0, 2.0], [3.0, 4.0]]),
-                        "1": np.array([[0.5, 1.5], [2.5, 3.5]])
+                        "1": np.array([[0.5, 1.5], [2.5, 3.5]]),
                     },
                     "rw_vars": ["pt", "eta"],
-                    "class_var": "flavour_label"
+                    "class_var": "flavour_label",
                 }
             }
         }
@@ -154,29 +136,25 @@ class TestReweight:
         # Verify data integrity
         assert len(loaded_data["bins"]) == 2
         np.testing.assert_array_equal(
-            loaded_data["bins"][0],
-            weights_dict["jets"]["weight_test"]["bins"][0]
+            loaded_data["bins"][0], weights_dict["jets"]["weight_test"]["bins"][0]
         )
         np.testing.assert_array_equal(
-            loaded_data["bins"][1],
-            weights_dict["jets"]["weight_test"]["bins"][1]
+            loaded_data["bins"][1], weights_dict["jets"]["weight_test"]["bins"][1]
         )
 
         assert loaded_data["rw_vars"] == ["pt", "eta"]
         assert loaded_data["class_var"] == "flavour_label"
 
         np.testing.assert_array_equal(
-            loaded_data["weights"]["0"],
-            weights_dict["jets"]["weight_test"]["weights"]["0"]
+            loaded_data["weights"]["0"], weights_dict["jets"]["weight_test"]["weights"]["0"]
         )
         np.testing.assert_array_equal(
-            loaded_data["weights"]["1"],
-            weights_dict["jets"]["weight_test"]["weights"]["1"]
+            loaded_data["weights"]["1"], weights_dict["jets"]["weight_test"]["weights"]["1"]
         )
 
-    @patch('upp.stages.reweight.Reweight.calculate_weights')
-    @patch('upp.stages.reweight.Reweight.save_weights_hdf5')
-    @patch('upp.stages.reweight.Reweight.plot_rw_histograms')
+    @patch("upp.stages.reweight.Reweight.calculate_weights")
+    @patch("upp.stages.reweight.Reweight.save_weights_hdf5")
+    @patch("upp.stages.reweight.Reweight.plot_rw_histograms")
     def test_run(self, mock_plot, mock_save, mock_calculate, mock_config):
         """Test the main run method."""
         # Mock return values
@@ -199,7 +177,7 @@ class TestReweight:
                     "bins": [np.array([0, 1, 2])],
                     "weights": {"0": np.array([1.0, 2.0])},
                     "rw_vars": ["pt"],
-                    "class_var": "flavour_label"
+                    "class_var": "flavour_label",
                 }
             }
         }
