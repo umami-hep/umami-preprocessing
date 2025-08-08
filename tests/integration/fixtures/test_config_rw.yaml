@@ -14,6 +14,7 @@ variables:
       - qOverP
     labels:
       - qOverP
+      - leptonID
 global_cuts: !include GN3V01/simple-split.yaml
 
 ttbar: &ttbar
@@ -75,6 +76,48 @@ reweighting:
           ]
         eta: [[-2.5, 2.5, 40]]
       class_var: flavour_label
+      class_target: mean
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: min
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: max
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: uniform
+    - group: tracks
+      reweight_vars: [deta]
+      bins:
+        deta: [[-1.0, 1.0, 50]]
+      class_var: leptonID
       class_target: mean
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
