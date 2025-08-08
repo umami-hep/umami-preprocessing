@@ -54,9 +54,9 @@ class TestRunRW:
         main(args)
         outpath = Path("tmp/upp-tests/integration/temp_workspace/split-components")
 
-        assert (outpath / "organised-components.yaml").exists(), (
-            "Organised components file not found"
-        )
+        assert (
+            outpath / "organised-components.yaml"
+        ).exists(), "Organised components file not found"
 
         for container in ["data1.h5", "data2.h5", "data3.h5"]:
             assert (outpath / container).exists()
@@ -87,9 +87,10 @@ class TestRunRW:
         assert hist_file, "Histograms file not found"
         with h5py.File(hist_file, "r") as f:
             print("the stuf?", f.keys())
-            assert f.keys() == {"jets", "tracks"}, (
-                f"Expected 'jets' key in histograms file only found {f.keys()}"
-            )
+            assert f.keys() == {
+                "jets",
+                "tracks",
+            }, f"Expected 'jets' key in histograms file only found {f.keys()}"
             jets = f["jets"]
             for dist_target in ["mean", "min", "max", "uniform"]:
                 rw_str = f"weight_jets_pt_eta_target_{dist_target}_flavour_label"
@@ -116,9 +117,9 @@ class TestRunRW:
                 assert "jets" in f, "Expected 'jets' group in output file"
                 print("LOL", f.attrs, f["jets"].attrs, f["jets"].attrs.keys())
 
-                assert "flavour_label" in f["jets"].attrs, (
-                    "Expected 'flavour_label' attribute in 'jets' group of output file"
-                )
+                assert (
+                    "flavour_label" in f["jets"].attrs
+                ), "Expected 'flavour_label' attribute in 'jets' group of output file"
                 assert "flavour_label" in f["jets"].dtype.names
 
     def test_rw(self):
