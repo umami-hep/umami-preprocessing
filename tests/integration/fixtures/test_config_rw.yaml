@@ -113,6 +113,30 @@ reweighting:
         eta: [[-2.5, 2.5, 40]]
       class_var: flavour_label
       class_target: uniform
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: [0, 1]
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: 0
     - group: tracks
       reweight_vars: [deta]
       bins:
