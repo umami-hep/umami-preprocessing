@@ -1,0 +1,76 @@
+variables: !include GN3V01/variables-ghost.yaml
+global_cuts: !include GN3V01/simple-split.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "data1.h5"
+    - "data3.h5"
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "data2.h5"
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [bjets, cjets, ujets, taujets]
+    num_jets: -1
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [bjets, cjets, ujets, taujets]
+    num_jets: -1
+
+resampling:
+  target: ghostcjets
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt_btagJes:
+      bins:
+        [
+          [20_000, 250_000, 46],
+          [250_000, 1_000_000, 30],
+          [1_000_000, 6_000_000, 20],
+        ]
+    absEta_btagJes:
+      bins: [[0, 2.5, 10]]
+
+reweighting:
+  num_jets_estimate: 100
+  merge_num_proc: 1
+  reweights:
+    - group: jets
+      reweight_vars: [pt_btagJes, absEta_btagJes]
+      bins:
+        pt_btagJes: [[20_000, 250_000, 5], [250_000, 1_000_000, 5]]
+        absEta_btagJes: [[0, 2.5, 5]]
+      class_var: flavour_label
+      class_target: mean
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 25_000_000
+  base_dir: /tmp/upp-tests/integration/temp_workspace/
+  out_dir: test_out
