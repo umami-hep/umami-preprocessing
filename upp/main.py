@@ -26,6 +26,7 @@ from upp.stages.resampling import Resampling
 from upp.stages.reweight import Reweight
 from upp.stages.rw_merge import RWMerge
 from upp.stages.split_containers import SplitContainers
+from upp.utils.check_input_samples import run_input_sample_check
 from upp.utils.logger import setup_logger
 
 
@@ -42,21 +43,82 @@ def parse_args(args: Any) -> argparse.Namespace:
     argparse.Namespace
         Namespace with the parsed command line arguments
     """
-    _st = "store_true"
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=HelpFormatter)
-    parser.add_argument("--config", required=True, type=valid_path, help="Path to config file")
-    parser.add_argument("--prep", action=_st, default=None, help="Estimate and write PDFs")
-    parser.add_argument("--no-prep", dest="prep", action="store_false")
-    parser.add_argument("--resample", action=_st, default=None, help="Run resampling")
-    parser.add_argument("--no-resample", dest="resample", action="store_false")
-    parser.add_argument("--merge", action=_st, default=None, help="Run merging")
-    parser.add_argument("--no-merge", dest="merge", action="store_false")
-    parser.add_argument("--norm", action=_st, default=None, help="Compute normalisations")
-    parser.add_argument("--no-norm", dest="norm", action="store_false")
-    parser.add_argument("--plot", action=_st, default=None, help="Plot output distributions")
-    parser.add_argument("--no-plot", dest="plot", action="store_false")
-    splits = ["train", "val", "test", "all"]
-    parser.add_argument("--split", default="train", choices=splits, help="Which file to produce")
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=HelpFormatter,
+    )
+    parser.add_argument(
+        "--config",
+        required=True,
+        type=valid_path,
+        help="Path to config file",
+    )
+    parser.add_argument(
+        "--prep",
+        action="store_true",
+        default=None,
+        help="Estimate and write PDFs",
+    )
+    parser.add_argument(
+        "--no-prep",
+        dest="prep",
+        action="store_false",
+    )
+    parser.add_argument(
+        "--resample",
+        action="store_true",
+        default=None,
+        help="Run resampling",
+    )
+    parser.add_argument(
+        "--no-resample",
+        dest="resample",
+        action="store_false",
+    )
+    parser.add_argument(
+        "--merge",
+        action="store_true",
+        default=None,
+        help="Run merging",
+    )
+    parser.add_argument(
+        "--no-merge",
+        dest="merge",
+        action="store_false",
+    )
+    parser.add_argument(
+        "--norm",
+        action="store_true",
+        default=None,
+        help="Compute normalisations",
+    )
+    parser.add_argument(
+        "--no-norm",
+        dest="norm",
+        action="store_false",
+    )
+    parser.add_argument(
+        "--plot",
+        action="store_true",
+        default=None,
+        help="Plot output distributions",
+    )
+    parser.add_argument(
+        "--no-plot",
+        dest="plot",
+        action="store_false",
+    )
+    parser.add_argument(
+        "--split",
+        default="train",
+        choices=["train", "val", "test", "all"],
+        help="Which file to produce",
+    )
+    parser.add_argument(
+        "--component",
+        default=None,
+        help="Component which is processed during --prep",
+    )
     parser.add_argument(
         "--split-components", action=_st, default=False, help="Split containers into components"
     )
@@ -77,10 +139,27 @@ def parse_args(args: Any) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--component", default=None, help="Component which is processed during --prep"
+        "--region",
+        default=None,
+        help="Region which is processed during --resample",
     )
     parser.add_argument(
-        "--region", default=None, help="Region which is processed during --resample"
+        "--skip-sample-check",
+        action="store_true",
+        help="Skip the inital input sample check",
+    )
+    parser.add_argument("--grid", action=_st, help="Use when running the split stage on the grid. ")
+    parser.add_argument(
+        "--container",
+        default=None,
+        type=str,
+        help="Container to use during the 'split-containers' stage. "
+        "If not specified, all containers in the config will be used.",
+    )
+    parser.add_argument(
+        "--files",
+        default=None,
+        help="comma-separated list of files to use during the 'split-containers' stage ",
     )
     parser.add_argument("--grid", action=_st, help="Use when running the split stage on the grid. ")
     parser.add_argument(
@@ -151,11 +230,20 @@ def run_pp(args: argparse.Namespace) -> None:
         reweight = Reweight(config)
         reweight.run()
     # create virtual datasets and pdf files
-    if args.prep and args.split == "train":
-        create_histograms(
-            config=config,
-            component_to_run=args.component,
-        )
+    if args.prep:
+        # Check the input samples sizes
+        if not args.skip_sample_check:
+            run_input_sample_check(
+                config=config,
+                deviation_factor=10.0,
+                verbose=True,
+            )
+
+        if args.split == "train":
+            create_histograms(
+                config=config,
+                component_to_run=args.component,
+            )
 
     # run the resampling
     if args.resample:

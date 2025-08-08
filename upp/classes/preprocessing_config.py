@@ -9,7 +9,7 @@ from typing import Any, Literal
 
 import yaml
 from dotmap import DotMap
-from ftag import Cuts
+from ftag import Cuts, Extended_Flavours, Flavours
 from ftag.git_check import get_git_hash
 from ftag.labels import LabelContainer
 from ftag.track_selector import TrackSelector
@@ -21,7 +21,7 @@ from upp.classes.components import Components
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.reweight_config import ReweightConfig
 from upp.classes.variable_config import VariableConfig
-from upp.utils import path_append
+from upp.utils.tools import path_append
 
 # support inclusion of yaml files in the config dir
 YamlIncludeConstructor.add_to_loader_class(
@@ -105,6 +105,10 @@ class PreprocessingConfig:
         Name of the jets dataset in the input file. By default "jets".
     flavour_config : Path | None, optional
         Flavour config yaml file which is to be used. By default None
+    flavour_category : str, optional
+        Flavour categories that are to be used. By default, the "standard" (non-extended)
+        labels are loaded. The extended labels can be used by setting this value to "extended".
+        By default "standard". To use this option, flavour_config must be None.
     num_jets_per_output_file : int | None, optional
         Number of jets per final output file. If the number of total jets is larger
         than this number, the final h5 output files are splitted in multiple smaller
@@ -112,6 +116,8 @@ class PreprocessingConfig:
         huge output file.
     skip_checks : bool, optional
         Skip checks for the input files. This is used for grid submission
+    skip_config_copy : bool, optional
+        Decide, if the config copying is skipped or not. By default False
     """
 
     config_path: Path
@@ -131,8 +137,10 @@ class PreprocessingConfig:
     merge_test_samples: bool = False
     jets_name: str = "jets"
     flavour_config: Path | None = None
+    flavour_category: str = "standard"
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
+    skip_config_copy: bool = False
 
     def __post_init__(self):
         # postprocess paths
@@ -154,22 +162,29 @@ class PreprocessingConfig:
         self.components_dir = self.components_dir / self.split
         self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
         self.flavour_cont = LabelContainer.from_yaml(self.flavour_config)
-
-        self.sampl_cfg = (
-            ResamplingConfig(
-                **self.config["resampling"],
+        # Define the content of the flavour label container
+        if self.flavour_config:
+            self.flavour_cont = LabelContainer.from_yaml(
+                yaml_path=self.flavour_config,
             )
-            if "resampling" in self.config
-            else None
-        )
-        if sampl_cfg := self.config.get("resampling", None):
-            if self.is_test:
-                sampl_cfg["method"] = None
-            self.sampl_cfg = ResamplingConfig(**sampl_cfg)
+
+        elif self.flavour_category == "standard":
+            self.flavour_cont = Flavours
+
+        elif self.flavour_category == "extended":
+            self.flavour_cont = Extended_Flavours
+
         else:
-            self.sampl_cfg = None
+            raise ValueError(
+                f"flavour_category {self.flavour_category} is not supported in the default "
+                "flavours! If you want to use your own flavour config yaml file, please "
+                "provide flavour_config!"
+            )
         # configure classes
-        # sampl_cfg = copy(self.config["resampling"])
+        sampl_cfg = copy(self.config["resampling"])
+        if self.is_test:
+            sampl_cfg["method"] = None
+        self.sampl_cfg = ResamplingConfig(**sampl_cfg)
         self.components = Components.from_config(self)
 
         # get track selectors
@@ -205,7 +220,8 @@ class PreprocessingConfig:
         self.config["upp_hash"] = self.git_hash
 
         # copy config
-        self.copy_config()
+        if not self.skip_config_copy:
+            self.copy_config()
 
     @classmethod
     def from_file(
@@ -213,12 +229,19 @@ class PreprocessingConfig:
         config_path: Path,
         split: Split,
         skip_checks=False,
-    ):
+    , skip_config_copy: bool = False):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
         with open(config_path) as file:
             config = yaml.safe_load(file)
-            return cls(config_path, split, config, **config["global"], skip_checks=skip_checks)
+            return cls(
+                config_path=config_path,
+                split=split,
+                config=config,
+                skip_config_copy=skip_config_copy,
+                **config["global"],
+                skip_checks=skip_checks,
+            )
 
     def get_path(self, path: Path):
         return path if path.is_absolute() else (self.base_dir / path).absolute()
