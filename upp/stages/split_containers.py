@@ -118,7 +118,7 @@ class SplitContainers:
         self,
         input_file: Path,
         output_dir: Path,
-        cuts_by_component: dict[str, list[str]],
+        cuts_by_component: dict[str, Cuts],
         batch_size: int = 1_00_000,
         limit_num_batches: int | None = None,
         verbose_freq: int = 1,
@@ -173,7 +173,8 @@ class SplitContainers:
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
             )
-            cuts_by_sample_components[split] = Cuts.from_list(component_cuts)
+            print("omg what? ", type(component_cuts), type(component_cuts[0]), flush=True)
+            cuts_by_sample_components[split] = component_cuts
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
 
         if add_flavour_label:
