@@ -173,7 +173,6 @@ class SplitContainers:
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
             )
-
             cuts_by_sample_components[split] = Cuts.from_list(component_cuts)
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
 

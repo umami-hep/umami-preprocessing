@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import logging as log
+from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
@@ -161,7 +162,6 @@ class PreprocessingConfig:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
         self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
-        self.flavour_cont = LabelContainer.from_yaml(self.flavour_config)
         # Define the content of the flavour label container
         if self.flavour_config:
             self.flavour_cont = LabelContainer.from_yaml(
@@ -181,10 +181,14 @@ class PreprocessingConfig:
                 "provide flavour_config!"
             )
         # configure classes
-        sampl_cfg = copy(self.config["resampling"])
-        if self.is_test:
-            sampl_cfg["method"] = None
-        self.sampl_cfg = ResamplingConfig(**sampl_cfg)
+        if sampl_cfg := self.config.get("resampling", None):
+            sampl_cfg = copy(sampl_cfg)
+            if self.is_test:
+                sampl_cfg["method"] = None
+            self.sampl_cfg = ResamplingConfig(**sampl_cfg)
+        else:
+            self.sampl_cfg = None
+
         self.components = Components.from_config(self)
 
         # get track selectors
@@ -225,11 +229,8 @@ class PreprocessingConfig:
 
     @classmethod
     def from_file(
-        cls,
-        config_path: Path,
-        split: Split,
-        skip_checks=False,
-    , skip_config_copy: bool = False):
+        cls, config_path: Path, split: Split, skip_checks=False, skip_config_copy: bool = False
+    ):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
         with open(config_path) as file:

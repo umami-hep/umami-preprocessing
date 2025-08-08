@@ -120,13 +120,16 @@ def parse_args(args: Any) -> argparse.Namespace:
         help="Component which is processed during --prep",
     )
     parser.add_argument(
-        "--split-components", action=_st, default=False, help="Split containers into components"
+        "--split-components",
+        action="store_true",
+        default=False,
+        help="Split containers into components",
     )
     parser.add_argument(
-        "--reweight", "--rw", action=_st, default=False, help="Run the reweighting stage"
+        "--reweight", "--rw", action="store_true", default=False, help="Run the reweighting stage"
     )
     parser.add_argument(
-        "--rw-merge", "--rwm", action=_st, default=False, help="Run the reweighting stage"
+        "--rw-merge", "--rwm", action="store_true", default=False, help="Run the reweighting stage"
     )
     parser.add_argument(
         "--rw-merge-idx",
@@ -148,20 +151,9 @@ def parse_args(args: Any) -> argparse.Namespace:
         action="store_true",
         help="Skip the inital input sample check",
     )
-    parser.add_argument("--grid", action=_st, help="Use when running the split stage on the grid. ")
     parser.add_argument(
-        "--container",
-        default=None,
-        type=str,
-        help="Container to use during the 'split-containers' stage. "
-        "If not specified, all containers in the config will be used.",
+        "--grid", action="store_true", help="Use when running the split stage on the grid. "
     )
-    parser.add_argument(
-        "--files",
-        default=None,
-        help="comma-separated list of files to use during the 'split-containers' stage ",
-    )
-    parser.add_argument("--grid", action=_st, help="Use when running the split stage on the grid. ")
     parser.add_argument(
         "--container",
         default=None,
