@@ -266,7 +266,6 @@ class TestReweight:
     def _test_class_target_calculation(
         self, mock_h5file, mock_bin_jets, mock_h5reader, mock_config, class_target
     ):
-        """Helper method to test different class target calculations."""
         # Create a mock reweight config with the specified class_target
         mock_reweight = MagicMock()
         mock_reweight.group = "jets"
@@ -315,7 +314,7 @@ class TestReweight:
         mock_reader.stream.return_value = [mock_batch]
 
         # Mock bin_jets to return different histograms for each class
-        def mock_bin_jets_side_effect(data, bins):
+        def mock_bin_jets_side_effect(data, _):
             # Return different histogram patterns for different classes
             if len(data) == 2:  # bjets (class 0)
                 return np.array([[2, 0], [0, 1]]), None  # More jets in first bin
