@@ -20,15 +20,15 @@ class Reweight:
         self.config = config
         self.rw_config = config.rw_config
         self.flavours = [f.name for f in config.components.flavours]
-        assert (
-            self.rw_config is not None
-        ), "Reweighting configuration is not set in the preprocessing config"
+        assert self.rw_config is not None, (
+            "Reweighting configuration is not set in the preprocessing config"
+        )
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert (
-            self.organised_components_config.exists()
-        ), f"Organised components config file not found: {self.organised_components_config}"
+        assert self.organised_components_config.exists(), (
+            f"Organised components config file not found: {self.organised_components_config}"
+        )
 
     @property
     def hists_path(self):
@@ -53,21 +53,18 @@ class Reweight:
         }
         for f, r in input_readers.items():
             assert r.num_jets >= self.num_jets_estimate, (
-                f"Requested {self.num_jets_estimate} jets per flavour, "
-                f"but found {r.num_jets} jets in {f}."
+                f"Requested {self.num_jets_estimate} jets per flavour, but found {r.num_jets} jets in {f}."
             )
             print(
-                f"Flavour {f} has {r.num_jets} jets, reading in batches of "
-                f"{self.config.batch_size}."
+                f"Flavour {f} has {r.num_jets} jets, reading in batches of {self.config.batch_size}."
             )
         return list(input_readers.values())
 
     def calculate_weights(
         self,
     ):
-        """Generate all the weights for the reweighting.
-
-        Returns them in a dict
+        """
+        Generates all the calculate_weights for the reweighting and returns them in a dict
         of the form:
         {
             'group_name' : {
@@ -87,14 +84,14 @@ class Reweight:
         print(f"Calculating weights for {len(reweights)} reweights")
         readers = self.get_input_readers()
         for reader in readers:
-            assert (
-                reader.batch_size == readers[0].batch_size
-            ), "All readers must have the same batch size"
+            assert reader.batch_size == readers[0].batch_size, (
+                "All readers must have the same batch size"
+            )
         batch_size_per_file = readers[0].batch_size
         all_vars = {}
         existing_vars = {}
         with h5py.File(readers[0].fname[0], "r") as f:
-            for group in f:
+            for group in f.keys():
                 if isinstance(f[group], h5py.Dataset):
                     existing_vars[group] = list(f[group].dtype.names)
 
@@ -127,7 +124,7 @@ class Reweight:
         for i in range(num_batches):
             all_batches = [next(reader_streams[j]) for j in range(len(readers))]
             combined_batch = {}
-            for _j, batch in enumerate(all_batches):
+            for j, batch in enumerate(all_batches):
                 for k, v in batch.items():
                     if k not in combined_batch:
                         combined_batch[k] = [v]
@@ -157,7 +154,10 @@ class Reweight:
                         assert "valid" in data.dtype.names
                         data = data[data["valid"]]
 
-                classes = np.unique(data[rw.class_var]) if rw.class_var is not None else [None]
+                if rw.class_var is not None:
+                    classes = np.unique(data[rw.class_var])
+                else:
+                    classes = [None]
                 for cls in classes:
                     mask = data[rw.class_var] == cls
                     hist, outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
@@ -199,18 +199,24 @@ class Reweight:
             if isinstance(rw.class_target, int):
                 target = all_histograms[rw_group][rw_rep]["histograms"][str(rw.class_target)]
             elif isinstance(rw.class_target, str) and rw.class_target == "mean":
-                for _cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
+                for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
                     if target is None:
                         target = hist.copy()
                     else:
                         target += hist
                 target /= len(all_histograms[rw_group][rw_rep]["histograms"])
             elif isinstance(rw.class_target, str) and rw.class_target == "min":
-                for _cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
-                    target = hist.copy() if target is None else np.minimum(target, hist)
+                for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
+                    if target is None:
+                        target = hist.copy()
+                    else:
+                        target = np.minimum(target, hist)
             elif isinstance(rw.class_target, str) and rw.class_target == "max":
-                for _cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
-                    target = hist.copy() if target is None else np.maximum(target, hist)
+                for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
+                    if target is None:
+                        target = hist.copy()
+                    else:
+                        target = np.maximum(target, hist)
             elif isinstance(rw.class_target, str) and rw.class_target == "uniform":
                 target = np.ones_like(all_histograms[rw_group][rw_rep]["histograms"][str(0)])
             elif isinstance(rw.class_target, (list, tuple)):
@@ -228,8 +234,7 @@ class Reweight:
             if np.any(target == 0):
                 num_zeros = np.sum(target == 0)
                 print(
-                    f"Target histogram has {num_zeros} bins with zero entries "
-                    f"out of total {target.shape} : {rw!r}"
+                    f"Target histogram has {num_zeros} bins with zero entries out of total {target.shape} : {rw!r}"
                 )
             if np.any(target < 0):
                 raise ValueError(f"Target histogram has bins with negative entries : {rw!r}")
@@ -269,8 +274,8 @@ class Reweight:
             # If we have any bins where we have 0 of a given flavour, we set all the
             # weights to 0
             if np.any(idx_below_min):
-                for _cls, _hist in all_histograms[rw_group][rw_rep]["histograms"].items():
-                    output_weights[rw_group][rw_rep]["weights"][_cls][idx_below_min] = 0
+                for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
+                    output_weights[rw_group][rw_rep]["weights"][cls][idx_below_min] = 0
 
         return output_weights
 
@@ -284,8 +289,8 @@ class Reweight:
             plot_dir.mkdir(parents=True, exist_ok=True)
 
         # Now, iterate each re-weighting
-        for group in histograms:
-            for rw in histograms[group]:
+        for group in histograms.keys():
+            for rw in histograms[group].keys():
                 rw_dir = plot_dir / group / rw
                 if not rw_dir.exists():
                     rw_dir.mkdir(parents=True, exist_ok=True)
@@ -312,7 +317,7 @@ class Reweight:
                     logy=True,
                     figsize=(10, 6),
                 )
-                for cls in weights:
+                for cls in weights.keys():
                     w = weights[cls][:]
                     w_flat = w.flatten()
                     histo = Histogram(
@@ -325,7 +330,7 @@ class Reweight:
                 plot.savefig(rw_dir / "weights_distribution.png")
                 for var1, var2 in combinations(rw_vars, 2):
                     print(f"Plotting 2D histogram for {var1} vs {var2} in {rw}")
-                    for cls in weights:
+                    for cls in weights.keys():
                         fig, ax = plt.subplots(figsize=(10, 6))
 
                         var1_bin_idx = rw_vars.index(var1)
@@ -387,9 +392,8 @@ class Reweight:
 
     @staticmethod
     def save_weights_hdf5(weights_dict, filename):
-        """Save the weights to an HDF5 file.
-
-        With the following structure:
+        """
+        Saves the weights to an HDF5 file, with the following structure:
         {
             'group_name' : {
                 'repr(reweight)' : {
@@ -434,18 +438,17 @@ class Reweight:
 
     @staticmethod
     def load_weights_hdf5(filename):
-        """Load the weights from an HDF5 file.
-
-        See `save_weights_hdf5` for the structure.
+        """
+        Loads the weights from an HDF5 file, see `save_weights_hdf5` for the structure
         """
         weights_dict = {}
         with h5py.File(filename, "r") as f:
             # Iterate through the groups in the file (top-level groups represent 'group_name')
-            for group in f:
+            for group in f.keys():
                 weights_dict[group] = {}
                 group_obj = f[group]
                 # For each group, iterate through the reweight names
-                for reweight_name in group_obj:
+                for reweight_name in group_obj.keys():
                     reweight_group = group_obj[reweight_name]
 
                     # Load the bins, which is now a list of arrays
@@ -453,11 +456,11 @@ class Reweight:
                     bins = [bins_group[f"bin_{i}"][:] for i in range(len(bins_group))]
 
                     reweight_vars = [var.decode("utf-8") for var in reweight_group["rw_vars"][:]]
-                    class_var = next(var.decode("utf-8") for var in reweight_group["class_var"][:])
+                    class_var = [var.decode("utf-8") for var in reweight_group["class_var"][:]][0]
                     # Load the histograms
                     histograms = {}
                     hist_group = reweight_group["weights"]
-                    for label in hist_group:
+                    for label in hist_group.keys():
                         histograms[label] = hist_group[label][:]
 
                     # Reconstruct the structure
