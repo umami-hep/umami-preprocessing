@@ -229,7 +229,11 @@ class PreprocessingConfig:
 
     @classmethod
     def from_file(
-        cls, config_path: Path, split: Split, skip_checks=False, skip_config_copy: bool = False
+        cls,
+        config_path: Path,
+        split: Split,
+        skip_checks: bool = False,
+        skip_config_copy: bool = False,
     ):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
