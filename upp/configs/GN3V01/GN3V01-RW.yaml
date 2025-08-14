@@ -19,20 +19,6 @@ zprime: &zprime
     - "user.alfroch.800030.e8514_s4159_r15530_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
     - "user.alfroch.800030.e8514_s4369_r16083_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
 
-tau_gstart: &tau_gstar
-  name: tau_gstar
-  pattern:
-    - "user.npond.801002.e8514_s4369_r16083_p6859.tdd.GN3_dev.25_2_56.24-07-16_all_flows_v4-139-g6ef5674_output.h5"
-    - "user.npond.801002.e8514_s4162_r14622_p6859.tdd.GN3_dev.25_2_56.24-07-16_all_flows_v4-139-g6ef5674_output.h5"
-    - "user.npond.801002.e8514_s4159_r15530_p6859.tdd.GN3_dev.25_2_56.24-07-16_all_flows_v4-139-g6ef5674_output.h5"
-
-tau_fullrange: &tau_fullrange
-  name: tau_fullrange
-  cuts:
-    - [pt_btagJes, ">", 20_000]
-    - [pt_btagJes, "<", 6_000_000]
-    - [absEta_btagJes, "<", 2.5]
-
 lowpt: &lowpt
   name: lowpt
   cuts:
@@ -77,13 +63,6 @@ components:
       ]
     num_jets: -1
 
-  # - region:
-  #     <<: *tau_fullrange
-  #   sample:
-  #     <<: *tau_gstar
-  #   flavours: [ghosttaujets]
-  #   num_jets: -1
-
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   jets_name: jets
@@ -94,7 +73,7 @@ global:
   ntuple_dir: /home/xzcappon/phd/datasets/flavour_tagging/gn3/high-stats/ntuples
 
 reweighting:
-  num_jets_estimate: 1_500_000
+  num_jets_estimate: 5_000_000
   merge_num_proc: 20
   reweights:
     - group: jets
