@@ -7,7 +7,7 @@ This ensures that the flavour ratio of any two bins is approximately constant.
 This does however have some disadvantages:
 - results in throwing away some jets
 - upsampling introduces copies of the same jet, meaning we are passing the same data through the model more than once per epoch
-- bins always fave some non-zero finite size, such that there can still be a residual distibution hhape, see [this mention](https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf) of shark-toothing
+- bins always fave some non-zero finite size, such that there can still be a residual distibution shape, see [this mention](https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf) of shark-toothing
 
 We can instead re-weight, where instead of throwing away or copying jets, we assign each jet in a bin a weight such that we end up with a constant weighted flavour ratio per bin.
 
