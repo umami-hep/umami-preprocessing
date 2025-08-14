@@ -12,5 +12,3 @@ pip install backcall
 
 lsetup panda
 lsetup rucio
-
-# python upp//grid/grid_split.py --config upp/configs/GN3V01/GN3V01-RW.yaml --rucio_user npond --tag FTAG-RW-V3 --excludedSite CA-VICTORIA-K8S-T2
