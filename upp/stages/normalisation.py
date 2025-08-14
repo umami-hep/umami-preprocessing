@@ -233,9 +233,11 @@ class Normalisation:
         """Run the normalisation calculation."""
         title = " Computing Normalisations "
         log.info(f"[bold green]{title:-^100}")
+        if self.config.rw_config is not None:
+            fname = str(self.config.out_fname).replace(".h5", "_vds.h5")
 
         # Get the correct output names if multiple output files were written
-        if self.config.num_jets_per_output_file:
+        elif self.config.num_jets_per_output_file:
             fname = self.config.out_fname.parent / f"{self.config.out_fname.stem}*.h5"
 
         else:

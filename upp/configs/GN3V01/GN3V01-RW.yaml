@@ -1,0 +1,90 @@
+variables: !include GN3V01/variables-ghost.yaml
+global_cuts: !include GN3V01/simple-split.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "user.alfroch.601589.e8547_s3797_r13144_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+    - "user.alfroch.601589.e8549_s4162_r14622_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+    - "user.alfroch.601589.e8549_s4159_r15530_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+    - "user.alfroch.601589.e8549_s4369_r16083_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "user.alfroch.800030.e7954_s3797_r13144_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+    - "user.alfroch.800030.e8514_s4162_r14622_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+    - "user.alfroch.800030.e8514_s4159_r15530_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+    - "user.alfroch.800030.e8514_s4369_r16083_p6859.tdd.GN3_dev.25_2_56.250729_Central_Dump_output.h5"
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+    - [absEta_btagJes, "<", 2.5]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+    - [absEta_btagJes, "<", 2.5]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours:
+      [
+        ghostbjets,
+        ghostcjets,
+        ghostsjets,
+        ghostudjets,
+        ghostgjets,
+        ghosttaujets,
+      ]
+    num_jets: -1
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours:
+      [
+        ghostbjets,
+        ghostcjets,
+        ghostsjets,
+        ghostudjets,
+        ghostgjets,
+        ghosttaujets,
+      ]
+    num_jets: -1
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 25_000_000
+  num_jets_per_output_file: 25_000_000
+  base_dir: /home/xzcappon/phd/datasets/flavour_tagging/gn3/high-stats/
+  ntuple_dir: /home/xzcappon/phd/datasets/flavour_tagging/gn3/high-stats/ntuples
+
+reweighting:
+  num_jets_estimate: 5_000_000
+  merge_num_proc: 20
+  reweights:
+    - group: jets
+      reweight_vars: [pt_btagJes, eta_btagJes]
+      bins:
+        pt_btagJes:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta_btagJes: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: mean
