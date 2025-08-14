@@ -205,7 +205,7 @@ def run_pp(args: argparse.Namespace) -> None:
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
     # load config
     config = PreprocessingConfig.from_file(args.config, args.split, skip_checks=args.grid)
-    print(args)
+
     if args.split_components:
         log.info("Splitting containers...")
         split = SplitContainers(args.config)
