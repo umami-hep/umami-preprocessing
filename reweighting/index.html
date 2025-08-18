@@ -1,0 +1,556 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the umami preprocessing framework">
+      
+      
+        <meta name="author" content="Umami Team">
+      
+      
+        <link rel="canonical" href="https://umami-hep.github.io/umami-preprocessing/reweighting/">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.5">
+    
+    
+      
+        <title>Reweighting - UPP: Umami Preprocessing</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#reweighting" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="UPP: Umami Preprocessing" class="md-header__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            UPP: Umami Preprocessing
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Reweighting
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/umami-hep/umami-preprocessing/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="UPP: Umami Preprocessing" class="md-nav__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    UPP: Umami Preprocessing
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/umami-hep/umami-preprocessing/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Github
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        Setup
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampling/" class="md-nav__link">
+        Sampling methods
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run/" class="md-nav__link">
+        Run
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../umami_int/" class="md-nav__link">
+        Umami integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-reweighting" class="md-nav__link">
+    Running the reweighting
+  </a>
+  
+    <nav class="md-nav" aria-label="Running the reweighting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#component-splitting" class="md-nav__link">
+    Component Splitting
+  </a>
+  
+    <nav class="md-nav" aria-label="Component Splitting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#split-on-the-grid" class="md-nav__link">
+    Split on the grid
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-weights" class="md-nav__link">
+    Generate weights
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#merging" class="md-nav__link">
+    Merging
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+
+<h1 id="reweighting">Reweighting<a class="headerlink" href="#reweighting" title="Permanent link">#</a></h1>
+<p>A different approach to balancing classes to resampling is to instead reweight them instead.
+In resampling, we bin our jets over their kinematics. We look in each bin, and if we have more jets of a given flavour compared to the target flavour, we throw those jets away. If we have less of a given flavour than the target flavour, we copy-and-paste (upsample) the jet until the bins are equal.
+This ensures that the flavour ratio of any two bins is approximately constant.</p>
+<p>This does however have some disadvantages:
+- results in throwing away some jets
+- upsampling introduces copies of the same jet, meaning we are passing the same data through the model more than once per epoch
+- bins always fave some non-zero finite size, such that there can still be a residual distibution shape, see <a href="https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf">this mention</a> of shark-toothing</p>
+<p>We can instead reweight, where instead of throwing away or copying jets, we assign each jet in a bin a weight such that we end up with a constant weighted flavour ratio per bin.</p>
+<h2 id="running-the-reweighting">Running the reweighting<a class="headerlink" href="#running-the-reweighting" title="Permanent link">#</a></h2>
+<p>The reweighting consists of 4 main stages:
+- component splitting
+- histogram/weights calculation
+- merging
+- normalisation</p>
+<p>The normalisation step utilises the same commands as in resampling, and so is not discussed here further</p>
+<h3 id="component-splitting">Component Splitting<a class="headerlink" href="#component-splitting" title="Permanent link">#</a></h3>
+<p>The first stage takes each sample and splits it into its split and flavour components. For example, if we have a ttbar sample, and we have 4 jet flavours (b,c,light,tau) then the splitting will produce 12 files: <code>train_bjets, val_bjets, test_bjets,...</code>.</p>
+<p>To run the splitting, 
+<div class="highlight"><pre><span></span><code>python upp/main.py --config {config} --split-components [--container {single container} --files {files}]
+</code></pre></div></p>
+<p>which will split the components. If <code>--container</code> is defined, then only that container from the config will be split. If this is not included, then all contains in the config will be split.
+Similarly, if <code>--files</code> is defined then only the specified files in the specified container will be split.
+Once the splitting is complete, a meta-data file is automatically created which points towards each file needed for the next stages of reweighting</p>
+<h4 id="split-on-the-grid">Split on the grid<a class="headerlink" href="#split-on-the-grid" title="Permanent link">#</a></h4>
+<p>The splitting stage can be quite time consuming, and is often limited by system IO. To speed the processing up, a grid-submission script is provided.
+First, you must setup a virtual environment to be packaged up and sent to the grid. This can be done by</p>
+<div class="highlight"><pre><span></span><code>setupATLAS
+source upp/grid/setup_env.sh
+</code></pre></div>
+<p>Once this has setup, you can run the grid dump by:</p>
+<div class="highlight"><pre><span></span><code>python upp/grid/grid_split.py --config {config} --rucio_user {your rucio username} --tag {something to identify this dump} [--dryrun]
+</code></pre></div>
+<p>Where the dryrun flag will prepare the submission directory without submitting to the grid.</p>
+<p>Once all your jobs are complete, you can use the download_and_prepare script:</p>
+<div class="highlight"><pre><span></span><code>python upp/grid/download_and_prepare.py -config {config} --rucio_user {your rucio username} --tag {same tag as before}
+</code></pre></div>
+<p>which will then automatically download, package up, and generate the meta data ready for the next stage.</p>
+<h2 id="generate-weights">Generate weights<a class="headerlink" href="#generate-weights" title="Permanent link">#</a></h2>
+<p>Once all the samples are prepared, we can calculate the weights. An example config can be found in <code>configs/GN3v01/GN3V01-RW.yaml</code>. We can look at the reweighting section:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">reweighting</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_500_000</span>
+<span class="w">  </span><span class="nt">merge_num_proc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="w">  </span><span class="nt">reweights</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
+<span class="w">      </span><span class="nt">reweight_vars</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">eta_btagJes</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">bins</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">pt_btagJes</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">[</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">20_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
+<span class="w">          </span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">eta_btagJes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">-2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">40</span><span class="p p-Indicator">]]</span>
+<span class="w">      </span><span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flavour_label</span>
+<span class="w">      </span><span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
+</code></pre></div>
+<p><code>num_jets_estimate</code> represents the number of each jet flavour used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevent in the next section of these docs.
+Then, you have the <code>reweights</code> section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max</code> which will instead target either the mean distribution, or always take the maximum/minumum bin counts as the target.
+The reweighting can also be performed over track variables, for example</p>
+<div class="highlight"><pre><span></span><code><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
+<span class="nt">reweight_vars</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_frac</span><span class="p p-Indicator">]</span>
+<span class="nt">bins</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">pt_frac</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">[</span>
+<span class="w">        </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
+<span class="w">        </span><span class="p p-Indicator">[</span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="p p-Indicator">]</span>
+<span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthOriginLabel</span>
+<span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
+</code></pre></div>
+<p>Would calculate weights such that we have equivilent pt_frac distributions across the track labels.</p>
+<p>To run the reweighting simply do</p>
+<div class="highlight"><pre><span></span><code>python upp/main.py --config {config} --rw
+</code></pre></div>
+<h2 id="merging">Merging<a class="headerlink" href="#merging" title="Permanent link">#</a></h2>
+<p>Finally, we can merge all the relevent jets with their weights. This is done by</p>
+<div class="highlight"><pre><span></span><code>python upp/main.py --rwm --split {train/test/val}
+</code></pre></div>
+<p>This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the <code>global</code> section of the pre-processing config includes <code>num_jets_per_output_file</code> and the <code>reweighting</code> section has <code>merge_num_proc&gt;1</code>.
+This will then launch <code>merge_num_proc</code> processes, with approximately <code>num_jets_per_output_file</code> per file*.</p>
+<ul>
+<li>Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.</li>
+</ul>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2025 14:15:39 UTC">August 18, 2025</span>
+      
+        <br>
+        Created:
+        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2025 14:15:39 UTC">August 18, 2025</span>
+      
+    
+  </small>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 - 2023 CERN for the benefit of the ATLAS collaboration
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>
