@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Merging:
-    """Merging Class to merge different components/regions."""
+    """Merging Class to merge different components/regions, with safe auto-resume."""
 
     def __init__(self, config: PreprocessingConfig):
         self.config = config
@@ -30,6 +30,12 @@ class Merging:
         self.flavours = self.components.flavours
         self.num_jets_per_output_file = config.num_jets_per_output_file
         self.file_tag = "split"
+
+        # Auto-resume toggle (make configurable if you prefer opt-in)
+        self.resume = True
+
+        # Internal state, guard to keep fast-forward from opening files
+        self._fast_forwarding: bool = False
 
         # perfectly valid, no union necessary
         self.dtypes: dict[str, np.dtype] = {}
@@ -43,7 +49,7 @@ class Merging:
         # Setup the sample string
         self._sample: str | None = None
 
-        # Use cast because we cannot init Components/H5Writer
+        # Use cast because we cannot init Components/H5Writer here
         self.current_components = cast("Components", None)
         self.writer = cast(H5Writer, None)
 
@@ -72,6 +78,91 @@ class Merging:
 
         return join_structured_arrays([jets, label_array])
 
+    def _part_fname(self, sample: str | None, file_idx: int) -> Path:
+        """Construct the exact output filename for a given part index.
+
+        Parameters
+        ----------
+        sample : str | None
+            Name of the output sample
+        file_idx : int
+            Iterator number of the output file
+
+        Returns
+        -------
+        Path
+            Final path to the output file
+        """
+        # Get base path of the output
+        fname = Path(self.config.out_fname)
+
+        # Append the sample name to the file name
+        if sample:
+            fname = path_append(fname, sample)
+
+        # Define the suffix for the file (including the iterator number)
+        suffix = f"{self.file_tag}_{file_idx:03d}"
+
+        # Return the final path
+        return fname.with_name(f"{fname.stem}_{suffix}{fname.suffix}")
+
+    def _detect_completed_parts(self, sample: str | None) -> int:
+        """Count how many contiguous parts (starting from 0) already exist on disk.
+
+        Parameters
+        ----------
+        sample : str | None
+            Name of the sample
+
+        Returns
+        -------
+        int
+            _description_
+        """
+        # If only one output file is produced, skip
+        if self.num_jets_per_output_file is None:
+            return 0
+
+        # Define the idx counter
+        idx = 0
+
+        # Check which files already exist
+        while self._part_fname(sample, idx).exists():
+            idx += 1
+
+        # Return the idx number of the new file
+        return idx
+
+    class _NullWriter:
+        """A minimal writer that discards data while tracking how much would be written."""
+
+        def __init__(self, capacity: int):
+            self.num_jets = capacity
+            self.num_written = 0
+
+        def write(self, batch: dict[str, np.ndarray]) -> None:
+            """Count the number of jets that would be written.
+
+            Parameters
+            ----------
+            batch : dict[str, np.ndarray]
+                Dict with the batches
+            """
+            # advance by the leading dimension of any array (they are aligned)
+            if not batch:
+                return
+            any_arr = next(iter(batch.values()))
+            k = len(any_arr)
+            self.num_written = min(self.num_written + k, self.num_jets)
+
+        def add_attr(self, *args, **kwargs):
+            """Skip the attribute addition."""
+            pass
+
+        def close(self):
+            """Skip the close."""
+            pass
+
     def _open_writer(
         self,
         sample: str | None,
@@ -79,7 +170,7 @@ class Merging:
         file_idx: int,
         components: Components,
     ) -> None:
-        """Create `self.writer` for the next output file and attach all static attributes.
+        """Create `self.writer` for the next output file and attach static attributes.
 
         Parameters
         ----------
@@ -189,8 +280,12 @@ class Merging:
         merged_len = len(merged[self.jets_name])
         capacity_left = self.writer.num_jets - self.writer.num_written
 
-        # Check if the capacity of the given file is already zero
-        if capacity_left == 0:
+        if self._fast_forwarding:
+            # effectively infinite; never roll files
+            capacity_left = 1 << 62
+
+        # If current file is full (and not fast-forwarding), roll to next file
+        if capacity_left == 0 and not self._fast_forwarding:
             # close the filled file
             self.writer.close()
 
@@ -217,8 +312,8 @@ class Merging:
             # Recompute free space in the freshly-opened file
             capacity_left = self.writer.num_jets - self.writer.num_written
 
-        # Check if the whole batch fits into the file
-        if merged_len <= capacity_left:
+        # Write (or discard) the batch
+        if merged_len <= capacity_left or self._fast_forwarding:
             # whole batch fits
             self.writer.write(merged)
 
@@ -281,22 +376,51 @@ class Merging:
         self._sample = sample
         self.current_components = components
 
-        # decide capacity of the first file
+        # Auto-resume: fast-forward if parts exist
+        resume_parts = 0
+        if self.resume and self.num_jets_per_output_file is not None:
+            resume_parts = self._detect_completed_parts(sample)
+
+        if resume_parts:
+            to_discard = resume_parts * int(self.num_jets_per_output_file)
+            log.info(
+                f"[bold yellow]Resuming merge: found {resume_parts} completed part(s); "
+                f"skipping first {to_discard:,} jets."
+            )
+            # Use a NullWriter to pre-consume data via the exact same logic
+            self._fast_forwarding = True
+            self.writer = self._NullWriter(to_discard)
+            while self.jets_written < to_discard:
+                consumed = self.write_chunk(components)
+                if consumed == 0:
+                    break
+            self.writer.close()
+            self._fast_forwarding = False
+
+            # Align counters with the next missing part
+            self._file_idx = resume_parts
+            self.jets_written = to_discard
+
+        # Decide capacity of the first real file
+        remaining_total = self.total_jets - self.jets_written
         first_file_size = (
-            min(self.num_jets_per_output_file, self.total_jets)
+            min(self.num_jets_per_output_file, remaining_total)
             if self.num_jets_per_output_file
-            else self.total_jets
+            else remaining_total
         )
 
         # Open the first output file
         self._open_writer(sample, first_file_size, self._file_idx, components)
 
-        # Main merge loop (progress bar unchanged)
+        # Main merge loop with progress
         with ProgressBar() as progress:
             task = progress.add_task(
                 f"[green]Merging {components.num_jets:,} jets...",
                 total=components.num_jets,
             )
+            if self.jets_written:
+                progress.update(task, advance=self.jets_written)
+
             while True:
                 n = self.write_chunk(components)
                 if not n:
