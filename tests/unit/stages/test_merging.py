@@ -383,6 +383,15 @@ def test_part_fname_formatting(monkeypatch, tmp_path):
     assert ps.parent == tmp_path
 
 
+def test_detect_and_clean_completed_parts_empty_dir(monkeypatch, tmp_path):
+    merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
+    merge.total_jets = 10
+    merge.base_shapes = {"jets": (10,)}
+    # no files exist
+    idx = merge._detect_and_clean_completed_parts(None)
+    assert idx == 0
+
+
 def test_expected_rows_for_part_middle_and_tail(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
     merge.total_jets = 12  # 5 + 5 + 2
@@ -400,6 +409,18 @@ def test_is_part_valid_happy_path(monkeypatch, tmp_path):
     f0 = merge._part_fname(None, 0)
     _write_valid_part(f0, rows=5)
 
+    assert merge._is_part_valid(None, 0) is True
+
+
+def test_is_part_valid_multiple_datasets(monkeypatch, tmp_path):
+    merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
+    merge.total_jets = 5
+    merge.base_shapes = {"jets": (5,), "tracks": (5,)}
+
+    f0 = merge._part_fname(None, 0)
+    with h5py.File(f0, "w") as f:
+        f.create_dataset("jets", shape=(5,), dtype="f4")
+        f.create_dataset("tracks", shape=(5,), dtype="f4")
     assert merge._is_part_valid(None, 0) is True
 
 
@@ -487,6 +508,35 @@ def test_detect_and_clean_completed_parts_no_delete_when_disabled(monkeypatch, t
     assert bad.exists()  # left in place
 
 
+def test_detect_and_clean_handles_unlink_error(monkeypatch, tmp_path):
+    """Simulate OSError during unlink to cover error logging branch."""
+    merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
+    merge.total_jets = 10
+    merge.base_shapes = {"jets": (10,)}
+
+    # Valid part 0
+    _write_valid_part(merge._part_fname(None, 0), rows=5)
+    # Corrupt part 1
+    bad = merge._part_fname(None, 1)
+    _write_invalid_hdf5(bad)
+
+    # Make Path.unlink raise OSError for this file
+    original_unlink = Path.unlink
+
+    def _unlink_raise(self):
+        if self == bad:
+            raise OSError("permission denied")
+        return original_unlink(self)
+
+    monkeypatch.setattr(Path, "unlink", _unlink_raise)
+
+    merge.auto_fix_parts = True
+    idx = merge._detect_and_clean_completed_parts(None)
+    # It stops at first invalid (failed to delete), index unchanged and file remains
+    assert idx == 1
+    assert bad.exists()
+
+
 def test_resume_skips_completed_parts_and_opens_next(monkeypatch, tmp_path):
     """End-to-end resume: pre-create parts 0 & 1; merging should start at part 2 with capacity 3."""
     out = tmp_path / "merged.h5"
@@ -494,7 +544,7 @@ def test_resume_skips_completed_parts_and_opens_next(monkeypatch, tmp_path):
 
     # One component with 13 jets total, e.g. [5,5,3] split
     all_jets = {"jets": _jets_struct(13)}
-    batches = [all_jets]  # single batch is fine; write_chunk handles splitting
+    batches = [all_jets]
     comp = ComponentStub("bjets", batches)
     comps = ComponentsStub([comp])
 
@@ -504,7 +554,6 @@ def test_resume_skips_completed_parts_and_opens_next(monkeypatch, tmp_path):
 
     # Spy on _open_writer to ensure it's NOT called during fast-forward
     open_calls = []
-
     _orig_open = merging_mod.Merging._open_writer
 
     def _wrapped_open(self, sample, jets_in_file, file_idx, components):
@@ -547,7 +596,6 @@ def test_fast_forward_does_not_open_real_writer(monkeypatch, tmp_path):
     # - once after fast-forward (to open part 1),
     # - possibly again if rollover happens when writing.
     call_times = {"count": 0}
-
     _orig_open = merging_mod.Merging._open_writer
 
     def _wrapped_open(self, sample, jets_in_file, file_idx, components):
@@ -562,3 +610,109 @@ def test_fast_forward_does_not_open_real_writer(monkeypatch, tmp_path):
 
     # At least one open (for part 1) happened, and none during fast-forward
     assert call_times["count"] >= 1
+
+
+def test_nullwriter_basic_behaviour():
+    """Cover the tiny _NullWriter helper."""
+    nw = merging_mod.Merging._NullWriter(capacity=5)
+    # add_attr and close are no-ops, but execute them for coverage
+    nw.add_attr("x", 1)
+    nw.close()
+    # write smaller than capacity
+    batch1 = {"jets": _jets_struct(3)}
+    nw.write(batch1)
+    assert nw.num_written == 3
+    # write beyond capacity (should clamp)
+    batch2 = {"jets": _jets_struct(4)}
+    nw.write(batch2)
+    assert nw.num_written == 5
+
+
+def test_write_chunk_all_components_complete_early_return(monkeypatch):
+    """If all components exhaust immediately, write_chunk returns 0."""
+    merge = _minimal_merging(monkeypatch, jets_per_file=5)
+
+    # No batches → StopIteration immediately
+    comp = DummyComponent("bjets", [])
+    comps = [comp]
+
+    # Minimal bookkeeping to allow a writer
+    jets0 = _jets_struct(0)
+    merge.dtypes = {"jets": jets0.dtype}
+    merge.base_shapes = {"jets": (0,)}
+    merge.total_jets = 0
+    merge._file_idx = 0
+    merge.jets_written = 0
+    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+    merge._sample = None
+    merge._open_writer(None, 0, 0, merge.current_components)
+
+    n = merge.write_chunk(comps)
+    assert n == 0
+
+
+def test_write_components_single_file_mode(monkeypatch, tmp_path):
+    """When num_jets_per_output_file is None, no split suffix is added."""
+    out = tmp_path / "merged.h5"
+    merge = _mk_merge_for_path(monkeypatch, out, jets_per_file=None)
+    merge.num_jets_per_output_file = None  # ensure single-file mode
+
+    jets = {"jets": _jets_struct(7)}
+    comp = ComponentStub("bjets", [jets])
+    comps = ComponentsStub([comp])
+
+    merge.write_components(sample=None, components=comps)
+
+    assert isinstance(merge.writer, MemWriter)
+    assert merge.writer.num_jets == 7
+    assert merge.writer.num_written == 7
+    assert merge.writer.dst.name == "merged.h5"
+
+
+def test_run_groupby_sample_calls_write_components(monkeypatch, tmp_path):
+    """Cover run() branch that uses components.groupby_sample()."""
+    # Patch H5Writer just in case (unused since we stub write_components)
+    monkeypatch.setattr(merging_mod, "H5Writer", MemWriter)
+
+    variables = SimpleNamespace(
+        variables=["jets"],
+        selectors={},
+        combined=lambda: {"jets": None},
+        keys=lambda: ["jets"],
+    )
+
+    class FakeComponents:
+        def __init__(self):
+            self.flavours = [Flavours["bjets"]]
+
+        def groupby_sample(self):
+            jetsA = {"jets": _jets_struct(2)}
+            jetsB = {"jets": _jets_struct(3)}
+            compA = ComponentStub("bjets", [jetsA])
+            compB = ComponentStub("bjets", [jetsB])
+            return [("A", ComponentsStub([compA])), ("B", ComponentsStub([compB]))]
+
+    cfg = SimpleNamespace(
+        components=FakeComponents(),
+        variables=variables,
+        batch_size=100,
+        jets_name="jets",
+        num_jets_per_output_file=10,
+        file_tag="split",
+        out_fname=tmp_path / "merged.h5",
+        git_hash="deadbeef",
+        config={},
+        is_test=True,  # force groupby_sample path
+        merge_test_samples=False,  # keep per-sample merging
+    )
+    merge = merging_mod.Merging(cast(PreprocessingConfig, cfg))
+
+    called = []
+
+    def _wc(self, sample, components):  # noqa: ARG001
+        called.append((sample, components.num_jets))
+
+    monkeypatch.setattr(merging_mod.Merging, "write_components", _wc)
+
+    merge.run()
+    assert called == [("A", 2), ("B", 3)]
