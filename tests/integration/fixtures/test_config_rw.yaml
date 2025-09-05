@@ -1,0 +1,154 @@
+variables:
+  jets:
+    inputs:
+      - pt
+      - eta
+    labels:
+      - mass
+      - eventNumber
+
+  tracks:
+    inputs:
+      - dphi
+      - deta
+      - qOverP
+    labels:
+      - qOverP
+      - leptonID
+global_cuts: !include GN3V01/simple-split.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "data1.h5"
+    - "data2.h5"
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "data3.h5"
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt, ">", 20_000]
+    - [pt, "<", 250_000]
+    - [eta, "<", 2.5]
+    - [eta, ">", -2.5]
+
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt, ">", 250_000]
+    - [pt, "<", 6_000_000]
+    - [eta, "<", 2.5]
+    - [eta, ">", -2.5]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [bjets, cjets, ujets, taujets]
+    num_jets: -1
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [bjets, cjets, ujets, taujets]
+    num_jets: -1
+
+reweighting:
+  num_jets_estimate: 100
+  merge_num_proc: 1
+  reweights:
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: mean
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: min
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: max
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: uniform
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: [0, 1]
+    - group: jets
+      reweight_vars: [pt, eta]
+      bins:
+        pt:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: 0
+    - group: tracks
+      reweight_vars: [deta]
+      bins:
+        deta: [[-1.0, 1.0, 50]]
+      class_var: leptonID
+      class_target: mean
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 25_000_000
+  base_dir: tmp/upp-tests/integration/temp_workspace/
+  out_dir: test_out
+  ntuple_dir: ntuples
