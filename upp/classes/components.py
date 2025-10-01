@@ -511,7 +511,7 @@ class Components:
     def __getitem__(self, index):
         if isinstance(index, int):
             return self.components[index]
-        if isinstance(index, (str, Label)):
+        if isinstance(index, str | Label):
             return self.components[self.flavours.index(index)]
 
     def __len__(self):

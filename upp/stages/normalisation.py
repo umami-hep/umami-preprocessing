@@ -191,7 +191,7 @@ class Normalisation:
                             "Class dict A has arrays of different lengths for the same"
                             " variable. This should not happen."
                         )
-                    counts_A = dict(zip(*class_dict_A[name][v]))
+                    counts_A = dict(zip(*class_dict_A[name][v], strict=False))
                     counts[i] += counts_A.get(label, 0)
                 var[v] = (labels, counts)
         return class_dict_B
