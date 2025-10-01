@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 import numpy as np
 
@@ -45,7 +45,7 @@ class SingleReweightConfig:
                 b = b[1:]
             flat_bins.append(b)
         if self.add_overflow:
-            flat_bins = [np.array([(-np.inf)])] + flat_bins + [np.array([(np.inf)])]
+            flat_bins = [np.array([-np.inf])] + flat_bins + [np.array([np.inf])]
         return np.concatenate(flat_bins)
 
     @property
@@ -69,7 +69,7 @@ class SingleReweightConfig:
         if self.target_hist_func_name is not None:
             target_str += f"{self.target_hist_func_name}_"
         if self.class_target is not None:
-            if isinstance(self.class_target, (list, tuple)):
+            if isinstance(self.class_target, list | tuple):
                 target_str += "_".join(map(str, self.class_target))
             else:
                 target_str += f"{self.class_target}_{self.class_var}"

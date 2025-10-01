@@ -211,7 +211,7 @@ class Reweight:
                     target = np.maximum(target, hist) if target is not None else hist.copy()
             elif isinstance(rw.class_target, str) and rw.class_target == "uniform":
                 target = np.ones_like(all_histograms[rw_group][rw_rep]["histograms"][str(0)])
-            elif isinstance(rw.class_target, (list, tuple)):
+            elif isinstance(rw.class_target, list | tuple):
                 for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
                     cast_cls_target = tuple(map(str, rw.class_target))
                     if cls in cast_cls_target:
