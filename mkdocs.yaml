@@ -16,6 +16,7 @@ nav:
   - Introduction: index.md
   - Setup: setup.md
   - Sampling methods: sampling.md
+  - Reweighting: reweighting.md
   - Configuration: configuration.md
   - Run: run.md
   - Umami integration: umami_int.md
