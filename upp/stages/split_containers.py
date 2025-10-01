@@ -4,9 +4,10 @@ import copy
 import glob
 import tempfile
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING
 
 import h5py
 import numpy as np

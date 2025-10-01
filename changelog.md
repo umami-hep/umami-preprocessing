@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Update Package Versions [#112](https://github.com/umami-hep/umami-preprocessing/pull/112)
+
 ### [v0.2.6](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.6) (07.08.2025)
 
 - Added support for reweighting instead of resampling [#105](https://github.com/umami-hep/umami-preprocessing/pull/105)
