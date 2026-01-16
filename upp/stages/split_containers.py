@@ -19,7 +19,8 @@ from ftag.vds import create_virtual_file
 from numpy.lib import recfunctions as rfn
 
 from upp.classes.preprocessing_config import PreprocessingConfig
-from upp.logger import logger
+
+import logging as log
 
 if TYPE_CHECKING:  # pragma: no cover
     pass
@@ -300,13 +301,13 @@ class SplitContainers:
                 if validate_h5_file(file_path):
                     valid_files.append(file)
                 else:
-                    logger.warning(f"Skipping corrupted file: {file_path}")
+                    log.warning(f"Skipping corrupted file: {file_path}")
 
             if not valid_files:
                 raise RuntimeError("No valid HDF5 files found - all files are corrupted")
 
             if len(valid_files) < len(files):
-                logger.warning(
+                log.warning(
                     f"Skipped {len(files) - len(valid_files)}/{len(files)} corrupted files. "
                     f"Continuing with {len(valid_files)} valid files."
                 )
@@ -369,7 +370,7 @@ class SplitContainers:
                 this_files = [Path(f) for f in this_files.split(",")]
 
             print(self.config.ntuple_dir, container, this_files, type(this_files), flush=True)
-            print("The fiules are", this_files, flush=True)
+            print("The files are", this_files, flush=True)
 
             # Create a virtual dataset of all input files
             with self._make_tmp_vds(this_files) as input_file:
