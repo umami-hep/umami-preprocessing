@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Handle corrupted HDF5 files gracefully in split_containers [#113](https://github.com/umami-hep/umami-preprocessing/pull/113)
 - Adding Resume Functionality when Merging broke [#110](https://github.com/umami-hep/umami-preprocessing/pull/110)
 
 ### [v0.2.7](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.7) (01.10.2025)
