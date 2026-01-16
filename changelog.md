@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+
+- Handle corrupted HDF5 files gracefully in split_containers [#113](https://github.com/umami-hep/umami-preprocessing/pull/113)
 - Adding docker build for UPP [#113](https://github.com/umami-hep/umami-preprocessing/pull/113)
 - Adding Resume Functionality when Merging broke [#110](https://github.com/umami-hep/umami-preprocessing/pull/110)
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import glob
+import logging as log
 import tempfile
 import time
 from collections.abc import Generator
@@ -22,6 +23,28 @@ from upp.classes.preprocessing_config import PreprocessingConfig
 
 if TYPE_CHECKING:  # pragma: no cover
     pass
+
+
+def validate_h5_file(file_path: Path | str) -> bool:
+    """Check if an HDF5 file can be opened and read.
+
+    Parameters
+    ----------
+    file_path : Path | str
+        Path to the h5 file
+
+    Returns
+    -------
+    bool
+        True if the file is valid, False if corrupted
+    """
+    try:
+        with h5py.File(file_path, "r") as f:
+            # Try to access keys to ensure file is readable
+            _ = list(f.keys())
+        return True
+    except OSError:
+        return False
 
 
 # TODO move these to some util place
@@ -269,9 +292,27 @@ class SplitContainers:
                 yield Path(files)
                 return
             tmp_dir = Path(tmp)
-            # Create a sum link for each h5 file such that we ensure they all exist in the same
-            # directory
+
+            # Validate files and filter out corrupted ones
+            valid_files = []
             for file in files:
+                file_path = Path(file)
+                if validate_h5_file(file_path):
+                    valid_files.append(file)
+                else:
+                    log.warning(f"Skipping corrupted file: {file_path}")
+
+            if not valid_files:
+                raise RuntimeError("No valid HDF5 files found - all files are corrupted")
+
+            if len(valid_files) < len(files):
+                log.warning(
+                    f"Skipped {len(files) - len(valid_files)}/{len(files)} corrupted files. "
+                    f"Continuing with {len(valid_files)} valid files."
+                )
+
+            # Create symlinks for valid files only
+            for file in valid_files:
                 file_path = Path(file)
                 (tmp_dir / file_path.name).symlink_to(file_path.resolve())
 
@@ -328,7 +369,7 @@ class SplitContainers:
                 this_files = [Path(f) for f in this_files.split(",")]
 
             print(self.config.ntuple_dir, container, this_files, type(this_files), flush=True)
-            print("The fiules are", this_files, flush=True)
+            print("The files are", this_files, flush=True)
 
             # Create a virtual dataset of all input files
             with self._make_tmp_vds(this_files) as input_file:
