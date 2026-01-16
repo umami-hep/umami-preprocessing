@@ -292,8 +292,6 @@ class ComponentStub:
     """Component with a ReaderStub; compatible with write_components()."""
 
     def __init__(self, flavour: str, batches: list[dict[str, np.ndarray]]):
-        from ftag import Flavours
-
         self.flavour = Flavours[flavour]
         self._batches = batches
         self.num_jets = sum(len(b["jets"]) for b in batches)

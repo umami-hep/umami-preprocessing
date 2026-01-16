@@ -1,0 +1,55 @@
+name: Docker build
+
+on:
+  pull_request:
+    branches:
+      - "*"
+  push:
+    branches:
+      - "main"
+    tags:
+      - "*"
+  workflow_dispatch:
+
+env:
+  GITLAB_CONTAINER_REGISTRY: gitlab-registry.cern.ch/aft/training-images/upp-images
+
+jobs:
+  build_latest:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build image
+        run: docker build -f docker/Dockerfile --tag ${GITLAB_CONTAINER_REGISTRY}/upp:latest .
+
+      - name: Login to GitLab container registry
+        run: docker login gitlab-registry.cern.ch -u ${{ secrets.GITLAB_USERNAME }} -p ${{ secrets.GITLAB_TOKEN }}
+
+      # Push this image if this is on the main branch
+      - name: Push image
+        run: docker push ${GITLAB_CONTAINER_REGISTRY}/upp:latest
+
+  build_release:
+    # Build an extra image for tagged commits
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitLab container registry
+        run: docker login gitlab-registry.cern.ch -u ${{ secrets.GITLAB_USERNAME }} -p ${{ secrets.GITLAB_TOKEN }}
+
+      - name: Build and push release image
+        run: |
+          docker build -f docker/Dockerfile --tag ${GITLAB_CONTAINER_REGISTRY}/upp:${{  github.ref_name  }} .
+          docker push ${GITLAB_CONTAINER_REGISTRY}/upp:${{  github.ref_name  }}
