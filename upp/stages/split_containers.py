@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import glob
+import logging as log
 import tempfile
 import time
 from collections.abc import Generator
@@ -19,8 +20,6 @@ from ftag.vds import create_virtual_file
 from numpy.lib import recfunctions as rfn
 
 from upp.classes.preprocessing_config import PreprocessingConfig
-
-import logging as log
 
 if TYPE_CHECKING:  # pragma: no cover
     pass
