@@ -1,0 +1,8 @@
+# simple split on event number: 90/05/05 train/val/test
+# no k-folding
+train:
+  - [eventNumber, "%20<=", 17]
+val:
+  - [eventNumber, "%20==", 18]
+test:
+  - [eventNumber, "%20==", 19]
