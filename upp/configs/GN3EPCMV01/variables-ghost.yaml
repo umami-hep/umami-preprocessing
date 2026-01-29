@@ -56,6 +56,47 @@ tracks_ghost:
     - numberOfPixelSharedHits
     - numberOfPixelSplitHits
     - numberOfSCTSharedHits
+    # Soft Muon variables
+    - leptonID
+    - muon_quality
+    - muon_qOverPratio
+    - muon_momentumBalanceSignificance
+    - muon_scatteringNeighbourSignificance
+
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
+    - ftagTruthVertexIndex
+
+tracks_ghost_rich_ip:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - lifetimeSignedD0Significance
+    - lifetimeSignedZ0SinThetaSignificance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    # Soft Muon variables
+    - leptonID
+    - muon_quality
+    - muon_qOverPratio
+    - muon_momentumBalanceSignificance
+    - muon_scatteringNeighbourSignificance
+
   labels:
     - ftagTruthOriginLabel
     - ftagTruthTypeLabel
@@ -126,4 +167,3 @@ muons:
     - lifetimeSignedZ0SinTheta
     - lifetimeSignedD0Significance
     - lifetimeSignedZ0SinThetaSignificance
-
