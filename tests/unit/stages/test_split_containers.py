@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import h5py
-import pytest
 
 from upp.stages.split_containers import validate_h5_file
 

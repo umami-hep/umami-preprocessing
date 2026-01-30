@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Handle corrupted HDF5 files gracefully in split_containers
+- Handle corrupted HDF5 files gracefully in split_containers [#114](https://github.com/umami-hep/umami-preprocessing/pull/114)
 
 ### [v0.2.8](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.8) (26.01.2026)
 
