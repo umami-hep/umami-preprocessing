@@ -142,6 +142,7 @@ class PreprocessingConfig:
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
+    vds_dir: Path | None = None
 
     def __post_init__(self):
         # postprocess paths
