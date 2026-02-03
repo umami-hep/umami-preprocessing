@@ -119,6 +119,9 @@ class PreprocessingConfig:
         Skip checks for the input files. This is used for grid submission
     skip_config_copy : bool, optional
         Decide, if the config copying is skipped or not. By default False
+    vds_dir : Path | None, optional
+        Directory name for creation of virtual datasets. By default None
+        If none is given, virtual datasets is created next to input ntuples
     """
 
     config_path: Path
