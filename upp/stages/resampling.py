@@ -332,6 +332,7 @@ class Resampling:
                 jets_name=self.jets_name,
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
+                vds_dir=sample.vds_dir,
             )
 
             # Define a stream of jets with the cuts for the region and the variables used
