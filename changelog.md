@@ -1,6 +1,8 @@
 # Changelog
 
 ### [Latest]
+
+- Update atlas-ftag-tools and Puma [#119](https://github.com/umami-hep/umami-preprocessing/pull/119)
 - Updating variables in GN3EPCMV01 [#116](https://github.com/umami-hep/umami-preprocessing/pull/116)
 
 ### [v0.2.8](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.2.8) (26.01.2026)
