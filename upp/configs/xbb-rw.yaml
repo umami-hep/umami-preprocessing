@@ -1,0 +1,145 @@
+variables: !include xbb-rw-variables.yaml
+global_cuts: !include splits/simple-split.yaml
+
+
+hbb: &hbb
+  name: hbb
+  equal_jets: False
+  pattern:
+    # mc20
+    - "user.jabarr.801471.e8441_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    # mc23
+    - "user.jabarr.801972.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+
+hcc: &hcc
+  name: hcc
+  equal_jets: False
+  pattern:
+    # mc20
+    - "user.jabarr.801472.e8441_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    # mc23
+    - "user.jabarr.801973.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+
+htautauhad: &htautauhad
+  name: htautauhad
+  equal_jets: False
+  pattern:
+    # mc20
+    - "user.jabarr.802168.e8558_s3797_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    # mc23
+    - "user.jabarr.802168.e8558_s4159_r15530_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    # mc20
+    - "user.jabarr.426345.e6880_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    # mc23
+    - "user.jabarr.802423.e8514_s4159_r15530_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+
+qcd: &qcd
+  name: qcd
+  equal_jets: False
+  pattern:
+    # mc20 dijet
+    - "user.jabarr.364703.e7142_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.364704.e7142_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.364705.e7142_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.364706.e7142_s3681_r13144_p6646.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.364707.e7142_s3681_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    # mc23 dijet
+    - "user.jabarr.801168.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.801169.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.801170.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.801171.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    - "user.jabarr.801172.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+
+wqq: &wqq
+  name: wqq
+  equal_jets: False
+  pattern:
+    # mc20
+    - "user.jabarr.802017.e8482_s3797_r13144_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+    # mc23
+    - "user.jabarr.802017.e8557_s4159_r15224_p6453.tdd.FatJets.25_2_76.26-01-05_cb_output.h5"
+
+inclusive: &inclusive
+  name: inclusive
+  cuts: []
+
+components:
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *hbb
+    flavours: [hbb]
+    num_jets: -1
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *hcc
+    flavours: [hcc]
+    num_jets: -1
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *htautauhad
+    flavours: [htautauhad]
+    num_jets: -1
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *zprime
+    flavours: [top]
+    num_jets: -1
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *qcd
+    flavours: [qcd]
+    num_jets: -1
+
+  - region:
+      <<: *inclusive
+    sample:
+      <<: *wqq
+    flavours: [Wqq]
+    num_jets: -1
+
+
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 10_000_000
+  num_jets_per_output_file: 25_000_000
+  base_dir: /share/lustre/jbarr/training-files/2026-01-01-cb/
+  merge_test_samples: False
+
+
+reweighting:
+  num_jets_estimate: 5_000_000
+  merge_num_proc: 10
+  reweights:
+    # 4D reweighting over pt, eta, mass, and mcCampaignYear
+    - group: jets
+      reweight_vars: [pt, eta, mass, mcCampaignYear]
+      bins:
+        pt:
+          [
+            [250_000, 600_000, 20],
+            [600_000, 2_100_000, 20],
+          ]
+        eta: [[-2.0, 2.0, 10]]
+        mass:
+          [
+            [50_000, 150_000, 15],
+            [150_000, 300_000, 15],
+          ]
+        mcCampaignYear: [[2015, 2026, 11]]
+      class_var: R10TruthLabel_R22v1
+      class_target: mean
