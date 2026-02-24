@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Allow configurable virtual dataset creation directory [#117](https://github.com/umami-hep/umami-preprocessing/pull/117)
+
 - Add campaign year reweighting/resampling to Xbb configs [#118](https://github.com/umami-hep/umami-preprocessing/pull/118)
 
 ### [v0.3.0](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.0) (23.02.2026)
