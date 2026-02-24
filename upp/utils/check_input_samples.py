@@ -211,6 +211,7 @@ def run_input_sample_check(
                 fname=config.ntuple_dir / sample,
                 batch_size=config.batch_size,
                 jets_name=config.jets_name,
+                vds_dir=getattr(config, "vds_dir", None),
             ).num_jets
 
         # Drop the pattern

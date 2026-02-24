@@ -86,6 +86,9 @@ class Component:
         if fname is None:
             fname = self.sample.path
 
+        if "vds_dir" not in kwargs and self.sample.vds_dir is not None:
+            kwargs["vds_dir"] = self.sample.vds_dir
+
         self.reader = H5Reader(
             fname=fname,
             batch_size=batch_size,
@@ -337,6 +340,7 @@ class Components:
                 ntuple_dir=config.ntuple_dir,
                 name=component["sample"]["name"],
                 skip_checks=config.skip_checks,
+                vds_dir=config.vds_dir,
             )
 
             # Create the Component instances for the different flavours

@@ -119,6 +119,9 @@ class PreprocessingConfig:
         Skip checks for the input files. This is used for grid submission
     skip_config_copy : bool, optional
         Decide, if the config copying is skipped or not. By default False
+    vds_dir : Path | None, optional
+        Directory name for creation of virtual datasets. By default None
+        If none is given, virtual datasets is created next to input ntuples
     """
 
     config_path: Path
@@ -142,6 +145,7 @@ class PreprocessingConfig:
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
+    vds_dir: Path | None = None
 
     def __post_init__(self):
         # postprocess paths

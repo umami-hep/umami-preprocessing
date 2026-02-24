@@ -178,6 +178,7 @@ def plot_resampling_dists(config: PreprocessingConfig, stage: str) -> None:
             jets_name=config.jets_name,
             shuffle=False,
             equal_jets=True,
+            vds_dir=config.vds_dir,
         ).load(
             {config.jets_name: vars_to_load},
             num_jets=config.num_jets_estimate_plotting,
