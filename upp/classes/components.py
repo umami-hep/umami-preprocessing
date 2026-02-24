@@ -85,7 +85,7 @@ class Component:
         """
         if fname is None:
             fname = self.sample.path
-        
+
         if "vds_dir" not in kwargs and self.sample.vds_dir is not None:
             kwargs["vds_dir"] = self.sample.vds_dir
 
