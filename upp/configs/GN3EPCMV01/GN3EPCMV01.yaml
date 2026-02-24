@@ -1,0 +1,163 @@
+variables: !include /home/users/r/reisch/production/slurm-scripts/umami-preprocessing/260112/configs/variables-ghost.yaml
+global_cuts: !include /home/users/r/reisch/production/slurm-scripts/umami-preprocessing/260112/configs/simple-split.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "user.treisch.601589.e8547_s3797_r13144_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC20d
+    - "user.treisch.601589.e8549_s4159_r15530_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23d
+    - "user.treisch.601589.e8549_s4162_r14622_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23a
+    - "user.treisch.601589.e8549_s4369_r16083_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23e
+
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "user.treisch.802818.e8599_s3797_r13144_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC20d
+    - "user.treisch.802818.e8599_s4159_r15530_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23d
+    - "user.treisch.802818.e8599_s4162_r15540_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23a
+    - "user.treisch.802818.e8599_s4369_r16083_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23e
+
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostbjets]
+    num_jets: 168_968_784
+    num_jets_test: 2_000_000
+    num_jets_val: 2_000_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostcjets]
+    num_jets: 38_872_067
+    num_jets_test: 2_000_000
+    num_jets_val: 2_000_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostsjets]
+    num_jets: 30_714_894
+    num_jets_test: 1_706_567
+    num_jets_val: 1_706_567
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostudjets]
+    num_jets: 78_352_864
+    num_jets_test: 2_000_000
+    num_jets_val: 2_000_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostgjets]
+    num_jets: 92_319_320
+    num_jets_test: 2_000_000
+    num_jets_val: 2_000_000
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghosttaujets]
+    num_jets: 16_261_627
+    num_jets_test: 896_611
+    num_jets_val: 896_611
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostbjets]
+    num_jets: 40_230_662 #40_696_238
+    num_jets_test: 476_190
+    num_jets_val: 476_190
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostcjets]
+    num_jets: 9_255_254 #39_928_286
+    num_jets_test: 476_190
+    num_jets_val: 476_190
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostsjets]
+    num_jets: 7_313_070 #25_814_913
+    num_jets_test: 406_325
+    num_jets_val: 406_325
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostudjets]
+    num_jets: 18_655_443 #28_206_672
+    num_jets_test: 476_190
+    num_jets_val: 476_190
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostgjets]
+    num_jets: 21_980_790 #55_036_052
+    num_jets_test: 476_190
+    num_jets_val: 476_190
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghosttaujets]
+    num_jets: 3_871_815 #25_623_679
+    num_jets_test: 213_478
+    num_jets_val: 213_478
+
+resampling:
+  target: ghostcjets
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 46], [250_000, 1_000_000, 30], [1_000_000, 6_000_000, 20]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 10]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 50_000_000
+  num_jets_estimate_plotting: 10_000_000
+  num_jets_per_output_file: 5_000_000
+  base_dir: /srv/beegfs/scratch/groups/rodem/DAOD_FTAG/
+  out_dir: p7085/upp/
+  ntuple_dir: p7085/

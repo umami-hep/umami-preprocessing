@@ -65,6 +65,8 @@ resampling:
       bins: [[0, 2, 20]]
     mass:
       bins: [[50_000, 300_000, 50]]
+    mcCampaignYear:
+      bins: [[2015, 2026, 11]]
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
