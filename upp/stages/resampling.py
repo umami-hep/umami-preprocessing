@@ -502,11 +502,12 @@ class Resampling:
                 f" {self.config.sampling_fraction}..."
             )
             frac = iter_component.sampling_fraction if self.select_func else 1
-            iter_component.check_num_jets(
-                iter_component.num_jets,
-                sampling_fraction=frac,
-                cuts=iter_component.cuts,
-            )
+            if self.select_func:
+                iter_component.check_num_jets(
+                    iter_component.num_jets,
+                    sampling_fraction=frac,
+                    cuts=iter_component.cuts,
+                )
 
         # Create check variable to ensure at least one region was processed
         region_processed = not region
