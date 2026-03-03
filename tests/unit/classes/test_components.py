@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+# import pytest
 from ftag import Cuts, Flavours, Sample
 from ftag.mock import get_mock_file
 
+import upp.classes.components as components_module
 from upp.classes.components import Component
 from upp.classes.region import Region
 
@@ -35,7 +37,7 @@ def test_setup_reader_passes_vds_dir(tmp_path, monkeypatch):
         def __init__(self, **kwargs):
             captured.update(kwargs)
 
-    monkeypatch.setattr("upp.classes.components.H5Reader", _H5Reader)
+    monkeypatch.setattr(components_module, "H5Reader", _H5Reader)
     comp.setup_reader(batch_size=100)
 
     assert "vds_dir" in captured
@@ -52,7 +54,7 @@ def test_setup_reader_no_vds_dir(tmp_path, monkeypatch):
         def __init__(self, **kwargs):
             captured.update(kwargs)
 
-    monkeypatch.setattr("upp.classes.components.H5Reader", _H5Reader)
+    monkeypatch.setattr(components_module, "H5Reader", _H5Reader)
     comp.setup_reader(batch_size=100)
 
     assert "vds_dir" not in captured
