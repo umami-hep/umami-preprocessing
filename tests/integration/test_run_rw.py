@@ -126,3 +126,17 @@ class TestRunRW:
         self._run_split()
         self._calculate_weights()
         self._rw_merge()
+
+    def test_rw_unequal_jets(self):
+        """Test reweighting when a file has fewer jets than num_jets_estimate.
+
+        Previously this would crash with an assertion error. After the fix,
+        get_input_readers() caps per-reader jet counts at available jets and
+        the batch loop handles StopIteration from shorter readers.
+        """
+        # Overwrite data1.h5 with a smaller mock — after per-flavour splitting
+        # some flavour files will have fewer jets than num_jets_estimate
+        self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5", N=500)
+        self._run_split()
+        self._calculate_weights()
+        self._rw_merge()

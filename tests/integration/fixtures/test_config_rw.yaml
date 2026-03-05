@@ -62,7 +62,7 @@ components:
     num_jets: -1
 
 reweighting:
-  num_jets_estimate: 100
+  num_jets_estimate: 200
   merge_num_proc: 1
   reweights:
     - group: jets
