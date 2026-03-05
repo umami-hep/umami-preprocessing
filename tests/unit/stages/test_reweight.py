@@ -12,20 +12,7 @@ from upp.stages.reweight import Reweight
 
 
 def _make_organised_components(tmpdir, jets_per_flavour):
-    """Write a minimal organised-components.yaml and return its path.
-
-    Parameters
-    ----------
-    tmpdir : Path
-        Directory to write files into.
-    jets_per_flavour : dict[str, int]
-        Mapping of flavour name to jet count (used to create mock H5 files).
-
-    Returns
-    -------
-    Path
-        Path to the organised-components.yaml file.
-    """
+    """Write a minimal organised-components.yaml and return its path."""
     files = {}
     for flav, n in jets_per_flavour.items():
         fpath = tmpdir / f"{flav}.h5"
