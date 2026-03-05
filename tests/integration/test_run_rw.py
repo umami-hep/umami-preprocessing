@@ -136,8 +136,7 @@ class TestRunRW:
         """
         # Overwrite data1.h5 with a small mock (fewer jets than
         # num_jets_estimate=100 after per-flavour splitting)
-        self.generate_mock(
-            "tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5", N=30
-        )
+        self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5", N=30)
         self._run_split()
         self._calculate_weights()
+        self._rw_merge()
