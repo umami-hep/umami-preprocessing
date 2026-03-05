@@ -124,7 +124,7 @@ class Reweight:
         print("Setting up streams with vars: ", all_vars, flush=True)
         reader_streams = [
             r.stream(all_vars, num_jets=n)
-            for r, n in zip(readers, per_reader_num_jets)
+            for r, n in zip(readers, per_reader_num_jets, strict=False)
         ]
         max_num_jets = max(per_reader_num_jets)
         num_batches = max_num_jets // batch_size_per_file + (
