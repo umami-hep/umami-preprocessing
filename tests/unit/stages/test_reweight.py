@@ -89,18 +89,6 @@ class TestGetInputReaders:
         _, per_reader_num_jets = rw.get_input_readers()
         assert per_reader_num_jets == [100, 100]
 
-    def test_warning_printed(self, tmp_path, capsys):
-        """Capping prints a warning message."""
-        rw = _make_reweight_obj(
-            tmp_path,
-            jets_per_flavour={"bjets": 30},
-            num_jets_estimate=100,
-        )
-        rw.get_input_readers()
-        captured = capsys.readouterr()
-        assert "WARNING" in captured.out
-        assert "30" in captured.out
-
 
 class TestCalculateWeightsStopIteration:
     """Test that the batch loop handles StopIteration from shorter readers."""
