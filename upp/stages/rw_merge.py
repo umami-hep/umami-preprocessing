@@ -113,15 +113,11 @@ class RWMerge:
     @staticmethod
     def _assign_weights(this_rw, bins, to_dump):
         this_weights = np.zeros(to_dump.shape, dtype=float)
-
-        # This is SUPER slow - as we iterate each object, but its
-        for i in range(this_weights.shape[0]):
-            bin_idx = bins[:, i]
-
-            cls = to_dump[i]
-
-            thishist = this_rw["weights"][str(cls)][tuple(bin_idx)]
-            this_weights[i] = thishist
+        unique_classes = np.unique(to_dump)
+        for cls in unique_classes:
+            cls_mask = to_dump == cls
+            cls_bins = bins[:, cls_mask]
+            this_weights[cls_mask] = this_rw["weights"][str(cls)][tuple(cls_bins)]
         return this_weights
 
     @staticmethod
