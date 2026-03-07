@@ -169,8 +169,6 @@ class RWMerge:
                     bins = np.expand_dims(bins, axis=0)
 
                 try:
-                    # Note - I tried vectorising this but its not the bottleneck so
-                    # I'm leaving it as is
                     this_weights = RWMerge._assign_weights(rw, bins, to_dump[class_var])
 
                 except Exception:
