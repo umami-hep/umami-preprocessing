@@ -87,7 +87,7 @@ class RWMerge:
             args_list.append(
                 (
                     reader_kwargs,
-                    output_dir / f"pp_output_train-full_{i}.h5",
+                    output_dir / f"pp_output_{self.config.split}-full_{i}.h5",
                     weights,
                     num_jets_per_flavours,
                     variables,
