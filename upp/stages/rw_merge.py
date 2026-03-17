@@ -87,7 +87,7 @@ class RWMerge:
             args_list.append(
                 (
                     reader_kwargs,
-                    output_dir / f"pp_output_train-full_{i}.h5",
+                    output_dir / f"pp_output_{self.config.split}-full_{i}.h5",
                     weights,
                     num_jets_per_flavours,
                     variables,
@@ -113,15 +113,11 @@ class RWMerge:
     @staticmethod
     def _assign_weights(this_rw, bins, to_dump):
         this_weights = np.zeros(to_dump.shape, dtype=float)
-
-        # This is SUPER slow - as we iterate each object, but its
-        for i in range(this_weights.shape[0]):
-            bin_idx = bins[:, i]
-
-            cls = to_dump[i]
-
-            thishist = this_rw["weights"][str(cls)][tuple(bin_idx)]
-            this_weights[i] = thishist
+        unique_classes = np.unique(to_dump)
+        for cls in unique_classes:
+            cls_mask = to_dump == cls
+            cls_bins = bins[:, cls_mask]
+            this_weights[cls_mask] = this_rw["weights"][str(cls)][tuple(cls_bins)]
         return this_weights
 
     @staticmethod
@@ -173,8 +169,6 @@ class RWMerge:
                     bins = np.expand_dims(bins, axis=0)
 
                 try:
-                    # Note - I tried vectorising this but its not the bottleneck so
-                    # I'm leaving it as is
                     this_weights = RWMerge._assign_weights(rw, bins, to_dump[class_var])
 
                 except Exception:
