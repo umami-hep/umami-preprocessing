@@ -277,12 +277,22 @@ class Resampling:
             if all(component._complete for component in components):
                 break
 
-        # If one component couldn't be completed, raise ValueError
+        # If one component couldn't be completed, raise ValueError if resampling is not None
         for component in components:
-            if not component._complete:
+            if not component._complete and self.select_func:
                 raise ValueError(
                     f"Ran out of {component} jets after writing {component.writer.num_written:,}"
                 )
+            elif not component._complete:
+                log.warning(
+                    f"Ran out of {component} jets after writing {component.writer.num_written:,}, continuing with maximum available number since 
+                    resampling is disabled!"
+                )
+                component._ups_ratio = component.writer.num_written / component._unique_jets
+                component.writer.add_attr("upsampling_ratio", component._ups_ratio)
+                component.writer.add_attr("unique_jets", component._unique_jets)
+                component.writer.add_attr("dsid", str(component.sample.dsid))
+                component.writer.close()
 
     def run_on_region(
         self,
