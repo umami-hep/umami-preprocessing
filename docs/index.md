@@ -20,7 +20,7 @@ Input ntuples for the preprocessing are produced using the [training-dataset-dum
 A list of available h5 ntuples is maintained in the central [FTAG documentation pages](https://ftag.docs.cern.ch/software/samples/).
 However, the ntuples listed there are not directly suitable for algorithm training and require preprocessing (handled by this package).
 
-This library is alredy used to preprocess data for [Salt](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/salt/) framework.
+This library is already used to preprocess data for [Salt](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/salt/) framework.
 UPP is planned to be integrated into [Umami](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami) framework for training of Umami/DIPS and DL1r and replace current umami preprocessing, as it addresses [several issues](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/?label_name%5B%5D=Preprocessing) with the current umami preprocessing workflow, and uses the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/) package extensively.
 
 
@@ -66,7 +66,7 @@ Compared with [umami](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorith
     - other plotting scripts can support a single file format
     - normalisation/concatenation is applied on the fly during training
     - training files can contain supersets of variables used for training
-- new "countup" samping which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
+- new "countup" sampling which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
 - the code estimates the number of unique jets for you and saves this number as an attribute in the output file
 
 These features yield the following benefits as compared with umami:

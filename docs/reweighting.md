@@ -1,6 +1,6 @@
 # Reweighting
 
-A different approach to balancing classes to resampling is to instead reweight them instead.
+A different approach to balancing classes to resampling is to instead reweight them.
 In resampling, we bin our jets over their kinematics. We look in each bin, and if we have more jets of a given flavour compared to the target flavour, we throw those jets away. If we have less of a given flavour than the target flavour, we copy-and-paste (upsample) the jet until the bins are equal.
 This ensures that the flavour ratio of any two bins is approximately constant.
 
@@ -85,9 +85,9 @@ reweighting:
 
 ```
 
-`num_jets_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevent in the next section of these docs.
+`num_jets_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
 Then, you have the `reweights` section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
-The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minumum bin counts as the target.
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
 The reweighting can also be performed over track variables, for example
 
 ```yaml
@@ -104,7 +104,7 @@ class_var: ftagTruthOriginLabel
 class_target: mean
 ```
 
-Would calculate weights such that we have equivilent pt_frac distributions across the track labels.
+Would calculate weights such that we have equivalent pt_frac distributions across the track labels.
 
 To run the reweighting simply do
 
@@ -114,7 +114,7 @@ python upp/main.py --config {config} --rw
 
 ## Merging
 
-Finally, we can merge all the relevent jets with their weights. This is done by
+Finally, we can merge all the relevant jets with their weights. This is done by
 
 ```
 python upp/main.py --rwm --split {train/test/val}

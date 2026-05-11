@@ -48,7 +48,7 @@ python -m pip install umami-preprocessing
 
 !!!info "On lxplus you may have to use ```python3```"
 
-After this installation all the fuctionality for the user is available. The further steps are only useful for the development of the package.
+After this installation all the functionality for the user is available. The further steps are only useful for the development of the package.
 
 ### Get the code
 
