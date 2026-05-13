@@ -49,10 +49,10 @@ Umami will first ```try``` to read the config file as an old umami preprocessing
 * ```--write``` step will execute umamii code for scaling the variables and writing them in an unstructured scaling array it will also produce default umami preprocessing plots
 * ```--to_records``` step will execute umamii code for converting dataset to a TFrecords format 
 
-Note: ```--prepare``` step will do nothing and will only trow an arror as UPP does not require (same) preparation as old umami preprocession. 
+Note: ```--prepare``` step will do nothing and will only trow an error as UPP does not require (same) preparation as old umami preprocessing. 
 ```--resampling --hybrid_validation``` is also not available for upp as it does both splits at the resampling step
 
-After that one can use the results of the preprocessing for umami trainig for example for DL1 or DIPS.
+After that one can use the results of the preprocessing for umami training for example for DL1 or DIPS.
 One can either only run ```--resampling``` and ```--scaling``` and train on the structured array data using TDDgenerator by setting your training configs similar to this:
 ```
 # Set modelname and path to Pflow preprocessing config file
@@ -86,7 +86,7 @@ test_files:
 
 ```
 or you can perform all three steps to train using unstructured array data. This way one looses time to write the dataset but the training may be somewhat faster. 
-To do this just chnge your training_file in the example above to 
+To do this just change your training_file in the example above to 
 ```
 train_file: <base_dir><out_dir>pp_output_train_resampled_scaled_shifted.h5
 ```
