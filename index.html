@@ -471,44 +471,42 @@ In particular, it handles hybrid sample creation, resampling, normalisation, and
 <ul>
 <li><a href="https://github.com/umami-hep/umami-preprocessing">https://github.com/umami-hep/umami-preprocessing</a></li>
 </ul>
-<p>You can find information about tagger training and FTAG software at the central <a href="https://ftag.docs.cern.ch/algorithms/GNN/">docs pages</a>.</p>
+<p>You can find information about tagger training and FTAG software at the central <a href="https://ftag.docs.cern.ch/">docs pages</a>.</p>
 <details class="info" open="open">
 <summary>UPP tutorial</summary>
-<p>A tutorial on how to use the framework is provided at the <a href="update-link">central FTAG docs page</a></p>
+<p>A tutorial on how to use the framework is provided at the <a href="https://ftag.docs.cern.ch/software/tutorials/tutorial-upp/">central FTAG docs page</a></p>
 </details>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
 <p>Input ntuples for the preprocessing are produced using the <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper">training-dataset-dumper</a> which converts from ROOT files to HDF5 ntuples.
 A list of available h5 ntuples is maintained in the central <a href="https://ftag.docs.cern.ch/software/samples/">FTAG documentation pages</a>.
-However, the ntuples listed there are not directly suitable for algorithm training and require preprocessing (handled by this package).</p>
-<p>This library is alredy used to preprocess data for <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/salt/">Salt</a> framework.
-UPP is planned to be integrated into <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami">Umami</a> framework for training of Umami/DIPS and DL1r and replace current umami preprocessing, as it addresses <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/?label_name%5B%5D=Preprocessing">several issues</a> with the current umami preprocessing workflow, and uses the <a href="https://github.com/umami-hep/atlas-ftag-tools/"><code>atlas-ftag-tools</code></a> package extensively.</p>
+However, the ntuples listed there are not directly suitable for algorithm training and require preprocessing. That is what UPP is used for!</p>
+<p>This library is already used to preprocess data for the <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/salt/">Salt</a> framework.
+UPP is <a href="https://gitlab.cern.ch/aft/algorithms/umami/-/merge_requests/740">integrated</a> into the <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami">Umami</a> framework used for training Umami/DIPS and DL1r. UPP uses the <a href="https://github.com/umami-hep/atlas-ftag-tools/"><code>atlas-ftag-tools</code></a> package extensively, which reduces maintenance and streamlines development efforts.</p>
 <h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">#</a></h2>
-<p>The primary motivation behind preprocessing the training samples is to ensure that the distributions of kinematic variables such as <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span> are the same for all flavors.
-This uniformity in kinematic distributions is crucial to avoid kinematic biases in the tagging performance.
-In order to ensure the uniformity in kinematic distributions, resampling techniques are employed.
-These techniques involve removing samples from the majority class (under-sampling) and/or adding more samples from the minority class (over-sampling).</p>
-<p>The preprocessing can also be used to control the number of jets of each flavour, to stitch together jets from various samples, and to perform the shuffling and normalisation.</p>
+<p>The primary motivation behind preprocessing the training samples is to ensure that the distributions of kinematic variables, such as <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span>, are the same for all flavors.
+This uniformity in kinematic distributions in training data is crucial to avoid kinematic biases in the tagging performance. It also allows the machine learning model to focus on the less represented jet flavour classes such as b- and c-jets. Resampling techniques are used to achieve this goal. These techniques involve removing samples from the majority class (under-sampling) and/or adding more samples from the minority class (over-sampling).</p>
+<p>UPP can also be used to control the number of jets of each flavour in the training data, to stitch together jets from various samples, and to perform shuffling and normalisation of training features.</p>
 <h2 id="hybrid-samples">Hybrid Samples<a class="headerlink" href="#hybrid-samples" title="Permanent link">#</a></h2>
-<p>Umami/DIPS and DL1r are trained on so-called hybrid samples created by combining <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> and <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> jets using a <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> threshold, which is defined by the <code>pt_btagJes</code>.
-Below a certain pt threshold (which needs to be defined for the preprocessing), <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> events are used in the hybrid sample.
-Above this pt threshold, the jets are taken from <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> events.
-The advantage of these hybrid samples is the availability of sufficient jets with high pt, as the <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> samples typically have lower-pt jets than those jets from the <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> sample.</p>
-<p>The following image show the distributions of jet flavours in both samples</p>
-<p><img alt="Pt distribution of hybrid samples being composed from ttbar and Zjets samples" src="assets/pt_btagJes-cut_spectrum.png" /></p>
-<p>After applying <code>pdf</code> resampling with upscaling, we achieve the following combined distributions for jets:</p>
+<p>Umami/DIPS and DL1r are trained on so-called hybrid samples created by combining <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> and <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> jets using a <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> threshold.
+Below a certain <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> threshold (which needs to be defined for the preprocessing), <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> events are used in the hybrid sample.
+Above this <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> threshold, the jets are taken from <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> events. The <code>pt_btagJes</code> variable is used to define if a jet is above or below the <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> threshold.
+The advantage of these hybrid samples is the availability of sufficient jets with high <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span>, as <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> samples typically have a larger number of low-<span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> jets than <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> samples.</p>
+<p>The following image shows the distributions of jet flavours in both samples:</p>
+<p><img alt="pT distribution of hybrid samples being composed from ttbar and Zjets samples" src="assets/pt_btagJes-cut_spectrum.png" /></p>
+<p>After applying <code>pdf</code> resampling with upscaling using the UPP framework, we get a training sample with the following combined distributions:</p>
 <p><img alt="pT distribution of downsampled hybrid samples" src="assets/train_pt_btagJes.png" /></p>
-<p>It's worth noting that, while we used <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> and <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> samples here for illustrative purposes, you can use any type of samples.
+<p>It's worth noting that, while in this example we used <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> and <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span> samples, any samples with different kinematic distributions can be combined using the same method.
 Additionally, you're not obligated to create a hybrid sample; UPP can still be used with a single sample for preprocessing.</p>
 <h2 id="this-package">This package<a class="headerlink" href="#this-package" title="Permanent link">#</a></h2>
-<p>Compared with <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami">umami</a>, the main features of this code are:</p>
+<p>The main differences between UPP and the old <a href="https://umami.docs.cern.ch/preprocessing/Overview/">Umami</a> preprocessing workflow are:</p>
 <ul>
-<li>modular, class-based design</li>
-<li>use of h5 virtual datasets to wrap the source files</li>
-<li>only 2 main stages: resample -&gt; merge -&gt; done!</li>
-<li>parallelised processing of flavours within a sample, which avoids wasted reads</li>
-<li>support for different resampling "regions", which is useful for generalising to <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225">Xbb preprocessing</a></li>
+<li>A modular, class-based design</li>
+<li>The use of h5 virtual datasets to wrap the source files</li>
+<li>Only 2 main stages: resample -&gt; merge -&gt; done!</li>
+<li>Parallelised processing of flavours within a sample, which avoids wasted reads</li>
+<li>Support for different resampling "regions", which is useful for generalising to <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225">Xbb preprocessing</a></li>
 <li>n-dim sampling support, which is also useful for Xbb</li>
-<li>"new" improved training file format (which is actually just the tdd output format)<ul>
+<li>"New" improved training file format (which is actually just the tdd output format)<ul>
 <li>structured arrays are smaller on disk and therefore faster to read</li>
 <li>only one dataloader is needed and can be reused for training and testing</li>
 <li>other plotting scripts can support a single file format</li>
@@ -516,15 +514,15 @@ Additionally, you're not obligated to create a hybrid sample; UPP can still be u
 <li>training files can contain supersets of variables used for training</li>
 </ul>
 </li>
-<li>new "countup" samping which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)</li>
-<li>the code estimates the number of unique jets for you and saves this number as an attribute in the output file</li>
+<li>New "countup" sampling which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)</li>
+<li>The code estimates the number of unique jets for you and saves this number as an attribute in the output file</li>
 </ul>
-<p>These features yield the following benefits as compared with umami:</p>
+<p>These features yield the following benefits as compared with the old Umami preprocessing:</p>
 <ul>
-<li>only one command is needed to generate all preprocessing outputs (running with <code>--split=all</code> will produce train/val/test files)</li>
-<li>lines of code are reduced vs umami by 4x</li>
-<li>10x faster than default umami preprocessing (0.06 vs 0.825 hours/million jets in an old test)</li>
-<li>improvements to output file size and read speed</li>
+<li>Only one command is needed to generate all preprocessing outputs (running with <code>--split=all</code> will produce train/val/test files)</li>
+<li>Lines of code are reduced vs Umami by 4x</li>
+<li>10x faster than default Umami preprocessing (0.06 vs 0.825 hours/million jets in an old test)</li>
+<li>Improvements to output file size and read speed</li>
 </ul>
 
   <hr>
@@ -532,7 +530,7 @@ Additionally, you're not obligated to create a hybrid sample; UPP can still be u
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 21, 2023 16:21:32 UTC">September 21, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:

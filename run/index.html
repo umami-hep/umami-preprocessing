@@ -551,8 +551,8 @@
 <p>Before running UPP, make sure you have modified the configuration file according to the <a href="../configuration/">configuration instructions</a></p>
 <h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">#</a></h3>
 <p>To run all preprocessing stages for the <code>train</code> split use:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/test.yaml
-</code></pre></div>
+<p><code>bash
+preprocess --config configs/test.yaml</code></p>
 <p>For a comprehensive list of available flags, refer to <code>preprocess --help</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">If you are running on lxplus you may need to use <code>python3 upp/main.py</code> instead of <code>preprocess</code></p>
@@ -562,91 +562,91 @@
 These splits are defined in <a href="../configuration/#global-cuts">configuration files</a>, typically based on the <code>eventNumber</code> variable.
 By default, the train split contains 80% of the jets, while val and test contain 10% each.</p>
 <p>If you want to preprocess the <code>val</code> or <code>test</code> split, use the <code>--split</code> argument:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--split<span class="w"> </span>val
-</code></pre></div>
+<p><code>bash
+preprocess --config configs/config.yaml --split val</code></p>
 <p>You can also process <code>train</code>, <code>val</code>, and <code>test</code> with a single command using <code>--split=all</code>.</p>
 <h3 id="stages">Stages<a class="headerlink" href="#stages" title="Permanent link">#</a></h3>
 <p>The preprocessing is broken up into several stages.</p>
 <p>To run with only specific stages enabled, include the flag for the required stages:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--resample
-</code></pre></div>
+<p><code>bash
+preprocess --config configs/config.yaml --prep --resample</code></p>
 <p>To run the whole chain excluding certain stages, include the corresponding negative flag (<code>--no-*</code>).
 For example to run without plotting</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--no-plot
-</code></pre></div>
+<p><code>bash
+preprocess --config configs/config.yaml --no-plot</code></p>
 <p>The stages are described below.</p>
 <h4 id="1-prepare">1. Prepare<a class="headerlink" href="#1-prepare" title="Permanent link">#</a></h4>
-<p>The prepare stage (<code>--prep</code>) checks first the number of inital jets that are available per group/sample. For each of the entries in the <code>pattern</code> of the group, it checks how many jets are in total available. If this differs too much between the entries in <code>pattern</code>, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in <code>pattern</code> are different MC campaigns and by using drastically different numbers of initial jets, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument <code>--skip-sample-check</code>. If you run the script the first time and you want to run the prepare stage in parallel, please let this script run first! It creates virtual datasets for each entry in <code>pattern</code> which could become corrupted if you do run this script in parallel multiple times! Instructions on how to run this check stand-alone can be found in <a href="#additional-scripts-initial-sample-check">here</a>.</p>
+<p>The prepare stage (<code>--prep</code>) checks first the number of initial jets that are available per group/sample. For each of the entries in the <code>pattern</code> of the group, it checks how many jets are in total available. If this differs too much between the entries in <code>pattern</code>, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in <code>pattern</code> are different MC campaigns and by using drastically different numbers of initial jets, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument <code>--skip-sample-check</code>. If you run the script the first time and you want to run the prepare stage in parallel, please let this script run first! It creates virtual datasets for each entry in <code>pattern</code> which could become corrupted if you do run this script in parallel multiple times! Instructions on how to run this check stand-alone can be found in <a href="#additional-scripts-initial-sample-check">here</a>.</p>
 <p>Afterwards, the prepare stage reads a specified number of jets (<code>num_jets_estimate_hist</code>) for each flavor and constructs histograms of the resampling variables. These histograms are stored in <code>&lt;base_dir&gt;/hists</code>.</p>
 <details class="info">
 <summary>Paralellisation</summary>
-<p>This step can be paralellised to speed up the histogram creation. To do so, you need to provide the additional <code>--component</code> flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the <code>components</code> part of the config file. As an example, we take the <code>ghost-highstat.yaml</code> config file from the <code>gn3</code> folder in <code>configs/</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
-<span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
-<span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ghostsplitbjets</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22_000_000</span>
-<span class="w">    </span><span class="nt">num_jets_test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2_000_000</span>
-</code></pre></div>
+<p>This step can be parallelized to speed up the histogram creation. To do so, you need to provide the additional <code>--component</code> flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the <code>components</code> part of the config file. As an example, we take the <code>ghost-highstat.yaml</code> config file from the <code>gn3</code> folder in <code>configs/</code>:</p>
+<p><code>yaml
+- region:
+    &lt;&lt;: *lowpt
+    sample:
+    &lt;&lt;: *ttbar
+    flavours: [ghostsplitbjets]
+    num_jets: 22_000_000
+    num_jets_test: 2_000_000</code></p>
 <p>The argument for the component flag can be constructed by taking the name of the region (this is defined in the definition of <code>lowpt</code>)</p>
-<div class="highlight"><pre><span></span><code><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
-<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
-<span class="nt">cuts</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
-</code></pre></div>
+<p><code>yaml
+lowpt: &amp;lowpt
+name: lowpt
+cuts:
+    - [pt_btagJes, "&gt;", 20_000]
+    - [pt_btagJes, "&lt;", 250_000]</code></p>
 <p>plus the name of the sample which is used (this is defined in the definition of <code>ttbar</code>)</p>
-<div class="highlight"><pre><span></span><code><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
-<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
-<span class="nt">equal_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
-<span class="nt">pattern</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5&quot;</span><span class="w"> </span><span class="c1"># mc20d</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5&quot;</span><span class="w"> </span><span class="c1"># mc23a</span>
-</code></pre></div>
+<p><code>yaml
+ttbar: &amp;ttbar
+name: ttbar
+equal_jets: False
+pattern:
+    - "user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
+    - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a</code></p>
 <p>and finally the flavour that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
-</code></pre></div>
-<p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.</p>
+<p><code>bash
+preprocess --config configs/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets</code></p>
+<p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.</p>
 </details>
 <h4 id="2-resample">2. Resample<a class="headerlink" href="#2-resample" title="Permanent link">#</a></h4>
 <p>The resample stage (<code>--resample</code>) resamples jets to achieve similar <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span> distributions across flavours.
 After execution, resampled samples for each flavor, sample, and split are saved separately in <code>&lt;base_dir&gt;/components/&lt;split&gt;/</code>.
 You need to run the resampling stage even if you don't apply any resampling (e.g. you configured with <code>method: none</code>).</p>
 <details class="info">
-<summary>Paralellisation</summary>
+<summary>Parallelization</summary>
 <p>Similar to the <code>--prep</code> step, the resampling step is also able to run in parallel, but only for the different region (e.g. <code>lowpt</code> &amp; <code>highpt</code>). To do so, you need to run with the command line argument <code>--region</code> which takes as input the region on which to run. Please ensure that all components for this region were prepared in the <code>--prep</code> step before running this!</p>
 <p>The command to run the specific region would look like this:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
-</code></pre></div>
-<p>Similar to the <code>--prep</code> step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
-<p>If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the <code>--region</code> command line argument together with the <code>--component</code> command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the paralellisation chapter of the Prepare stage.</p>
+<p><code>bash
+preprocess --config configs/config.yaml --resample --region lowpt</code></p>
+<p>Similar to the <code>--prep</code> step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
+<p>If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the <code>--region</code> command line argument together with the <code>--component</code> command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the parallelization chapter of the Prepare stage.</p>
 <p>The command to run the specific region would look like this:</p>
-<div class="highlight"><pre><span></span><code>preprocess<span class="w"> </span>--config<span class="w"> </span>configs/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
-</code></pre></div>
-<p>Similar to the <code>--prep</code> step and the previous <code>--region</code> explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to paralellise the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
-Also, please do NOT use this functionality if you don't have fast I/O (Harddrives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.</p>
+<p><code>bash
+preprocess --config configs/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets</code></p>
+<p>Similar to the <code>--prep</code> step and the previous <code>--region</code> explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
+Also, please do NOT use this functionality if you don't have fast I/O (hard drives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.</p>
 </details>
 <h4 id="3-merge">3. Merge<a class="headerlink" href="#3-merge" title="Permanent link">#</a></h4>
 <p>The merge stage (<code>--merge</code>) combines the resampled samples into a single file named <code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/pp_output_&lt;split&gt;.h5</code>.
 It also handles shuffling.</p>
 <h4 id="4-normalise">4. Normalise<a class="headerlink" href="#4-normalise" title="Permanent link">#</a></h4>
-<p>The normalise stage (<code>--norm</code>) calculates scaling and shifting values for all variables intended for training based on (<code>num_jets_estimate_norm</code>). The results are stored in<code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/norm_dict.yaml</code>.</p>
+<p>The normalize stage (<code>--norm</code>) calculates scaling and shifting values for all variables intended for training based on (<code>num_jets_estimate_norm</code>). The results are stored in<code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/norm_dict.yaml</code>.</p>
 <h4 id="5-plotting">5. Plotting<a class="headerlink" href="#5-plotting" title="Permanent link">#</a></h4>
 <p>The plotting stage (<code>--plot</code>) produces histograms of resampled variables to verify the resampling quality.
 You can find these plots in <code>&lt;tbase_dir&gt;/plots/</code>.</p>
 <h3 id="additional-scripts-initial-sample-check">Additional Scripts: Initial Sample Check<a class="headerlink" href="#additional-scripts-initial-sample-check" title="Permanent link">#</a></h3>
-<p>The check for the inital samples from the prepare stage can also be run stand-alone. This is important if you plan to run in parallel mode. To do so, you can simply use the following command:</p>
-<div class="highlight"><pre><span></span><code>check_input_samples<span class="w"> </span>--config_path<span class="w"> </span>&lt;path/to/your/config&gt;
-</code></pre></div>
-<p>You can also add the <code>--deviation-factor</code>, which is by default <code>10.0</code> and the <code>--verbose</code> flags. The latter will print the number of inital jets to your terminal.</p>
+<p>The check for the initial samples from the prepare stage can also be run stand-alone. This is important if you plan to run in parallel mode. To do so, you can simply use the following command:</p>
+<p><code>bash
+check_input_samples --config_path &lt;path/to/your/config&gt;</code></p>
+<p>You can also add the <code>--deviation-factor</code>, which is by default <code>10.0</code> and the <code>--verbose</code> flags. The latter will print the number of initial jets to your terminal.</p>
 
   <hr>
 <div class="md-source-file">
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 7, 2025 13:49:59 UTC">August 7, 2025</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:

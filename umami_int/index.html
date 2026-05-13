@@ -344,6 +344,55 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#running-preprocessing" class="md-nav__link">
+    Running preprocessing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-modelname-and-path-to-pflow-preprocessing-config-file" class="md-nav__link">
+    Set modelname and path to Pflow preprocessing config file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-here-a-pretrained-model-to-start-with" class="md-nav__link">
+    Add here a pretrained model to start with.
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leave-empty-for-a-fresh-start" class="md-nav__link">
+    Leave empty for a fresh start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-training-file" class="md-nav__link">
+    Add training file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-templates-for-the-variable-cuts" class="md-nav__link">
+    Defining templates for the variable cuts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-validation-files" class="md-nav__link">
+    Add validation files
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -398,6 +447,55 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#running-preprocessing" class="md-nav__link">
+    Running preprocessing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-modelname-and-path-to-pflow-preprocessing-config-file" class="md-nav__link">
+    Set modelname and path to Pflow preprocessing config file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-here-a-pretrained-model-to-start-with" class="md-nav__link">
+    Add here a pretrained model to start with.
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leave-empty-for-a-fresh-start" class="md-nav__link">
+    Leave empty for a fresh start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-training-file" class="md-nav__link">
+    Add training file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-templates-for-the-variable-cuts" class="md-nav__link">
+    Defining templates for the variable cuts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-validation-files" class="md-nav__link">
+    Add validation files
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -423,43 +521,39 @@
 <h3 id="umami-specific-configs">Umami-specific configs<a class="headerlink" href="#umami-specific-configs" title="Permanent link">#</a></h3>
 <p>First you need to add umami-specific configs to the config file.
 Here is an example config:
-<div class="highlight"><pre><span></span><code><span class="nt">umami</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">general</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">plot_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PFlow_ext-hybrid</span>
-<span class="w">    </span><span class="nt">plot_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pdf&quot;</span>
-<span class="w">    </span><span class="nt">use_atlas_tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="w">    </span><span class="nt">atlas_first_tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Simulation</span><span class="nv"> </span><span class="s">Internal&quot;</span>
-<span class="w">    </span><span class="nt">atlas_second_tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$\\sqrt{s}=13$</span><span class="nv"> </span><span class="s">TeV,</span><span class="nv"> </span><span class="s">PFlow</span><span class="nv"> </span><span class="s">jets&quot;</span>
-<span class="w">    </span><span class="nt">legend_sample_category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="w">    </span><span class="nt">var_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">umami/user/upp_prep_small/config/Dips_Variables_R22.yaml</span>
-<span class="w">    </span><span class="nt">dict_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;base_dir&gt;&lt;out_dir&gt;PFlow-scale_dict.json</span>
-<span class="w">    </span><span class="nt">compression</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lzf</span>
-<span class="w">    </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float16</span>
-<span class="w">    </span><span class="nt">concat_jet_tracks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
-<span class="w">  </span><span class="nt">sampling</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">use_validation_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="w">    </span><span class="nt">options</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">n_jets_to_plot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3e4</span>
-<span class="w">      </span><span class="nt">save_tracks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="w">      </span><span class="nt">save_track_labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="w">      </span><span class="nt">bool_attach_sample_weights</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="w">      </span><span class="nt">tracks_names</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;tracks&quot;</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">n_jets_scaling</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
-
-<span class="l l-Scalar l-Scalar-Plain">This config part mimics the umami config structure. Parameters in `general` mimic ones that are in the root of umami config. Parameters in `sampling`, `sampling.options`, `parameters` and `convert_to_tfrecord` mimic the corresponding structures in umami config. All the parameters given in the example should be given in order for UPP integration in umami to work except `parameters` and `convert_to_tfrecord`. You need to provide `convert_to_tfrecord` if you need to convert dataset to TFrecord and `parameters` oonly if you does not want to saveinto `&lt;base_dir&gt;&lt;out_dir&gt;` by default.</span>
-<span class="l l-Scalar l-Scalar-Plain">Please refer to umami documentation [https://umami.docs.cern.ch/preprocessing/Overview/] for up-to-date explanation.</span>
-
-<span class="c1">### Running preprocessing</span>
-
-<span class="l l-Scalar l-Scalar-Plain">After you make the necessary changes to the config file you can perform preprocessing in umami by running the umami/preprocessing.py script</span>
-<span class="l l-Scalar l-Scalar-Plain">the same way as you would do with the old umami preprocessing</span><span class="w"> </span>
-
-<span class="err">```</span><span class="l l-Scalar l-Scalar-Plain">bash</span>
-<span class="l l-Scalar l-Scalar-Plain">cd umami</span><span class="w"> </span>
-<span class="l l-Scalar l-Scalar-Plain">preprocessing.py --config_file path/to/my_upp_config.yaml --resampling</span>
-<span class="l l-Scalar l-Scalar-Plain">preprocessing.py --config_file path/to/my_upp_config.yaml --scaling</span>
-<span class="l l-Scalar l-Scalar-Plain">preprocessing.py --config_file path/to/my_upp_config.yaml --write</span>
-</code></pre></div></p>
+```yaml
+umami:
+  general:
+    plot_name: PFlow_ext-hybrid
+    plot_type: "pdf"
+    use_atlas_tag: True
+    atlas_first_tag: "Simulation Internal"
+    atlas_second_tag: "<span class="arithmatex"><span class="MathJax_Preview">\\sqrt{s}=13</span><script type="math/tex">\\sqrt{s}=13</script></span> TeV, PFlow jets"
+    legend_sample_category: True
+    var_file: umami/user/upp_prep_small/config/Dips_Variables_R22.yaml
+    dict_file: <base_dir><out_dir>PFlow-scale_dict.json
+    compression: lzf
+    precision: float16
+    concat_jet_tracks: False
+  sampling:
+    use_validation_samples: false
+    options:
+      n_jets_to_plot: 3e4
+      save_tracks: true
+      save_track_labels: true
+      bool_attach_sample_weights: false
+      tracks_names: ["tracks"]
+      n_jets_scaling: 0</p>
+<p>This config part mimics the umami config structure. Parameters in <code>general</code> mimic ones that are in the root of umami config. Parameters in <code>sampling</code>, <code>sampling.options</code>, <code>parameters</code> and <code>convert_to_tfrecord</code> mimic the corresponding structures in umami config. All the parameters given in the example should be given in order for UPP integration in umami to work except <code>parameters</code> and <code>convert_to_tfrecord</code>. You need to provide <code>convert_to_tfrecord</code> if you need to convert dataset to TFrecord and <code>parameters</code> oonly if you does not want to saveinto <code>&lt;base_dir&gt;&lt;out_dir&gt;</code> by default.
+Please refer to umami documentation [https://umami.docs.cern.ch/preprocessing/Overview/] for up-to-date explanation.</p>
+<h3 id="running-preprocessing">Running preprocessing<a class="headerlink" href="#running-preprocessing" title="Permanent link">#</a></h3>
+<p>After you make the necessary changes to the config file you can perform preprocessing in umami by running the umami/preprocessing.py script
+the same way as you would do with the old umami preprocessing </p>
+<p><code>bash
+cd umami 
+preprocessing.py --config_file path/to/my_upp_config.yaml --resampling
+preprocessing.py --config_file path/to/my_upp_config.yaml --scaling
+preprocessing.py --config_file path/to/my_upp_config.yaml --write</code></p>
 <p>Umami will first <code>try</code> to read the config file as an old umami preprocessing configuration. When that fails it will read the config as a UPP preprocessing config.</p>
 <ul>
 <li><code>--resampling</code> step will perform Upp preprocessing with this config file and <code>split==all</code></li>
@@ -467,50 +561,46 @@ Here is an example config:
 <li><code>--write</code> step will execute umamii code for scaling the variables and writing them in an unstructured scaling array it will also produce default umami preprocessing plots</li>
 <li><code>--to_records</code> step will execute umamii code for converting dataset to a TFrecords format </li>
 </ul>
-<p>Note: <code>--prepare</code> step will do nothing and will only trow an arror as UPP does not require (same) preparation as old umami preprocession. 
+<p>Note: <code>--prepare</code> step will do nothing and will only trow an error as UPP does not require (same) preparation as old umami preprocessing. 
 <code>--resampling --hybrid_validation</code> is also not available for upp as it does both splits at the resampling step</p>
-<p>After that one can use the results of the preprocessing for umami trainig for example for DL1 or DIPS.
+<p>After that one can use the results of the preprocessing for umami training for example for DL1 or DIPS.
 One can either only run <code>--resampling</code> and <code>--scaling</code> and train on the structured array data using TDDgenerator by setting your training configs similar to this:
-<div class="highlight"><pre><span></span><code># Set modelname and path to Pflow preprocessing config file
-model_name: user_DL1r-PFlow_new-taggers-stats-22M-tdd-upp
-preprocess_config: /home/users/o/oleksiyu/WORK/umami/user/upp_prep_small/config/upp_prepr.yaml
-
-# Add here a pretrained model to start with.
-# Leave empty for a fresh start
-model_file: 
-
-# Add training file
-train_file: &lt;base_dir&gt;&lt;out_dir&gt;pp_output_train.h5
-
-# Defining templates for the variable cuts
-...
-
-#Add validation files
-validation_files:
+```</p>
+<h1 id="set-modelname-and-path-to-pflow-preprocessing-config-file">Set modelname and path to Pflow preprocessing config file<a class="headerlink" href="#set-modelname-and-path-to-pflow-preprocessing-config-file" title="Permanent link">#</a></h1>
+<p>model_name: user_DL1r-PFlow_new-taggers-stats-22M-tdd-upp
+preprocess_config: /home/users/o/oleksiyu/WORK/umami/user/upp_prep_small/config/upp_prepr.yaml</p>
+<h1 id="add-here-a-pretrained-model-to-start-with">Add here a pretrained model to start with.<a class="headerlink" href="#add-here-a-pretrained-model-to-start-with" title="Permanent link">#</a></h1>
+<h1 id="leave-empty-for-a-fresh-start">Leave empty for a fresh start<a class="headerlink" href="#leave-empty-for-a-fresh-start" title="Permanent link">#</a></h1>
+<p>model_file: </p>
+<h1 id="add-training-file">Add training file<a class="headerlink" href="#add-training-file" title="Permanent link">#</a></h1>
+<p>train_file: <base_dir><out_dir>pp_output_train.h5</p>
+<h1 id="defining-templates-for-the-variable-cuts">Defining templates for the variable cuts<a class="headerlink" href="#defining-templates-for-the-variable-cuts" title="Permanent link">#</a></h1>
+<p>...</p>
+<h1 id="add-validation-files">Add validation files<a class="headerlink" href="#add-validation-files" title="Permanent link">#</a></h1>
+<p>validation_files:
     r22_hybrid_val:
-        path: &lt;base_dir&gt;&lt;out_dir&gt;pp_output_val.h5
-        label: &quot;Hybrid Validation&quot;
-
-test_files:
+        path: <base_dir><out_dir>pp_output_val.h5
+        label: "Hybrid Validation"</p>
+<p>test_files:
     ttbar_r22:
-        path: &lt;base_dir&gt;&lt;out_dir&gt;pp_output_test_ttbar.h5
-        &lt;&lt;: *variable_cuts_ttbar
-
-    zpext_r22:
-        path: &lt;base_dir&gt;&lt;out_dir&gt;pp_output_test_zprime.h5
-        &lt;&lt;: *variable_cuts_zpext
+        path: <base_dir><out_dir>pp_output_test_ttbar.h5
+        &lt;&lt;: *variable_cuts_ttbar</p>
+<div class="codehilite"><pre><span></span><code><span class="n">zpext_r22</span><span class="p">:</span>
+<span class="w">    </span><span class="n">path</span><span class="p">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">base_dir</span><span class="o">&gt;&lt;</span><span class="n">out_dir</span><span class="o">&gt;</span><span class="n">pp_output_test_zprime</span><span class="o">.</span><span class="n">h5</span>
+<span class="w">    </span><span class="o">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="o">*</span><span class="n">variable_cuts_zpext</span>
 </code></pre></div>
-or you can perform all three steps to train using unstructured array data. This way one looses time to write the dataset but the training may be somewhat faster. 
-To do this just chnge your training_file in the example above to 
-<div class="highlight"><pre><span></span><code>train_file: &lt;base_dir&gt;&lt;out_dir&gt;pp_output_train_resampled_scaled_shifted.h5
-</code></pre></div></p>
+
+<p><code>or you can perform all three steps to train using unstructured array data. This way one looses time to write the dataset but the training may be somewhat faster. 
+To do this just change your training_file in the example above to</code>
+train_file: <base_dir><out_dir>pp_output_train_resampled_scaled_shifted.h5
+```</p>
 
   <hr>
 <div class="md-source-file">
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 2, 2023 11:25:20 UTC">November 2, 2023</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:

@@ -560,19 +560,19 @@ The samples are used to define components later on in configs and so one should 
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single DSID</label><label for="__tabbed_1_2">Multiple DSIDs</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
-<span class="w">  </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1.*.410470.*/*.h5</span>
-</code></pre></div>
+<p><code>yaml
+ttbar: &amp;ttbar
+  name: ttbar
+  pattern: name1.*.410470.*/*.h5</code></p>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
-<span class="w">  </span><span class="nt">equal_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
-<span class="w">  </span><span class="nt">pattern</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1.*.410470.*/*.h5</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name2.*.410470.*/*.h5</span>
-</code></pre></div>
+<p><code>yaml
+ttbar: &amp;ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - name1.*.410470.*/*.h5
+    - name2.*.410470.*/*.h5</code></p>
 </div>
 </div>
 </div>
@@ -618,17 +618,17 @@ Possible operators are:</p>
 </ul>
 <p>Along with the common selection cuts, you should also specify the cuts that separate <code>train</code>, <code>val</code> and <code>test</code> splits using modulo of <code>eventNumber</code>.
 For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">global_cuts</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">common</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">JetFitterSecondaryVertex_mass</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">25000</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">JetFitter_deltaR</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.6</span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">train</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10&lt;=&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">7</span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">val</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10==&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10==&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">]</span>
-</code></pre></div>
+<p><code>yaml
+global_cuts:
+  common:
+    - [JetFitterSecondaryVertex_mass, "&lt;", 25000]
+    - [JetFitter_deltaR, "&lt;", 0.6]
+  train:
+    - [eventNumber, "%10&lt;=", 7]
+  val:
+    - [eventNumber, "%10==", 8]
+  test:
+    - [eventNumber, "%10==", 9]</code></p>
 <details class="info">
 <summary>More info about cuts</summary>
 <p>The <code>Cuts</code> class is defined in the <a href="https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/cuts.py"><code>atlas-ftag-tools</code></a> package.</p>
@@ -645,17 +645,17 @@ since the train/val/test split will suffice.</p>
 <p>Next we define any kinematic regions which need to be resampled separately, again using anchors as these will also be used in the definition of our components.
 For each region you need to provide a name and a list of cuts (see above).
 Here is an example:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
-<span class="w">  </span><span class="nt">cuts</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
-<span class="nt">highpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;highpt</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">highpt</span>
-<span class="w">  </span><span class="nt">cuts</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">]</span>
-</code></pre></div>
+<p><code>yaml
+lowpt: &amp;lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, "&gt;", 20_000]
+    - [pt_btagJes, "&lt;", 250_000]
+highpt: &amp;highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, "&gt;", 250_000]
+    - [pt_btagJes, "&lt;", 6_000_000]</code></p>
 <p>Again, aliasing these just helps to reduce duplication of information when defining the components as can be seen below.</p>
 <h3 id="components">Components<a class="headerlink" href="#components" title="Permanent link">#</a></h3>
 <p>The <code>components</code> section is where all the configuration comes together. 
@@ -663,21 +663,23 @@ A component is a combination of a region, a sample and a flavour.
 They allow for full flexibility when defining different preprocessing pipelines
 (e.g. single-b versus Xbb).</p>
 <p>An example <code>components</code> block is provided below.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">components</span><span class="p">:</span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
-<span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
-<span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10_000_000</span>
-
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*highpt</span>
-<span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*zprime</span>
-<span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
-</code></pre></div>
+<p>```yaml
+components:
+- region:
+    &lt;&lt;: <em>lowpt
+    sample:
+    &lt;&lt;: </em>ttbar
+    flavours: [bjets, cjets, ujets]
+    num_jets: 10_000_000</p>
+<ul>
+<li>region:
+    &lt;&lt;: <em>highpt
+    sample:
+    &lt;&lt;: </em>zprime
+    flavours: [bjets, cjets, ujets]
+    num_jets: 5_000_000
+```</li>
+</ul>
 <p>Notice that we use <code>&lt;&lt;*</code> insertion tool to insert already defined regions and samples.</p>
 <table>
 <thead>
@@ -724,38 +726,38 @@ They allow for full flexibility when defining different preprocessing pipelines
 <p>The next thing you need is to provide the variables that are taken from the TDD files and written in the resampled dataset.
 Selecting only a subset of variables keeps the output files lightweight, and ensures the dataloading does not become a bottleneck during training.</p>
 <p>One can simply define them under <code>variables:</code> like:</p>
-<p><div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">jets</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pt_btagJes</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absEta_btagJes</span>
-<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HadronConeExclTruthLabelID</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pt</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eta</span>
-
-<span class="w">  </span><span class="nt">tracks</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dphi</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deta</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">qOverP</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP3D_signed_d0_significance</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP3D_signed_z0_significance</span>
-<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthOriginLabel</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthVertexIndex</span>
-</code></pre></div>
-Each key under <code>variables:</code> corresponds to a dataset name in the TDD h5 file (e.g. <code>jets</code>, <code>tracks</code>, <code>hits</code>).
-The combined set of variables in <code>inputs</code> and <code>labels</code> are carried over to the output files to a dataset with the same name as the input dataset.
-Internally, UPP will compute normalisation parameters for variables in the <code>inputs</code>, and compute class weightings (for categorical labels) for variables in the <code>labels</code> block.</p>
+<p>```yaml
+variables:
+  jets:
+    inputs:
+      - pt_btagJes
+      - absEta_btagJes
+    labels:
+      - HadronConeExclTruthLabelID
+      - pt
+      - eta</p>
+<p>tracks:
+    inputs:
+      - dphi
+      - deta
+      - qOverP
+      - IP3D_signed_d0_significance
+      - IP3D_signed_z0_significance
+    labels:
+      - ftagTruthOriginLabel
+      - ftagTruthVertexIndex
+<code>``
+Each key under</code>variables:<code>corresponds to a dataset name in the TDD h5 file (e.g.</code>jets<code>,</code>tracks<code>,</code>hits<code>).
+The combined set of variables in</code>inputs<code>and</code>labels<code>are carried over to the output files to a dataset with the same name as the input dataset.
+Internally, UPP will compute normalisation parameters for variables in the</code>inputs<code>, and compute class weightings (for categorical labels) for variables in the</code>labels` block.</p>
 <p>Alternatively include the variables from your custom variable config by providing the full path to the file after an include statement.
 The file you provide should have the same structure as shown above but without <code>variable:</code> level.
 For example:
-<div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xbb-variables.yaml</span>
-</code></pre></div></p>
-<p>One can also import vaiables configs already provided in this package <code>upp/config/</code> yaml files using just the yaml file name e.g.:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/&lt;full path to your file&gt;.yaml</span>
-</code></pre></div>
+<code>yaml
+variables: !include xbb-variables.yaml</code></p>
+<p>One can also import variables configs already provided in this package <code>upp/config/</code> yaml files using just the yaml file name e.g.:</p>
+<p><code>yaml
+variables: !include /&lt;full path to your file&gt;.yaml</code></p>
 <details class="info">
 <summary>You can choose later which variables in your output files are used for training</summary>
 <p>When it comes to defining your training config, you will be required to <a href="https://ftag-salt.docs.cern.ch/configuration/#selecting-training-variables">define the variables used for training</a>.
@@ -765,30 +767,29 @@ This is straightforward since we always store data using structured arrays (in t
 <h3 id="track-selections">Track selections<a class="headerlink" href="#track-selections" title="Permanent link">#</a></h3>
 <p>You can apply on the fly selections to tracks in the preprocessing stage (specifically the merging step).</p>
 <p>To do this, include a <code>selection</code> key in the variable config block under the tracks, for example:</p>
-<div class="highlight"><pre><span></span><code>  tracks:
+<p><code>tracks:
     inputs:
       - d0
     labels:
       - ftagTruthOriginLabel
     selection:
-      - [d0, &quot;&gt;&quot;, 0.1]
-</code></pre></div>
+      - [d0, "&gt;", 0.1]</code></p>
 <h3 id="resampling">Resampling<a class="headerlink" href="#resampling" title="Permanent link">#</a></h3>
 <p>There are currently two resampling methods implemented in the package <code>pdf</code> and <code>countup</code> and they share most of setting.
-Below is the example of setting up the <code>pdf</code> resampling method and a table describitng all the parameters.</p>
+Below is the example of setting up the <code>pdf</code> resampling method and a table describing all the parameters.</p>
 <p>In order to run UPP without any kinematic resampling, just set <code>method: none</code>. 
 Note you will still need to run the resampling stage of the preprocessing pipeline.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">resampling</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cjets</span>
-<span class="w">  </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
-<span class="w">  </span><span class="nt">upscale_pdf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="w">  </span><span class="nt">sampling_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
-<span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">pt_btagJes</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">20_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]]</span>
-<span class="w">    </span><span class="nt">absEta_btagJes</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]]</span>
-</code></pre></div>
+<p><code>yaml
+resampling:
+  target: cjets
+  method: pdf
+  upscale_pdf: 2
+  sampling_fraction: auto
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 20]]</code></p>
 <table>
 <thead>
 <tr>
@@ -801,7 +802,7 @@ Note you will still need to run the resampling stage of the preprocessing pipeli
 <tr>
 <td><code>target</code></td>
 <td><code>str</code></td>
-<td>The resampling is done in such a way that the distribution of the kinematic variables matches the distribution of those in one particular flavour given in here. Usually it is the leat populated flavour, as this flavour will not be resampled instead all jets of this flavour are taken.</td>
+<td>The resampling is done in such a way that the distribution of the kinematic variables matches the distribution of those in one particular flavour given in here. Usually it is the least populated flavour, as this flavour will not be resampled instead all jets of this flavour are taken.</td>
 </tr>
 <tr>
 <td><code>method</code></td>
@@ -811,17 +812,17 @@ Note you will still need to run the resampling stage of the preprocessing pipeli
 <tr>
 <td><code>upscale_pdf</code></td>
 <td><code>int</code></td>
-<td><strong>Optional</strong> only availabe for <code>pdf</code> preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original</td>
+<td><strong>Optional</strong> only available for <code>pdf</code> preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original</td>
 </tr>
 <tr>
 <td><code>sampling_fraction</code></td>
 <td><code>None</code>, <code>float</code> or <code>auto</code></td>
-<td>The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are prefered. On the other hand eith smaller sampling fractions lead to longer preprocesing times. <code>auto</code> option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present.</td>
+<td>The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are preferred. On the other hand with smaller sampling fractions lead to longer preprocessing times. <code>auto</code> option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present.</td>
 </tr>
 <tr>
 <td><code>variables</code></td>
 <td><code>dict</code></td>
-<td>The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable prlease provide a <code>bins</code> setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut betwenn <strong>regions</strong> takes place to better handle the discontinuities.</td>
+<td>The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable please provide a <code>bins</code> setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut between <strong>regions</strong> takes place to better handle the discontinuities.</td>
 </tr>
 </tbody>
 </table>
@@ -850,13 +851,13 @@ Note you will still need to run the resampling stage of the preprocessing pipeli
 under the <code>global:</code> key. They are passed as kwargs to PreprocessingConfig.
 The config file is also copied to the output directory.</p>
 <p>For example:
-<div class="highlight"><pre><span></span><code><span class="nt">global</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">jets_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
-<span class="w">    </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_000_000</span>
-<span class="w">    </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
-<span class="w">    </span><span class="nt">base_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my/stuff/</span>
-<span class="w">    </span><span class="nt">ntuple_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">h5-inputs</span><span class="w"> </span><span class="c1"># resolved path: /my/stuff/h5-inputs/</span>
-</code></pre></div></p>
+<code>yaml
+global:
+    jets_name: jets
+    batch_size: 1_000_000
+    num_jets_estimate: 5_000_000
+    base_dir: /my/stuff/
+    ntuple_dir: h5-inputs # resolved path: /my/stuff/h5-inputs/</code></p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1152,7 +1153,7 @@ huge output file.</p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 19, 2024 15:37:08 UTC">September 19, 2024</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:

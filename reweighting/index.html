@@ -504,14 +504,17 @@
 
 
 <h1 id="reweighting">Reweighting<a class="headerlink" href="#reweighting" title="Permanent link">#</a></h1>
-<p>A different approach to balancing classes to resampling is to instead reweight them instead.
+<p>A different approach to balancing classes to resampling is to instead reweight them.
 In resampling, we bin our jets over their kinematics. We look in each bin, and if we have more jets of a given flavour compared to the target flavour, we throw those jets away. If we have less of a given flavour than the target flavour, we copy-and-paste (upsample) the jet until the bins are equal.
 This ensures that the flavour ratio of any two bins is approximately constant.</p>
 <p>This does however have some disadvantages:
 - results in throwing away some jets
 - upsampling introduces copies of the same jet, meaning we are passing the same data through the model more than once per epoch
-- bins always fave some non-zero finite size, such that there can still be a residual distibution shape, see <a href="https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf">this mention</a> of shark-toothing</p>
+- bins always have some non-zero finite size, such that there can still be a residual distibution shape, see <a href="https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf">this mention</a> of shark-toothing</p>
 <p>We can instead reweight, where instead of throwing away or copying jets, we assign each jet in a bin a weight such that we end up with a constant weighted flavour ratio per bin.</p>
+<div class="admonition info">
+<p class="admonition-title">Reweighting instead of resampling is a new feature in UPP and is <em>not</em> the recommended method.</p>
+</div>
 <h2 id="running-the-reweighting">Running the reweighting<a class="headerlink" href="#running-the-reweighting" title="Permanent link">#</a></h2>
 <p>The reweighting consists of 4 main stages:
 - component splitting
@@ -522,67 +525,63 @@ This ensures that the flavour ratio of any two bins is approximately constant.</
 <h3 id="component-splitting">Component Splitting<a class="headerlink" href="#component-splitting" title="Permanent link">#</a></h3>
 <p>The first stage takes each sample and splits it into its split and flavour components. For example, if we have a ttbar sample, and we have 4 jet flavours (b,c,light,tau) then the splitting will produce 12 files: <code>train_bjets, val_bjets, test_bjets,...</code>.</p>
 <p>To run the splitting, 
-<div class="highlight"><pre><span></span><code>python upp/main.py --config {config} --split-components [--container {single container} --files {files}]
-</code></pre></div></p>
+<code>python upp/main.py --config {config} --split-components [--container {single container} --files {files}]</code></p>
 <p>which will split the components. If <code>--container</code> is defined, then only that container from the config will be split. If this is not included, then all contains in the config will be split.
 Similarly, if <code>--files</code> is defined then only the specified files in the specified container will be split.
 Once the splitting is complete, a meta-data file is automatically created which points towards each file needed for the next stages of reweighting</p>
 <h4 id="split-on-the-grid">Split on the grid<a class="headerlink" href="#split-on-the-grid" title="Permanent link">#</a></h4>
 <p>The splitting stage can be quite time consuming, and is often limited by system IO. To speed the processing up, a grid-submission script is provided.
 First, you must setup a virtual environment to be packaged up and sent to the grid. This can be done by</p>
-<div class="highlight"><pre><span></span><code>setupATLAS
-source upp/grid/setup_env.sh
-</code></pre></div>
+<p><code>setupATLAS
+source upp/grid/setup_env.sh</code></p>
 <p>Once this has setup, you can run the grid dump by:</p>
-<div class="highlight"><pre><span></span><code>python upp/grid/grid_split.py --config {config} --rucio_user {your rucio username} --tag {something to identify this dump} [--dryrun]
-</code></pre></div>
+<p><code>python upp/grid/grid_split.py --config {config} --rucio_user {your rucio username} --tag {something to identify this dump} [--dryrun]</code></p>
 <p>Where the dryrun flag will prepare the submission directory without submitting to the grid.</p>
 <p>Once all your jobs are complete, you can use the download_and_prepare script:</p>
-<div class="highlight"><pre><span></span><code>python upp/grid/download_and_prepare.py -config {config} --rucio_user {your rucio username} --tag {same tag as before}
-</code></pre></div>
+<p><code>python upp/grid/download_and_prepare.py -config {config} --rucio_user {your rucio username} --tag {same tag as before}</code></p>
 <p>which will then automatically download, package up, and generate the meta data ready for the next stage.</p>
 <h2 id="generate-weights">Generate weights<a class="headerlink" href="#generate-weights" title="Permanent link">#</a></h2>
 <p>Once all the samples are prepared, we can calculate the weights. An example config can be found in <code>configs/GN3v01/GN3V01-RW.yaml</code>. We can look at the reweighting section:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">reweighting</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_500_000</span>
-<span class="w">  </span><span class="nt">merge_num_proc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
-<span class="w">  </span><span class="nt">reweights</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
-<span class="w">      </span><span class="nt">reweight_vars</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">eta_btagJes</span><span class="p p-Indicator">]</span>
-<span class="w">      </span><span class="nt">bins</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">pt_btagJes</span><span class="p">:</span>
-<span class="w">          </span><span class="p p-Indicator">[</span>
-<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">20_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
-<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
-<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
-<span class="w">          </span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="nt">eta_btagJes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">-2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">40</span><span class="p p-Indicator">]]</span>
-<span class="w">      </span><span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flavour_label</span>
-<span class="w">      </span><span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
-</code></pre></div>
-<p><code>num_jets_estimate</code> represents the number of each jet flavour used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevent in the next section of these docs.
+<p>```yaml</p>
+<p>reweighting:
+  num_jets_estimate: 1_500_000
+  merge_num_proc: 20
+  reweights:
+    - group: jets
+      reweight_vars: [pt_btagJes, eta_btagJes]
+      bins:
+        pt_btagJes:
+          [
+            [20_000, 250_000, 50],
+            [250_000, 1_000_000, 50],
+            [1_000_000, 6_000_000, 50],
+          ]
+        eta_btagJes: [[-2.5, 2.5, 40]]
+      class_var: flavour_label
+      class_target: mean</p>
+<p>```</p>
+<p><code>num_jets_estimate</code> represents the number of each jet flavour used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevant in the next section of these docs.
 Then, you have the <code>reweights</code> section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
-The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max</code> which will instead target either the mean distribution, or always take the maximum/minumum bin counts as the target.
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max</code> which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
 The reweighting can also be performed over track variables, for example</p>
-<div class="highlight"><pre><span></span><code><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
-<span class="nt">reweight_vars</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_frac</span><span class="p p-Indicator">]</span>
-<span class="nt">bins</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">pt_frac</span><span class="p">:</span>
-<span class="w">        </span><span class="p p-Indicator">[</span>
-<span class="w">        </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
-<span class="w">        </span><span class="p p-Indicator">[</span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="p p-Indicator">]</span>
-<span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthOriginLabel</span>
-<span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
-</code></pre></div>
-<p>Would calculate weights such that we have equivilent pt_frac distributions across the track labels.</p>
+<p>```yaml</p>
+<p>group: jets
+reweight_vars: [pt_frac]
+bins:
+    pt_frac:
+        [
+        [0, 0.5, 50],
+        [0.5, 1.0, 20]
+        ]
+class_var: ftagTruthOriginLabel
+class_target: mean
+```</p>
+<p>Would calculate weights such that we have equivalent pt_frac distributions across the track labels.</p>
 <p>To run the reweighting simply do</p>
-<div class="highlight"><pre><span></span><code>python upp/main.py --config {config} --rw
-</code></pre></div>
+<p><code>python upp/main.py --config {config} --rw</code></p>
 <h2 id="merging">Merging<a class="headerlink" href="#merging" title="Permanent link">#</a></h2>
-<p>Finally, we can merge all the relevent jets with their weights. This is done by</p>
-<div class="highlight"><pre><span></span><code>python upp/main.py --rwm --split {train/test/val}
-</code></pre></div>
+<p>Finally, we can merge all the relevant jets with their weights. This is done by</p>
+<p><code>python upp/main.py --rwm --split {train/test/val}</code></p>
 <p>This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the <code>global</code> section of the pre-processing config includes <code>num_jets_per_output_file</code> and the <code>reweighting</code> section has <code>merge_num_proc&gt;1</code>.
 This will then launch <code>merge_num_proc</code> processes, with approximately <code>num_jets_per_output_file</code> per file*.</p>
 <ul>
@@ -594,7 +593,7 @@ This will then launch <code>merge_num_proc</code> processes, with approximately 
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2025 14:15:39 UTC">August 18, 2025</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:

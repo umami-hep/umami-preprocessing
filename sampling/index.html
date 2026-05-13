@@ -75,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pdf-probability-density-function" class="md-skip">
+        <a href="#resampling" class="md-skip">
           Skip to content
         </a>
       
@@ -254,6 +254,8 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Sampling methods
@@ -269,6 +271,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -391,6 +395,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -431,28 +437,29 @@
 
 
 
-  <h1>Sampling methods</h1>
-
+<h1 id="resampling">Resampling<a class="headerlink" href="#resampling" title="Permanent link">#</a></h1>
+<p>There are two main strategies for handling the issue of different kinematic properties for different jet flavours. These are reweighting and resampling. Reweighting applies a weight to each data point when calculating the loss, resulting in a weighted average loss for the considered data points. Resampling changes the actual data distribution by over- or undersampling data to achieve the desired data distribution. Statistically, the two methods are equivalent (in expectation). However, <a href="https://web.stanford.edu/~lexing/resw.pdf">in some cases</a>, resampling may result in a more numerically stable approximation of the minima of the loss function. Empirically, it has been found that resampling produces better results for jet flavour tagging performance.</p>
+<p>For resampling, UPP has two different methods implemented. The desired method (<code>pdf</code> or <code>countup</code>) can be specified in the configuration file.</p>
 <h3 id="pdf-probability-density-function">PDF (probability density function)<a class="headerlink" href="#pdf-probability-density-function" title="Permanent link">#</a></h3>
-<p>This is a implementation of the <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a>. 
-It is done vi following algorythm:</p>
+<p>This is an implementation of an <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> method. The aim of the algorithm is to ensure that the kinematic probability density functions (pdfs) of all jet flavours are matched to that of a chosen target flavour.</p>
+<p>The resampling is done using the following steps:</p>
 <ol>
-<li><code>num_jets_estimate</code> jets are binned for each flavour using the configurations for resampling variable bins. This histogram is the initial estimate of the pdf of jets of each flavour.</li>
-<li>The importance function is estimated using the ratio of the histograms <code>pdf_target_flavour/pdf_resampled_flavour</code> for each flavor except the target. Safe divesion is used i.e. if <code>pdf_resampled_flavour</code> is 0 the expressin defaults thus the jets where <code>pdf_target_flavour</code> or <code>pdf_resampled_flavour</code> is estimated by 0 are not resampled. </li>
-<li>Optionally the importance function is upscaled i.e. interpolated using cubic spline interpolation to a finer grid of bins. Centres of bins are used as nodes for the splines and the function is evaluated in the centeres of the new bins where the new bins are created by splitting the old bins in <code>upscale_pdf</code> intervals of equal width. This way the edge bins of each binning region are actually extrapolated rather than interpolated.</li>
+<li>A <code>num_jets_estimate</code> number of jets are binned for each flavour using the configurations for resampling variable bins. This histogram, <code>pdf_resampled_flavour</code>, is the initial estimate of the pdf of jets of each flavour.</li>
+<li>The importance function is estimated by using the ratio of the histograms for each flavor to that of the target flavour, <code>pdf_target_flavour/pdf_resampled_flavour</code>. Safe division is used, which ensures that if for a bin in <code>pdf_resampled_flavour</code> is 0, we skip that bin. This ensures that we do not divide by 0. If a bin in <code>pdf_target_flavour</code> is 0, we also skip the bin. </li>
+<li>Optionally, the importance function is upscaled. This means that it is interpolated using cubic spline interpolation to a finer grid of bins. The centres of bins are used as nodes for the splines. The new bins are created by splitting the old bins into <code>upscale_pdf</code> number of bins of equal width. The function is evaluated in the centers of the new bins. This way, the edge bins of each binning region are actually extrapolated rather than interpolated.</li>
 <li>The new batch of jets is being read and after the cuts are applied <code>n_batch</code> jets remain. The jets are binned with the the binning from step 1 (if upscaling is not used) or upscaled binning defined by 3 (if upscaling is used) and the reference number of the bin for each jet is saved.</li>
 <li>Each jet is assigned an importance score equal to the value of the importance function in the corresponding bin.</li>
-<li><code>n_batch*flavour.sampling_fraction</code> jets are selected with replacement using importances as weights.</li>
+<li><code>n_batch*flavour.sampling_fraction</code> jets are selected with replacement using importance scores as weights.</li>
 </ol>
-<p>This algryhtm is used for all the flavours except the target flavour for which all jets are saved without sampling as they already follow the desired distribution. One has to remember that <code>flavour.sampling_fraction==1</code> will lead to many jets beig selected more then once, choosing lower <code>sampling_fractions</code> can help agains it.</p>
+<p>This algorithm is used for all the flavours except the target flavour for which all jets are saved without sampling as they already follow the desired distribution. One has to remember that <code>flavour.sampling_fraction==1</code> will lead to many jets being selected more then once, choosing lower <code>sampling_fractions</code> can help against it.</p>
 <h3 id="countup">Countup<a class="headerlink" href="#countup" title="Permanent link">#</a></h3>
 <p>Countup resampling tries to select as many unique jets from each bin as possible before selecting the duplicates.</p>
 <ol>
 <li><code>num_jets_estimate</code> jets are binned for each flavour using the configurations for resampling variable bins. This histogram is the initial estimate of the pdf of jets of each flavour.</li>
 <li>The new batch of jets is being read and after the cuts are applied <code>n_batch</code> jets remain. The jets are binned with the the binning from step 1 (if upscaling is not used) or upscaled binning defined by 3 (if upscaling is used) and the reference number of the bin for each jet is saved.</li>
-<li>The number of <strong>requested</strong> jets in each bin are calculated as <code>floor(n_batch*pdf_target_flavour+uniform([0, 1]))</code> so that if <code>n_batch*flavour.sampling_fraction*pdf_target_flavour=1.2</code> it has a 80% chance to be rounded up to 1 and 20% cnahce to be rounded up to 2 so that for each bin we get an integer number that on average corresponds to the expected value. </li>
-<li>From each bin we select consecutively (without replacement) the required number of jets. If the bin holds less jets than the <strong>requested</strong> number the rest of jets in this bin is chosen at random from this bin with replacemene. This way only few jets in each bin are repeated for <code>flavour.sampling_fraction=1</code> and rarely any are repeated for smaller sampling fractions</li>
-<li>It may happen that we required jets from the bin that is empty in this batch thus the operations above lead to less jets than <strong>requested</strong> in total. To compencate we resample this number at random (with replacement) from already sampled jets. This leads to some additional repetitions but this way we can be sure that we adhere to the target pdf.</li>
+<li>The number of <strong>requested</strong> jets in each bin are calculated as <code>floor(n_batch*pdf_target_flavour+uniform([0, 1]))</code> so that if <code>n_batch*flavour.sampling_fraction*pdf_target_flavour=1.2</code> it has a 80% chance to be rounded up to 1 and 20% chance to be rounded up to 2 so that for each bin we get an integer number that on average corresponds to the expected value. </li>
+<li>From each bin we select consecutively (without replacement) the required number of jets. If the bin holds less jets than the <strong>requested</strong> number the rest of jets in this bin is chosen at random from this bin with replacement. This way only few jets in each bin are repeated for <code>flavour.sampling_fraction=1</code> and rarely any are repeated for smaller sampling fractions</li>
+<li>It may happen that we required jets from the bin that is empty in this batch thus the operations above lead to less jets than <strong>requested</strong> in total. To compensate we resample this number at random (with replacement) from already sampled jets. This leads to some additional repetitions but this way we can be sure that we adhere to the target pdf.</li>
 </ol>
 
   <hr>
@@ -460,7 +467,7 @@ It is done vi following algorythm:</p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 18, 2024 13:48:34 UTC">January 18, 2024</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:

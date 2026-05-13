@@ -277,8 +277,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-the-code" class="md-nav__link">
-    Get the code
+  <a href="#download-source-code" class="md-nav__link">
+    Download source code
   </a>
   
 </li>
@@ -434,8 +434,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-the-code" class="md-nav__link">
-    Get the code
+  <a href="#download-source-code" class="md-nav__link">
+    Download source code
   </a>
   
 </li>
@@ -477,30 +477,28 @@
 
 <p>This guide will walk you through the process of setting up the Umami-Preprocessing Python package on your system.</p>
 <h3 id="environment-setup">Environment Setup<a class="headerlink" href="#environment-setup" title="Permanent link">#</a></h3>
-<p>Creating a virtual environment helps keep your Python environment isolated and organized.
-While it's not essential, we highly recommend using one.
-You can set up a virtual environment using either Conda or Python's venv.
+<p>Install UPP in a virtual environment to avoid conflicts with other software libraries.
 UPP requires Python 3.8 or later.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">conda</label><label for="__tabbed_1_2">venv</label><label for="__tabbed_1_3">lxplus</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>Set up a fresh <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html">conda</a> or <a href="https://github.com/conda-forge/miniforge#install">mamba</a> environment:</p>
-<div class="highlight"><pre><span></span><code>mamba<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>upp<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11
-mamba<span class="w"> </span>activate<span class="w"> </span>upp
-</code></pre></div>
+<p><code>bash
+conda create -n upp python=3.11
+conda activate upp</code></p>
 </div>
 <div class="tabbed-block">
 <p><a href="https://docs.python.org/3/library/venv.html">venv</a> is a lightweight solution for creating virtual python environments, however it is not as fully featured as a fully fledged package manager such as conda.
 Create a fresh virtual environment and activate it using</p>
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
-<span class="nb">source</span><span class="w"> </span>env/bin/activate
-</code></pre></div>
+<p><code>bash
+python3 -m venv upp
+source upp/bin/activate</code></p>
 </div>
 <div class="tabbed-block">
 <p>If you don't want to use conda environments on lxplus, you can setup python via</p>
-<div class="highlight"><pre><span></span><code>setupATLAS
-lsetup<span class="w"> </span><span class="s2">&quot;python 3.9.18-x86_64-el9&quot;</span>
-</code></pre></div>
+<p><code>bash
+setupATLAS
+lsetup "python 3.9.18-x86_64-el9"</code></p>
 <div class="admonition info">
 <p class="admonition-title">You can also <a href="https://abpcomputing.web.cern.ch/guides/python_inst/">set up conda on lxplus</a></p>
 </div>
@@ -508,56 +506,53 @@ lsetup<span class="w"> </span><span class="s2">&quot;python 3.9.18-x86_64-el9&qu
 </div>
 </div>
 <h3 id="pypi-installation">PyPi installation<a class="headerlink" href="#pypi-installation" title="Permanent link">#</a></h3>
-<p>A simple installation can be done via <code>pip</code> from Python Packade Index:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>umami-preprocessing
-</code></pre></div>
+<p>If you don't plan on editing the source code, the simplest way to install UPP directly from the Python Package Index (PyPI):</p>
+<p><code>bash
+python -m pip install umami-preprocessing</code></p>
 <div class="admonition info">
-<p class="admonition-title">On lxplus you may have to use <code>python3</code></p>
+<p class="admonition-title">On lxplus you may have to use <code>python3</code> instead of just <code>python</code></p>
 </div>
-<p>After this installation all the fuctionality for the user is available. The further steps are only useful for the development of the package.</p>
-<h3 id="get-the-code">Get the code<a class="headerlink" href="#get-the-code" title="Permanent link">#</a></h3>
-<p>Start by cloning the Umami-Preprocessing repository and navigating into the project directory using the following commands in your terminal:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/umami-hep/umami-preprocessing.git
-<span class="nb">cd</span><span class="w"> </span>umami-preprocessing
-</code></pre></div>
+<h3 id="download-source-code">Download source code<a class="headerlink" href="#download-source-code" title="Permanent link">#</a></h3>
+<p>The following instructions are only relevant for those that wish to modify UPP source code.
+Start by cloning the Umami-Preprocessing repository. If you want to contribute to the development of UPP, you should fork the repository and make sure you do all your edits in a development branch.</p>
+<p><code>bash
+git clone https://github.com/umami-hep/umami-preprocessing.git</code></p>
 <h3 id="install-package-from-code">Install package from code<a class="headerlink" href="#install-package-from-code" title="Permanent link">#</a></h3>
-<p>Install the package as in editable mode if you would like to develop the code:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
-</code></pre></div>
-<p>Or do a simple installation if you only plan to use the provided functionality as is</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
-</code></pre></div>
+<p>Navigate to the newly downloaded repository and install the package in editable mode:</p>
+<p><code>bash
+cd umami-preprocessing
+python -m pip install -e .[dev]</code></p>
+<p>If you don't plan on editing the code you can do a regular install instead</p>
+<p><code>bash
+python -m pip install .</code></p>
 <div class="admonition info">
 <p class="admonition-title">Note for running on lxplus</p>
 <p>Again, you may have to use <code>python3</code> here.</p>
 <p>You may also see a warning like this:</p>
-<div class="highlight"><pre><span></span><code>WARNING: The script preprocess is installed in &#39;/afs/cern.ch/user/X/Y/.local/bin&#39; which is not on PATH.
-Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-</code></pre></div>
+<p><code>WARNING: The script preprocess is installed in '/afs/cern.ch/user/X/Y/.local/bin' which is not on PATH.
+Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.</code></p>
 <p>if you do, you can add the directory to your path using</p>
-<div class="highlight"><pre><span></span><code>export PATH=$PATH:/afs/cern.ch/user/X/Y/.local/bin
-</code></pre></div>
+<p><code>export PATH=$PATH:/afs/cern.ch/user/X/Y/.local/bin</code></p>
 <p>Alternatively, you can just run the scripts by pointing to the <code>main.py</code></p>
-<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>upp/main.py
-</code></pre></div>
+<p><code>bash
+python3 upp/main.py</code></p>
 </div>
 <h3 id="run-the-tests-optional">Run the tests (Optional)<a class="headerlink" href="#run-the-tests-optional" title="Permanent link">#</a></h3>
-<p>To ensure that the package is working correctly, you can run tests using the pytest framework. 
-Additionally, you can install coverage to generate a coverage report.</p>
+<p>To ensure that the package is working correctly, you can run the tests using the pytest framework. </p>
 <p>Use <code>pytest</code> to run the tests to make sure the package works</p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>tests<span class="w"> </span>
-</code></pre></div>
-<p>If you want to measure test coverage, first install coverage, and then run tests as follows:</p>
-<div class="highlight"><pre><span></span><code>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
-coverage<span class="w"> </span>report<span class="w"> </span>
-</code></pre></div>
+<p><code>bash
+pytest tests</code></p>
+<p>If you want to measure test coverage you can use the commands:
+<code>bash
+coverage run --source upp -m pytest tests --show-capture=stdout
+coverage report</code></p>
 
   <hr>
 <div class="md-source-file">
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2024 08:38:53 UTC">September 16, 2024</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
       
         <br>
         Created:
