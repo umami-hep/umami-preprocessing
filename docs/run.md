@@ -8,7 +8,7 @@ Before running UPP, make sure you have modified the configuration file according
 To run all preprocessing stages for the `train` split use:
 
 ```bash
-preprocess --config configs/test.yaml
+preprocess --config upp/configs/test.yaml
 ```
 
 For a comprehensive list of available flags, refer to `preprocess --help`.
@@ -24,7 +24,7 @@ By default, the train split contains 80% of the jets, while val and test contain
 If you want to preprocess the `val` or `test` split, use the `--split` argument:
 
 ```bash
-preprocess --config configs/config.yaml --split val
+preprocess --config path/to/config.yaml --split val
 ```
 
 You can also process `train`, `val`, and `test` with a single command using `--split=all`.
@@ -36,14 +36,14 @@ The preprocessing is broken up into several stages.
 To run with only specific stages enabled, include the flag for the required stages:
 
 ```bash
-preprocess --config configs/config.yaml --prep --resample
+preprocess --config path/to/config.yaml --prep --resample
 ```
 
 To run the whole chain excluding certain stages, include the corresponding negative flag (`--no-*`).
 For example to run without plotting
 
 ```bash
-preprocess --config configs/config.yaml --no-plot
+preprocess --config path/to/config.yaml --no-plot
 ```
 
 The stages are described below.
@@ -90,7 +90,7 @@ Afterwards, the prepare stage reads a specified number of jets (`num_jets_estima
     and finally the flavour that is used. In this case, `ghostsplitbjets`. The full name of the component is therefore: `lowpt_ttbar_ghostsplitbjets`. The full command would look like this:
 
     ```bash
-    preprocess --config configs/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets
+    preprocess --config path/to/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets
     ```
 
     It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
@@ -106,7 +106,7 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
     The command to run the specific region would look like this:
 
     ```bash
-    preprocess --config configs/config.yaml --resample --region lowpt
+    preprocess --config path/to/config.yaml --resample --region lowpt
     ```
 
     Similar to the `--prep` step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all regions are resampled, you can continue with the following steps.
@@ -116,7 +116,7 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
     The command to run the specific region would look like this:
 
     ```bash
-    preprocess --config configs/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets
+    preprocess --config path/to/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets
     ```
 
     Similar to the `--prep` step and the previous `--region` explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
@@ -143,4 +143,3 @@ check_input_samples --config_path <path/to/your/config>
 ```
 
 You can also add the `--deviation-factor`, which is by default `10.0` and the `--verbose` flags. The latter will print the number of initial jets to your terminal.
-
