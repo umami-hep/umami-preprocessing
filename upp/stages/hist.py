@@ -41,8 +41,9 @@ def bin_jets(array: dict, bins: list) -> tuple[np.ndarray, np.ndarray]:
             bin in which this observation falls.  The representation depends on the
             `expand_binnumbers` argument.  See `Notes` for details.
     """
+    sample = s2u(array).astype(np.float64, copy=False)
     hist, _, out_bins = binned_statistic_dd(
-        sample=s2u(array),
+        sample=sample,
         values=None,
         statistic="count",
         bins=bins,
