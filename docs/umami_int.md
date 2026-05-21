@@ -1,22 +1,28 @@
-UPP is istalled alongside Umami and can be used from within the umami framework in a very simple manner
+# Umami Integration
 
-### Umami-specific configs 
-First you need to add umami-specific configs to the config file.
-Here is an example config:
+UPP can be used from within the Umami preprocessing workflow when it is installed in
+the same environment as Umami. The UPP config keeps the normal UPP sections and adds
+an `umami` block with the settings Umami needs for scaling, writing, and optional
+TFRecord conversion.
+
+## Umami-Specific Config
+
+Add an `umami` block to the UPP preprocessing config. A minimal example looks like:
+
 ```yaml
 umami:
   general:
     plot_name: PFlow_ext-hybrid
-    plot_type: "pdf"
-    use_atlas_tag: True
+    plot_type: pdf
+    use_atlas_tag: true
     atlas_first_tag: "Simulation Internal"
     atlas_second_tag: "$\\sqrt{s}=13$ TeV, PFlow jets"
-    legend_sample_category: True
+    legend_sample_category: true
     var_file: umami/user/upp_prep_small/config/Dips_Variables_R22.yaml
-    dict_file: <base_dir><out_dir>PFlow-scale_dict.json
+    dict_file: <base_dir>/<out_dir>/PFlow-scale_dict.json
     compression: lzf
     precision: float16
-    concat_jet_tracks: False
+    concat_jet_tracks: false
   sampling:
     use_validation_samples: false
     options:
@@ -26,70 +32,76 @@ umami:
       bool_attach_sample_weights: false
       tracks_names: ["tracks"]
       n_jets_scaling: 0
+```
 
-This config part mimics the umami config structure. Parameters in `general` mimic ones that are in the root of umami config. Parameters in `sampling`, `sampling.options`, `parameters` and `convert_to_tfrecord` mimic the corresponding structures in umami config. All the parameters given in the example should be given in order for UPP integration in umami to work except `parameters` and `convert_to_tfrecord`. You need to provide `convert_to_tfrecord` if you need to convert dataset to TFrecord and `parameters` oonly if you does not want to saveinto `<base_dir><out_dir>` by default.
-Please refer to umami documentation [https://umami.docs.cern.ch/preprocessing/Overview/] for up-to-date explanation.
+The `general` keys mirror Umami's top-level preprocessing settings. The `sampling`,
+`sampling.options`, `parameters`, and `convert_to_tfrecord` keys mirror the
+corresponding Umami config sections.
 
-### Running preprocessing
+The `parameters` block is optional. If it is not provided, UPP writes to its configured
+`out_dir`. Add `convert_to_tfrecord` only if the Umami workflow should also convert
+the preprocessed dataset to TFRecord format.
 
-After you make the necessary changes to the config file you can perform preprocessing in umami by running the umami/preprocessing.py script
-the same way as you would do with the old umami preprocessing 
+For Umami-specific option details, refer to the
+[Umami preprocessing documentation](https://umami.docs.cern.ch/preprocessing/Overview/).
+
+## Running Through Umami
+
+Run Umami's preprocessing entry point with the UPP config, as in the old Umami
+preprocessing workflow:
 
 ```bash
-cd umami 
+cd umami
 preprocessing.py --config_file path/to/my_upp_config.yaml --resampling
 preprocessing.py --config_file path/to/my_upp_config.yaml --scaling
 preprocessing.py --config_file path/to/my_upp_config.yaml --write
 ```
 
-Umami will first ```try``` to read the config file as an old umami preprocessing configuration. When that fails it will read the config as a UPP preprocessing config.
+Umami first tries to read the config as an old-style Umami preprocessing config. If
+that fails, it reads it as a UPP preprocessing config.
 
-* ```--resampling``` step will perform Upp preprocessing with this config file and ```split==all```
-* ```--scaling``` step will execute umami version of rescaling code that will prepare a json scaling dictionary at ```dict_file``` location
-* ```--write``` step will execute umamii code for scaling the variables and writing them in an unstructured scaling array it will also produce default umami preprocessing plots
-* ```--to_records``` step will execute umamii code for converting dataset to a TFrecords format 
+- `--resampling` runs UPP preprocessing with `--split all`.
+- `--scaling` runs Umami's scaling step and writes the JSON scale dictionary to
+  `dict_file`.
+- `--write` runs Umami's scaling/writing step and produces the default Umami
+  preprocessing plots.
+- `--to_records` runs Umami's TFRecord conversion step when configured.
 
-Note: ```--prepare``` step will do nothing and will only trow an error as UPP does not require (same) preparation as old umami preprocessing. 
-```--resampling --hybrid_validation``` is also not available for upp as it does both splits at the resampling step
+The old Umami `--prepare` step is not used for UPP configs. The
+`--resampling --hybrid_validation` combination is also not available for UPP because
+UPP handles all splits during the resampling step.
 
-After that one can use the results of the preprocessing for umami training for example for DL1 or DIPS.
-One can either only run ```--resampling``` and ```--scaling``` and train on the structured array data using TDDgenerator by setting your training configs similar to this:
-```
-# Set modelname and path to Pflow preprocessing config file
+## Training Outputs
+
+After preprocessing, the structured UPP outputs can be used for Umami training. For
+example:
+
+```yaml
 model_name: user_DL1r-PFlow_new-taggers-stats-22M-tdd-upp
-preprocess_config: /home/users/o/oleksiyu/WORK/umami/user/upp_prep_small/config/upp_prepr.yaml
+preprocess_config: /path/to/upp_prepr.yaml
 
-# Add here a pretrained model to start with.
-# Leave empty for a fresh start
-model_file: 
+model_file:
 
-# Add training file
-train_file: <base_dir><out_dir>pp_output_train.h5
+train_file: <base_dir>/<out_dir>/pp_output_train.h5
 
-# Defining templates for the variable cuts
-...
-
-#Add validation files
 validation_files:
-    r22_hybrid_val:
-        path: <base_dir><out_dir>pp_output_val.h5
-        label: "Hybrid Validation"
+  r22_hybrid_val:
+    path: <base_dir>/<out_dir>/pp_output_val.h5
+    label: "Hybrid Validation"
 
 test_files:
-    ttbar_r22:
-        path: <base_dir><out_dir>pp_output_test_ttbar.h5
-        <<: *variable_cuts_ttbar
+  ttbar_r22:
+    path: <base_dir>/<out_dir>/pp_output_test_ttbar.h5
+    <<: *variable_cuts_ttbar
 
-    zpext_r22:
-        path: <base_dir><out_dir>pp_output_test_zprime.h5
-        <<: *variable_cuts_zpext
-
-```
-or you can perform all three steps to train using unstructured array data. This way one looses time to write the dataset but the training may be somewhat faster. 
-To do this just change your training_file in the example above to 
-```
-train_file: <base_dir><out_dir>pp_output_train_resampled_scaled_shifted.h5
+  zpext_r22:
+    path: <base_dir>/<out_dir>/pp_output_test_zprime.h5
+    <<: *variable_cuts_zpext
 ```
 
+Alternatively, run the Umami `--write` step and train from the unstructured scaled
+output:
 
-
+```yaml
+train_file: <base_dir>/<out_dir>/pp_output_train_resampled_scaled_shuffled.h5
+```
