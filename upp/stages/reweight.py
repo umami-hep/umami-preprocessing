@@ -20,15 +20,15 @@ class Reweight:
         self.config = config
         self.rw_config = config.rw_config
         self.flavours = [f.name for f in config.components.flavours]
-        assert (
-            self.rw_config is not None
-        ), "Reweighting configuration is not set in the preprocessing config"
+        assert self.rw_config is not None, (
+            "Reweighting configuration is not set in the preprocessing config"
+        )
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert (
-            self.organised_components_config.exists()
-        ), f"Organised components config file not found: {self.organised_components_config}"
+        assert self.organised_components_config.exists(), (
+            f"Organised components config file not found: {self.organised_components_config}"
+        )
 
     @property
     def hists_path(self):
@@ -90,9 +90,9 @@ class Reweight:
         print(f"Calculating weights for {len(reweights)} reweights")
         readers, per_reader_num_jets = self.get_input_readers()
         for reader in readers:
-            assert (
-                reader.batch_size == readers[0].batch_size
-            ), "All readers must have the same batch size"
+            assert reader.batch_size == readers[0].batch_size, (
+                "All readers must have the same batch size"
+            )
         batch_size_per_file = readers[0].batch_size
         all_vars = {}
         existing_vars = {}
@@ -174,7 +174,7 @@ class Reweight:
 
                 for cls in classes:
                     mask = data[rw.class_var] == cls
-                    hist, outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
+                    hist, _outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
                     if rw.class_var is not None:
                         cls = str(cls)
                     if rw_group not in all_histograms:

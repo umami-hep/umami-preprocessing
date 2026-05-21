@@ -188,9 +188,7 @@ class Merging:
                 # All expected datasets that are present should match obs_len
                 for nm in expected_names:
                     if nm in f and f[nm].shape[0] != obs_len:
-                        log.warning(
-                            f"Dataset '{nm}' len={f[nm].shape[0]} " f"!= {obs_len} in {fname}"
-                        )
+                        log.warning(f"Dataset '{nm}' len={f[nm].shape[0]} != {obs_len} in {fname}")
                         return False
 
                 # Compare with expected rows for this part (if split mode)

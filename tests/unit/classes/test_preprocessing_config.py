@@ -73,7 +73,7 @@ class TestPreprocessingConfig(unittest.TestCase):
         # Valid cases
         self.assertEqual(
             str(config.get_file_name("resampled")),
-            "/tmp/upp-tests/integration/temp_workspace/" "test_out/pp_output_train.h5",
+            "/tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5",
         )
         self.assertEqual(
             str(config.get_file_name("resampled_scaled_shuffled")),
