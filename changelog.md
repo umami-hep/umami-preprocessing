@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Refresh Umami integration docs and CLI help text [#139](https://github.com/umami-hep/umami-preprocessing/pull/139)
 - Avoid expected divide warnings in reweighting weight calculation [#140](https://github.com/umami-hep/umami-preprocessing/pull/140)
 - Update Python support and CI workflows [#141](https://github.com/umami-hep/umami-preprocessing/pull/141)
 - Update documentation [#124](https://github.com/umami-hep/umami-preprocessing/pull/124)
