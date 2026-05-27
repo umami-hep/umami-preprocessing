@@ -80,9 +80,9 @@ flavour_categories:
   jets: [djets, ujets, sjets, cjets, bjets, gluon]
 
 custom_flavours:
-  djets:   { label: 0, cuts: [[PartonTruthLabelID, "==", 1]] }
-  ujets:   { label: 1, cuts: [[PartonTruthLabelID, "==", 2]] }
-  sjets:   { label: 2, cuts: [[PartonTruthLabelID, "==", 3]] }
-  cjets:   { label: 3, cuts: [[PartonTruthLabelID, "==", 4]] }
-  bjets:   { label: 4, cuts: [[PartonTruthLabelID, "==", 5]] }
-  gluon:   { label: 5, cuts: [[PartonTruthLabelID, "==", 21]] }
+  djets: { label: 0, cuts: [[PartonTruthLabelID, "==", 1]] }
+  ujets: { label: 1, cuts: [[PartonTruthLabelID, "==", 2]] }
+  sjets: { label: 2, cuts: [[PartonTruthLabelID, "==", 3]] }
+  cjets: { label: 3, cuts: [[PartonTruthLabelID, "==", 4]] }
+  bjets: { label: 4, cuts: [[PartonTruthLabelID, "==", 5]] }
+  gluon: { label: 5, cuts: [[PartonTruthLabelID, "==", 21]] }

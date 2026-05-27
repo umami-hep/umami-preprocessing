@@ -120,7 +120,8 @@ class PreprocessingConfig:
     skip_config_copy : bool, optional
         Decide, if the config copying is skipped or not. By default False
     keep_all_variables : bool, optional
-        If true, split and rw-merge keep all top-level HDF5 datasets / full jets fields (PW + RW on jets).
+        When true: split-containers and rw-merge keep full jets fields and all top-level
+        HDF5 datasets (PW and RW columns still added on jets).
     """
 
     config_path: Path
@@ -144,7 +145,8 @@ class PreprocessingConfig:
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
-    # When true: split-containers and rw-merge keep all input datasets/fields (tracks, towers, …), not just variables.yaml subset.
+    # When true: keep all input top-level datasets (tracks, towers, …), not only the
+    # variables.yaml subset, through split-containers and rw-merge.
     keep_all_variables: bool = False
 
     def __post_init__(self):

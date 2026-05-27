@@ -88,10 +88,7 @@ def get_all_fp_vars(file: Path | str) -> list[str]:
 
     target_keywords = ["pt", "energy", "mass", "weight", "physicalWeight"]
 
-    fp_vars = [
-        v for v in all_vars 
-        if any(key in v.lower() for key in target_keywords)
-    ]
+    fp_vars = [v for v in all_vars if any(key in v.lower() for key in target_keywords)]
     return fp_vars
 
 
@@ -141,14 +138,12 @@ class SplitContainers:
         parsed_variables: dict[str, list[str]] | dict[str, None] = (
             parse_variables(variables) if variables is not None else all_variables
         )
-        # --- Modified patch logic as follows ---
+        # Ensure physicalWeight is requested for jets when using a column list (not None).
         if isinstance(parsed_variables, dict):
-            # Only process if the 'jets' group exists
-            if "jets" in parsed_variables:
-                # Force-add 'physicalWeight' only; do not add 'valid'
-                if "physicalWeight" not in parsed_variables["jets"]:
-                    parsed_variables["jets"].append("physicalWeight")
-                    print("FORCE RE-INTEGRATED: Only physicalWeight into jets", flush=True)
+            jets_cols = parsed_variables.get("jets")
+            if isinstance(jets_cols, list) and "physicalWeight" not in jets_cols:
+                jets_cols.append("physicalWeight")
+                print("FORCE RE-INTEGRATED: Only physicalWeight into jets", flush=True)
         # -----------------------
 
         print("parsed variables: ", parsed_variables, flush=True)
@@ -203,7 +198,7 @@ class SplitContainers:
             assert all(
                 len(_flavour_label_by_component[component]) == 1 for component in sample_components
             ), f"Each component must have exactly 1 flavour label not {_flavour_label_by_component}"
-            flavour_label_by_component: dict[str, int] = {  # noqa: no-redef
+            flavour_label_by_component: dict[str, int] = {
                 component: _flavour_label_by_component[component][0]
                 for component in _flavour_label_by_component
             }

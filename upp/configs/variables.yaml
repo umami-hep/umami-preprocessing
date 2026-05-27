@@ -24,7 +24,7 @@ jets:
     - eventNumber
     - jetFoldHash
     - physicalWeight
-    
+
 tracks:
   inputs:
     - d0

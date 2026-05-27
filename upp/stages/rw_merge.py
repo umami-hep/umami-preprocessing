@@ -76,21 +76,16 @@ class RWMerge:
         num_jets_per_file = self.config.num_jets_per_output_file or total_jets
 
         batches_per_file = num_jets_per_file // batch_size or 1
-        num_batches = (
-            total_jets // batch_size + (1 if total_jets % batch_size != 0 else 0)
-        ) or 1
+        num_batches = (total_jets // batch_size + (1 if total_jets % batch_size != 0 else 0)) or 1
 
-        # H5Reader.stream(None) only loads jets; for full-ntuple merge pass {ds: None} per top-level dataset.
+        # stream(None) only loads jets; for full ntuple merge use {dataset: None} per
+        # top-level HDF5 dataset.
         if self.config.variables.keep_all:
             p0 = Path(all_files[0])
             with h5py.File(p0, "r") as hf:
                 variables = {k: None for k in hf if isinstance(hf[k], h5py.Dataset)}
         else:
-            variables = (
-                self.config.variables.combined()
-                if self.config.split != "test"
-                else None
-            )
+            variables = self.config.variables.combined() if self.config.split != "test" else None
         if (
             variables is not None
             and not self.config.variables.keep_all

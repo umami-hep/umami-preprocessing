@@ -18,8 +18,6 @@ zprime: &zprime
   pattern:
     - "/atlas_cloud/triglion/data/TDD_Zprime/user.tstreble.800030.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562987._*.output.h5"
 
-
-
 lowpt: &lowpt
   name: lowpt
   cuts:
@@ -73,8 +71,6 @@ components:
       <<: *zprime
     flavours: [taujets]
     num_jets: 805_555
-
-
 
 resampling:
   target: cjets

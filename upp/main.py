@@ -20,6 +20,7 @@ from ftag.cli_utils import HelpFormatter, valid_path
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.stages.hist import create_histograms
 from upp.stages.merging import Merging
+from upp.stages.metadata_injector import MetadataInjector
 from upp.stages.normalisation import Normalisation
 from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
@@ -28,10 +29,6 @@ from upp.stages.rw_merge import RWMerge
 from upp.stages.split_containers import SplitContainers
 from upp.utils.check_input_samples import run_input_sample_check
 from upp.utils.logger import setup_logger
-
-from ftag.find_metadata import MetadataFinder
-from upp.stages.metadata_injector import MetadataInjector
-
 
 
 def parse_args(args: Any) -> argparse.Namespace:
@@ -58,10 +55,10 @@ def parse_args(args: Any) -> argparse.Namespace:
         help="Path to config file",
     )
     parser.add_argument(
-    "--metadata",
-    action="store_true",
-    default=False,
-    help="Run metadata injection stage before reweighting",
+        "--metadata",
+        action="store_true",
+        default=False,
+        help="Run metadata injection stage before reweighting",
     )
     parser.add_argument(
         "--prep",
