@@ -5,7 +5,7 @@ authors = [{name="Alexander Froch"}]
 dynamic = ["version"]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.11,<3.15"
 
 dependencies = [
   "atlas-ftag-tools==0.3.1",
@@ -52,6 +52,7 @@ requires = ["setuptools>=62"]
 build-backend = "setuptools.build_meta"
 
 [tool.ruff]
+target-version = "py311"
 lint.select = ["I", "E", "W", "F", "B", "UP", "ARG", "SIM", "TID", "RUF", "D2", "D3", "D4"]
 lint.ignore = ["RUF005"]
 line-length = 100
