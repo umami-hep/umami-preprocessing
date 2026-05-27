@@ -24,7 +24,7 @@ pre-commit run --all-files
 
 ### Testing
 
-It is highly encoraged to adhere to provide unit and/or integration tests for every new added feature.
+It is highly encouraged to adhere to provide unit and/or integration tests for every new added feature.
 You can test your code and check the coverage using.
 ```bash
 coverage run --source ftag -m pytest --show-capture=stdout

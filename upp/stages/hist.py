@@ -41,12 +41,12 @@ def bin_jets(array: dict, bins: list, weights: np.ndarray | None = None) -> tupl
             bin in which this observation falls.  The representation depends on the
             `expand_binnumbers` argument.  See `Notes` for details.
     """
+    sample = s2u(array).astype(np.float64, copy=False)
     statistic_mode = "count" if weights is None else "sum"
-    
     hist, _, out_bins = binned_statistic_dd(
-        sample=s2u(array),
-        values=weights,       
-        statistic=statistic_mode, 
+        sample=sample,
+        values=weights,
+        statistic=statistic_mode,
         bins=bins,
         expand_binnumbers=True,
     )

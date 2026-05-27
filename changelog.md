@@ -2,6 +2,10 @@
 
 ### [Latest]
 
+- Refresh Umami integration docs and CLI help text [#139](https://github.com/umami-hep/umami-preprocessing/pull/139)
+- Avoid expected divide warnings in reweighting weight calculation [#140](https://github.com/umami-hep/umami-preprocessing/pull/140)
+- Update Python support and CI workflows [#141](https://github.com/umami-hep/umami-preprocessing/pull/141)
+- Update documentation [#124](https://github.com/umami-hep/umami-preprocessing/pull/124)
 - Vectorize `_assign_weights` in rw_merge for ~14x speedup and fix hardcoded "train" in output filenames [#123](https://github.com/umami-hep/umami-preprocessing/pull/123)
 - Allow reweighting number of jets estimate to be larger than the minority class count [#122](https://github.com/umami-hep/umami-preprocessing/pull/122)
 - Add campaign year reweighting/resampling to Xbb configs [#118](https://github.com/umami-hep/umami-preprocessing/pull/118)

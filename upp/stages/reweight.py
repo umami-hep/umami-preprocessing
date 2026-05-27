@@ -291,12 +291,10 @@ class Reweight:
             HIST_FLOOR = 1e-6
             target = all_targets[rw_group][rw_rep]
             for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
-                rw = np.where(
-                    hist > HIST_FLOOR,
-                    target / np.maximum(hist, HIST_FLOOR),
-                    0.0,
-                )
-                output_weights[rw_group][rw_rep]["weights"][cls] = np.clip(rw, 0, RW_CAP)
+                safe_hist = np.maximum(hist, HIST_FLOOR)
+                weights = np.zeros_like(hist, dtype=float)
+                np.divide(target, safe_hist, out=weights, where=hist > HIST_FLOOR)
+                output_weights[rw_group][rw_rep]["weights"][cls] = np.clip(weights, 0, RW_CAP)
 
         return output_weights
 
