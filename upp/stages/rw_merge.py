@@ -5,6 +5,7 @@ import time
 from multiprocessing import Pool
 from pathlib import Path
 
+import h5py
 import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader, H5Writer, join_structured_arrays
@@ -76,12 +77,27 @@ class RWMerge:
 
         batches_per_file = num_jets_per_file // batch_size or 1
         num_batches = (
-            total_jets // batch_size + (1 if total_jets % num_jets_per_file != 0 else 0)
+            total_jets // batch_size + (1 if total_jets % batch_size != 0 else 0)
         ) or 1
 
-        variables = self.config.variables.combined() if self.config.split != "test" else None
-        if variables and "flavour_label" not in variables:
-            variables["jets"] += ["flavour_label"]
+        # H5Reader.stream(None) only loads jets; for full-ntuple merge pass {ds: None} per top-level dataset.
+        if self.config.variables.keep_all:
+            p0 = Path(all_files[0])
+            with h5py.File(p0, "r") as hf:
+                variables = {k: None for k in hf if isinstance(hf[k], h5py.Dataset)}
+        else:
+            variables = (
+                self.config.variables.combined()
+                if self.config.split != "test"
+                else None
+            )
+        if (
+            variables is not None
+            and not self.config.variables.keep_all
+            and isinstance(variables.get(self.config.jets_name), list)
+            and "flavour_label" not in variables[self.config.jets_name]
+        ):
+            variables[self.config.jets_name] += ["flavour_label"]
         args_list = []
         for i, bi in enumerate(range(0, num_batches, batches_per_file)):
             args_list.append(

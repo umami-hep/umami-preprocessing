@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
 
 
-def bin_jets(array: dict, bins: list) -> tuple[np.ndarray, np.ndarray]:
+def bin_jets(array: dict, bins: list, weights: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Create the histogram and bins for the given resampling variables.
 
     Parameters
@@ -41,10 +41,12 @@ def bin_jets(array: dict, bins: list) -> tuple[np.ndarray, np.ndarray]:
             bin in which this observation falls.  The representation depends on the
             `expand_binnumbers` argument.  See `Notes` for details.
     """
+    statistic_mode = "count" if weights is None else "sum"
+    
     hist, _, out_bins = binned_statistic_dd(
         sample=s2u(array),
-        values=None,
-        statistic="count",
+        values=weights,       
+        statistic=statistic_mode, 
         bins=bins,
         expand_binnumbers=True,
     )

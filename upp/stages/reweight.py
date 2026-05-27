@@ -116,6 +116,8 @@ class Reweight:
             all_vars[rw_group].extend(rw.reweight_vars)
             if "valid" in existing_vars[rw_group]:
                 all_vars[rw_group] += ["valid"]
+            if "physicalWeight" in existing_vars.get(rw_group, []):
+                all_vars[rw_group] += ["physicalWeight"]
         if "jets" not in all_vars:
             all_vars["jets"] = ["pt"]
         all_vars = {k: list(set(v)) for k, v in all_vars.items()}
@@ -171,10 +173,25 @@ class Reweight:
                         assert "valid" in data.dtype.names
                         data = data[data["valid"]]
                 classes = np.unique(data[rw.class_var]) if rw.class_var is not None else [None]
-
                 for cls in classes:
                     mask = data[rw.class_var] == cls
-                    hist, outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
+                    data_masked = data[mask]
+
+                    # Use physicalWeight column from the structured jets array if present;
+                    # otherwise fall back to uniform weights.
+                    if "physicalWeight" in data_masked.dtype.names:
+                        PW_CAP = 10000.0
+                        w = np.asarray(data_masked["physicalWeight"], dtype=np.float64)
+                        w = np.clip(w, 0, PW_CAP)
+                    else:
+                        w = np.ones(mask.sum(), dtype=float)
+
+                    hist, outbins = bin_jets(
+                        data_masked[rw.reweight_vars],
+                        rw.flat_bins,
+                        weights=w,
+                    )
+
                     if rw.class_var is not None:
                         cls = str(cls)
                     if rw_group not in all_histograms:
@@ -270,21 +287,16 @@ class Reweight:
                 "rw_vars": rw.reweight_vars,
                 "class_var": rw.class_var,
             }
-            idx_below_min = None
+            RW_CAP = 1e4
+            HIST_FLOOR = 1e-6
+            target = all_targets[rw_group][rw_rep]
             for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
-                this_idx_below_min = hist == 0  # | (all_targets[rw_group][rw_rep] == 0)
-                output_weights[rw_group][rw_rep]["weights"][cls] = np.where(
-                    hist > 0, all_targets[rw_group][rw_rep] / hist, 0
+                rw = np.where(
+                    hist > HIST_FLOOR,
+                    target / np.maximum(hist, HIST_FLOOR),
+                    0.0,
                 )
-                if idx_below_min is None:
-                    idx_below_min = this_idx_below_min
-                else:
-                    idx_below_min |= this_idx_below_min
-            # If we have any bins where we have 0 of a given flavour, we set all the
-            # weights to 0
-            if np.any(idx_below_min):
-                for cls in all_histograms[rw_group][rw_rep]["histograms"]:
-                    output_weights[rw_group][rw_rep]["weights"][cls][idx_below_min] = 0
+                output_weights[rw_group][rw_rep]["weights"][cls] = np.clip(rw, 0, RW_CAP)
 
         return output_weights
 

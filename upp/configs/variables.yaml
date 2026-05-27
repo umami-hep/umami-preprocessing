@@ -2,6 +2,9 @@ jets:
   inputs:
     - pt_btagJes
     - eta_btagJes
+    - R10TruthLabel_R22v1
+    - PartonTruthLabelID
+    - physicalWeight
   labels:
     - HadronConeExclTruthLabelID
     - HadronConeExclExtendedTruthLabelID
@@ -20,7 +23,8 @@ jets:
     - n_truth_promptLepton
     - eventNumber
     - jetFoldHash
-
+    - physicalWeight
+    
 tracks:
   inputs:
     - d0

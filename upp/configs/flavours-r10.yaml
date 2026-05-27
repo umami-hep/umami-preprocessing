@@ -1,0 +1,44 @@
+# flavour-r10.yaml
+# 已同步为 0-6 连续整数标签
+
+- name: djets
+  category: jets
+  label: "d-jets"
+  colour: blue
+  cuts:
+    - [PartonTruthLabelID, "==", 1]
+
+- name: ujets
+  category: jets
+  label: "u-jets"
+  colour: cyan
+  cuts:
+    - [PartonTruthLabelID, "==", 2]
+
+- name: sjets
+  category: jets
+  label: "s-jets"
+  colour: purple
+  cuts:
+    - [PartonTruthLabelID, "==", 3]
+
+- name: cjets
+  category: jets
+  label: "c-jets"
+  colour: red
+  cuts:
+    - [PartonTruthLabelID, "==", 4]
+
+- name: bjets
+  category: jets
+  label: "b-jets"
+  colour: orange
+  cuts:
+    - [PartonTruthLabelID, "==", 5]
+
+- name: gluon
+  category: jets
+  label: "gluon"
+  colour: pink
+  cuts:
+    - [PartonTruthLabelID, "==", 21]

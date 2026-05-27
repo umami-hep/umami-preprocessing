@@ -119,6 +119,8 @@ class PreprocessingConfig:
         Skip checks for the input files. This is used for grid submission
     skip_config_copy : bool, optional
         Decide, if the config copying is skipped or not. By default False
+    keep_all_variables : bool, optional
+        If true, split and rw-merge keep all top-level HDF5 datasets / full jets fields (PW + RW on jets).
     """
 
     config_path: Path
@@ -142,6 +144,8 @@ class PreprocessingConfig:
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
+    # When true: split-containers and rw-merge keep all input datasets/fields (tracks, towers, …), not just variables.yaml subset.
+    keep_all_variables: bool = False
 
     def __post_init__(self):
         # postprocess paths
@@ -198,9 +202,12 @@ class PreprocessingConfig:
             if selection := groups.get("selection", None):
                 selectors[name] = TrackSelector(Cuts.from_list(selection))
 
-        # configure variables
+        # configure variables (keep_all_variables is independent of train/val/test split)
         self.variables = VariableConfig(
-            self.config["variables"], self.jets_name, self.is_test, selectors
+            self.config["variables"],
+            self.jets_name,
+            self.keep_all_variables,
+            selectors,
         )
         if self.sampl_cfg is not None:
             self.variables = self.variables.add_jet_vars(

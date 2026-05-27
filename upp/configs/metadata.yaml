@@ -1,0 +1,88 @@
+global:
+  base_dir: /eos/home-y/yuanda/dev
+  # Metadata injection (--metadata) modifies files in-place; use copies under central_working, not origin.
+  ntuple_dir: /eos/home-y/yuanda/dev/sample/central_working
+  # When true: split + rw-merge preserve all top-level HDF5 datasets / full jet fields (PW + RW columns still added on jets).
+  keep_all_variables: true
+  out_dir: output_metadata
+  jets_name: jets
+  batch_size: 40000
+  num_jets_estimate: 700000
+  num_jets_per_output_file: 1_000_000
+  # test split: plot.py uses merged VDS path (glob) instead of per-sample pp_output_test_*.h5
+  merge_test_samples: true
+  flavour_config: /eos/home-y/yuanda/dev/umami-preprocessing/upp/configs/flavours-r10.yaml
+
+inputs:
+  train:
+    input_files:
+      - /eos/home-y/yuanda/dev/sample/central_working/*.h5
+
+global_cuts:
+  common: []
+  train: [[eventNumber, "%10<=", 7]]
+  val: [[eventNumber, "%10==", 8]]
+  test: [[eventNumber, "%10==", 9]]
+
+sample_all: &sample_all
+  name: sample_all
+  pattern: ["*.h5"]
+
+components:
+  - region: { name: inclusive, cuts: [[PartonTruthLabelID, "==", 1]] }
+    sample: { <<: *sample_all }
+    flavours: [djets]
+    num_jets: 60000
+  - region: { name: inclusive, cuts: [[PartonTruthLabelID, "==", 2]] }
+    sample: { <<: *sample_all }
+    flavours: [ujets]
+    num_jets: 120000
+  - region: { name: inclusive, cuts: [[PartonTruthLabelID, "==", 3]] }
+    sample: { <<: *sample_all }
+    flavours: [sjets]
+    num_jets: 15000
+  - region: { name: inclusive, cuts: [[PartonTruthLabelID, "==", 4]] }
+    sample: { <<: *sample_all }
+    flavours: [cjets]
+    num_jets: 10000
+  - region: { name: inclusive, cuts: [[PartonTruthLabelID, "==", 5]] }
+    sample: { <<: *sample_all }
+    flavours: [bjets]
+    num_jets: 6000
+  - region: { name: inclusive, cuts: [[PartonTruthLabelID, "==", 21]] }
+    sample: { <<: *sample_all }
+    flavours: [gluon]
+    num_jets: 160000
+
+variables:
+  jets:
+    inputs: [pt, eta, eventNumber]
+    labels: [PartonTruthLabelID, physicalWeight]
+
+resampling:
+  method: none
+  target: ujets
+  variables:
+    pt:
+      bins: [[20000, 2480000, 100]]
+
+reweighting:
+  num_jets_estimate: 700000
+  reweights:
+    - group: jets
+      reweight_vars: [pt]
+      bins:
+        pt: [[20000, 2480000, 100]]
+      class_var: flavour_label
+      class_target: uniform
+
+flavour_categories:
+  jets: [djets, ujets, sjets, cjets, bjets, gluon]
+
+custom_flavours:
+  djets:   { label: 0, cuts: [[PartonTruthLabelID, "==", 1]] }
+  ujets:   { label: 1, cuts: [[PartonTruthLabelID, "==", 2]] }
+  sjets:   { label: 2, cuts: [[PartonTruthLabelID, "==", 3]] }
+  cjets:   { label: 3, cuts: [[PartonTruthLabelID, "==", 4]] }
+  bjets:   { label: 4, cuts: [[PartonTruthLabelID, "==", 5]] }
+  gluon:   { label: 5, cuts: [[PartonTruthLabelID, "==", 21]] }

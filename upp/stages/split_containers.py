@@ -86,10 +86,12 @@ def get_all_fp_vars(file: Path | str) -> list[str]:
     all_vars = get_all_vars(file)
     # combine the values in this dict into a single list
 
-    fp_vars = [
-        v for v in all_vars if ("pt" in v.lower() or "energy" in v.lower() or "mass" in v.lower())
-    ]
+    target_keywords = ["pt", "energy", "mass", "weight", "physicalWeight"]
 
+    fp_vars = [
+        v for v in all_vars 
+        if any(key in v.lower() for key in target_keywords)
+    ]
     return fp_vars
 
 
@@ -127,6 +129,7 @@ class SplitContainers:
         output_name=None,
         variables: dict[str, dict[str, list[str]]] | None = None,
         flavour_label_list: list[str] | None = None,
+        keep_all_variables: bool = False,
     ):
         if isinstance(input_file, str):
             input_file = Path(input_file)
@@ -138,6 +141,16 @@ class SplitContainers:
         parsed_variables: dict[str, list[str]] | dict[str, None] = (
             parse_variables(variables) if variables is not None else all_variables
         )
+        # --- Modified patch logic as follows ---
+        if isinstance(parsed_variables, dict):
+            # Only process if the 'jets' group exists
+            if "jets" in parsed_variables:
+                # Force-add 'physicalWeight' only; do not add 'valid'
+                if "physicalWeight" not in parsed_variables["jets"]:
+                    parsed_variables["jets"].append("physicalWeight")
+                    print("FORCE RE-INTEGRATED: Only physicalWeight into jets", flush=True)
+        # -----------------------
+
         print("parsed variables: ", parsed_variables, flush=True)
         start = time.time()
         reader = H5Reader(input_file, batch_size=batch_size, shuffle=False)
@@ -163,6 +176,7 @@ class SplitContainers:
                 print(f"At least 1 output file exists for {input_file}. Skipping it", flush=True)
                 return
 
+            use_all_cols = keep_all_variables or ("test" in split)
             writers_by_sample_components[split] = H5Writer.from_file(
                 input_file,
                 num_jets=None,
@@ -170,7 +184,7 @@ class SplitContainers:
                 precision="half",
                 full_precision_vars=fp_vars,
                 shuffle=False,
-                variables=all_variables if "test" in split else parsed_variables,
+                variables=all_variables if use_all_cols else parsed_variables,
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
             )
@@ -308,8 +322,12 @@ class SplitContainers:
             assert container is not None, "Can only specify files if a container is specified"
 
         for container, cuts_by_component in containers_with_split_cuts.items():
+            # Sanitize container name when used as a directory: avoid literal '*' or '/'
+            # in the split-components subdir, otherwise downstream H5Reader will treat the
+            # path as a glob pattern and create a shared VDS that collides across flavours.
+            container_dir_name = container.replace("*", "all").replace("/", "_") or "default"
             this_out_dir = (
-                Path(self.config.base_dir) / "split-components" / container
+                Path(self.config.base_dir) / "split-components" / container_dir_name
                 if output_dir is None
                 else Path(".")
             )
@@ -340,6 +358,7 @@ class SplitContainers:
                     variables=self.config.config["variables"],
                     flavour_label_list=all_flavours,
                     output_name="output",
+                    keep_all_variables=self.config.keep_all_variables,
                 )
 
     def create_meta_data(self):
