@@ -365,18 +365,12 @@
     Global Config
   </a>
   
-    <nav class="md-nav" aria-label="Global Config">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="md-nav__link">
     PreprocessingConfig
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -513,18 +507,12 @@
     Global Config
   </a>
   
-    <nav class="md-nav" aria-label="Global Config">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="md-nav__link">
     PreprocessingConfig
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -755,9 +743,9 @@ The file you provide should have the same structure as shown above but without <
 For example:
 <code>yaml
 variables: !include xbb-variables.yaml</code></p>
-<p>One can also import variables configs already provided in this package <code>upp/config/</code> yaml files using just the yaml file name e.g.:</p>
+<p>One can also import variable configs already provided in this package under <code>upp/configs/</code> by using the yaml file name, e.g.:</p>
 <p><code>yaml
-variables: !include /&lt;full path to your file&gt;.yaml</code></p>
+variables: !include variables.yaml</code></p>
 <details class="info">
 <summary>You can choose later which variables in your output files are used for training</summary>
 <p>When it comes to defining your training config, you will be required to <a href="https://ftag-salt.docs.cern.ch/configuration/#selecting-training-variables">define the variables used for training</a>.
@@ -833,14 +821,14 @@ resampling:
 
 
 
-<h4 id="upp.classes.preprocessing_config.PreprocessingConfig" class="doc doc-heading">
+<h2 id="upp.classes.preprocessing_config.PreprocessingConfig" class="doc doc-heading">
               <code class=" language-python"><span class="n">upp</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">preprocessing_config</span><span class="o">.</span><span class="n">PreprocessingConfig</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
 
-<a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="headerlink" title="Permanent link">#</a></h4>
+<a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -1153,7 +1141,7 @@ huge output file.</p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 28, 2026 15:03:46 UTC">May 28, 2026</span>
       
         <br>
         Created:

@@ -552,7 +552,7 @@
 <h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">#</a></h3>
 <p>To run all preprocessing stages for the <code>train</code> split use:</p>
 <p><code>bash
-preprocess --config configs/test.yaml</code></p>
+preprocess --config upp/configs/test.yaml</code></p>
 <p>For a comprehensive list of available flags, refer to <code>preprocess --help</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">If you are running on lxplus you may need to use <code>python3 upp/main.py</code> instead of <code>preprocess</code></p>
@@ -563,17 +563,17 @@ These splits are defined in <a href="../configuration/#global-cuts">configuratio
 By default, the train split contains 80% of the jets, while val and test contain 10% each.</p>
 <p>If you want to preprocess the <code>val</code> or <code>test</code> split, use the <code>--split</code> argument:</p>
 <p><code>bash
-preprocess --config configs/config.yaml --split val</code></p>
+preprocess --config path/to/config.yaml --split val</code></p>
 <p>You can also process <code>train</code>, <code>val</code>, and <code>test</code> with a single command using <code>--split=all</code>.</p>
 <h3 id="stages">Stages<a class="headerlink" href="#stages" title="Permanent link">#</a></h3>
 <p>The preprocessing is broken up into several stages.</p>
 <p>To run with only specific stages enabled, include the flag for the required stages:</p>
 <p><code>bash
-preprocess --config configs/config.yaml --prep --resample</code></p>
+preprocess --config path/to/config.yaml --prep --resample</code></p>
 <p>To run the whole chain excluding certain stages, include the corresponding negative flag (<code>--no-*</code>).
 For example to run without plotting</p>
 <p><code>bash
-preprocess --config configs/config.yaml --no-plot</code></p>
+preprocess --config path/to/config.yaml --no-plot</code></p>
 <p>The stages are described below.</p>
 <h4 id="1-prepare">1. Prepare<a class="headerlink" href="#1-prepare" title="Permanent link">#</a></h4>
 <p>The prepare stage (<code>--prep</code>) checks first the number of initial jets that are available per group/sample. For each of the entries in the <code>pattern</code> of the group, it checks how many jets are in total available. If this differs too much between the entries in <code>pattern</code>, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in <code>pattern</code> are different MC campaigns and by using drastically different numbers of initial jets, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument <code>--skip-sample-check</code>. If you run the script the first time and you want to run the prepare stage in parallel, please let this script run first! It creates virtual datasets for each entry in <code>pattern</code> which could become corrupted if you do run this script in parallel multiple times! Instructions on how to run this check stand-alone can be found in <a href="#additional-scripts-initial-sample-check">here</a>.</p>
@@ -606,7 +606,7 @@ pattern:
     - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a</code></p>
 <p>and finally the flavour that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
 <p><code>bash
-preprocess --config configs/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets</code></p>
+preprocess --config path/to/config.yaml --prep --component lowpt_ttbar_ghostsplitbjets</code></p>
 <p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.</p>
 </details>
 <h4 id="2-resample">2. Resample<a class="headerlink" href="#2-resample" title="Permanent link">#</a></h4>
@@ -618,12 +618,12 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
 <p>Similar to the <code>--prep</code> step, the resampling step is also able to run in parallel, but only for the different region (e.g. <code>lowpt</code> &amp; <code>highpt</code>). To do so, you need to run with the command line argument <code>--region</code> which takes as input the region on which to run. Please ensure that all components for this region were prepared in the <code>--prep</code> step before running this!</p>
 <p>The command to run the specific region would look like this:</p>
 <p><code>bash
-preprocess --config configs/config.yaml --resample --region lowpt</code></p>
+preprocess --config path/to/config.yaml --resample --region lowpt</code></p>
 <p>Similar to the <code>--prep</code> step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
 <p>If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the <code>--region</code> command line argument together with the <code>--component</code> command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the parallelization chapter of the Prepare stage.</p>
 <p>The command to run the specific region would look like this:</p>
 <p><code>bash
-preprocess --config configs/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets</code></p>
+preprocess --config path/to/config.yaml --resample --region lowpt --component lowpt_ttbar_ghostsplitbjets</code></p>
 <p>Similar to the <code>--prep</code> step and the previous <code>--region</code> explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
 Also, please do NOT use this functionality if you don't have fast I/O (hard drives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.</p>
 </details>
@@ -646,7 +646,7 @@ check_input_samples --config_path &lt;path/to/your/config&gt;</code></p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 13, 2026 10:40:52 UTC">May 13, 2026</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 28, 2026 15:03:46 UTC">May 28, 2026</span>
       
         <br>
         Created:
