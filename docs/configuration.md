@@ -182,10 +182,10 @@ For example:
 variables: !include xbb-variables.yaml
 ```
 
-One can also import variables configs already provided in this package `upp/config/` yaml files using just the yaml file name e.g.:
+One can also import variable configs already provided in this package under `upp/configs/` by using the yaml file name, e.g.:
 
 ```yaml
-variables: !include /<full path to your file>.yaml
+variables: !include variables.yaml
 ```
 
 ???info "You can choose later which variables in your output files are used for training"
@@ -242,4 +242,4 @@ resampling:
 
 ### Global Config 
 
-#### ::: upp.classes.preprocessing_config.PreprocessingConfig
+::: upp.classes.preprocessing_config.PreprocessingConfig
