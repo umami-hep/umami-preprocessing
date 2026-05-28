@@ -189,7 +189,7 @@ class SplitContainers:
             assert all(
                 len(_flavour_label_by_component[component]) == 1 for component in sample_components
             ), f"Each component must have exactly 1 flavour label not {_flavour_label_by_component}"
-            flavour_label_by_component: dict[str, int] = {  # noqa: no-redef
+            flavour_label_by_component: dict[str, int] = {
                 component: _flavour_label_by_component[component][0]
                 for component in _flavour_label_by_component
             }

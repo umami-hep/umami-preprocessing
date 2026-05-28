@@ -30,9 +30,9 @@ class RWMerge:
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert (
-            self.organised_components_config.exists()
-        ), f"Organised components config file not found: {self.organised_components_config}"
+        assert self.organised_components_config.exists(), (
+            f"Organised components config file not found: {self.organised_components_config}"
+        )
 
         with open(self.organised_components_config) as f:
             organised_components = yaml.safe_load(f)
