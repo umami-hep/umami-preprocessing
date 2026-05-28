@@ -29,7 +29,7 @@ The first stage takes each sample and splits it into its split and flavour compo
 
 To run the splitting, 
 ```
-python upp/main.py --config {config} --split-components [--container {single container} --files {files}]
+preprocess --config {config} --split-components [--container {single container} --files {files}]
 ```
 
 which will split the components. If `--container` is defined, then only that container from the config will be split. If this is not included, then all contains in the config will be split.
@@ -63,7 +63,7 @@ which will then automatically download, package up, and generate the meta data r
 
 ## Generate weights
 
-Once all the samples are prepared, we can calculate the weights. An example config can be found in `configs/GN3v01/GN3V01-RW.yaml`. We can look at the reweighting section:
+Once all the samples are prepared, we can calculate the weights. An example config can be found in `upp/configs/GN3V01/GN3V01-RW.yaml`. We can look at the reweighting section:
 
 
 ```yaml
@@ -111,7 +111,7 @@ Would calculate weights such that we have equivalent pt_frac distributions acros
 To run the reweighting simply do
 
 ```
-python upp/main.py --config {config} --rw
+preprocess --config {config} --rw
 ```
 
 ## Merging
@@ -119,11 +119,10 @@ python upp/main.py --config {config} --rw
 Finally, we can merge all the relevant jets with their weights. This is done by
 
 ```
-python upp/main.py --rwm --split {train/test/val}
+preprocess --config {config} --rwm --split {train/test/val}
 ```
 
 This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the `global` section of the pre-processing config includes `num_jets_per_output_file` and the `reweighting` section has `merge_num_proc>1`.
 This will then launch `merge_num_proc` processes, with approximately `num_jets_per_output_file` per file*.
 
 * Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.
-

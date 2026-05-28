@@ -33,7 +33,7 @@ plugins:
       handlers:
         python:
           options:
-            paths: [salt]
+            paths: [upp]
             line_length: 100
             show_root_heading: true
             show_root_toc_entry: true
