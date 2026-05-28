@@ -7,6 +7,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 from ftag.mock import JET_VARS, get_mock_file
+from numpy.lib import recfunctions as rfn
 
 from upp.main import main
 
@@ -18,7 +19,25 @@ this_dir = Path(__file__).parent
 class TestRunRW:
     def generate_mock(self, out_file, N=1_000):
         _, f = get_mock_file(num_jets=N, fname=out_file)
-        f["jets"]["eventNumber"] = np.arange(N, dtype="i4")
+        jets = f["jets"][:]
+        if "eventNumber" in jets.dtype.names:
+            jets["eventNumber"] = np.arange(N, dtype="i4")
+        else:
+            jets = rfn.append_fields(
+                jets,
+                "eventNumber",
+                np.arange(N, dtype="i4"),
+                usemask=False,
+            )
+        if "physicalWeight" not in jets.dtype.names:
+            jets = rfn.append_fields(
+                jets,
+                "physicalWeight",
+                np.ones(jets.shape[0], dtype="f4"),
+                usemask=False,
+            )
+        del f["jets"]
+        f.create_dataset("jets", data=jets)
         f.close()
 
     def setup_method(self, method):

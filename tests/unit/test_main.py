@@ -25,6 +25,7 @@ def test_parse_args_with_config(config_file):
     parsed_args = parse_args(args)
     expected_args = Namespace(
         config=config_file,
+        metadata=False,
         prep=None,
         resample=True,
         merge=None,
@@ -51,6 +52,7 @@ def test_parse_args_flags_not_given(config_file):
     parsed_args = parse_args(args)
     expected_args = Namespace(
         config=config_file,
+        metadata=False,
         prep=True,
         resample=True,
         merge=True,
@@ -88,6 +90,7 @@ def test_parse_args_flags_negative(config_file):
     # Check if the parsed arguments match the expected values
     expected_args = Namespace(
         config=config_file,
+        metadata=False,
         prep=False,
         resample=False,
         merge=False,
@@ -123,6 +126,7 @@ def test_parse_args_flags_positive(config_file):
     parsed_args = parse_args(args)
     expected_args = Namespace(
         config=config_file,
+        metadata=False,
         prep=True,
         resample=True,
         merge=True,
@@ -160,6 +164,7 @@ def test_parse_args_component(config_file):
     parsed_args = parse_args(args)
     expected_args = Namespace(
         config=config_file,
+        metadata=False,
         prep=True,
         resample=True,
         merge=True,
@@ -197,6 +202,7 @@ def test_parse_args_region(config_file):
     parsed_args = parse_args(args)
     expected_args = Namespace(
         config=config_file,
+        metadata=False,
         prep=True,
         resample=True,
         merge=True,
@@ -216,3 +222,9 @@ def test_parse_args_region(config_file):
     )
 
     assert parsed_args == expected_args
+
+
+def test_parse_args_metadata_flag(config_file):
+    args = ["--config", str(config_file), "--metadata"]
+    parsed_args = parse_args(args)
+    assert parsed_args.metadata is True
