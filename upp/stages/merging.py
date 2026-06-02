@@ -109,9 +109,10 @@ class Merging:
 
         # Define the suffix for the file (including the iterator number)
         suffix = f"{self.file_tag}_{file_idx:03d}"
+        fname = fname.with_name(f"{fname.stem}_{suffix}{fname.suffix}")
 
-        # Return the final path
-        return fname.with_name(f"{fname.stem}_{suffix}{fname.suffix}")
+        # Return the final path in the split-specific output subdirectory
+        return fname.parent / self.config.split / fname.name
 
     def _expected_rows_for_part(self, part_idx: int) -> int:
         """Return the expected number of rows for part `part_idx` given total_jets and split size.
@@ -313,17 +314,18 @@ class Merging:
             The `Components` object we are currently merging needed for `jet_counts`, etc.
         """
         # Construct the filename
-        fname = Path(self.config.out_fname)
-
-        if sample:
-            fname = path_append(fname, sample)
-
         if self.num_jets_per_output_file is not None:
-            suffix = f"{self.file_tag}_{file_idx:03d}"
-            fname = fname.with_name(f"{fname.stem}_{suffix}{fname.suffix}")
+            fname = self._part_fname(sample, file_idx)
+        else:
+            fname = Path(self.config.out_fname)
+            if sample:
+                fname = path_append(fname, sample)
 
         # Adjust shapes to the capacity of this file
         shapes = {name: (jets_in_file,) + shape[1:] for name, shape in self.base_shapes.items()}
+
+        # Ensure the output directory exists before opening the writer
+        fname.parent.mkdir(parents=True, exist_ok=True)
 
         # Instantiate an H5Writer
         self.writer = H5Writer(

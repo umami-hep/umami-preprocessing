@@ -237,8 +237,12 @@ class Normalisation:
             fname = str(self.config.out_fname).replace(".h5", "_vds.h5")
 
         # Get the correct output names if multiple output files were written
-        elif self.config.num_jets_per_output_file:
-            fname = self.config.out_fname.parent / f"{self.config.out_fname.stem}*.h5"
+        elif self.config.num_jets_per_output_file is not None:
+            fname = (
+                self.config.out_fname.parent
+                / self.config.split
+                / f"{self.config.out_fname.stem}*.h5"
+            )
 
         else:
             fname = self.config.out_fname
