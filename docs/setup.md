@@ -3,7 +3,7 @@ This guide will walk you through the process of setting up the Umami-Preprocessi
 ### Environment Setup
 
 Install UPP in a virtual environment to avoid conflicts with other software libraries.
-UPP requires Python 3.8 or later.
+UPP currently supports Python 3.10 and 3.11, with Python 3.11 recommended.
 
 === "conda"
 
@@ -30,7 +30,7 @@ UPP requires Python 3.8 or later.
 
     ```bash
     setupATLAS
-    lsetup "python 3.9.18-x86_64-el9"
+    lsetup "python 3.11.9-x86_64-el9"
     ```
 
     !!!info "You can also [set up conda on lxplus](https://abpcomputing.web.cern.ch/guides/python_inst/)"

@@ -2,6 +2,9 @@
 
 ### [Latest]
 
+- Update atlas-ftag-tools and puma [#143](https://github.com/umami-hep/umami-preprocessing/pull/143)
+- Sync pre-commit hooks and fix Ruff lint failures [#138](https://github.com/umami-hep/umami-preprocessing/pull/138)
+- Update docs and CI validation for supported Python versions [#137](https://github.com/umami-hep/umami-preprocessing/pull/137)
 - Refresh Umami integration docs and CLI help text [#139](https://github.com/umami-hep/umami-preprocessing/pull/139)
 - Avoid expected divide warnings in reweighting weight calculation [#140](https://github.com/umami-hep/umami-preprocessing/pull/140)
 - Update Python support and CI workflows [#141](https://github.com/umami-hep/umami-preprocessing/pull/141)
