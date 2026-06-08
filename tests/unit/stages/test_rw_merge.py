@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from unittest.mock import MagicMock
+
 import numpy as np
 import pytest
 
@@ -54,3 +56,78 @@ class TestAssignWeights:
 
         result = RWMerge._assign_weights(rw, bins, classes)
         assert result.shape == (0,)
+
+
+class TestRWMergeInit:
+    """Cover RWMerge.__init__ assertion for outfile_idx_range (line 26)."""
+
+    def test_non_tuple_idx_range_raises(self):
+        config = MagicMock()
+        with pytest.raises(AssertionError):
+            RWMerge(config, outfile_idx_range=[0, 1])
+
+    def test_wrong_length_tuple_raises(self):
+        config = MagicMock()
+        with pytest.raises(AssertionError):
+            RWMerge(config, outfile_idx_range=(0, 1, 2))
+
+
+class TestStartMp:
+    """Cover start_mp multiprocess branch (lines 314-316)."""
+
+    def test_start_mp_multiprocess(self, monkeypatch):
+        called_with: list = []
+
+        class FakePool:
+            def __init__(self, n: int) -> None:
+                pass
+
+            def __enter__(self) -> FakePool:
+                return self
+
+            def __exit__(self, *_: object) -> None:
+                pass
+
+            def starmap(self, _fn: object, args_list: list) -> None:
+                for args in args_list:
+                    called_with.append(args)
+
+        monkeypatch.setattr("upp.stages.rw_merge.Pool", FakePool)
+
+        def fn(x: int) -> int:
+            return x
+
+        RWMerge.start_mp(fn, [(1,), (2,), (3,)], n_threads=2)
+        assert called_with == [(1,), (2,), (3,)]
+
+
+class TestGetSampleWeightsException:
+    """Cover the except-and-reraise path in get_sample_weights (lines 185-187)."""
+
+    def test_exception_propagates(self, monkeypatch):
+        n = 5
+        jets = np.zeros(n, dtype=[("x", "f4"), ("class_var", "i4")])
+        batch = {"jets": jets}
+        weights = {
+            "jets": {
+                "rw1": {
+                    "rw_vars": ["x"],
+                    "class_var": "class_var",
+                    "bins": [np.linspace(0.0, 1.0, 6)],
+                    "weights": {"0": np.ones(5)},
+                }
+            }
+        }
+
+        monkeypatch.setattr(
+            "upp.stages.rw_merge.bin_jets",
+            lambda *_a, **_k: (np.zeros(5), np.zeros((1, n), dtype=int)),
+        )
+
+        def bad_assign(*_a: object, **_k: object) -> None:
+            raise ValueError("injected error")
+
+        monkeypatch.setattr(RWMerge, "_assign_weights", staticmethod(bad_assign))
+
+        with pytest.raises(ValueError, match="injected error"):
+            RWMerge.get_sample_weights(batch, weights)

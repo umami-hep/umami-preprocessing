@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import argparse
 from argparse import Namespace
+from unittest.mock import MagicMock, patch
 
 from pytest import fixture
 
-from upp.main import parse_args
+from upp.main import main, parse_args, run_pp
 
 
 @fixture
@@ -228,3 +230,75 @@ def test_parse_args_metadata_flag(config_file):
     args = ["--config", str(config_file), "--metadata"]
     parsed_args = parse_args(args)
     assert parsed_args.metadata is True
+
+
+def _base_args(config_file: object, **overrides: object) -> argparse.Namespace:
+    defaults: dict = dict(
+        config=config_file,
+        metadata=False,
+        prep=False,
+        resample=False,
+        merge=False,
+        norm=False,
+        plot=False,
+        split="train",
+        component=None,
+        region=None,
+        container=None,
+        grid=False,
+        split_components=False,
+        reweight=False,
+        rw_merge=False,
+        rw_merge_idx=None,
+        files=None,
+        skip_sample_check=False,
+    )
+    defaults.update(overrides)
+    return argparse.Namespace(**defaults)
+
+
+def test_run_pp_metadata_injection(tmp_path):
+    """run_pp with metadata=True constructs and runs MetadataInjector (lines 222-224)."""
+    config_file = tmp_path / "config.yaml"
+    config_file.write_text("")
+    args = _base_args(config_file, metadata=True)
+
+    mock_injector = MagicMock()
+    with (
+        patch("upp.main.PreprocessingConfig.from_file", return_value=MagicMock()),
+        patch("upp.main.MetadataInjector", return_value=mock_injector),
+    ):
+        run_pp(args)
+
+    mock_injector.run.assert_called_once()
+
+
+def test_run_pp_rw_merge_with_idx(tmp_path):
+    """run_pp with rw_merge_idx parses the comma-separated pair (lines 269-272)."""
+    config_file = tmp_path / "config.yaml"
+    config_file.write_text("")
+    args = _base_args(config_file, rw_merge=True, rw_merge_idx="0,1")
+
+    mock_rw = MagicMock()
+    with (
+        patch("upp.main.PreprocessingConfig.from_file", return_value=MagicMock()),
+        patch("upp.main.RWMerge", return_value=mock_rw),
+    ):
+        run_pp(args)
+
+    mock_rw.run.assert_called_once()
+
+
+def test_main_split_all(tmp_path):
+    """main() with split='all' calls run_pp three times (lines 303-310)."""
+    config_file = tmp_path / "config.yaml"
+    config_file.write_text("")
+    mock_args = _base_args(config_file, split="all")
+
+    with (
+        patch("upp.main.parse_args", return_value=mock_args),
+        patch("upp.main.run_pp") as mock_run_pp,
+    ):
+        main()
+
+    assert mock_run_pp.call_count == 3

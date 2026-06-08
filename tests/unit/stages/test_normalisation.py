@@ -4,6 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 
+import numpy as np
 import pytest
 from ftag import get_mock_file
 
@@ -104,6 +105,30 @@ class TestCombineClassDict:
         # Check that the correct values are returned
         assert combined_mean_ref == combined_mean
         assert combined_std_ref == combined_std
+
+    def test_get_class_dict_integer_label(self):
+        """Integer-typed label vars are counted in get_class_dict (lines 160-161)."""
+        norm = Normalisation(
+            config=PreprocessingConfig.from_file(
+                Path(CFG_DIR / "test_config_pdf_auto_umami.yaml"), "train"
+            )
+        )
+        # config labels for jets: [pt, eta, mass] + resampling vars [pt, abs_eta]
+        # → effective labels: [pt, eta, mass, abs_eta]; make "pt" integer → lines 160-161
+        jets_dtype = np.dtype(
+            [
+                ("pt_btagJes", "f4"),
+                ("eta_btagJes", "f4"),
+                ("flavour_label", "i4"),
+                ("pt", "i4"),
+                ("eta", "f4"),
+                ("mass", "f4"),
+                ("abs_eta", "f4"),
+            ]
+        )
+        batch = {"jets": np.zeros(10, dtype=jets_dtype)}
+        result = norm.get_class_dict(batch)
+        assert "pt" in result["jets"]
 
     @staticmethod
     def test_combine_norm_dict():

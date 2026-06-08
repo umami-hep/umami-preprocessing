@@ -186,7 +186,7 @@ class Reweight:
                     else:
                         w = np.ones(mask.sum(), dtype=float)
 
-                    hist, outbins = bin_jets(
+                    hist, _outbins = bin_jets(
                         data_masked[rw.reweight_vars],
                         rw.flat_bins,
                         weights=w,
