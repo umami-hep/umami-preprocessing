@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
 
+import upp.stages.rw_merge as rw_merge_module
 from upp.stages.rw_merge import RWMerge
 
 
@@ -75,7 +76,7 @@ class TestRWMergeInit:
 class TestStartMp:
     """Cover start_mp multiprocess branch (lines 314-316)."""
 
-    def test_start_mp_multiprocess(self, monkeypatch):
+    def test_start_mp_multiprocess(self):
         called_with: list = []
 
         class FakePool:
@@ -92,19 +93,19 @@ class TestStartMp:
                 for args in args_list:
                     called_with.append(args)
 
-        monkeypatch.setattr("upp.stages.rw_merge.Pool", FakePool)
-
         def fn(x: int) -> int:
             return x
 
-        RWMerge.start_mp(fn, [(1,), (2,), (3,)], n_threads=2)
+        with patch.object(rw_merge_module, "Pool", FakePool):
+            RWMerge.start_mp(fn, [(1,), (2,), (3,)], n_threads=2)
+
         assert called_with == [(1,), (2,), (3,)]
 
 
 class TestGetSampleWeightsException:
     """Cover the except-and-reraise path in get_sample_weights (lines 185-187)."""
 
-    def test_exception_propagates(self, monkeypatch):
+    def test_exception_propagates(self):
         n = 5
         jets = np.zeros(n, dtype=[("x", "f4"), ("class_var", "i4")])
         batch = {"jets": jets}
@@ -119,15 +120,15 @@ class TestGetSampleWeightsException:
             }
         }
 
-        monkeypatch.setattr(
-            "upp.stages.rw_merge.bin_jets",
-            lambda *_a, **_k: (np.zeros(5), np.zeros((1, n), dtype=int)),
-        )
+        def fake_bin_jets(*_a: object, **_k: object) -> tuple:
+            return (np.zeros(5), np.zeros((1, n), dtype=int))
 
         def bad_assign(*_a: object, **_k: object) -> None:
             raise ValueError("injected error")
 
-        monkeypatch.setattr(RWMerge, "_assign_weights", staticmethod(bad_assign))
-
-        with pytest.raises(ValueError, match="injected error"):
+        with (
+            patch.object(rw_merge_module, "bin_jets", fake_bin_jets),
+            patch.object(RWMerge, "_assign_weights", staticmethod(bad_assign)),
+            pytest.raises(ValueError, match="injected error"),
+        ):
             RWMerge.get_sample_weights(batch, weights)
