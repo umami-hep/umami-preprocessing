@@ -97,6 +97,15 @@ def test_plot_helpers_format_labels_and_ranges():
     assert plot_mod._display_range("absEta_btagJes", (0, 2.5)) == (0, 2.5)
 
 
+def test_plot_helpers_optional_labels_and_no_pt():
+    """Check labels without jet counts and configurations without a pT variable."""
+    plotting = PlottingConfig()
+    assert plot_mod._atlas_second_tag(plotting=plotting) == plotting.atlas_second_tag
+
+    config = SimpleNamespace(sampl_cfg=SimpleNamespace(vars=["mass", "abs_eta"]))
+    assert plot_mod._pt_variable(config) is None
+
+
 def test_plot_helpers_pt_regions_and_stitching():
     """Check that region and stitching windows are derived from pT cuts."""
     low = plot_mod.PlotRegion(
@@ -118,6 +127,56 @@ def test_plot_helpers_pt_regions_and_stitching():
     assert len(stitching) == 1
     assert stitching[0].name == "stitching"
     assert stitching[0].pt_range == (150_000, 350_000)
+
+
+def test_plot_helpers_skip_duplicate_and_non_stitching_regions():
+    """Check duplicate-region filtering and non-touching stitching branches."""
+    low = SimpleNamespace(
+        name="lowpt",
+        cuts=Cuts.from_list([["pt", ">", 20_000], ["pt", "<", 250_000]]),
+    )
+    high = plot_mod.PlotRegion(
+        "highpt",
+        Cuts.from_list([["pt", ">", 300_000], ["pt", "<", 600_000]]),
+        (300_000, 600_000),
+    )
+    components = SimpleNamespace(groupby_region=lambda: [(low, object()), (low, object())])
+    config = SimpleNamespace(components=components)
+
+    assert len(plot_mod._unique_regions(config, "pt")) == 1
+    assert plot_mod._stitching_regions([high], None) == []
+    assert (
+        plot_mod._stitching_regions(
+            [plot_mod.PlotRegion("lowpt", low.cuts, (20_000, 250_000)), high], "pt"
+        )
+        == []
+    )
+
+
+def test_make_hist_adds_sample_linestyle_legend(monkeypatch, tmp_path):
+    """Check that overlays of multiple samples create a linestyle legend."""
+    fname, file = get_mock_file(num_jets=100, fname=tmp_path / "sample.h5")
+    file.close()
+    values = H5Reader(
+        fname=fname, batch_size=100, jets_name="jets", shuffle=False, equal_jets=True
+    ).load({"jets": ["pt", "HadronConeExclTruthLabelID"]})["jets"]
+    calls = []
+    monkeypatch.setattr(
+        plot_mod.HistogramPlot,
+        "make_linestyle_legend",
+        lambda _self, **kwargs: calls.append(kwargs),
+    )
+
+    make_hist(
+        stage="initial",
+        values_dict={"one": values, "two": values},
+        flavours=[Flavours["bjets"]],
+        variable="pt",
+        out_dir=tmp_path,
+        out_format_list=["png"],
+    )
+
+    assert calls[0]["labels"] == ("one", "two")
 
 
 def test_post_resampling_paths_split_mode(tmp_path):
