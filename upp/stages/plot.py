@@ -14,14 +14,8 @@ from puma import Histogram, HistogramPlot
 from upp.utils.tools import path_append
 
 if TYPE_CHECKING:  # pragma: no cover
+    from upp.classes.plotting_config import PlottingConfig
     from upp.classes.preprocessing_config import PreprocessingConfig
-
-
-ATLAS_SECOND_TAG = "$\\sqrt{s} = 13/13.6$ TeV"
-SAMPLE_LABELS = {
-    "ttbar": "$t\\bar{t}$",
-    "zprime": "$Z'$",
-}
 
 
 @dataclass(frozen=True)
@@ -60,6 +54,12 @@ def _is_pt_variable(variable: str) -> bool:
     return "pt" in variable.lower()
 
 
+def _uses_gev_display_units(variable: str) -> bool:
+    """Return whether a variable should be converted from MeV to GeV."""
+    variable_lower = variable.lower()
+    return "pt" in variable_lower or "mass" in variable_lower
+
+
 def _display_values(variable: str, values: Any) -> Any:
     """Convert values to display units for plotting.
 
@@ -73,9 +73,9 @@ def _display_values(variable: str, values: Any) -> Any:
     Returns
     -------
     Any
-        Values converted to GeV for pT variables and unchanged otherwise.
+        Values converted to GeV for pT and mass variables and unchanged otherwise.
     """
-    return values / 1e3 if _is_pt_variable(variable) else values
+    return values / 1e3 if _uses_gev_display_units(variable) else values
 
 
 def _display_range(
@@ -93,11 +93,11 @@ def _display_range(
     Returns
     -------
     tuple[float, float] | None
-        Range converted to GeV for pT variables and unchanged otherwise.
+        Range converted to GeV for pT and mass variables and unchanged otherwise.
     """
     if bins_range is None:
         return None
-    if _is_pt_variable(variable):
+    if _uses_gev_display_units(variable):
         return (bins_range[0] / 1e3, bins_range[1] / 1e3)
     return bins_range
 
@@ -139,20 +139,22 @@ def _suffix(*parts: str) -> str:
     return "_" + "_".join(re.sub(r"[^A-Za-z0-9]+", "_", part).strip("_") for part in parts if part)
 
 
-def _sample_label(sample_name: str) -> str:
+def _sample_label(sample_name: str, plotting: PlottingConfig) -> str:
     """Return a display label for a configured sample name.
 
     Parameters
     ----------
     sample_name : str
         Name of the configured input sample.
+    plotting : PlottingConfig
+        Active plotting configuration.
 
     Returns
     -------
     str
         LaTeX label for known samples and the raw sample name otherwise.
     """
-    return SAMPLE_LABELS.get(sample_name, sample_name)
+    return plotting.sample_label(sample_name)
 
 
 def _format_num_jets(num_jets: int) -> str:
@@ -177,13 +179,19 @@ def _format_num_jets(num_jets: int) -> str:
     return str(num_jets)
 
 
-def _atlas_second_tag(*sample_names: str, num_jets: int | None = None) -> str:
+def _atlas_second_tag(
+    *sample_names: str,
+    plotting: PlottingConfig,
+    num_jets: int | None = None,
+) -> str:
     """Build the second ATLAS tag with energy, sample labels, and jet count.
 
     Parameters
     ----------
     *sample_names : str
         Sample names to include after the centre-of-mass energy.
+    plotting : PlottingConfig
+        Active plotting configuration.
     num_jets : int | None, optional
         Number of jets requested for plotting. If provided, it is added as an
         extra line using compact formatting.
@@ -194,8 +202,8 @@ def _atlas_second_tag(*sample_names: str, num_jets: int | None = None) -> str:
         Multiline ATLAS second tag. Sample labels share the first line with the
         centre-of-mass energy, while the jet count is placed on a second line.
     """
-    labels = [_sample_label(name) for name in dict.fromkeys(sample_names) if name]
-    first_line = ATLAS_SECOND_TAG
+    labels = [_sample_label(name, plotting) for name in dict.fromkeys(sample_names) if name]
+    first_line = plotting.atlas_second_tag
     if labels:
         first_line = f"{first_line}, {' + '.join(labels)} jets"
     if num_jets is None:
@@ -216,10 +224,10 @@ def _plotting_num_jets(config: PreprocessingConfig, available_jets: int) -> int:
     Returns
     -------
     int
-        Minimum of the available jets and ``num_jets_estimate_plotting``.
+        Minimum of the available jets and ``plotting.num_jets_plotting``.
     """
-    assert config.num_jets_estimate_plotting is not None
-    return min(available_jets, config.num_jets_estimate_plotting)
+    assert config.plotting.num_jets_plotting is not None
+    return min(available_jets, config.plotting.num_jets_plotting)
 
 
 def _pt_bounds_from_cuts(cuts: Cuts, pt_variable: str) -> tuple[float, float] | None:
@@ -428,7 +436,7 @@ def _load_jets(config: PreprocessingConfig, in_paths: Any, vars_to_load: list[st
         equal_jets=True,
     ).load(
         {config.jets_name: list(dict.fromkeys(vars_to_load))},
-        num_jets=config.num_jets_estimate_plotting,
+        num_jets=config.plotting.num_jets_plotting,
     )[config.jets_name]
 
 
@@ -441,9 +449,10 @@ def make_hist(
     jets_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
-    out_format_list: tuple[str, ...] = ("pdf", "png"),
+    out_format_list: tuple[str, ...] | list[str] | None = None,
     selection_cuts: Cuts | None = None,
     atlas_second_tag: str | None = None,
+    plotting: PlottingConfig | None = None,
 ) -> None:
     """Make a flavour-split histogram for one variable.
 
@@ -476,46 +485,36 @@ def make_hist(
     suffix : str, optional
         A string suffix which is added to the plot
         output name, by default "".
-    out_format_list : tuple[str, ...], optional
+    out_format_list : tuple[str, ...] | list[str] | None, optional
         Output formats to save. By default, both "pdf" and "png" are created.
     selection_cuts : Cuts | None, optional
         Additional cuts that are applied before the flavour selection.
     atlas_second_tag : str | None, optional
         Second ATLAS label passed to Puma. If ``None``, only the default
         centre-of-mass energy label is shown.
+    plotting : PlottingConfig | None, optional
+        Plot labels and style settings. If ``None``, use the defaults.
     """
+    from upp.classes.plotting_config import PlottingConfig
+
     selection_cuts = selection_cuts or Cuts.empty()
-
-    # Get the correct name of the xlabel
-    if _is_pt_variable(variable):
-        xlabel = "Jet $p_\\mathrm{T}$ [GeV]"
-
-    elif "eta" in variable.lower():
-        xlabel = "Jet $|\\eta|$"
-
-    elif "mass" in variable.lower():
-        xlabel = "Jet Mass"
-
-    else:
-        xlabel = variable
+    plotting = plotting or PlottingConfig()
 
     # Setup the histogram
     plot = HistogramPlot(
-        ylabel=f"Normalised Number of {jets_name}",
-        xlabel=xlabel,
-        y_scale=1.5,
-        figsize=(6, 4),
-        logy=True,
-        leg_loc="upper right",
-        leg_linestyle_loc="upper center",
-        atlas_first_tag="Simulation Internal",
-        atlas_second_tag=atlas_second_tag or ATLAS_SECOND_TAG,
+        ylabel=plotting.ylabel.replace("{jets_name}", jets_name),
+        xlabel=plotting.variable_label(variable),
+        y_scale=plotting.y_scale,
+        figsize=plotting.figsize,
+        logy=plotting.logy,
+        leg_loc=plotting.legend_location,
+        leg_linestyle_loc=plotting.linestyle_legend_location,
+        atlas_first_tag=plotting.atlas_first_tag,
+        atlas_second_tag=atlas_second_tag or plotting.atlas_second_tag,
     )
 
-    # Define different linestyles for the different samples
-    linestyles = ["-", "--", "-.", ":"]
     sample_legend_entries = [
-        (linestyles[counter % len(linestyles)], label)
+        (plotting.linestyles[counter % len(plotting.linestyles)], label)
         for counter, label in enumerate(values_dict)
         if label
     ]
@@ -536,13 +535,13 @@ def make_hist(
             # Get the histogram object
             histo = Histogram(
                 values=histo_values,
-                bins=50,
+                bins=plotting.bins,
                 bins_range=bins_range,
-                norm=True,
+                norm=plotting.norm,
                 label=flavour.label if counter == 0 else None,
                 colour=flavour.colour,
-                linestyle=linestyles[counter % len(linestyles)],
-                underoverflow=True,
+                linestyle=plotting.linestyles[counter % len(plotting.linestyles)],
+                underoverflow=plotting.underoverflow,
             )
 
             # Add to histogram
@@ -559,7 +558,7 @@ def make_hist(
         plot.make_linestyle_legend(
             linestyles=sample_linestyles,
             labels=sample_labels,
-            bbox_to_anchor=(0.55, 1),
+            bbox_to_anchor=plotting.linestyle_legend_anchor,
         )
 
     # Check that the output dir exists
@@ -568,7 +567,7 @@ def make_hist(
     # Define output name and path and save it
     fname = f"{stage}_{variable}"
 
-    for iter_out_format in out_format_list:
+    for iter_out_format in out_format_list or plotting.output_formats:
         out_path = out_dir / f"{fname}{suffix}.{iter_out_format}"
         plot.savefig(out_path)
         log.info(f"Saved plot to {out_path}")
@@ -615,9 +614,11 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                     selection_cuts=selection_cuts,
                     atlas_second_tag=_atlas_second_tag(
                         sample.name,
+                        plotting=config.plotting,
                         num_jets=_plotting_num_jets(config, region_components.num_jets),
                     ),
-                    out_dir=config.out_dir / "plots",
+                    plotting=config.plotting,
+                    out_dir=config.out_dir / config.plotting.output_directory,
                 )
 
 
@@ -669,7 +670,9 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
 
     sample_names = [sample.name for sample in config.components.samples]
     atlas_second_tag = _atlas_second_tag(
-        *sample_names, num_jets=_plotting_num_jets(config, config.components.num_jets)
+        *sample_names,
+        plotting=config.plotting,
+        num_jets=_plotting_num_jets(config, config.components.num_jets),
     )
 
     vars_to_load = list(config.sampl_cfg.vars) + ["flavour_label"]
@@ -698,7 +701,8 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                 suffix=_suffix(region.name),
                 selection_cuts=region.cuts,
                 atlas_second_tag=atlas_second_tag,
-                out_dir=config.out_dir / "plots",
+                plotting=config.plotting,
+                out_dir=config.out_dir / config.plotting.output_directory,
             )
 
         if _is_pt_variable(variable):
@@ -714,7 +718,8 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                     suffix=_suffix(stitching_region.name),
                     selection_cuts=stitching_region.cuts,
                     atlas_second_tag=atlas_second_tag,
-                    out_dir=config.out_dir / "plots",
+                    plotting=config.plotting,
+                    out_dir=config.out_dir / config.plotting.output_directory,
                 )
 
 

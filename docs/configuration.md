@@ -240,6 +240,36 @@ resampling:
 |`sampling_fraction`|`None`, `float` or `auto`| The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are preferred. On the other hand with smaller sampling fractions lead to longer preprocessing times. `auto` option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present. |
 |`variables`|`dict`| The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable please provide a `bins` setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut between **regions** takes place to better handle the discontinuities.|
 
+### Plotting
+
+Plot labels and styles can be configured under the optional `plotting:` key. Any omitted setting uses the default defined by [`PlottingConfig`][upp.classes.plotting_config.PlottingConfig]. Variable-label keys are matched case-insensitively against the plotted variable name, so a single `pt` entry applies to variables such as `pt_btagJes`.
+
+```yaml
+plotting:
+  num_jets_plotting: 10_000_000
+  variable_labels:
+    pt: "Jet $p_\\mathrm{T}$ [GeV]"
+    eta: "Jet $|\\eta|$"
+    mass: "Jet Mass [GeV]"
+  sample_labels:
+    ttbar: "$t\\bar{t}"
+    zprime: "$Z'$"
+  atlas_first_tag: Simulation Internal
+  atlas_second_tag: "$\\sqrt{s} = 13/13.6$ TeV"
+  output_formats: [pdf, png]
+  bins: 50
+  y_scale: 1.5
+  figsize: [6, 4]
+  logy: true
+  linestyles: ["-", "--", "-.", ":"]
+  legend_location: upper right
+  linestyle_legend_location: upper center
+  linestyle_legend_anchor: [0.55, 1]
+  output_directory: plots
+```
+
+The `ylabel` setting supports a `{jets_name}` placeholder. Histogram normalisation and overflow handling can be controlled with `norm` and `underoverflow`.
+
 ### Global Config 
 
 ::: upp.classes.preprocessing_config.PreprocessingConfig

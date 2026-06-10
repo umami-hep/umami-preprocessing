@@ -9,6 +9,7 @@ from ftag import Cuts, Flavours, get_mock_file
 from ftag.hdf5 import H5Reader
 
 import upp.stages.plot as plot_mod
+from upp.classes.plotting_config import PlottingConfig
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.stages.plot import make_hist
 
@@ -83,15 +84,16 @@ class TestClass:
 
 
 def test_plot_helpers_format_labels_and_ranges():
-    """Check compact labels and pT unit conversion helpers."""
+    """Check compact labels and GeV unit conversion helpers."""
     assert plot_mod._format_num_jets(999) == "999"
     assert plot_mod._format_num_jets(100_000) == "100k"
     assert plot_mod._format_num_jets(10_000_000) == "10M"
     assert (
-        plot_mod._atlas_second_tag("ttbar", "zprime", num_jets=100_000)
+        plot_mod._atlas_second_tag("ttbar", "zprime", plotting=PlottingConfig(), num_jets=100_000)
         == "$\\sqrt{s} = 13/13.6$ TeV, $t\\bar{t}$ + $Z'$ jets\n100k jets"
     )
     assert plot_mod._display_range("pt_btagJes", (20_000, 250_000)) == (20, 250)
+    assert plot_mod._display_range("JetFitterSecondaryVertex_mass", (0, 25_000)) == (0, 25)
     assert plot_mod._display_range("absEta_btagJes", (0, 2.5)) == (0, 2.5)
 
 
@@ -163,12 +165,12 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
 
     config = SimpleNamespace(
         split="val",
+        plotting=PlottingConfig(num_jets_plotting=10_000),
         sampl_cfg=SimpleNamespace(
             vars=["pt"],
             bins={"pt": [[20_000, 250_000, 5]]},
         ),
         components=FakeComponents(),
-        num_jets_estimate_plotting=10_000,
         jets_name="jets",
         batch_size=100,
         out_dir=tmp_path,

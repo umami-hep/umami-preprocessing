@@ -19,6 +19,7 @@ from yamlinclude import YamlIncludeConstructor
 
 from upp import __version__
 from upp.classes.components import Components
+from upp.classes.plotting_config import PlottingConfig
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.reweight_config import ReweightConfig
 from upp.classes.variable_config import VariableConfig
@@ -217,6 +218,10 @@ class PreprocessingConfig:
             if "reweighting" in self.config
             else None
         )
+        self.plotting = PlottingConfig(**self.config.get("plotting", {}))
+        if self.plotting.num_jets_plotting is None:
+            self.plotting.num_jets_plotting = self.num_jets_estimate_plotting
+
         # reproducibility
         self.git_hash = get_git_hash(Path(__file__).parent)
         if self.git_hash is None:
