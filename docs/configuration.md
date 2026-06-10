@@ -270,6 +270,8 @@ plotting:
 
 The `ylabel` setting supports a `{jets_name}` placeholder. Histogram normalisation and overflow handling can be controlled with `norm` and `underoverflow`.
 
+::: upp.classes.plotting_config.PlottingConfig
+
 ### Global Config 
 
 ::: upp.classes.preprocessing_config.PreprocessingConfig
