@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 def _default_variable_labels() -> dict[str, str]:
     return {
-        "pt": "$p_\\mathrm{T}$ [GeV]",
+        "pt": "Jet $p_\\mathrm{T}$ [GeV]",
         "eta": "Jet $|\\eta|$",
         "mass": "Jet Mass [GeV]",
     }
