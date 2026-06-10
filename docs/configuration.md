@@ -255,7 +255,7 @@ plotting:
     ttbar: "$t\\bar{t}"
     zprime: "$Z'$"
   atlas_first_tag: Simulation Internal
-  atlas_second_tag: "$\\sqrt{s} = 13/13.6$ TeV"
+  atlas_second_tag: "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$"
   output_formats: [pdf, png]
   bins: 50
   y_scale: 1.5

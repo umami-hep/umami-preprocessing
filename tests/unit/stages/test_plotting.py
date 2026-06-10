@@ -89,8 +89,15 @@ def test_plot_helpers_format_labels_and_ranges():
     assert plot_mod._format_num_jets(100_000) == "100k"
     assert plot_mod._format_num_jets(10_000_000) == "10M"
     assert (
-        plot_mod._atlas_second_tag("ttbar", "zprime", plotting=PlottingConfig(), num_jets=100_000)
-        == "$\\sqrt{s} = 13/13.6$ TeV, $t\\bar{t}$ + $Z'$ jets\n100k jets"
+        plot_mod._atlas_second_tag(
+            "ttbar",
+            "zprime",
+            plotting=PlottingConfig(),
+            num_jets=100_000,
+            resampling_status="Pre Resampling",
+        )
+        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ + $Z'$ jets"
+        "\nPre Resampling\n100k jets"
     )
     assert plot_mod._display_range("pt_btagJes", (20_000, 250_000)) == (20, 250)
     assert plot_mod._display_range("JetFitterSecondaryVertex_mass", (0, 25_000)) == (0, 25)
@@ -101,6 +108,10 @@ def test_plot_helpers_optional_labels_and_no_pt():
     """Check labels without jet counts and configurations without a pT variable."""
     plotting = PlottingConfig()
     assert plot_mod._atlas_second_tag(plotting=plotting) == plotting.atlas_second_tag
+    assert (
+        plot_mod._atlas_second_tag(plotting=plotting, resampling_status="Post Resampling")
+        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$\nPost Resampling"
+    )
 
     config = SimpleNamespace(sampl_cfg=SimpleNamespace(vars=["mass", "abs_eta"]))
     assert plot_mod._pt_variable(config) is None
@@ -251,4 +262,6 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
     assert len(calls) == 1
     assert calls[0]["suffix"] == "_val_ttbar_lowpt"
     assert calls[0]["bins_range"] == (20, 250)
-    assert calls[0]["atlas_second_tag"] == ("$\\sqrt{s} = 13/13.6$ TeV, $t\\bar{t}$ jets\n10k jets")
+    assert calls[0]["atlas_second_tag"] == (
+        "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ jets\nPre Resampling\n10k jets"
+    )

@@ -183,8 +183,9 @@ def _atlas_second_tag(
     *sample_names: str,
     plotting: PlottingConfig,
     num_jets: int | None = None,
+    resampling_status: str | None = None,
 ) -> str:
-    """Build the second ATLAS tag with energy, sample labels, and jet count.
+    """Build the second ATLAS tag with energy, sample labels, status, and jet count.
 
     Parameters
     ----------
@@ -195,20 +196,26 @@ def _atlas_second_tag(
     num_jets : int | None, optional
         Number of jets requested for plotting. If provided, it is added as an
         extra line using compact formatting.
+    resampling_status : str | None, optional
+        Resampling status added as an extra line.
 
     Returns
     -------
     str
         Multiline ATLAS second tag. Sample labels share the first line with the
-        centre-of-mass energy, while the jet count is placed on a second line.
+        centre-of-mass energy, followed by the optional resampling status and
+        jet count.
     """
     labels = [_sample_label(name, plotting) for name in dict.fromkeys(sample_names) if name]
     first_line = plotting.atlas_second_tag
     if labels:
         first_line = f"{first_line}, {' + '.join(labels)} jets"
-    if num_jets is None:
-        return first_line
-    return f"{first_line}\n{_format_num_jets(num_jets)} jets"
+    lines = [first_line]
+    if resampling_status is not None:
+        lines.append(resampling_status)
+    if num_jets is not None:
+        lines.append(f"{_format_num_jets(num_jets)} jets")
+    return "\n".join(lines)
 
 
 def _plotting_num_jets(config: PreprocessingConfig, available_jets: int) -> int:
@@ -616,6 +623,7 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                         sample.name,
                         plotting=config.plotting,
                         num_jets=_plotting_num_jets(config, region_components.num_jets),
+                        resampling_status="Pre Resampling",
                     ),
                     plotting=config.plotting,
                     out_dir=config.out_dir / config.plotting.output_directory,
@@ -673,6 +681,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
         *sample_names,
         plotting=config.plotting,
         num_jets=_plotting_num_jets(config, config.components.num_jets),
+        resampling_status="Post Resampling",
     )
 
     vars_to_load = list(config.sampl_cfg.vars) + ["flavour_label"]
