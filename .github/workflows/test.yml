@@ -34,7 +34,7 @@ jobs:
       - name: Install git gnupg python3-tk
         run: sudo apt-get update && sudo apt-get install -y git gnupg python3-tk
       - name: Install dependencies
-        run: uv sync --extra dev
+        run: uv sync --all-extras
       - name: Run tests
         run: uv run pytest -v --junitxml=coverage.xml --cov-report=term-missing:skip-covered --cov=upp tests/
       - name: Report coverage with Codecov

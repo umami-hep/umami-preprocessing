@@ -3,6 +3,7 @@
 ### [Latest]
 
 - Add configurable plotting settings and split-specific merge output directories [#144](https://github.com/umami-hep/umami-preprocessing/pull/144)
+- Remove pytest-notebook dep, move dev to dependency-groups [#147](https://github.com/umami-hep/umami-preprocessing/pull/147)
 - Update Docker development image [#145](https://github.com/umami-hep/umami-preprocessing/pull/145)
 - Update atlas-ftag-tools and puma [#143](https://github.com/umami-hep/umami-preprocessing/pull/143)
 - Sync pre-commit hooks and fix Ruff lint failures [#138](https://github.com/umami-hep/umami-preprocessing/pull/138)
