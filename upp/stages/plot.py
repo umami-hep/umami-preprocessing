@@ -518,6 +518,7 @@ def make_hist(
         leg_linestyle_loc=plotting.linestyle_legend_location,
         atlas_first_tag=plotting.atlas_first_tag,
         atlas_second_tag=atlas_second_tag or plotting.atlas_second_tag,
+        show_xaxis_endpoints=True,
     )
 
     sample_legend_entries = [
@@ -622,7 +623,9 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                     atlas_second_tag=_atlas_second_tag(
                         sample.name,
                         plotting=config.plotting,
-                        num_jets=_plotting_num_jets(config, region_components.num_jets),
+                        num_jets=_plotting_num_jets(config, region_components.num_jets)
+                        if config.plotting.show_num_jets
+                        else None,
                         resampling_status="Pre Resampling",
                     ),
                     plotting=config.plotting,
@@ -680,7 +683,9 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
     atlas_second_tag = _atlas_second_tag(
         *sample_names,
         plotting=config.plotting,
-        num_jets=_plotting_num_jets(config, config.components.num_jets),
+        num_jets=_plotting_num_jets(config, config.components.num_jets)
+        if config.plotting.show_num_jets
+        else None,
         resampling_status="Post Resampling",
     )
 

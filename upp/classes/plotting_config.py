@@ -45,6 +45,8 @@ class PlottingConfig:
         First ATLAS plot label. By default "Simulation Internal".
     atlas_second_tag : str, optional
         Second ATLAS plot label. By default "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$".
+    show_num_jets : bool, optional
+        Decide, if the number of jets is shown in the ATLAS second tag
     output_formats : list[str], optional
         File formats in which each plot is saved. By default `["pdf", "png"]`.
     linestyles : list[str], optional
@@ -80,6 +82,7 @@ class PlottingConfig:
     ylabel: str = "Normalised Number of {jets_name}"
     atlas_first_tag: str = "Simulation Internal"
     atlas_second_tag: str = "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$"
+    show_num_jets: bool = True
     output_formats: list[str] = field(default_factory=lambda: ["pdf", "png"])
     linestyles: list[str] = field(default_factory=lambda: ["-", "--", "-.", ":"])
     bins: int = 50
