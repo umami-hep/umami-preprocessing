@@ -11,6 +11,8 @@ __pycache__
 
 *.egg-info/
 *_cache/
+.cache/
+site/
 logs/
 tmp/
 env/
