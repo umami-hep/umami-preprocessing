@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import logging as log
+import subprocess
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
@@ -218,7 +219,14 @@ class PreprocessingConfig:
             else None
         )
         # reproducibility
-        self.git_hash = get_git_hash(Path(__file__).parent)
+        try:
+            self.git_hash = get_git_hash(Path(__file__).parent)
+        except (OSError, subprocess.CalledProcessError):
+            log.warning(
+                "Could not determine the git hash (is git installed and on PATH?); "
+                "using the UPP version for reproducibility metadata instead."
+            )
+            self.git_hash = None
         if self.git_hash is None:
             self.git_hash = __version__
         self.config["upp_hash"] = self.git_hash
