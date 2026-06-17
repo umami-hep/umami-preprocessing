@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Migrate the documentation build from MkDocs to Zensical with per-PR previews
+- Move documentation build to Zensical with per-PR previews [#151](https://github.com/umami-hep/umami-preprocessing/pull/151)
 - Update Puma Version [#149](https://github.com/umami-hep/umami-preprocessing/pull/149)
 - Remove pytest-notebook dep, move dev to dependency-groups [#147](https://github.com/umami-hep/umami-preprocessing/pull/147)
 - Update Docker development image [#145](https://github.com/umami-hep/umami-preprocessing/pull/145)
