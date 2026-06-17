@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Make skip-resampling work end-to-end; support `num_jets: -1` to write all jets passing cuts
+- Make skip-resampling work end-to-end; support `num_jets: -1` to write all jets passing cuts [#153](https://github.com/umami-hep/umami-preprocessing/pull/153)
 - Update Puma Version [#149](https://github.com/umami-hep/umami-preprocessing/pull/149)
 - Remove pytest-notebook dep, move dev to dependency-groups [#147](https://github.com/umami-hep/umami-preprocessing/pull/147)
 - Update Docker development image [#145](https://github.com/umami-hep/umami-preprocessing/pull/145)
