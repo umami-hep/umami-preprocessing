@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Refresh setup/contributing docs and fix stale Python version and Black references
+- Refresh setup and contributing docs, fix stale Python version and formatter references [#150](https://github.com/umami-hep/umami-preprocessing/pull/150)
 - Update Puma Version [#149](https://github.com/umami-hep/umami-preprocessing/pull/149)
 - Remove pytest-notebook dep, move dev to dependency-groups [#147](https://github.com/umami-hep/umami-preprocessing/pull/147)
 - Update Docker development image [#145](https://github.com/umami-hep/umami-preprocessing/pull/145)
