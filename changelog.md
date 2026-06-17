@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Fix license metadata (Apache-2.0), add classifiers, fix dev install in CI/Docker
+
 - Remove pytest-notebook dep, move dev to dependency-groups [#147](https://github.com/umami-hep/umami-preprocessing/pull/147)
 - Update Docker development image [#145](https://github.com/umami-hep/umami-preprocessing/pull/145)
 - Update atlas-ftag-tools and puma [#143](https://github.com/umami-hep/umami-preprocessing/pull/143)
