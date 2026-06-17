@@ -202,7 +202,7 @@ class PreprocessingConfig:
         self.variables = VariableConfig(
             self.config["variables"], self.jets_name, self.is_test, selectors
         )
-        if self.sampl_cfg is not None:
+        if self.sampl_cfg is not None and self.sampl_cfg.variables:
             self.variables = self.variables.add_jet_vars(
                 list(self.config["resampling"]["variables"].keys()), "labels"
             )
@@ -255,12 +255,23 @@ class PreprocessingConfig:
     def is_test(self):
         return self.split == "test"
 
+    @property
+    def skip_resampling(self) -> bool:
+        """Return whether resampling is disabled (no block, or method none).
+
+        Returns
+        -------
+        bool
+            ``True`` if resampling should be skipped.
+        """
+        return self.sampl_cfg is None or self.sampl_cfg.method in (None, "none")
+
     @functools.cached_property
     def global_cuts(self):
         cuts_list = self.config["global_cuts"].get("common", [])
         cuts_list += self.config["global_cuts"][self.split]
         if not self.is_test and self.config.get("resampling", None) is not None:
-            for resampling_var, cfg in self.config["resampling"]["variables"].items():
+            for resampling_var, cfg in self.config["resampling"].get("variables", {}).items():
                 cuts_list.append([resampling_var, ">", cfg["bins"][0][0]])
                 cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
         return Cuts.from_list(cuts_list)

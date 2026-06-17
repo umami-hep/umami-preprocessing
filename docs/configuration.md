@@ -136,7 +136,7 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 | `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
 | `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
 | `flavours` | `list[str]` | One or more jet flavours, e.g. `[bjets]` or `[ujets]`. The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each flavour.|
-|`num_jets`|`int`| The number of jets to be sampled from this component in the training split|
+|`num_jets`|`int`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts.|
 |`num_jets_val`|`int`| **Optional** (default: `num_jets//10`) number of jets of this component in validation set.|
 |`num_jets_test`|`int`| **Optional** (default: `num_jets//10`) number of jets of this component in a test set.|
 

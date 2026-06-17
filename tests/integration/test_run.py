@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 from pathlib import Path
@@ -104,6 +105,42 @@ class TestClass:
             "train",
         ]
         main(args)
+
+    def test_run_no_resample(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_no_resample.yaml")),
+            "--split",
+            "train",
+        ]
+        main(args)
+
+        fname = "tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5"
+        assert os.path.exists(fname)
+        with h5py.File(fname, "r") as f:
+            jets = f["jets"][:]
+            jet_counts = json.loads(f.attrs["jet_counts"])
+
+        # capped components write exactly num_jets; the -1 component writes all its jets
+        assert jet_counts["lowpt_ttbar_bjets"]["num_jets"] == 1_000
+        assert jet_counts["lowpt_ttbar_cjets"]["num_jets"] == 1_000
+        assert jet_counts["lowpt_ttbar_ujets"]["num_jets"] > 1_000
+        assert jet_counts["total"]["num_jets"] == len(jets)
+
+    def test_run_method_none(self):
+        args = [
+            "--config",
+            str(Path(this_dir / "fixtures/test_config_method_none.yaml")),
+            "--split",
+            "train",
+        ]
+        main(args)
+
+        fname = "tmp/upp-tests/integration/temp_workspace/test_out/pp_output_train.h5"
+        assert os.path.exists(fname)
+        with h5py.File(fname, "r") as f:
+            jets = f["jets"][:]
+        assert len(jets) == 1_000 + 2_000 + 3_000
 
     def test_run_track_selector(self):
         args = [

@@ -138,6 +138,11 @@ def plot_resampling_dists(config: PreprocessingConfig, stage: str) -> None:
     stage : str
         Stage that is to be run.
     """
+    # Nothing to plot when no resampling variables are configured (e.g. resampling skipped)
+    if config.sampl_cfg is None or not config.sampl_cfg.vars:
+        log.info("No resampling variables configured - skipping resampling plots.")
+        return
+
     log.info("Plotting initial plots for the resampling variables...")
     # Get all the variables that need to be loaded
     vars_to_load = config.sampl_cfg.vars

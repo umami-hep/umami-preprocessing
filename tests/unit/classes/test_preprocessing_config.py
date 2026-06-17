@@ -128,6 +128,35 @@ class TestPreprocessingConfig(unittest.TestCase):
         )
         self.assertEqual(config.flavour_cont, Extended_Flavours)
 
+    def test_skip_resampling_no_block(self) -> None:
+        config = PreprocessingConfig(
+            config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+            split="train",
+            config={
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+        )
+        self.assertIsNone(config.sampl_cfg)
+        self.assertTrue(config.skip_resampling)
+
+    def test_skip_resampling_method_none(self) -> None:
+        config = PreprocessingConfig(
+            config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+            split="train",
+            config={
+                "resampling": {"method": "none"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+        )
+        # a minimal block (no target/variables) is valid and still counts as skipping
+        self.assertEqual(config.sampl_cfg.target, None)
+        self.assertEqual(config.sampl_cfg.variables, {})
+        self.assertTrue(config.skip_resampling)
+
     def test_unsupported_flavour_config(self) -> None:
         with self.assertRaises(ValueError) as ctx:
             PreprocessingConfig(

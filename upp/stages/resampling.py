@@ -48,30 +48,38 @@ class Resampling:
 
     def __init__(self, config: PreprocessingConfig):
         self.config = config.sampl_cfg
+        self.skip = config.skip_resampling
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
         self.jets_name = config.jets_name
-        self.upscale_pdf = config.sampl_cfg.upscale_pdf or 1
-        self.num_bins = self.get_num_bins_from_config()
-        self.methods_map = {
-            "pdf": self.pdf_select_func,
-            "countup": self.countup_select_func,
-            "none": None,
-            None: None,
-        }
-        if self.config.method not in self.methods_map:
-            raise ValueError(
-                f"Unsupported resampling method {self.config.method}, choose from"
-                f" {self.methods_map.keys()}"
-            )
-        self.select_func = self.methods_map[self.config.method]
         self.transform = config.transform
-
         self.rng = np.random.default_rng(42)
 
         # Define what type self.target will be
         self.target = cast("Component", None)
+
+        # In skip mode no selection is applied; jets are written as-is (see sample())
+        if self.skip:
+            self.method = None
+            self.upscale_pdf = 1
+            self.num_bins = []
+            self.select_func = None
+            return
+
+        self.method = self.config.method
+        self.upscale_pdf = self.config.upscale_pdf or 1
+        self.num_bins = self.get_num_bins_from_config()
+        self.methods_map = {
+            "pdf": self.pdf_select_func,
+            "countup": self.countup_select_func,
+        }
+        if self.method not in self.methods_map:
+            raise ValueError(
+                f"Unsupported resampling method {self.method}, choose from"
+                f" {list(self.methods_map.keys())} or 'none' to disable resampling"
+            )
+        self.select_func = self.methods_map[self.method]
 
     def countup_select_func(self, jets: dict, component: Component) -> np.ndarray:
         """Countup resampling function.
@@ -185,6 +193,15 @@ class Resampling:
         max_ups = ups_counts.max()
         component._ups_max = max_ups if max_ups > component._ups_max else component._ups_max
 
+    def _finalise_component(self, component: Component) -> None:
+        """Write metadata attrs and close the writer for a completed component."""
+        unique = component._unique_jets
+        component._ups_ratio = component.writer.num_written / unique if unique else 0.0
+        component.writer.add_attr("upsampling_ratio", component._ups_ratio)
+        component.writer.add_attr("unique_jets", component._unique_jets)
+        component.writer.add_attr("dsid", str(component.sample.dsid))
+        component.writer.close()
+
     def sample(
         self,
         components: Components,
@@ -248,8 +265,9 @@ class Resampling:
                     # Get the resampled jets in the dict
                     batch_out = select_batch(batch_out, idx)
 
-                # Check for completion and set to True if completed
-                if component.writer.num_written + len(idx) >= component.num_jets:
+                # Check for completion (only when a finite num_jets is requested;
+                # num_jets < 0 means write all jets passing the cuts)
+                if 0 <= component.num_jets <= component.writer.num_written + len(idx):
                     keep = component.num_jets - component.writer.num_written
                     idx = idx[:keep]
                     for name, array in batch_out.items():
@@ -267,19 +285,21 @@ class Resampling:
 
                 # When the component is completed, write metadata and close the writer.
                 if component._complete:
-                    component._ups_ratio = component.writer.num_written / component._unique_jets
-                    component.writer.add_attr("upsampling_ratio", component._ups_ratio)
-                    component.writer.add_attr("unique_jets", component._unique_jets)
-                    component.writer.add_attr("dsid", str(component.sample.dsid))
-                    component.writer.close()
+                    self._finalise_component(component)
 
             # Check for completion of all components
             if all(component._complete for component in components):
                 break
 
-        # If one component couldn't be completed, raise ValueError
+        # Finalise components: unbounded ones (num_jets < 0) are done once the input is
+        # exhausted; bounded ones that didn't reach their target ran out of jets.
         for component in components:
-            if not component._complete:
+            if component._complete:
+                continue
+            if component.num_jets < 0:
+                component._complete = True
+                self._finalise_component(component)
+            else:
                 raise ValueError(
                     f"Ran out of {component} jets after writing {component.writer.num_written:,}"
                 )
@@ -307,10 +327,11 @@ class Resampling:
         ValueError
             If the equal_jets flag is not the same for all components.
         """
-        # Get the target component
-        target = [component for component in components if component.is_target(self.config.target)]
-        assert len(target) == 1, "Should have 1 target component per region"
-        self.target = target[0]
+        # Get the target component (not needed when resampling is skipped)
+        if not self.skip:
+            target = [c for c in components if c.is_target(self.config.target)]
+            assert len(target) == 1, "Should have 1 target component per region"
+            self.target = target[0]
 
         # Groupby samples
         grouped_samples = components.groupby_sample()
@@ -359,9 +380,11 @@ class Resampling:
                     if selected_component and selected_component != component.name:
                         continue
 
+                    unbounded = component.num_jets < 0
+                    label = "all" if unbounded else f"{component.num_jets:,}"
                     component.pbar = progress.add_task(
-                        f"[green]Sampling {component.num_jets:,} jets from {component}...",
-                        total=component.num_jets,
+                        f"[green]Sampling {label} jets from {component}...",
+                        total=None if unbounded else component.num_jets,
                     )
 
                 # Run the actual resampling sampling
@@ -378,14 +401,15 @@ class Resampling:
             if (selected_component and component.name == selected_component) or (
                 not selected_component
             ):
+                written = component.writer.num_written
                 log.info(
                     f"{component} usampling ratio is {np.mean(component._ups_ratio):.3f}, with"
-                    f" {component.num_jets / np.mean(component._ups_ratio):,.0f}/"
-                    f"{component.num_jets:,} unique jets."
+                    f" {written / np.mean(component._ups_ratio):,.0f}/"
+                    f"{written:,} written jets."
                     f" Jets are upsampled at most {np.max(component._ups_max):.0f} times"
                 )
 
-    def set_component_sampling_fractions(self, component: Component):
+    def set_component_sampling_fractions(self, component: Component) -> None:
         """Automatically set the sampling fraction for each of the components.
 
         Parameters
@@ -398,6 +422,11 @@ class Resampling:
         ValueError
             If the sampling fraction is found to be >1 when the countup method is used.
         """
+        # No selection is applied when resampling is skipped
+        if self.skip:
+            component.sampling_fraction = 1
+            return
+
         # Check that the sampling fraction must be found automatically
         if self.config.sampling_fraction == "auto" or self.config.sampling_fraction is None:
             log.info(
@@ -465,7 +494,7 @@ class Resampling:
 
         title = " Running resampling "
         log.info(f"[bold green]{title:-^100}")
-        log.info(f"Resampling method: {self.config.method}")
+        log.info(f"Resampling method: {self.method or 'none'}")
 
         # Setup the different components and readers/writers and their sampling fraction
         for iter_component in self.components:
@@ -474,9 +503,10 @@ class Resampling:
                 continue
 
             # Check if the component is either the to-be-resampled component or the target
-            if component and (
-                component != iter_component.name
-                and not iter_component.is_target(self.config.target)
+            if (
+                component
+                and component != iter_component.name
+                and (self.skip or not iter_component.is_target(self.config.target))
             ):
                 continue
 
@@ -497,9 +527,10 @@ class Resampling:
             self.set_component_sampling_fractions(component=iter_component)
 
             # Check that enough jets are available
+            sampling_fraction = 1 if self.skip else self.config.sampling_fraction
             log.info(
                 "[bold green]Checking requested num_jets based on a sampling fraction of"
-                f" {self.config.sampling_fraction}..."
+                f" {sampling_fraction}..."
             )
             frac = iter_component.sampling_fraction if self.select_func else 1
             iter_component.check_num_jets(

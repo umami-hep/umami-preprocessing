@@ -3,6 +3,12 @@ There are two main strategies for handling the issue of different kinematic prop
 
 For resampling, UPP has two different methods implemented. The desired method (`pdf` or `countup`) can be specified in the configuration file.
 
+### Skipping resampling
+
+Resampling can be disabled entirely by either omitting the `resampling` block from the config or setting `method: none`. In this case no `target`, resampling `variables`, or histogram (`--prep`) step are required. The jets passing the cuts are written directly, capped at each component's `num_jets`. Setting `num_jets: -1` (also valid for `num_jets_val` / `num_jets_test`) writes **all** jets of that component passing the cuts.
+
+Note that the `--no-resample` command line flag is different: it only skips the resampling *stage* (for example to re-run the merge/norm/plot stages on existing component files) and does not disable resampling.
+
 ### PDF (probability density function)
 
 This is an implementation of an [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) method. The aim of the algorithm is to ensure that the kinematic probability density functions (pdfs) of all jet flavours are matched to that of a chosen target flavour.
