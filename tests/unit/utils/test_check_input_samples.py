@@ -273,14 +273,18 @@ def test_script_entry_point_executes_main(tmp_path):
     fake_logger.setup_logger = lambda: _Log()
 
     # Inject fakes into sys.modules so the script can import them
-    sys.modules["ftag"] = types.ModuleType("ftag")  # namespace package placeholder
-    sys.modules["ftag.cli_utils"] = fake_cli_utils
-    sys.modules["ftag.hdf5"] = fake_hdf5
-    sys.modules["upp"] = types.ModuleType("upp")
-    sys.modules["upp.classes"] = types.ModuleType("upp.classes")
-    sys.modules["upp.classes.preprocessing_config"] = fake_ppcfg
-    sys.modules["upp.utils"] = types.ModuleType("upp.utils")
-    sys.modules["upp.utils.logger"] = fake_logger
+    fakes = {
+        "ftag": types.ModuleType("ftag"),  # namespace package placeholder
+        "ftag.cli_utils": fake_cli_utils,
+        "ftag.hdf5": fake_hdf5,
+        "upp": types.ModuleType("upp"),
+        "upp.classes": types.ModuleType("upp.classes"),
+        "upp.classes.preprocessing_config": fake_ppcfg,
+        "upp.utils": types.ModuleType("upp.utils"),
+        "upp.utils.logger": fake_logger,
+    }
+    saved_modules = {name: sys.modules.get(name) for name in fakes}
+    sys.modules.update(fakes)
 
     # Provide a fake parse_args inside the script execution context
     # We'll override it via init_globals after the file loads.
@@ -296,3 +300,9 @@ def test_script_entry_point_executes_main(tmp_path):
         runpy.run_path(str(file_path), run_name="__main__")
     finally:
         sys.argv = old_argv
+        # Restore sys.modules so the fakes don't leak into other tests
+        for name, original in saved_modules.items():
+            if original is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = original
