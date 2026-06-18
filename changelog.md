@@ -2,8 +2,8 @@
 
 ### [Latest]
 
+- Fix license metadata and packaging cleanups [#152](https://github.com/umami-hep/umami-preprocessing/pull/152)
 - Allow configurable virtual dataset creation directory [#117](https://github.com/umami-hep/umami-preprocessing/pull/117)
-
 - Update Puma Version [#149](https://github.com/umami-hep/umami-preprocessing/pull/149)
 - Remove pytest-notebook dep, move dev to dependency-groups [#147](https://github.com/umami-hep/umami-preprocessing/pull/147)
 - Update Docker development image [#145](https://github.com/umami-hep/umami-preprocessing/pull/145)
