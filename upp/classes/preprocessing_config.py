@@ -266,6 +266,19 @@ class PreprocessingConfig:
         """
         return self.sampl_cfg is None or self.sampl_cfg.method in (None, "none")
 
+    @property
+    def resampling_method(self) -> str:
+        """Resampling method recorded in the output metadata ("none" if skipped).
+
+        Returns
+        -------
+        str
+            The resampling method (e.g. ``"pdf"``/``"countup"``), or ``"none"``.
+        """
+        if self.skip_resampling:
+            return "none"
+        return self.sampl_cfg.method
+
     @functools.cached_property
     def global_cuts(self):
         cuts_list = self.config["global_cuts"].get("common", [])

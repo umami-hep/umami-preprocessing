@@ -10,6 +10,7 @@ from dotmap import DotMap
 from ftag import Extended_Flavours, Flavours, LabelContainer, get_mock_file
 
 from upp.classes.preprocessing_config import PreprocessingConfig
+from upp.classes.resampling_config import ResamplingConfig
 
 
 class TestPreprocessingConfig(unittest.TestCase):
@@ -99,6 +100,39 @@ class TestPreprocessingConfig(unittest.TestCase):
             )
 
         self.assertEqual("Path /tmp/error/ntuples does not exist", str(ctx.exception))
+
+    def _make_config(self, resampling: dict | None) -> PreprocessingConfig:
+        config = {
+            "components": [],
+            "variables": {"jets": {"labels": ["test"]}},
+        }
+        if resampling is not None:
+            config["resampling"] = resampling
+        return PreprocessingConfig(
+            config_path=Path("/tmp/upp-tests/integration/temp_workspace/test.yaml"),
+            split="train",
+            config=config,
+            base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
+        )
+
+    def test_resampling_method(self) -> None:
+        # skipping (method none or no block) is reported as "none"
+        none_block = {
+            "variables": {"jets": {"labels": ["test"]}},
+            "target": "bjets",
+            "method": "none",
+        }
+        self.assertEqual(self._make_config(none_block).resampling_method, "none")
+        self.assertEqual(self._make_config(None).resampling_method, "none")
+
+        # an active method is reported as-is (set directly to avoid the flavour-ratio
+        # check that needs real components; the end-to-end case is in the integration tests)
+        config = self._make_config(None)
+        for method in ("pdf", "countup"):
+            config.sampl_cfg = ResamplingConfig(
+                variables={"jets": {"labels": ["test"]}}, target="bjets", method=method
+            )
+            self.assertEqual(config.resampling_method, method)
 
     def test_standard_flavour_config(self) -> None:
         config = PreprocessingConfig(

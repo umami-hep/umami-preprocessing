@@ -110,6 +110,7 @@ def _minimal_merging(monkeypatch, jets_per_file=10) -> merging_mod.Merging:
         out_fname=Path("/tmp/merged.h5"),
         git_hash="deadbeef",
         config={},
+        resampling_method="countup",
         is_test=False,
         merge_test_samples=False,
     )
@@ -341,6 +342,7 @@ def _mk_merge_for_path(monkeypatch, out_path: Path, jets_per_file=5):
         out_fname=out_path,
         git_hash="deadbeef",
         config={},
+        resampling_method="countup",
         is_test=False,
         merge_test_samples=False,
     )
@@ -700,6 +702,7 @@ def test_run_groupby_sample_calls_write_components(monkeypatch, tmp_path):
         out_fname=tmp_path / "merged.h5",
         git_hash="deadbeef",
         config={},
+        resampling_method="countup",
         is_test=True,  # force groupby_sample path
         merge_test_samples=False,  # keep per-sample merging
     )

@@ -346,6 +346,7 @@ class Merging:
         self.writer.add_attr("dsids", str(components.dsids))
         self.writer.add_attr("config", json.dumps(self.config.config))
         self.writer.add_attr("upp_hash", self.config.git_hash)
+        self.writer.add_attr("resampling_method", self.config.resampling_method)
 
         # Log for debugging
         log.debug(f"Setup merge output at {self.writer.dst}")

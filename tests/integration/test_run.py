@@ -120,6 +120,7 @@ class TestClass:
         with h5py.File(fname, "r") as f:
             jets = f["jets"][:]
             jet_counts = json.loads(f.attrs["jet_counts"])
+            assert f.attrs["resampling_method"] == "none"
 
         # capped components write exactly num_jets; the -1 component writes all its jets
         assert jet_counts["lowpt_ttbar_bjets"]["num_jets"] == 1_000
@@ -140,6 +141,7 @@ class TestClass:
         assert os.path.exists(fname)
         with h5py.File(fname, "r") as f:
             jets = f["jets"][:]
+            assert f.attrs["resampling_method"] == "none"
         assert len(jets) == 1_000 + 2_000 + 3_000
 
     def test_run_track_selector(self):
@@ -156,6 +158,7 @@ class TestClass:
         assert os.path.exists(fname)
         with h5py.File(fname, "r") as f:
             tracks = f["tracks"][:]
+            assert f.attrs["resampling_method"] == "countup"
         assert np.all(tracks[tracks["valid"]]["d0"] < 3.5)
 
     def test_run_countup_region_lowpt(self):
