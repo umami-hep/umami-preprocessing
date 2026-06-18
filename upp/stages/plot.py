@@ -441,6 +441,7 @@ def _load_jets(config: PreprocessingConfig, in_paths: Any, vars_to_load: list[st
         jets_name=config.jets_name,
         shuffle=False,
         equal_jets=True,
+        vds_dir=config.vds_dir,
     ).load(
         {config.jets_name: list(dict.fromkeys(vars_to_load))},
         num_jets=config.plotting.num_jets_plotting,

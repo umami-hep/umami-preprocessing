@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import logging as log
+import subprocess
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
@@ -120,6 +121,9 @@ class PreprocessingConfig:
         Skip checks for the input files. This is used for grid submission
     skip_config_copy : bool, optional
         Decide, if the config copying is skipped or not. By default False
+    vds_dir : Path | None, optional
+        Directory name for creation of virtual datasets. By default None
+        If none is given, virtual datasets is created next to input ntuples
     """
 
     config_path: Path
@@ -143,6 +147,7 @@ class PreprocessingConfig:
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
+    vds_dir: Path | None = None
 
     def __post_init__(self):
         # postprocess paths
@@ -159,6 +164,9 @@ class PreprocessingConfig:
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
+        # vds_dir is optional (Path | None), so the loop above skips it; resolve it here
+        if self.vds_dir is not None:
+            self.vds_dir = self.get_path(Path(self.vds_dir))
         if not self.ntuple_dir.exists() and not self.skip_checks:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
@@ -223,7 +231,14 @@ class PreprocessingConfig:
             self.plotting.num_jets_plotting = self.num_jets_estimate_plotting
 
         # reproducibility
-        self.git_hash = get_git_hash(Path(__file__).parent)
+        try:
+            self.git_hash = get_git_hash(Path(__file__).parent)
+        except (OSError, subprocess.CalledProcessError):
+            log.warning(
+                "Could not determine the git hash (is git installed and on PATH?); "
+                "using the UPP version for reproducibility metadata instead."
+            )
+            self.git_hash = None
         if self.git_hash is None:
             self.git_hash = __version__
         self.config["upp_hash"] = self.git_hash
