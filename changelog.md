@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Refresh setup and contributing docs, fix stale Python version and formatter references [#150](https://github.com/umami-hep/umami-preprocessing/pull/150)
 - Avoid crash when git is not installed; fall back to the UPP version for the reproducibility hash [#154](https://github.com/umami-hep/umami-preprocessing/pull/154)
 - Move documentation build to Zensical with per-PR previews [#151](https://github.com/umami-hep/umami-preprocessing/pull/151)
 - Fix license metadata and packaging cleanups [#152](https://github.com/umami-hep/umami-preprocessing/pull/152)
