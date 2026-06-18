@@ -671,26 +671,37 @@
 <p>This guide will walk you through the process of setting up the Umami-Preprocessing Python package on your system.</p>
 <h3 id="environment-setup">Environment Setup<a class="headerlink" href="#environment-setup" title="Permanent link">#</a></h3>
 <p>Install UPP in a virtual environment to avoid conflicts with other software libraries.
-UPP currently supports Python 3.10 and 3.11, with Python 3.11 recommended.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">conda</label><label for="__tabbed_1_2">venv</label><label for="__tabbed_1_3">lxplus</label></div>
+UPP currently supports Python 3.11, 3.12, 3.13 and 3.14.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">uv</label><label for="__tabbed_1_2">conda</label><label for="__tabbed_1_3">venv</label><label for="__tabbed_1_4">lxplus</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
+<p><a href="https://docs.astral.sh/uv/">uv</a> is a fast Python package and project manager and is
+the recommended way to develop UPP. Install it following the
+<a href="https://docs.astral.sh/uv/getting-started/installation/">official instructions</a>, then
+let <code>uv</code> create and manage the environment for you:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>venv
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</span></code></pre></div>
+<p>When working from a clone of the repository you can skip the manual environment setup
+entirely and use <code>uv sync</code> (see below).</p>
+</div>
+<div class="tabbed-block">
 <p>Set up a fresh <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html">conda</a> or <a href="https://github.com/conda-forge/miniforge#install">mamba</a> environment:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>upp<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>upp
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>upp<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.13
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>upp
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
 <p><a href="https://docs.python.org/3/library/venv.html">venv</a> is a lightweight solution for creating virtual python environments, however it is not as fully featured as a fully fledged package manager such as conda.
 Create a fresh virtual environment and activate it using</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>upp
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">source</span><span class="w"> </span>upp/bin/activate
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>upp
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">source</span><span class="w"> </span>upp/bin/activate
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
 <p>If you don't want to use conda environments on lxplus, you can setup python via</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>setupATLAS
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>lsetup<span class="w"> </span><span class="s2">&quot;python 3.11.9-x86_64-el9&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>setupATLAS
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>lsetup<span class="w"> </span><span class="s2">&quot;python 3.11.9-x86_64-el9&quot;</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">You can also <a href="https://abpcomputing.web.cern.ch/guides/python_inst/">set up conda on lxplus</a></p>
@@ -700,7 +711,7 @@ Create a fresh virtual environment and activate it using</p>
 </div>
 <h3 id="pypi-installation">PyPi installation<a class="headerlink" href="#pypi-installation" title="Permanent link">#</a></h3>
 <p>If you don't plan on editing the source code, the simplest way to install UPP directly from the Python Package Index (PyPI):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>umami-preprocessing
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>umami-preprocessing
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">On lxplus you may have to use <code>python3</code> instead of just <code>python</code></p>
@@ -708,38 +719,56 @@ Create a fresh virtual environment and activate it using</p>
 <h3 id="download-source-code">Download source code<a class="headerlink" href="#download-source-code" title="Permanent link">#</a></h3>
 <p>The following instructions are only relevant for those that wish to modify UPP source code.
 Start by cloning the Umami-Preprocessing repository. If you want to contribute to the development of UPP, you should fork the repository and make sure you do all your edits in a development branch.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/umami-hep/umami-preprocessing.git
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/umami-hep/umami-preprocessing.git
 </span></code></pre></div>
 <h3 id="install-package-from-code">Install package from code<a class="headerlink" href="#install-package-from-code" title="Permanent link">#</a></h3>
-<p>Navigate to the newly downloaded repository and install the package in editable mode:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">cd</span><span class="w"> </span>umami-preprocessing
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
+<p>Navigate to the newly downloaded repository and install the package in editable mode.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">uv</label><label for="__tabbed_2_2">pip</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>uv sync</code> creates a virtual environment in <code>.venv</code> and installs UPP together with the
+development dependency group in editable mode:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>umami-preprocessing
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>uv<span class="w"> </span>sync
 </span></code></pre></div>
+<p>Prefix subsequent commands with <code>uv run</code> (e.g. <code>uv run preprocess ...</code>) or activate the
+environment with <code>source .venv/bin/activate</code>.</p>
+</div>
+<div class="tabbed-block">
+<p>Install UPP in editable mode, then add the development dependency group (requires
+<code>pip &gt;= 25.1</code>, which understands PEP 735 dependency groups):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">cd</span><span class="w"> </span>umami-preprocessing
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--group<span class="w"> </span>dev
+</span></code></pre></div>
+</div>
+</div>
+</div>
 <p>If you don't plan on editing the code you can do a regular install instead</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Note for running on lxplus</p>
 <p>Again, you may have to use <code>python3</code> here.</p>
 <p>You may also see a warning like this:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>WARNING: The script preprocess is installed in &#39;/afs/cern.ch/user/X/Y/.local/bin&#39; which is not on PATH.
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>WARNING: The script preprocess is installed in &#39;/afs/cern.ch/user/X/Y/.local/bin&#39; which is not on PATH.
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
 </span></code></pre></div>
 <p>if you do, you can add the directory to your path using</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>export PATH=$PATH:/afs/cern.ch/user/X/Y/.local/bin
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>export PATH=$PATH:/afs/cern.ch/user/X/Y/.local/bin
 </span></code></pre></div>
 <p>Alternatively, you can just run the scripts by pointing to the <code>main.py</code></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3<span class="w"> </span>upp/main.py
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>upp/main.py
 </span></code></pre></div>
 </div>
 <h3 id="run-the-tests-optional">Run the tests (Optional)<a class="headerlink" href="#run-the-tests-optional" title="Permanent link">#</a></h3>
 <p>To ensure that the package is working correctly, you can run the tests using the pytest framework. </p>
 <p>Use <code>pytest</code> to run the tests to make sure the package works</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pytest<span class="w"> </span>tests<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest<span class="w"> </span>tests<span class="w"> </span>
 </span></code></pre></div>
 <p>If you want to measure test coverage you can use the commands:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
 </span></code></pre></div></p>
 
 

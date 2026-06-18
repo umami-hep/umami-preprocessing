@@ -633,16 +633,21 @@ You can read about forking workflows <a href="https://www.atlassian.com/git/tuto
 <h3 id="code-formatting">Code Formatting<a class="headerlink" href="#code-formatting" title="Permanent link">#</a></h3>
 <p>It's good practice to document your code with module and function docstrings, and inline comments.
 Consider also providing type hints for the function in/outputs.
-It's also recommended to use <a href="https://github.com/psf/black">black</a> to format your contributions.
-You can take a look at the <a href="https://umami-docs.web.cern.ch/setup/development/">umami docs</a> for more guidelines on code style.</p>
-<p>For the formatting in this project use pre-commit hooks:</p>
+Code formatting and linting is handled by <a href="https://docs.astral.sh/ruff/">Ruff</a> (both the
+linter and the <code>ruff-format</code> formatter), with <a href="https://mypy-lang.org/">mypy</a> for type
+checks. All of these run automatically through the project's pre-commit hooks, so you
+don't need to invoke them by hand.</p>
+<p>To format and lint your contribution, run the pre-commit hooks:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</span></code></pre></div>
+<p>You can also install the hooks so they run automatically on every commit:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pre-commit<span class="w"> </span>install
 </span></code></pre></div>
 <h3 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">#</a></h3>
 <p>It is highly encouraged to adhere to provide unit and/or integration tests for every new added feature.
 You can test your code and check the coverage using.
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>ftag<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>--show-capture<span class="o">=</span>stdout
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>--show-capture<span class="o">=</span>stdout
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>coverage<span class="w"> </span>report
 </span></code></pre></div>
 You may also find the <a href="https://about.codecov.io/">codecov</a> tool helpful</p>
 
