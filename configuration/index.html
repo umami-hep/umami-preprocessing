@@ -594,6 +594,9 @@ ttbar: &amp;ttbar
 </tr>
 </tbody>
 </table>
+<p>The virtual dataset files created from wildcard patterns are by default stored alongside the input ntuples.
+If you have no write access to the input ntuples directory and would like to collect all VDS files in an accessible directory instead, set <code>vds_dir</code> in the global config (see <a href="#global-config">Global Config</a>).
+Each pattern gets its own VDS file named after its DSID directory (e.g. <code>vds_dir/user.wlai.601589.e8547_..._output_vds.h5</code>).</p>
 <h3 id="global-cuts">Global Cuts<a class="headerlink" href="#global-cuts" title="Permanent link">#</a></h3>
 <p>The selections that should be applied to all the data should be listed under <code>common:</code>.
 For example these could be outlier removal cuts, or a global kinematic selection.
@@ -1112,6 +1115,18 @@ huge output file.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.vds_dir">vds_dir</span></code></td>
+            <td>
+                  <code>(pathlib.<span title="pathlib.Path">Path</span> | None, optional)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Directory name for creation of virtual datasets. By default None
+If none is given, virtual datasets is created next to input ntuples</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1141,7 +1156,7 @@ huge output file.</p>
   <small>
     
       Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 28, 2026 15:03:46 UTC">May 28, 2026</span>
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 18, 2026 08:08:34 UTC">June 18, 2026</span>
       
         <br>
         Created:
