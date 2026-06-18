@@ -1,7 +1,7 @@
 # Configuration
 
 The configuration of the preprocessing is done with a [`.yaml`](https://en.wikipedia.org/wiki/YAML) file which steers the whole preprocessing.
-Available example config files for UPP can be found in [`upp/configs`]({{repo_url}}tree/main/upp/configs).
+Available example config files for UPP can be found in [`upp/configs`](https://github.com/umami-hep/umami-preprocessing/tree/main/upp/configs).
 
 Each aspect of the configuration is described in detail below.
 
