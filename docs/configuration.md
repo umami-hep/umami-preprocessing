@@ -40,6 +40,11 @@ Below is an example and a table explaining each setting.
 |`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
 |`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
 
+The virtual dataset files created from wildcard patterns are by default stored alongside the input ntuples.
+If you have no write access to the input ntuples directory and would like to collect all VDS files in an accessible directory instead, set `vds_dir` in the global config (see [Global Config](#global-config)).
+Each pattern gets its own VDS file named after its DSID directory (e.g. `vds_dir/user.wlai.601589.e8547_..._output_vds.h5`).
+
+
 
 ### Global Cuts
 

@@ -53,6 +53,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
             self.jets_name = "jets"
+            self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
     # Should run to completion (we only log errors for missing ids/rtags)
@@ -89,6 +90,7 @@ def test_run_input_sample_check_unsupported_pattern_type_is_logged_and_skipped(
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
             self.jets_name = "jets"
+            self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
     cis.run_input_sample_check(config=cfg, deviation_factor=10.0, verbose=False)
@@ -111,6 +113,7 @@ def test_main_calls_pipeline_with_parsed_args(monkeypatch, tmp_path):
             self.ntuple_dir = tmp_path
             self.batch_size = 1
             self.jets_name = "jets"
+            self.vds_dir = None
 
     called = {"run": False, "cfg": None, "df": None, "v": None}
 
@@ -176,6 +179,7 @@ def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
             self.jets_name = "jets"
+            self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
     cis.run_input_sample_check(config=cfg, deviation_factor=10.0, verbose=False)
@@ -221,6 +225,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
             self.jets_name = "jets"
+            self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
     cis.run_input_sample_check(config=cfg, deviation_factor=10.0, verbose=False)
@@ -254,6 +259,7 @@ def test_script_entry_point_executes_main(tmp_path):
             self.ntuple_dir = tmp_path
             self.batch_size = 1
             self.jets_name = "jets"
+            self.vds_dir = None
 
         @classmethod
         def from_file(cls, *_a, **_k):  # signature compatible
