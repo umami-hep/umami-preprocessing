@@ -20,8 +20,12 @@
       
         <link rel="next" href="../run/">
       
+      
+        
+      
+      
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.5">
+      <meta name="generator" content="zensical-0.0.45">
     
     
       
@@ -29,32 +33,37 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+      
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.a2001754.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/classic/palette.7dc9a0ad.min.css">
       
       
 
+
     
+    
+      
     
     
       
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
-    
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
-    
     
     
   </head>
@@ -62,16 +71,17 @@
   
     
     
+      
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
-    
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
     <div data-md-component="skip">
       
         
@@ -87,16 +97,19 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="UPP: Umami Preprocessing" class="md-header__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+    <a href="./.." title="UPP: Umami Preprocessing" class="md-header__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -115,54 +128,63 @@
       </div>
     </div>
     
-    
-    
-      <label class="md-header__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
-        </button>
-      </nav>
       
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
 </div>
+      
     
-    
-      <div class="md-header__source">
-        <a href="https://github.com/umami-hep/umami-preprocessing/" title="Go to repository" class="md-source" data-md-component="source">
+    <div class="md-header__source">
+      
+        <a href="https://github.com/umami-hep/umami-preprocessing" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
-    Github
+    GitHub
   </div>
 </a>
-      </div>
-    
+      
+    </div>
   </nav>
   
 </header>
@@ -185,25 +207,26 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="UPP: Umami Preprocessing" class="md-nav__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+    <a href="./.." title="UPP: Umami Preprocessing" class="md-nav__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     UPP: Umami Preprocessing
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/umami-hep/umami-preprocessing/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/umami-hep/umami-preprocessing" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
-    Github
+    GitHub
   </div>
 </a>
     </div>
@@ -212,14 +235,25 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
-        Introduction
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Introduction
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -227,14 +261,25 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../setup/" class="md-nav__link">
-        Setup
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Setup
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -242,14 +287,25 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../sampling/" class="md-nav__link">
-        Sampling methods
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Sampling methods
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -257,14 +313,25 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../reweighting/" class="md-nav__link">
-        Reweighting
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Reweighting
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -272,33 +339,59 @@
     
       
       
-      
-
   
   
     
   
   
+  
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
       
       
         
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Configuration
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Configuration
+
+    
+  </span>
+  
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="./" class="md-nav__link md-nav__link--active">
-        Configuration
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Configuration
+
+    
+  </span>
+  
+  
+
       </a>
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
@@ -307,69 +400,105 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#input-h5-samples" class="md-nav__link">
-    Input H5 Samples
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Input H5 Samples
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#global-cuts" class="md-nav__link">
-    Global Cuts
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Global Cuts
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#resampling-regions" class="md-nav__link">
-    Resampling Regions
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Resampling Regions
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#components" class="md-nav__link">
-    Components
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Components
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#variables" class="md-nav__link">
-    Variables
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Variables
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#track-selections" class="md-nav__link">
-    Track selections
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Track selections
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#resampling" class="md-nav__link">
-    Resampling
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Resampling
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#global-config" class="md-nav__link">
-    Global Config
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Global Config
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="md-nav__link">
-    PreprocessingConfig
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        PreprocessingConfig
+      </span>
+    </span>
   </a>
   
 </li>
@@ -384,14 +513,25 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../run/" class="md-nav__link">
-        Run
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Run
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -399,14 +539,25 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../umami_int/" class="md-nav__link">
-        Umami integration
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Umami integration
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -414,14 +565,51 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../contributing/" class="md-nav__link">
-        Contributing
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Docs development
+
+    
+  </span>
+  
+  
+
       </a>
     </li>
   
@@ -437,10 +625,12 @@
               
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
+                  
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
@@ -449,69 +639,105 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#input-h5-samples" class="md-nav__link">
-    Input H5 Samples
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Input H5 Samples
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#global-cuts" class="md-nav__link">
-    Global Cuts
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Global Cuts
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#resampling-regions" class="md-nav__link">
-    Resampling Regions
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Resampling Regions
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#components" class="md-nav__link">
-    Components
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Components
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#variables" class="md-nav__link">
-    Variables
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Variables
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#track-selections" class="md-nav__link">
-    Track selections
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Track selections
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#resampling" class="md-nav__link">
-    Resampling
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Resampling
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#global-config" class="md-nav__link">
-    Global Config
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Global Config
+      </span>
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#upp.classes.preprocessing_config.PreprocessingConfig" class="md-nav__link">
-    PreprocessingConfig
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        PreprocessingConfig
+      </span>
+    </span>
   </a>
   
 </li>
@@ -526,13 +752,12 @@
           
           
             <div class="md-content" data-md-component="content">
+              
               <article class="md-content__inner md-typeset">
                 
                   
-
   
   
-
 
 
 <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h1>
@@ -548,19 +773,19 @@ The samples are used to define components later on in configs and so one should 
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Single DSID</label><label for="__tabbed_1_2">Multiple DSIDs</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><code>yaml
-ttbar: &amp;ttbar
-  name: ttbar
-  pattern: name1.*.410470.*/*.h5</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1.*.410470.*/*.h5</span>
+</span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<p><code>yaml
-ttbar: &amp;ttbar
-  name: ttbar
-  equal_jets: False
-  pattern:
-    - name1.*.410470.*/*.h5
-    - name2.*.410470.*/*.h5</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">equal_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">pattern</span><span class="p">:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name1.*.410470.*/*.h5</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name2.*.410470.*/*.h5</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -609,17 +834,17 @@ Possible operators are:</p>
 </ul>
 <p>Along with the common selection cuts, you should also specify the cuts that separate <code>train</code>, <code>val</code> and <code>test</code> splits using modulo of <code>eventNumber</code>.
 For example:</p>
-<p><code>yaml
-global_cuts:
-  common:
-    - [JetFitterSecondaryVertex_mass, "&lt;", 25000]
-    - [JetFitter_deltaR, "&lt;", 0.6]
-  train:
-    - [eventNumber, "%10&lt;=", 7]
-  val:
-    - [eventNumber, "%10==", 8]
-  test:
-    - [eventNumber, "%10==", 9]</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">global_cuts</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">common</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">JetFitterSecondaryVertex_mass</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">25000</span><span class="p p-Indicator">]</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">JetFitter_deltaR</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.6</span><span class="p p-Indicator">]</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">train</span><span class="p">:</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10&lt;=&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">7</span><span class="p p-Indicator">]</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">val</span><span class="p">:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10==&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">]</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">eventNumber</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;%10==&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
 <details class="info">
 <summary>More info about cuts</summary>
 <p>The <code>Cuts</code> class is defined in the <a href="https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/cuts.py"><code>atlas-ftag-tools</code></a> package.</p>
@@ -636,17 +861,17 @@ since the train/val/test split will suffice.</p>
 <p>Next we define any kinematic regions which need to be resampled separately, again using anchors as these will also be used in the definition of our components.
 For each region you need to provide a name and a list of cuts (see above).
 Here is an example:</p>
-<p><code>yaml
-lowpt: &amp;lowpt
-  name: lowpt
-  cuts:
-    - [pt_btagJes, "&gt;", 20_000]
-    - [pt_btagJes, "&lt;", 250_000]
-highpt: &amp;highpt
-  name: highpt
-  cuts:
-    - [pt_btagJes, "&gt;", 250_000]
-    - [pt_btagJes, "&lt;", 6_000_000]</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">cuts</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nt">highpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;highpt</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">highpt</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">cuts</span><span class="p">:</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;&lt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
 <p>Again, aliasing these just helps to reduce duplication of information when defining the components as can be seen below.</p>
 <h3 id="components">Components<a class="headerlink" href="#components" title="Permanent link">#</a></h3>
 <p>The <code>components</code> section is where all the configuration comes together. 
@@ -654,23 +879,21 @@ A component is a combination of a region, a sample and a flavour.
 They allow for full flexibility when defining different preprocessing pipelines
 (e.g. single-b versus Xbb).</p>
 <p>An example <code>components</code> block is provided below.</p>
-<p>```yaml
-components:
-- region:
-    &lt;&lt;: <em>lowpt
-    sample:
-    &lt;&lt;: </em>ttbar
-    flavours: [bjets, cjets, ujets]
-    num_jets: 10_000_000</p>
-<ul>
-<li>region:
-    &lt;&lt;: <em>highpt
-    sample:
-    &lt;&lt;: </em>zprime
-    flavours: [bjets, cjets, ujets]
-    num_jets: 5_000_000
-```</li>
-</ul>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">components</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10_000_000</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*highpt</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*zprime</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="nt">flavours</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="nt">num_jets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
+</span></code></pre></div>
 <p>Notice that we use <code>&lt;&lt;*</code> insertion tool to insert already defined regions and samples.</p>
 <table>
 <thead>
@@ -684,12 +907,12 @@ components:
 <tr>
 <td><code>region</code></td>
 <td>anchor</td>
-<td>The pre-defined kinematic region anchor, e.g. <code>lowpt</code> or <code>highpt</code>, or <code>inclusive</code> if not splitting in <span class="arithmatex"><span class="MathJax_Preview">p_T</span><script type="math/tex">p_T</script></span></td>
+<td>The pre-defined kinematic region anchor, e.g. <code>lowpt</code> or <code>highpt</code>, or <code>inclusive</code> if not splitting in <span class="arithmatex">\(p_T\)</span></td>
 </tr>
 <tr>
 <td><code>sample</code></td>
 <td>anchor</td>
-<td>The pre-defined sample anchor, e.g. <span class="arithmatex"><span class="MathJax_Preview">t\bar{t}</span><script type="math/tex">t\bar{t}</script></span> or <span class="arithmatex"><span class="MathJax_Preview">Z'</span><script type="math/tex">Z'</script></span></td>
+<td>The pre-defined sample anchor, e.g. <span class="arithmatex">\(t\bar{t}\)</span> or <span class="arithmatex">\(Z'\)</span></td>
 </tr>
 <tr>
 <td><code>flavours</code></td>
@@ -717,38 +940,38 @@ components:
 <p>The next thing you need is to provide the variables that are taken from the TDD files and written in the resampled dataset.
 Selecting only a subset of variables keeps the output files lightweight, and ensures the dataloading does not become a bottleneck during training.</p>
 <p>One can simply define them under <code>variables:</code> like:</p>
-<p>```yaml
-variables:
-  jets:
-    inputs:
-      - pt_btagJes
-      - absEta_btagJes
-    labels:
-      - HadronConeExclTruthLabelID
-      - pt
-      - eta</p>
-<p>tracks:
-    inputs:
-      - dphi
-      - deta
-      - qOverP
-      - IP3D_signed_d0_significance
-      - IP3D_signed_z0_significance
-    labels:
-      - ftagTruthOriginLabel
-      - ftagTruthVertexIndex
-<code>``
-Each key under</code>variables:<code>corresponds to a dataset name in the TDD h5 file (e.g.</code>jets<code>,</code>tracks<code>,</code>hits<code>).
-The combined set of variables in</code>inputs<code>and</code>labels<code>are carried over to the output files to a dataset with the same name as the input dataset.
-Internally, UPP will compute normalisation parameters for variables in the</code>inputs<code>, and compute class weightings (for categorical labels) for variables in the</code>labels` block.</p>
+<p><div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">variables</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">jets</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pt_btagJes</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absEta_btagJes</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HadronConeExclTruthLabelID</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pt</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eta</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="nt">tracks</span><span class="p">:</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dphi</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deta</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">qOverP</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP3D_signed_d0_significance</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP3D_signed_z0_significance</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthOriginLabel</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ftagTruthVertexIndex</span>
+</span></code></pre></div>
+Each key under <code>variables:</code> corresponds to a dataset name in the TDD h5 file (e.g. <code>jets</code>, <code>tracks</code>, <code>hits</code>).
+The combined set of variables in <code>inputs</code> and <code>labels</code> are carried over to the output files to a dataset with the same name as the input dataset.
+Internally, UPP will compute normalisation parameters for variables in the <code>inputs</code>, and compute class weightings (for categorical labels) for variables in the <code>labels</code> block.</p>
 <p>Alternatively include the variables from your custom variable config by providing the full path to the file after an include statement.
 The file you provide should have the same structure as shown above but without <code>variable:</code> level.
 For example:
-<code>yaml
-variables: !include xbb-variables.yaml</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xbb-variables.yaml</span>
+</span></code></pre></div></p>
 <p>One can also import variable configs already provided in this package under <code>upp/configs/</code> by using the yaml file name, e.g.:</p>
-<p><code>yaml
-variables: !include variables.yaml</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">variables.yaml</span>
+</span></code></pre></div>
 <details class="info">
 <summary>You can choose later which variables in your output files are used for training</summary>
 <p>When it comes to defining your training config, you will be required to <a href="https://ftag-salt.docs.cern.ch/configuration/#selecting-training-variables">define the variables used for training</a>.
@@ -758,29 +981,30 @@ This is straightforward since we always store data using structured arrays (in t
 <h3 id="track-selections">Track selections<a class="headerlink" href="#track-selections" title="Permanent link">#</a></h3>
 <p>You can apply on the fly selections to tracks in the preprocessing stage (specifically the merging step).</p>
 <p>To do this, include a <code>selection</code> key in the variable config block under the tracks, for example:</p>
-<p><code>tracks:
-    inputs:
-      - d0
-    labels:
-      - ftagTruthOriginLabel
-    selection:
-      - [d0, "&gt;", 0.1]</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>  tracks:
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    inputs:
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>      - d0
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    labels:
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>      - ftagTruthOriginLabel
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    selection:
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>      - [d0, &quot;&gt;&quot;, 0.1]
+</span></code></pre></div>
 <h3 id="resampling">Resampling<a class="headerlink" href="#resampling" title="Permanent link">#</a></h3>
 <p>There are currently two resampling methods implemented in the package <code>pdf</code> and <code>countup</code> and they share most of setting.
 Below is the example of setting up the <code>pdf</code> resampling method and a table describing all the parameters.</p>
 <p>In order to run UPP without any kinematic resampling, just set <code>method: none</code>. 
 Note you will still need to run the resampling stage of the preprocessing pipeline.</p>
-<p><code>yaml
-resampling:
-  target: cjets
-  method: pdf
-  upscale_pdf: 2
-  sampling_fraction: auto
-  variables:
-    pt_btagJes:
-      bins: [[20_000, 250_000, 50], [250_000, 1_000_000, 50], [1_000_000, 6_000_000, 50]]
-    absEta_btagJes:
-      bins: [[0, 2.5, 20]]</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">resampling</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cjets</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pdf</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">upscale_pdf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">sampling_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="nt">pt_btagJes</span><span class="p">:</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">      </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">20_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">250_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]]</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="nt">absEta_btagJes</span><span class="p">:</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">      </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]]</span>
+</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -825,7 +1049,7 @@ resampling:
 
 
 <h2 id="upp.classes.preprocessing_config.PreprocessingConfig" class="doc doc-heading">
-              <code class=" language-python"><span class="n">upp</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">preprocessing_config</span><span class="o">.</span><span class="n">PreprocessingConfig</span></code>
+              <code class="highlight language-python"><span class="n">upp</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">preprocessing_config</span><span class="o">.</span><span class="n">PreprocessingConfig</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
@@ -837,18 +1061,19 @@ resampling:
     <div class="doc doc-contents first">
 
 
-      <p>Global options for the preprocessing.</p>
+
+        <p>Global options for the preprocessing.</p>
 <p>These options are specified in the config file
 under the <code>global:</code> key. They are passed as kwargs to PreprocessingConfig.
 The config file is also copied to the output directory.</p>
 <p>For example:
-<code>yaml
-global:
-    jets_name: jets
-    batch_size: 1_000_000
-    num_jets_estimate: 5_000_000
-    base_dir: /my/stuff/
-    ntuple_dir: h5-inputs # resolved path: /my/stuff/h5-inputs/</code></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">global</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">jets_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_000_000</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">base_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my/stuff/</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">ntuple_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">h5-inputs</span><span class="w"> </span><span class="c1"># resolved path: /my/stuff/h5-inputs/</span>
+</span></code></pre></div></p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -864,7 +1089,7 @@ global:
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.config_path">config_path</span></code></td>
             <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+                  <code><span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -875,7 +1100,7 @@ global:
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.split">split</span></code></td>
             <td>
-                  <code>upp.<span title="upp.classes">classes</span>.<span title="upp.classes.preprocessing_config">preprocessing_config</span>.<span title="upp.classes.preprocessing_config.Split">Split</span></code>
+                  <code><span title="upp">upp</span>.<span title="upp.classes">classes</span>.<span title="upp.classes.preprocessing_config">preprocessing_config</span>.<span title="upp.classes.preprocessing_config.Split">Split</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -888,7 +1113,7 @@ to be set in config.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.config">config</span></code></td>
             <td>
-                  <code>dict</code>
+                  <code><span title="dict">dict</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -899,7 +1124,7 @@ to be set in config.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.base_dir">base_dir</span></code></td>
             <td>
-                  <code>pathlib.<span title="pathlib.Path">Path</span></code>
+                  <code><span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -910,7 +1135,7 @@ to be set in config.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.ntuple_dir">ntuple_dir</span></code></td>
             <td>
-                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
+                  <code>(<span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -922,7 +1147,7 @@ interpreted as relative to base_dir. By default Path("ntuples")</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.components_dir">components_dir</span></code></td>
             <td>
-                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
+                  <code>(<span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -934,7 +1159,7 @@ interpreted as relative to base_dir. By default Path("components")</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.out_dir">out_dir</span></code></td>
             <td>
-                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
+                  <code>(<span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -946,7 +1171,7 @@ relative to base_dir. By default Path("output")</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.out_fname">out_fname</span></code></td>
             <td>
-                  <code>(pathlib.<span title="pathlib.Path">Path</span>, optional)</code>
+                  <code>(<span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -957,7 +1182,7 @@ relative to base_dir. By default Path("output")</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.batch_size">batch_size</span></code></td>
             <td>
-                  <code>(int, optional)</code>
+                  <code>(<span title="int">int</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -971,7 +1196,7 @@ distributions. By default 100_000</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate">num_jets_estimate</span></code></td>
             <td>
-                  <code>(int, optional)</code>
+                  <code>(<span title="int">int</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -983,7 +1208,7 @@ Is equal to 1_000_000 by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_available">num_jets_estimate_available</span></code></td>
             <td>
-                  <code>(int | None, optional)</code>
+                  <code>(<span title="int">int</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -997,7 +1222,7 @@ although it will be slow for large datasets. Is equal to num_jets_estimate by de
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_hist">num_jets_estimate_hist</span></code></td>
             <td>
-                  <code>(int | None, optional)</code>
+                  <code>(<span title="int">int</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1010,7 +1235,7 @@ Is equal to num_jets_estimate by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_norm">num_jets_estimate_norm</span></code></td>
             <td>
-                  <code>(int | None, optional)</code>
+                  <code>(<span title="int">int</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1023,7 +1248,7 @@ Is equal to num_jets_estimate by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_estimate_plotting">num_jets_estimate_plotting</span></code></td>
             <td>
-                  <code>(int | None, optional)</code>
+                  <code>(<span title="int">int</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1036,7 +1261,7 @@ Is equal to num_jets_estimate by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.merge_test_samples">merge_test_samples</span></code></td>
             <td>
-                  <code>(bool, optional)</code>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1047,7 +1272,7 @@ Is equal to num_jets_estimate by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.jets_name">jets_name</span></code></td>
             <td>
-                  <code>(str, optional)</code>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1058,7 +1283,7 @@ Is equal to num_jets_estimate by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.flavour_config">flavour_config</span></code></td>
             <td>
-                  <code>(pathlib.<span title="pathlib.Path">Path</span> | None, optional)</code>
+                  <code>(<span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1069,7 +1294,7 @@ Is equal to num_jets_estimate by default.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.flavour_category">flavour_category</span></code></td>
             <td>
-                  <code>(str, optional)</code>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1082,7 +1307,7 @@ By default "standard". To use this option, flavour_config must be None.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.num_jets_per_output_file">num_jets_per_output_file</span></code></td>
             <td>
-                  <code>(int | None, optional)</code>
+                  <code>(<span title="int">int</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1096,7 +1321,7 @@ huge output file.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.skip_checks">skip_checks</span></code></td>
             <td>
-                  <code>(bool, optional)</code>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1107,7 +1332,7 @@ huge output file.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.skip_config_copy">skip_config_copy</span></code></td>
             <td>
-                  <code>(bool, optional)</code>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1118,7 +1343,7 @@ huge output file.</p>
           <tr class="doc-section-item">
             <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.vds_dir">vds_dir</span></code></td>
             <td>
-                  <code>(pathlib.<span title="pathlib.Path">Path</span> | None, optional)</code>
+                  <code>(<span title="pathlib">pathlib</span>.<span title="pathlib.Path">Path</span> | None, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1133,7 +1358,15 @@ If none is given, virtual datasets is created next to input ntuples</p>
 
 
 
-  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
 
 
 
@@ -1151,20 +1384,14 @@ If none is given, virtual datasets is created next to input ntuples</p>
 
 </div>
 
-  <hr>
-<div class="md-source-file">
-  <small>
-    
-      Last update:
-      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 18, 2026 08:08:34 UTC">June 18, 2026</span>
-      
-        <br>
-        Created:
-        <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2023 10:06:01 UTC">September 5, 2023</span>
-      
-    
-  </small>
-</div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1175,7 +1402,14 @@ If none is given, virtual datasets is created next to input ntuples</p>
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
         
       </main>
       
@@ -1186,13 +1420,13 @@ If none is given, virtual datasets is created next to input ntuples</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2022 - 2023 CERN for the benefit of the ATLAS collaboration
+      Copyright &copy; 2022 - 2026 CERN for the benefit of the ATLAS collaboration
     </div>
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
     </a>
   
 </div>
@@ -1206,10 +1440,14 @@ If none is given, virtual datasets is created next to input ntuples</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.6e5f0216.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
