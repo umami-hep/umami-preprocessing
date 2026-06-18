@@ -247,7 +247,7 @@ resampling:
 
 ### Plotting
 
-Plot labels and styles can be configured under the optional `plotting:` key. Any omitted setting uses the default defined by [`PlottingConfig`][upp.classes.plotting_config.PlottingConfig]. Variable-label keys are matched case-insensitively against the plotted variable name, so a single `pt` entry applies to variables such as `pt_btagJes`.
+Plot labels and styles can be configured under the optional `plotting:` key. Any omitted setting uses the default defined by the `PlottingConfig` dataclass (documented below). Variable-label keys are matched case-insensitively against the plotted variable name, so a single `pt` entry applies to variables such as `pt_btagJes`.
 
 ```yaml
 plotting:
