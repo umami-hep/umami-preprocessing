@@ -3,9 +3,20 @@ name = "umami-preprocessing"
 description = "ATLAS Flavour Tagging Preprocessing - Umami PreProcessing (UPP)"
 authors = [{name="Alexander Froch"}]
 dynamic = ["version"]
-license = {text = "MIT"}
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Physics",
+]
 
 dependencies = [
   "atlas-ftag-tools==0.3.3",
@@ -47,7 +58,7 @@ include-package-data = true
 version = {attr = "upp.__version__"}
 
 [build-system]
-requires = ["setuptools>=62"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.ruff]

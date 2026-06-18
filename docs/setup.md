@@ -3,14 +3,29 @@ This guide will walk you through the process of setting up the Umami-Preprocessi
 ### Environment Setup
 
 Install UPP in a virtual environment to avoid conflicts with other software libraries.
-UPP currently supports Python 3.10 and 3.11, with Python 3.11 recommended.
+UPP currently supports Python 3.11, 3.12, 3.13 and 3.14.
+
+=== "uv"
+
+    [uv](https://docs.astral.sh/uv/) is a fast Python package and project manager and is
+    the recommended way to develop UPP. Install it following the
+    [official instructions](https://docs.astral.sh/uv/getting-started/installation/), then
+    let `uv` create and manage the environment for you:
+
+    ```bash
+    uv venv
+    source .venv/bin/activate
+    ```
+
+    When working from a clone of the repository you can skip the manual environment setup
+    entirely and use `uv sync` (see below).
 
 === "conda"
 
     Set up a fresh [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) or [mamba](https://github.com/conda-forge/miniforge#install) environment:
 
     ```bash
-    conda create -n upp python=3.11
+    conda create -n upp python=3.13
     conda activate upp
     ```
 
@@ -57,12 +72,31 @@ git clone https://github.com/umami-hep/umami-preprocessing.git
 
 ### Install package from code 
 
-Navigate to the newly downloaded repository and install the package in editable mode:
+Navigate to the newly downloaded repository and install the package in editable mode.
 
-```bash
-cd umami-preprocessing
-python -m pip install -e .[dev]
-```
+=== "uv"
+
+    `uv sync` creates a virtual environment in `.venv` and installs UPP together with the
+    development dependency group in editable mode:
+
+    ```bash
+    cd umami-preprocessing
+    uv sync
+    ```
+
+    Prefix subsequent commands with `uv run` (e.g. `uv run preprocess ...`) or activate the
+    environment with `source .venv/bin/activate`.
+
+=== "pip"
+
+    Install UPP in editable mode, then add the development dependency group (requires
+    `pip >= 25.1`, which understands PEP 735 dependency groups):
+
+    ```bash
+    cd umami-preprocessing
+    python -m pip install -e .
+    python -m pip install --group dev
+    ```
 
 If you don't plan on editing the code you can do a regular install instead
 
