@@ -1,5 +1,5 @@
 """
-Preprocessing pipeline for jet taggging.
+Preprocessing pipeline for jet tagging.
 
 By default all stages for the training split are run.
 To run with only specific stages enabled, include the flag for the required stages.
@@ -129,7 +129,11 @@ def parse_args(args: Any) -> argparse.Namespace:
         "--reweight", "--rw", action="store_true", default=False, help="Run the reweighting stage"
     )
     parser.add_argument(
-        "--rw-merge", "--rwm", action="store_true", default=False, help="Run the reweighting stage"
+        "--rw-merge",
+        "--rwm",
+        action="store_true",
+        default=False,
+        help="Run the reweighting merge stage",
     )
     parser.add_argument(
         "--rw-merge-idx",
@@ -137,7 +141,7 @@ def parse_args(args: Any) -> argparse.Namespace:
         type=str,
         default=None,
         help=(
-            "Commar seperated pair of indices representing the range of output "
+            "Comma-separated pair of indices representing the range of output "
             "files to create, e.g '0,10' will create files 0 to 9"
         ),
     )
@@ -149,7 +153,7 @@ def parse_args(args: Any) -> argparse.Namespace:
     parser.add_argument(
         "--skip-sample-check",
         action="store_true",
-        help="Skip the inital input sample check",
+        help="Skip the initial input sample check",
     )
     parser.add_argument(
         "--grid", action="store_true", help="Use when running the split stage on the grid. "

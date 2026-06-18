@@ -10,17 +10,17 @@ from upp.stages.plot import make_hist, plot_resampling_dists
 from upp.stages.resampling import Resampling, safe_divide, select_batch
 
 __all__ = [
-    "bin_jets",
     "Hist",
+    "Merging",
+    "Normalisation",
+    "Resampling",
+    "bin_jets",
     "create_histograms",
+    "make_hist",
+    "plot_resampling_dists",
+    "safe_divide",
+    "select_batch",
     "subdivide_bins",
     "upscale_array",
     "upscale_array_regionally",
-    "Merging",
-    "Normalisation",
-    "make_hist",
-    "plot_resampling_dists",
-    "select_batch",
-    "safe_divide",
-    "Resampling",
 ]

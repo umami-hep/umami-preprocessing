@@ -381,7 +381,7 @@ class Resampling:
             ):
                 log.info(
                     f"{component} usampling ratio is {np.mean(component._ups_ratio):.3f}, with"
-                    f" {component.num_jets/np.mean(component._ups_ratio):,.0f}/"
+                    f" {component.num_jets / np.mean(component._ups_ratio):,.0f}/"
                     f"{component.num_jets:,} unique jets."
                     f" Jets are upsampled at most {np.max(component._ups_max):.0f} times"
                 )

@@ -13,7 +13,7 @@ from upp.stages.plot import make_hist
 
 class TestClass:
     def generate_mock(self, out_file, N=100):
-        fname, f = get_mock_file(num_jets=N, fname=out_file)
+        _fname, f = get_mock_file(num_jets=N, fname=out_file)
         f.close()
 
     def setup_method(self, method):

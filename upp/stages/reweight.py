@@ -20,15 +20,15 @@ class Reweight:
         self.config = config
         self.rw_config = config.rw_config
         self.flavours = [f.name for f in config.components.flavours]
-        assert (
-            self.rw_config is not None
-        ), "Reweighting configuration is not set in the preprocessing config"
+        assert self.rw_config is not None, (
+            "Reweighting configuration is not set in the preprocessing config"
+        )
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
-        assert (
-            self.organised_components_config.exists()
-        ), f"Organised components config file not found: {self.organised_components_config}"
+        assert self.organised_components_config.exists(), (
+            f"Organised components config file not found: {self.organised_components_config}"
+        )
 
     @property
     def hists_path(self):
@@ -51,15 +51,20 @@ class Reweight:
             )
             for f in files_by_flavour
         }
+        per_reader_num_jets = []
         for f, r in input_readers.items():
-            assert r.num_jets >= self.num_jets_estimate, (
-                f"Requested {self.num_jets_estimate} jets per flavour, but found "
-                f"{r.num_jets} jets in {f}."
-            )
+            n = min(self.num_jets_estimate, r.num_jets)
+            if r.num_jets < self.num_jets_estimate:
+                print(
+                    f"WARNING: Requested {self.num_jets_estimate} jets for {f}, "
+                    f"but only {r.num_jets} available. Using {r.num_jets}."
+                )
             print(
-                f"Flavour {f} has {r.num_jets} jets, reading in batches of {self.config.batch_size}"
+                f"Flavour {f} has {r.num_jets} jets, using {n}, "
+                f"reading in batches of {self.config.batch_size}"
             )
-        return list(input_readers.values())
+            per_reader_num_jets.append(n)
+        return list(input_readers.values()), per_reader_num_jets
 
     def calculate_weights(
         self,
@@ -83,11 +88,11 @@ class Reweight:
         """
         reweights = self.rw_config.reweights
         print(f"Calculating weights for {len(reweights)} reweights")
-        readers = self.get_input_readers()
+        readers, per_reader_num_jets = self.get_input_readers()
         for reader in readers:
-            assert (
-                reader.batch_size == readers[0].batch_size
-            ), "All readers must have the same batch size"
+            assert reader.batch_size == readers[0].batch_size, (
+                "All readers must have the same batch size"
+            )
         batch_size_per_file = readers[0].batch_size
         all_vars = {}
         existing_vars = {}
@@ -117,13 +122,24 @@ class Reweight:
         num_in_hists = {}
         all_histograms = {}
         print("Setting up streams with vars: ", all_vars, flush=True)
-        reader_streams = [r.stream(all_vars, num_jets=self.num_jets_estimate) for r in readers]
-        num_batches = self.num_jets_estimate // batch_size_per_file + (
-            1 if self.num_jets_estimate % batch_size_per_file != 0 else 0
+        reader_streams = [
+            r.stream(all_vars, num_jets=n)
+            for r, n in zip(readers, per_reader_num_jets, strict=False)
+        ]
+        max_num_jets = max(per_reader_num_jets)
+        num_batches = max_num_jets // batch_size_per_file + (
+            1 if max_num_jets % batch_size_per_file != 0 else 0
         )
         start_time = time.time()
         for i in range(num_batches):
-            all_batches = [next(reader_streams[j]) for j in range(len(readers))]
+            all_batches = []
+            for j in range(len(readers)):
+                try:
+                    all_batches.append(next(reader_streams[j]))
+                except StopIteration:
+                    continue
+            if not all_batches:
+                break
             combined_batch = {}
             for batch in all_batches:
                 for k, v in batch.items():
@@ -158,7 +174,7 @@ class Reweight:
 
                 for cls in classes:
                     mask = data[rw.class_var] == cls
-                    hist, outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
+                    hist, _outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
                     if rw.class_var is not None:
                         cls = str(cls)
                     if rw_group not in all_histograms:
@@ -257,9 +273,14 @@ class Reweight:
             idx_below_min = None
             for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
                 this_idx_below_min = hist == 0  # | (all_targets[rw_group][rw_rep] == 0)
-                output_weights[rw_group][rw_rep]["weights"][cls] = np.where(
-                    hist > 0, all_targets[rw_group][rw_rep] / hist, 0
+                weights = np.zeros_like(hist, dtype=float)
+                np.divide(
+                    all_targets[rw_group][rw_rep],
+                    hist,
+                    out=weights,
+                    where=hist > 0,
                 )
+                output_weights[rw_group][rw_rep]["weights"][cls] = weights
                 if idx_below_min is None:
                     idx_below_min = this_idx_below_min
                 else:

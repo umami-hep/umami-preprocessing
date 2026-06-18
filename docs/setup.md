@@ -2,18 +2,16 @@ This guide will walk you through the process of setting up the Umami-Preprocessi
 
 ### Environment Setup
 
-Creating a virtual environment helps keep your Python environment isolated and organized.
-While it's not essential, we highly recommend using one.
-You can set up a virtual environment using either Conda or Python's venv.
-UPP requires Python 3.8 or later.
+Install UPP in a virtual environment to avoid conflicts with other software libraries.
+UPP currently supports Python 3.10 and 3.11, with Python 3.11 recommended.
 
 === "conda"
 
     Set up a fresh [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) or [mamba](https://github.com/conda-forge/miniforge#install) environment:
 
     ```bash
-    mamba create -n upp python=3.11
-    mamba activate upp
+    conda create -n upp python=3.11
+    conda activate upp
     ```
 
 === "venv"
@@ -22,8 +20,8 @@ UPP requires Python 3.8 or later.
     Create a fresh virtual environment and activate it using
 
     ```bash
-    python3 -m venv env
-    source env/bin/activate
+    python3 -m venv upp
+    source upp/bin/activate
     ```
 
 === "lxplus"
@@ -32,7 +30,7 @@ UPP requires Python 3.8 or later.
 
     ```bash
     setupATLAS
-    lsetup "python 3.9.18-x86_64-el9"
+    lsetup "python 3.11.9-x86_64-el9"
     ```
 
     !!!info "You can also [set up conda on lxplus](https://abpcomputing.web.cern.ch/guides/python_inst/)"
@@ -40,35 +38,33 @@ UPP requires Python 3.8 or later.
 
 ### PyPi installation 
 
-A simple installation can be done via `pip` from Python Packade Index:
+If you don't plan on editing the source code, the simplest way to install UPP directly from the Python Package Index (PyPI):
 
 ```bash
 python -m pip install umami-preprocessing
 ```
 
-!!!info "On lxplus you may have to use ```python3```"
+!!!info "On lxplus you may have to use ```python3``` instead of just ```python```"
 
-After this installation all the fuctionality for the user is available. The further steps are only useful for the development of the package.
-
-### Get the code
-
-Start by cloning the Umami-Preprocessing repository and navigating into the project directory using the following commands in your terminal:
+### Download source code
+The following instructions are only relevant for those that wish to modify UPP source code.
+Start by cloning the Umami-Preprocessing repository. If you want to contribute to the development of UPP, you should fork the repository and make sure you do all your edits in a development branch.
 
 ```bash
 git clone https://github.com/umami-hep/umami-preprocessing.git
-cd umami-preprocessing
 ```
 
 
 ### Install package from code 
 
-Install the package as in editable mode if you would like to develop the code:
+Navigate to the newly downloaded repository and install the package in editable mode:
 
 ```bash
+cd umami-preprocessing
 python -m pip install -e .[dev]
 ```
 
-Or do a simple installation if you only plan to use the provided functionality as is
+If you don't plan on editing the code you can do a regular install instead
 
 ```bash
 python -m pip install .
@@ -100,8 +96,7 @@ python -m pip install .
 
 ### Run the tests (Optional)
 
-To ensure that the package is working correctly, you can run tests using the pytest framework. 
-Additionally, you can install coverage to generate a coverage report.
+To ensure that the package is working correctly, you can run the tests using the pytest framework. 
 
 Use ```pytest``` to run the tests to make sure the package works
 
@@ -109,8 +104,7 @@ Use ```pytest``` to run the tests to make sure the package works
 pytest tests 
 ```
 
-If you want to measure test coverage, first install coverage, and then run tests as follows:
-
+If you want to measure test coverage you can use the commands:
 ```bash
 coverage run --source upp -m pytest tests --show-capture=stdout
 coverage report 

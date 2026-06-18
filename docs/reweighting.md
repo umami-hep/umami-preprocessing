@@ -1,15 +1,17 @@
 # Reweighting
 
-A different approach to balancing classes to resampling is to instead reweight them instead.
+A different approach to balancing classes to resampling is to instead reweight them.
 In resampling, we bin our jets over their kinematics. We look in each bin, and if we have more jets of a given flavour compared to the target flavour, we throw those jets away. If we have less of a given flavour than the target flavour, we copy-and-paste (upsample) the jet until the bins are equal.
 This ensures that the flavour ratio of any two bins is approximately constant.
 
 This does however have some disadvantages:
 - results in throwing away some jets
 - upsampling introduces copies of the same jet, meaning we are passing the same data through the model more than once per epoch
-- bins always fave some non-zero finite size, such that there can still be a residual distibution shape, see [this mention](https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf) of shark-toothing
+- bins always have some non-zero finite size, such that there can still be a residual distibution shape, see [this mention](https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf) of shark-toothing
 
 We can instead reweight, where instead of throwing away or copying jets, we assign each jet in a bin a weight such that we end up with a constant weighted flavour ratio per bin.
+
+!!!info "Reweighting instead of resampling is a new feature in UPP and is *not* the recommended method."
 
 ## Running the reweighting
 
@@ -27,7 +29,7 @@ The first stage takes each sample and splits it into its split and flavour compo
 
 To run the splitting, 
 ```
-python upp/main.py --config {config} --split-components [--container {single container} --files {files}]
+preprocess --config {config} --split-components [--container {single container} --files {files}]
 ```
 
 which will split the components. If `--container` is defined, then only that container from the config will be split. If this is not included, then all contains in the config will be split.
@@ -61,7 +63,7 @@ which will then automatically download, package up, and generate the meta data r
 
 ## Generate weights
 
-Once all the samples are prepared, we can calculate the weights. An example config can be found in `configs/GN3v01/GN3V01-RW.yaml`. We can look at the reweighting section:
+Once all the samples are prepared, we can calculate the weights. An example config can be found in `upp/configs/GN3V01/GN3V01-RW.yaml`. We can look at the reweighting section:
 
 
 ```yaml
@@ -85,9 +87,9 @@ reweighting:
 
 ```
 
-`num_jets_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevent in the next section of these docs.
+`num_jets_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
 Then, you have the `reweights` section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
-The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minumum bin counts as the target.
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
 The reweighting can also be performed over track variables, for example
 
 ```yaml
@@ -104,24 +106,23 @@ class_var: ftagTruthOriginLabel
 class_target: mean
 ```
 
-Would calculate weights such that we have equivilent pt_frac distributions across the track labels.
+Would calculate weights such that we have equivalent pt_frac distributions across the track labels.
 
 To run the reweighting simply do
 
 ```
-python upp/main.py --config {config} --rw
+preprocess --config {config} --rw
 ```
 
 ## Merging
 
-Finally, we can merge all the relevent jets with their weights. This is done by
+Finally, we can merge all the relevant jets with their weights. This is done by
 
 ```
-python upp/main.py --rwm --split {train/test/val}
+preprocess --config {config} --rwm --split {train/test/val}
 ```
 
 This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the `global` section of the pre-processing config includes `num_jets_per_output_file` and the `reweighting` section has `merge_num_proc>1`.
 This will then launch `merge_num_proc` processes, with approximately `num_jets_per_output_file` per file*.
 
 * Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.
-
