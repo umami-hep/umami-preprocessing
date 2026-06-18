@@ -76,6 +76,6 @@ When in doubt, open an issue and tag the @umami-preprocessing‑maintainers.
 
 ## License and certificate of origin
 
-umami-preprocessing is released under the MIT license. By submitting code you agree that it can be distributed under the same terms.
+umami-preprocessing is released under the Apache 2.0 license. By submitting code you agree that it can be distributed under the same terms.
 
 Happy coding — and may your $b$‑tagging be ever accurate! ✨
