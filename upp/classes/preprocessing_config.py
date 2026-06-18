@@ -162,6 +162,9 @@ class PreprocessingConfig:
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
+        # vds_dir is optional (Path | None), so the loop above skips it; resolve it here
+        if self.vds_dir is not None:
+            self.vds_dir = self.get_path(Path(self.vds_dir))
         if not self.ntuple_dir.exists() and not self.skip_checks:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
