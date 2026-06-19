@@ -482,6 +482,29 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#plotting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Plotting
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upp.classes.plotting_config.PlottingConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        PlottingConfig
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PlottingConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#global-config" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -489,6 +512,11 @@
       </span>
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -721,6 +749,29 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#plotting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Plotting
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upp.classes.plotting_config.PlottingConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        PlottingConfig
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PlottingConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#global-config" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -728,6 +779,11 @@
       </span>
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1041,7 +1097,314 @@ Note you will still need to run the resampling stage of the preprocessing pipeli
 </tr>
 </tbody>
 </table>
-<h3 id="global-config">Global Config<a class="headerlink" href="#global-config" title="Permanent link">#</a></h3>
+<h3 id="plotting">Plotting<a class="headerlink" href="#plotting" title="Permanent link">#</a></h3>
+<p>Plot labels and styles can be configured under the optional <code>plotting:</code> key. Any omitted setting uses the default defined by the <code>PlottingConfig</code> dataclass (documented below). Variable-label keys are matched case-insensitively against the plotted variable name, so a single <code>pt</code> entry applies to variables such as <code>pt_btagJes</code>.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">plotting</span><span class="p">:</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">num_jets_plotting</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10_000_000</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">variable_labels</span><span class="p">:</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">pt</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jet</span><span class="nv"> </span><span class="s">$p_\\mathrm{T}$</span><span class="nv"> </span><span class="s">[GeV]&quot;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nt">eta</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jet</span><span class="nv"> </span><span class="s">$|\\eta|$&quot;</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="nt">mass</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jet</span><span class="nv"> </span><span class="s">Mass</span><span class="nv"> </span><span class="s">[GeV]&quot;</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="nt">sample_labels</span><span class="p">:</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$t\\bar{t}&quot;</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="nt">zprime</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$Z&#39;$&quot;</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="nt">atlas_first_tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Simulation Internal</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">  </span><span class="nt">atlas_second_tag</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;$\\sqrt{s}</span><span class="nv"> </span><span class="s">=</span><span class="nv"> </span><span class="s">13/13.6\\,\\mathrm{TeV}$&quot;</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="nt">output_formats</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pdf</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">png</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">  </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">  </span><span class="nt">y_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.5</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">  </span><span class="nt">figsize</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">6</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">  </span><span class="nt">logy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">  </span><span class="nt">linestyles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;-&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;--&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;-.&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">  </span><span class="nt">legend_location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">upper right</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">  </span><span class="nt">linestyle_legend_location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">upper center</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">  </span><span class="nt">linestyle_legend_anchor</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.55</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">  </span><span class="nt">output_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plots</span>
+</span></code></pre></div>
+<p>The <code>ylabel</code> setting supports a <code>{jets_name}</code> placeholder. Histogram normalisation and overflow handling can be controlled with <code>norm</code> and <code>underoverflow</code>.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="upp.classes.plotting_config.PlottingConfig" class="doc doc-heading">
+              <code class="highlight language-python"><span class="n">upp</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">plotting_config</span><span class="o">.</span><span class="n">PlottingConfig</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#upp.classes.plotting_config.PlottingConfig" class="headerlink" title="Permanent link">#</a></h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Options for the preprocessing resampling distribution plots.</p>
+<p>These options are specified in the config file under the <code>plotting:</code> key.
+Any omitted option uses the default defined by this class.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.num_jets_plotting">num_jets_plotting</span></code></td>
+            <td>
+                  <code>(<span title="int">int</span> | None, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of jets loaded for plotting. If not set, use the global
+<code>num_jets_estimate_plotting</code> value. By default None.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.variable_labels">variable_labels</span></code></td>
+            <td>
+                  <code>(<span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span>], <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Display labels for plotted variables. Keys are matched case-insensitively
+against variable names, with the longest matching key taking precedence.
+User-provided labels are merged with the default pT, eta, and mass labels.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.sample_labels">sample_labels</span></code></td>
+            <td>
+                  <code>(<span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span>], <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Display labels for input samples. User-provided labels are merged with the
+default ttbar and zprime labels.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.ylabel">ylabel</span></code></td>
+            <td>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Label for the y-axis. The <code>{jets_name}</code> placeholder is replaced with the
+configured jet dataset name. By default "Normalised Number of {jets_name}".</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.atlas_first_tag">atlas_first_tag</span></code></td>
+            <td>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>First ATLAS plot label. By default "Simulation Internal".</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.atlas_second_tag">atlas_second_tag</span></code></td>
+            <td>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Second ATLAS plot label. By default "<span class="arithmatex">\(\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}\)</span>".</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.show_num_jets">show_num_jets</span></code></td>
+            <td>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Decide, if the number of jets is shown in the ATLAS second tag</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.output_formats">output_formats</span></code></td>
+            <td>
+                  <code>(<span title="list">list</span>[<span title="str">str</span>], <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File formats in which each plot is saved. By default <code>["pdf", "png"]</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.linestyles">linestyles</span></code></td>
+            <td>
+                  <code>(<span title="list">list</span>[<span title="str">str</span>], <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Linestyles used to distinguish input samples. By default
+<code>["-", "--", "-.", ":"]</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.bins">bins</span></code></td>
+            <td>
+                  <code>(<span title="int">int</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of histogram bins. By default 50.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.norm">norm</span></code></td>
+            <td>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Normalise each histogram before plotting. By default True.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.underoverflow">underoverflow</span></code></td>
+            <td>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Include underflow and overflow values in the edge bins. By default True.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.y_scale">y_scale</span></code></td>
+            <td>
+                  <code>(<span title="float">float</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Scale factor applied to the automatically determined y-axis range.
+By default 1.5.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.figsize">figsize</span></code></td>
+            <td>
+                  <code>(<span title="list">list</span>[<span title="float">float</span>], <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Figure width and height. By default <code>[6, 4]</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.logy">logy</span></code></td>
+            <td>
+                  <code>(<span title="bool">bool</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Use a logarithmic y-axis. By default True.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.legend_location">legend_location</span></code></td>
+            <td>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Location of the flavour legend. By default "upper right".</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.linestyle_legend_location">linestyle_legend_location</span></code></td>
+            <td>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Location of the sample-linestyle legend. By default "upper center".</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.linestyle_legend_anchor">linestyle_legend_anchor</span></code></td>
+            <td>
+                  <code>(<span title="list">list</span>[<span title="float">float</span>], <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Anchor position of the sample-linestyle legend. By default <code>[0.55, 1]</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="upp.classes.plotting_config.PlottingConfig.output_directory">output_directory</span></code></td>
+            <td>
+                  <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Plot directory relative to the preprocessing output directory.
+By default "plots".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h3 id="global-config">Global Config<a class="headerlink" href="#global-config" title="Permanent link">#</a></h3>
 
 
 <div class="doc doc-object doc-class">
