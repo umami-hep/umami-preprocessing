@@ -353,6 +353,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#skipping-resampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Skipping resampling
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pdf-probability-density-function" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -567,6 +578,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#skipping-resampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Skipping resampling
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pdf-probability-density-function" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -609,6 +631,9 @@
 <h1 id="resampling">Resampling<a class="headerlink" href="#resampling" title="Permanent link">#</a></h1>
 <p>There are two main strategies for handling the issue of different kinematic properties for different jet flavours. These are reweighting and resampling. Reweighting applies a weight to each data point when calculating the loss, resulting in a weighted average loss for the considered data points. Resampling changes the actual data distribution by over- or undersampling data to achieve the desired data distribution. Statistically, the two methods are equivalent (in expectation). However, <a href="https://web.stanford.edu/~lexing/resw.pdf">in some cases</a>, resampling may result in a more numerically stable approximation of the minima of the loss function. Empirically, it has been found that resampling produces better results for jet flavour tagging performance.</p>
 <p>For resampling, UPP has two different methods implemented. The desired method (<code>pdf</code> or <code>countup</code>) can be specified in the configuration file.</p>
+<h3 id="skipping-resampling">Skipping resampling<a class="headerlink" href="#skipping-resampling" title="Permanent link">#</a></h3>
+<p>Resampling can be disabled entirely by either omitting the <code>resampling</code> block from the config or setting <code>method: none</code>. In this case no <code>target</code>, resampling <code>variables</code>, or histogram (<code>--prep</code>) step are required. The jets passing the cuts are written directly, capped at each component's <code>num_jets</code>. Setting <code>num_jets: -1</code> (also valid for <code>num_jets_val</code> / <code>num_jets_test</code>) writes <strong>all</strong> jets of that component passing the cuts.</p>
+<p>Note that the <code>--no-resample</code> command line flag is different: it only skips the resampling <em>stage</em> (for example to re-run the merge/norm/plot stages on existing component files) and does not disable resampling.</p>
 <h3 id="pdf-probability-density-function">PDF (probability density function)<a class="headerlink" href="#pdf-probability-density-function" title="Permanent link">#</a></h3>
 <p>This is an implementation of an <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> method. The aim of the algorithm is to ensure that the kinematic probability density functions (pdfs) of all jet flavours are matched to that of a chosen target flavour.</p>
 <p>The resampling is done using the following steps:</p>
