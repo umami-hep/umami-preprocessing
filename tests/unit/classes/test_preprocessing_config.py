@@ -48,6 +48,30 @@ class TestPreprocessingConfig(unittest.TestCase):
         general = config.get_umami_general()
         self.assertEqual(general["dict_file"], "dict/file/path.json")
 
+    def test_legacy_plotting_jet_count(self) -> None:
+        config = PreprocessingConfig.from_file(
+            self.CFG_DIR / "test_config_pdf_auto_umami.yaml",
+            "train",
+            skip_checks=True,
+            skip_config_copy=True,
+        )
+
+        self.assertEqual(config.plotting.num_jets_plotting, config.num_jets_estimate_plotting)
+
+    def test_plotting_config(self) -> None:
+        config = PreprocessingConfig.from_file(
+            self.CFG_DIR.parent.parent / "integration/fixtures/test_config_pdf_auto.yaml",
+            "train",
+            skip_checks=True,
+            skip_config_copy=True,
+        )
+
+        self.assertEqual(config.plotting.num_jets_plotting, 100)
+        self.assertEqual(config.plotting.variable_label("pt"), "$p_\\mathrm{T}$ [GeV]")
+        self.assertEqual(config.plotting.variable_label("mass"), "Jet Mass [GeV]")
+        self.assertEqual(config.plotting.sample_label("ttbar"), "$t\\bar{t}$")
+        self.assertEqual(config.plotting.output_formats, ["png"])
+
     def test_mimic_umami_config(self) -> None:
         config = PreprocessingConfig.from_file(
             self.CFG_DIR / "test_config_pdf_auto_umami.yaml",

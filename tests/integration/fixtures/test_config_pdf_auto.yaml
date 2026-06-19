@@ -87,6 +87,14 @@ global:
   out_dir: test_out
   ntuple_dir: ntuples
 
+plotting:
+  num_jets_plotting: 100
+  variable_labels:
+    pt: "$p_\\mathrm{T}$ [GeV]"
+  sample_labels:
+    ttbar: "$t\\bar{t}$"
+  output_formats: [png]
+
 variables:
   jets:
     inputs:
