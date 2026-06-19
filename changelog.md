@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
+
 - Make skip-resampling work end-to-end; support `num_jets: -1` to write all jets passing cuts, and record the resampling method in the output metadata [#153](https://github.com/umami-hep/umami-preprocessing/pull/153)
 - Add configurable plotting settings and split-specific merge output directories [#144](https://github.com/umami-hep/umami-preprocessing/pull/144)
 - Refresh setup and contributing docs, fix stale Python version and formatter references [#150](https://github.com/umami-hep/umami-preprocessing/pull/150)
