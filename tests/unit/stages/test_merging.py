@@ -108,6 +108,7 @@ def _minimal_merging(monkeypatch, jets_per_file=10) -> merging_mod.Merging:
         num_jets_per_output_file=jets_per_file,
         file_tag="split",
         out_fname=Path("/tmp/merged.h5"),
+        split="train",
         git_hash="deadbeef",
         config={},
         resampling_method="countup",
@@ -154,6 +155,7 @@ def test_open_writer_names_and_shapes(monkeypatch):
     assert isinstance(writer, MemWriter)
     assert writer.num_jets == 7
     assert writer.dst.name.startswith("merged_split_000")
+    assert writer.dst.parent.name == "train"
     assert "flavour_label" in writer.attrs
 
 
@@ -340,6 +342,7 @@ def _mk_merge_for_path(monkeypatch, out_path: Path, jets_per_file=5):
         num_jets_per_output_file=jets_per_file,
         file_tag="split",
         out_fname=out_path,
+        split="train",
         git_hash="deadbeef",
         config={},
         resampling_method="countup",
@@ -380,7 +383,9 @@ def test_part_fname_formatting(monkeypatch, tmp_path):
     assert p7.name.endswith("merged_split_007.h5")
     # name should still be the same, only directory changes with sample
     assert ps.name.endswith("merged_ttbar_split_012.h5")
-    assert ps.parent == tmp_path
+    assert p0.parent == tmp_path / "train"
+    assert p7.parent == tmp_path / "train"
+    assert ps.parent == tmp_path / "train"
 
 
 def test_detect_and_clean_completed_parts_empty_dir(monkeypatch, tmp_path):
@@ -418,6 +423,7 @@ def test_is_part_valid_multiple_datasets(monkeypatch, tmp_path):
     merge.base_shapes = {"jets": (5,), "tracks": (5,)}
 
     f0 = merge._part_fname(None, 0)
+    f0.parent.mkdir(parents=True, exist_ok=True)
     with h5py.File(f0, "w") as f:
         f.create_dataset("jets", shape=(5,), dtype="f4")
         f.create_dataset("tracks", shape=(5,), dtype="f4")
@@ -440,6 +446,7 @@ def test_is_part_valid_missing_jets_dataset(monkeypatch, tmp_path):
     merge.base_shapes = {"jets": (5,)}
 
     f0 = merge._part_fname(None, 0)
+    f0.parent.mkdir(parents=True, exist_ok=True)
     with h5py.File(f0, "w") as f:
         f.create_dataset("something_else", shape=(5,), dtype="f4")
     assert merge._is_part_valid(None, 0) is False
@@ -452,6 +459,7 @@ def test_is_part_valid_mismatched_lengths(monkeypatch, tmp_path):
     merge.base_shapes = {"jets": (5,), "tracks": (5,)}
 
     f0 = merge._part_fname(None, 0)
+    f0.parent.mkdir(parents=True, exist_ok=True)
     with h5py.File(f0, "w") as f:
         f.create_dataset("jets", shape=(5,), dtype="f4")
         f.create_dataset("tracks", shape=(4,), dtype="f4")  # mismatched
@@ -700,6 +708,7 @@ def test_run_groupby_sample_calls_write_components(monkeypatch, tmp_path):
         num_jets_per_output_file=10,
         file_tag="split",
         out_fname=tmp_path / "merged.h5",
+        split="train",
         git_hash="deadbeef",
         config={},
         resampling_method="countup",
