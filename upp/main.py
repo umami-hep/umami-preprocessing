@@ -5,8 +5,10 @@ By default all stages for the training split are run.
 To run with only specific stages enabled, include the flag for the required stages.
 To run without certain stages, include the corresponding negative flag.
 
-Note that all stages are required to run the pipeline. If you want to disable resampling,
-you need to set method: none in your config file.
+To disable resampling, omit the `resampling` block or set `method: none`. The jets passing
+the cuts are then written directly, capped at each component's `num_jets` (use `num_jets: -1`
+to keep all of them). The `--no-resample` flag only skips the resampling *stage* (e.g. to
+re-run later stages); it does not disable resampling.
 """
 
 from __future__ import annotations
@@ -235,7 +237,7 @@ def run_pp(args: argparse.Namespace) -> None:
                 verbose=True,
             )
 
-        if args.split == "train":
+        if args.split == "train" and not config.skip_resampling:
             create_histograms(
                 config=config,
                 component_to_run=args.component,

@@ -750,6 +750,11 @@ def plot_resampling_dists(config: PreprocessingConfig, stage: str) -> None:
         current split name for post-resampling region, full-range, and stitching
         plots.
     """
+    # Nothing to plot when no resampling variables are configured (e.g. resampling skipped)
+    if config.sampl_cfg is None or not config.sampl_cfg.vars:
+        log.info("No resampling variables configured - skipping resampling plots.")
+        return
+
     log.info("Plotting resampling variable distributions...")
     if stage == "initial":
         _plot_initial(config)

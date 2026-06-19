@@ -109,7 +109,8 @@ class Component:
             Name of the group in which the jets are stored, by default "jets"
         """
         dtypes = self.reader.dtypes(variables.combined())
-        shapes = self.reader.shapes(self.num_jets, variables.keys())
+        # num_jets == -1 ("write all") -> 0 leading dim so the writer grows dynamically
+        shapes = self.reader.shapes(max(self.num_jets, 0), variables.keys())
         self.writer = H5Writer(self.out_path, dtypes, shapes, jets_name=jets_name)
         log.debug(f"Setup component writer at: {self.out_path}")
 
@@ -212,6 +213,10 @@ class Component:
         ValueError
             If more jets are requsted than available
         """
+        # num_req < 0 means "use all available jets" - nothing to check
+        if num_req < 0:
+            return
+
         # Check if num_jets jets are aviailable after the cuts and sampling fraction
         num_est = (
             None if self.num_jets_estimate_available <= 0 else self.num_jets_estimate_available
@@ -364,8 +369,8 @@ class Components:
                 )
         components = cls(component_list)
 
-        # Check the flavour ratios
-        if config.sampl_cfg and config.sampl_cfg.method is not None:
+        # Check the flavour ratios (not meaningful when resampling is skipped)
+        if not config.skip_resampling:
             components.check_flavour_ratios()
 
         return components

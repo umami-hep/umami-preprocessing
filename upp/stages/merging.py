@@ -348,6 +348,7 @@ class Merging:
         self.writer.add_attr("dsids", str(components.dsids))
         self.writer.add_attr("config", json.dumps(self.config.config))
         self.writer.add_attr("upp_hash", self.config.git_hash)
+        self.writer.add_attr("resampling_method", self.config.resampling_method)
 
         # Log for debugging
         log.debug(f"Setup merge output at {self.writer.dst}")
@@ -503,6 +504,14 @@ class Merging:
         components : Components
             Components that are to be written
         """
+        # Resolve "write all" (num_jets < 0) to the actual number of jets on disk
+        for component in components:
+            if component.num_jets < 0:
+                component.setup_reader(
+                    self.batch_size, fname=component.out_path, jets_name=self.jets_name
+                )
+                component.num_jets = component.reader.num_jets
+
         # Prepare every Component's reader
         for component in components:
             batch_size = self.batch_size * component.num_jets // components.num_jets + 1
