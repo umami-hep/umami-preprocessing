@@ -133,20 +133,18 @@ class SplitContainers:
         add_flavour_label = flavour_label_list is not None
         # All variables for test file
         all_variables = get_all_datasets(input_file)
-        print("All variables: ", all_variables, flush=True)
         # Subset of variables for train/val files
         parsed_variables: dict[str, list[str]] | dict[str, None] = (
             parse_variables(variables) if variables is not None else all_variables
         )
-        # Ensure physicalWeight is requested for jets when using a column list (not None).
+        # Request physicalWeight only if present (added by --metadata), else reader raises.
         if isinstance(parsed_variables, dict):
             jets_cols = parsed_variables.get("jets")
             if isinstance(jets_cols, list) and "physicalWeight" not in jets_cols:
-                jets_cols.append("physicalWeight")
-                print("FORCE RE-INTEGRATED: Only physicalWeight into jets", flush=True)
-        # -----------------------
-
-        print("parsed variables: ", parsed_variables, flush=True)
+                with h5py.File(input_file, "r") as f:
+                    has_pw = "jets" in f and "physicalWeight" in (f["jets"].dtype.names or ())
+                if has_pw:
+                    jets_cols.append("physicalWeight")
         start = time.time()
         reader = H5Reader(input_file, batch_size=batch_size, shuffle=False)
         if output_name is None:
@@ -317,9 +315,7 @@ class SplitContainers:
             assert container is not None, "Can only specify files if a container is specified"
 
         for container, cuts_by_component in containers_with_split_cuts.items():
-            # Sanitize container name when used as a directory: avoid literal '*' or '/'
-            # in the split-components subdir, otherwise downstream H5Reader will treat the
-            # path as a glob pattern and create a shared VDS that collides across flavours.
+            # Sanitize '*' and '/' so the subdir isn't treated as a glob by H5Reader.
             container_dir_name = container.replace("*", "all").replace("/", "_") or "default"
             this_out_dir = (
                 Path(self.config.base_dir) / "split-components" / container_dir_name

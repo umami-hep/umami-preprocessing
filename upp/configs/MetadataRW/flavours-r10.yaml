@@ -1,5 +1,5 @@
-# flavour-r10.yaml
-# 已同步为 0-6 连续整数标签
+# Flavour definitions for the metadata/reweight workflow on centrally produced
+# large-R ntuples. Labels are contiguous integers 0-5.
 
 - name: djets
   category: jets

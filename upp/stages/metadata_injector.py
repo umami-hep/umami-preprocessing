@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import glob
+import math
 import shutil
 from pathlib import Path
 
@@ -30,6 +31,7 @@ class MetadataInjector:
             matched = glob.glob(f)
             expanded_files.extend(matched)
 
+        failures: list[tuple[str, str]] = []
         for fpath_str in expanded_files:
             fpath = Path(fpath_str)
             backup_path = fpath.with_suffix(fpath.suffix + ".bak")
@@ -54,6 +56,14 @@ class MetadataInjector:
                     sow = (
                         float(sow_ds["sumOfWeights"][0]) if sow_ds.dtype.names else float(sow_ds[0])
                     )
+
+                    # Guard against div-by-zero / non-finite metadata (silent inf/nan weights).
+                    if sow == 0 or not math.isfinite(sow):
+                        raise ValueError(f"Invalid sum-of-weights (sow={sow}) in {fpath_str}")
+                    if not all(math.isfinite(v) for v in (xs, eff, kf)):
+                        raise ValueError(
+                            f"Non-finite metadata in {fpath_str}: xs={xs}, eff={eff}, kfactor={kf}"
+                        )
 
                     # 3. Read original jets and their attributes
                     old_jets_ds = f["jets"]
@@ -95,3 +105,12 @@ class MetadataInjector:
                 if backup_path.exists():
                     self.log.warning(f"Restoring {fpath.name} from backup...")
                     shutil.move(backup_path, fpath)
+                failures.append((fpath_str, str(e)))
+
+        # Re-raise a summary so partial failures are not silently missed in a long run.
+        if failures:
+            summary = "\n".join(f"  - {path}: {err}" for path, err in failures)
+            raise RuntimeError(
+                f"Metadata injection failed for {len(failures)}/{len(expanded_files)} file(s):\n"
+                f"{summary}"
+            )

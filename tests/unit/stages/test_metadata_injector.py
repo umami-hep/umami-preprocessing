@@ -4,6 +4,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+import pytest
 
 import upp.stages.metadata_injector as mi
 
@@ -60,14 +61,34 @@ def test_metadata_injector_appends_physical_weight(tmp_path, monkeypatch):
 
 
 def test_metadata_injector_missing_mcEventWeight_recovers(tmp_path, monkeypatch):
-    """Exception path: missing mcEventWeight raises KeyError, backup is restored."""
+    """Exception path: missing mcEventWeight restores the backup and a summary is raised."""
     _stub_finder(monkeypatch)
-    # jets without mcEventWeight triggers line 65 then lines 93-97
+    # jets without mcEventWeight triggers the per-file failure + restore path
     fpath = _make_injector_file(tmp_path, [("someField", "f4")])
     backup_path = fpath.with_suffix(fpath.suffix + ".bak")
 
     injector = mi.MetadataInjector(_Cfg(fpath))
-    injector.run()  # exception caught internally, must not propagate
+    # The file is restored from backup, but failures are surfaced as a summary error.
+    with pytest.raises(RuntimeError, match="Metadata injection failed"):
+        injector.run()
+
+    assert fpath.exists()
+    assert not backup_path.exists()
+
+
+def test_metadata_injector_zero_sow_raises(tmp_path, monkeypatch):
+    """A zero sum-of-weights is rejected instead of producing inf/nan weights."""
+    _stub_finder(monkeypatch)
+    fpath = _make_injector_file(tmp_path, [("mcEventWeight", "f4")])
+    # Force the stored sum-of-weights to zero.
+    with h5py.File(fpath, "a") as f:
+        del f["cutBookkeeper/nominal/counts"]
+        f["cutBookkeeper/nominal"].create_dataset("counts", data=np.array([0.0], dtype="f8"))
+    backup_path = fpath.with_suffix(fpath.suffix + ".bak")
+
+    injector = mi.MetadataInjector(_Cfg(fpath))
+    with pytest.raises(RuntimeError, match="Metadata injection failed"):
+        injector.run()
 
     assert fpath.exists()
     assert not backup_path.exists()

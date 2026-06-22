@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Add `--metadata` stage (metadata injection + physicalWeight) and `global.keep_all_variables` full-ntuple passthrough for centrally produced inputs [#142](https://github.com/umami-hep/umami-preprocessing/pull/142)
 - Update atlas-ftag-tools and puma [#143](https://github.com/umami-hep/umami-preprocessing/pull/143)
 - Sync pre-commit hooks and fix Ruff lint failures [#138](https://github.com/umami-hep/umami-preprocessing/pull/138)
 - Update docs and CI validation for supported Python versions [#137](https://github.com/umami-hep/umami-preprocessing/pull/137)

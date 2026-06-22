@@ -11,7 +11,7 @@ global:
   num_jets_per_output_file: 1_000_000
   # test split: plot.py uses merged VDS path (glob) instead of per-sample pp_output_test_*.h5
   merge_test_samples: true
-  flavour_config: /eos/home-y/yuanda/dev/umami-preprocessing/upp/configs/flavours-r10.yaml
+  flavour_config: /eos/home-y/yuanda/dev/umami-preprocessing/upp/configs/MetadataRW/flavours-r10.yaml
 
 inputs:
   train:

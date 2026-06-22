@@ -145,8 +145,7 @@ class PreprocessingConfig:
     num_jets_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
-    # When true: keep all input top-level datasets (tracks, towers, …), not only the
-    # variables.yaml subset, through split-containers and rw-merge.
+    # Keep all top-level datasets (not just the variables.yaml subset) through split/rw-merge.
     keep_all_variables: bool = False
 
     def __post_init__(self):
@@ -204,11 +203,11 @@ class PreprocessingConfig:
             if selection := groups.get("selection", None):
                 selectors[name] = TrackSelector(Cuts.from_list(selection))
 
-        # configure variables (keep_all_variables is independent of train/val/test split)
+        # test split always keeps all variables; keep_all_variables also forces it for train/val.
         self.variables = VariableConfig(
             self.config["variables"],
             self.jets_name,
-            self.keep_all_variables,
+            self.keep_all_variables or self.is_test,
             selectors,
         )
         if self.sampl_cfg is not None:
