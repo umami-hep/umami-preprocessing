@@ -134,6 +134,7 @@ def create_meta_data(
         split: {
             flavour: H5Reader(
                 files_by_component[split][flavour],
+                jets_name=pp_config.jets_name,
             ).num_jets
             for flavour in files_by_component[split]
         }

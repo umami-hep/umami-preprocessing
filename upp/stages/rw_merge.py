@@ -39,7 +39,7 @@ class RWMerge:
 
         num_jets = sum(organised_components["num_jets"][self.config.split].values())
         self.attr_to_write = {
-            "jets": {
+            self.config.jets_name: {
                 "flavour_label": [f.name for f in self.config.components.flavours],
             },
             None: {
@@ -70,6 +70,7 @@ class RWMerge:
             "fname": all_files,
             "batch_size": batch_size,
             "shuffle": False,
+            "jets_name": self.config.jets_name,
         }
         output_dir = self.config.out_dir / self.config.split
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -82,7 +83,7 @@ class RWMerge:
 
         variables = self.config.variables.combined() if self.config.split != "test" else None
         if variables and "flavour_label" not in variables:
-            variables["jets"] += ["flavour_label"]
+            variables[self.config.jets_name] += ["flavour_label"]
         args_list = []
         for i, bi in enumerate(range(0, num_batches, batches_per_file)):
             args_list.append(
@@ -98,6 +99,7 @@ class RWMerge:
                     if (bi + batches_per_file) < num_batches
                     else (num_batches - bi),
                     self.attr_to_write,
+                    self.config.jets_name,
                 )
             )
         print("Running with ", self.rw_config.merge_num_proc, "processes")
@@ -206,6 +208,7 @@ class RWMerge:
         writer_id=0,
         limit_batches=False,
         attrs=None,
+        jets_name="jets",
     ):
         """Take a series of input files and merge them into a single final output file.
 
@@ -252,7 +255,8 @@ class RWMerge:
 
         for i, batch in enumerate(reader.stream(variables, skip_batches=skip_batches)):
             print(
-                f"Writer {writer_id} Combined batch {i} has {len(batch['jets'])} jets", flush=True
+                f"Writer {writer_id} Combined batch {i} has {len(batch[jets_name])} jets",
+                flush=True,
             )
             all_sample_weights = RWMerge.get_sample_weights(batch, weights)
             to_write = {}
@@ -263,7 +267,14 @@ class RWMerge:
                     to_write[key] = batch[key]
             if writer is None:
                 shapes = {k: (None,) + v.shape[1:] for k, v in to_write.items()}
-                writer = H5Writer(output_file, dtypes, shapes, shuffle=True, compression="gzip")
+                writer = H5Writer(
+                    output_file,
+                    dtypes,
+                    shapes,
+                    shuffle=True,
+                    compression="gzip",
+                    jets_name=jets_name,
+                )
                 for group, g_attrs in attrs.items():
                     for attr, value in g_attrs.items():
                         writer.add_attr(attr, value, group)
