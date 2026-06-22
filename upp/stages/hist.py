@@ -152,6 +152,9 @@ def create_histograms(
     """
     # Setup the logger and load the variables used for resampling
     setup_logger()
+    if config.skip_resampling:
+        log.info("Resampling is disabled - skipping histogram/PDF creation.")
+        return
     sampl_vars = config.sampl_cfg.vars
 
     title = " Writing PDFs "

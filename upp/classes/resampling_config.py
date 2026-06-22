@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 
 
 @dataclass
 class ResamplingConfig:
-    variables: dict
-    target: str
+    # variables/target are only needed for pdf/countup resampling; optional when skipping
+    variables: dict = field(default_factory=dict)
+    target: str | None = None
     sampling_fraction: float = 1.0
     method: str | None = None
     upscale_pdf: int | None = None

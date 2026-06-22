@@ -9,14 +9,22 @@ If this is your first visit, please start with our detailed [Developer Guideline
 ## Quick start
 
 1. **Fork** the repository and clone it locally.
-2. Create and activate a Python 3.11 virtual environment (or conda env).
-3. Install the package *plus* development extras:
+2. Set up an environment with a supported Python version (3.11–3.14). Using
+   [uv](https://docs.astral.sh/uv/) is recommended:
 
    ```bash
-   python -m pip install -e ".[dev]"
+   uv sync          # creates .venv and installs UPP + the dev dependency group
+   uv run pre-commit install
+   ```
+
+   Alternatively, with pip (>= 25.1) in your own virtual environment:
+
+   ```bash
+   python -m pip install -e .
+   python -m pip install --group dev
    pre-commit install
    ```
-4. Run the hook chain once to auto‑format and lint the existing code base:
+3. Run the hook chain once to auto‑format and lint the existing code base:
 
    ```bash
    pre-commit run --all-files
@@ -38,7 +46,7 @@ If this is your first visit, please start with our detailed [Developer Guideline
 
 ## Style & static checks
 
-* **Formatting:** [Black](https://black.readthedocs.io/)
+* **Formatting:** [Ruff](https://docs.astral.sh/ruff/) (`ruff-format`)
 * **Linting & simple refactors:** [Ruff](https://docs.astral.sh/ruff/)
 * **Type safety:** [mypy](https://mypy-lang.org/)
 * **Import order:** isort (via ruff)
@@ -68,6 +76,6 @@ When in doubt, open an issue and tag the @umami-preprocessing‑maintainers.
 
 ## License and certificate of origin
 
-umami-preprocessing is released under the MIT license. By submitting code you agree that it can be distributed under the same terms.
+umami-preprocessing is released under the Apache 2.0 license. By submitting code you agree that it can be distributed under the same terms.
 
 Happy coding — and may your $b$‑tagging be ever accurate! ✨

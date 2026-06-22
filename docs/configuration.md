@@ -1,7 +1,7 @@
 # Configuration
 
 The configuration of the preprocessing is done with a [`.yaml`](https://en.wikipedia.org/wiki/YAML) file which steers the whole preprocessing.
-Available example config files for UPP can be found in [`upp/configs`]({{repo_url}}tree/main/upp/configs).
+Available example config files for UPP can be found in [`upp/configs`](https://github.com/umami-hep/umami-preprocessing/tree/main/upp/configs).
 
 Each aspect of the configuration is described in detail below.
 
@@ -39,6 +39,11 @@ Below is an example and a table explaining each setting.
 |`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
 |`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
 |`equal_jets`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
+
+The virtual dataset files created from wildcard patterns are by default stored alongside the input ntuples.
+If you have no write access to the input ntuples directory and would like to collect all VDS files in an accessible directory instead, set `vds_dir` in the global config (see [Global Config](#global-config)).
+Each pattern gets its own VDS file named after its DSID directory (e.g. `vds_dir/user.wlai.601589.e8547_..._output_vds.h5`).
+
 
 
 ### Global Cuts
@@ -136,7 +141,7 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 | `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
 | `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
 | `flavours` | `list[str]` | One or more jet flavours, e.g. `[bjets]` or `[ujets]`. The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each flavour.|
-|`num_jets`|`int`| The number of jets to be sampled from this component in the training split|
+|`num_jets`|`int`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts.|
 |`num_jets_val`|`int`| **Optional** (default: `num_jets//10`) number of jets of this component in validation set.|
 |`num_jets_test`|`int`| **Optional** (default: `num_jets//10`) number of jets of this component in a test set.|
 
@@ -239,6 +244,38 @@ resampling:
 |`upscale_pdf`|`int`| **Optional** only available for `pdf` preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original|
 |`sampling_fraction`|`None`, `float` or `auto`| The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are preferred. On the other hand with smaller sampling fractions lead to longer preprocessing times. `auto` option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present. |
 |`variables`|`dict`| The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable please provide a `bins` setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut between **regions** takes place to better handle the discontinuities.|
+
+### Plotting
+
+Plot labels and styles can be configured under the optional `plotting:` key. Any omitted setting uses the default defined by the `PlottingConfig` dataclass (documented below). Variable-label keys are matched case-insensitively against the plotted variable name, so a single `pt` entry applies to variables such as `pt_btagJes`.
+
+```yaml
+plotting:
+  num_jets_plotting: 10_000_000
+  variable_labels:
+    pt: "Jet $p_\\mathrm{T}$ [GeV]"
+    eta: "Jet $|\\eta|$"
+    mass: "Jet Mass [GeV]"
+  sample_labels:
+    ttbar: "$t\\bar{t}"
+    zprime: "$Z'$"
+  atlas_first_tag: Simulation Internal
+  atlas_second_tag: "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$"
+  output_formats: [pdf, png]
+  bins: 50
+  y_scale: 1.5
+  figsize: [6, 4]
+  logy: true
+  linestyles: ["-", "--", "-.", ":"]
+  legend_location: upper right
+  linestyle_legend_location: upper center
+  linestyle_legend_anchor: [0.55, 1]
+  output_directory: plots
+```
+
+The `ylabel` setting supports a `{jets_name}` placeholder. Histogram normalisation and overflow handling can be controlled with `norm` and `underoverflow`.
+
+::: upp.classes.plotting_config.PlottingConfig
 
 ### Global Config 
 

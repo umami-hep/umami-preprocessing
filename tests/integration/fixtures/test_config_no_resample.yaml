@@ -15,85 +15,45 @@ global_cuts:
   test:
     - [pt_btagJes, ">", 0]
 
+
 lowpt: &lowpt
   name: lowpt
   cuts:
     - [pt, ">", 0]
     - [pt, "<", 250_000]
-highpt: &highpt
-  name: highpt
-  cuts:
-    - [pt, ">", 250_000]
-    - [pt, "<", 6_000_000]
 
+# No `resampling` block: resampling is skipped and the jets passing the cuts are
+# written directly, capped at num_jets (or all of them when num_jets is -1).
 components:
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [bjets]
-    num_jets: 12_000
+    num_jets: 1_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [cjets]
-    num_jets: 12_000
+    num_jets: 1_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ujets]
-    num_jets: 12_000
-
-  - region:
-      <<: *highpt
-    sample:
-      <<: *zprime
-    flavours: [bjets]
-    num_jets: 6_000
-
-  - region:
-      <<: *highpt
-    sample:
-      <<: *zprime
-    flavours: [cjets]
-    num_jets: 6_000
-
-  - region:
-      <<: *highpt
-    sample:
-      <<: *zprime
-    flavours: [ujets]
-    num_jets: 6_000
-
-resampling:
-  target: cjets
-  method: pdf
-  sampling_fraction: "auto"
-  variables:
-    pt:
-      bins: [[0, 250000, 5], [250000, 6000000, 5]]
-    abs_eta:
-      bins: [[0, 2.5, 5]]
+    num_jets: -1
 
 global:
   batch_size: 10_000
-  num_jets_estimate: 5000
+  num_jets_estimate: 5_000
+  num_jets_estimate_norm: 100
   num_jets_estimate_available: -1
   base_dir: tmp/upp-tests/integration/temp_workspace/
   out_dir: test_out
   ntuple_dir: ntuples
-
-plotting:
-  num_jets_plotting: 100
-  variable_labels:
-    pt: "$p_\\mathrm{T}$ [GeV]"
-  sample_labels:
-    ttbar: "$t\\bar{t}$"
-  output_formats: [png]
 
 variables:
   jets:

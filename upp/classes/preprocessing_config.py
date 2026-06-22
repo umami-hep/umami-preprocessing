@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import logging as log
+import subprocess
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,7 @@ from yamlinclude import YamlIncludeConstructor
 
 from upp import __version__
 from upp.classes.components import Components
+from upp.classes.plotting_config import PlottingConfig
 from upp.classes.resampling_config import ResamplingConfig
 from upp.classes.reweight_config import ReweightConfig
 from upp.classes.variable_config import VariableConfig
@@ -122,6 +124,9 @@ class PreprocessingConfig:
     keep_all_variables : bool, optional
         When true: split-containers and rw-merge keep full jets fields and all top-level
         HDF5 datasets (PW and RW columns still added on jets).
+    vds_dir : Path | None, optional
+        Directory name for creation of virtual datasets. By default None
+        If none is given, virtual datasets is created next to input ntuples
     """
 
     config_path: Path
@@ -147,6 +152,7 @@ class PreprocessingConfig:
     skip_config_copy: bool = False
     # Keep all top-level datasets (not just the variables.yaml subset) through split/rw-merge.
     keep_all_variables: bool = False
+    vds_dir: Path | None = None
 
     def __post_init__(self):
         # postprocess paths
@@ -163,6 +169,9 @@ class PreprocessingConfig:
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":
                 setattr(self, field.name, self.get_path(Path(getattr(self, field.name))))
+        # vds_dir is optional (Path | None), so the loop above skips it; resolve it here
+        if self.vds_dir is not None:
+            self.vds_dir = self.get_path(Path(self.vds_dir))
         if not self.ntuple_dir.exists() and not self.skip_checks:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
@@ -210,7 +219,7 @@ class PreprocessingConfig:
             self.keep_all_variables or self.is_test,
             selectors,
         )
-        if self.sampl_cfg is not None:
+        if self.sampl_cfg is not None and self.sampl_cfg.variables:
             self.variables = self.variables.add_jet_vars(
                 list(self.config["resampling"]["variables"].keys()), "labels"
             )
@@ -225,8 +234,19 @@ class PreprocessingConfig:
             if "reweighting" in self.config
             else None
         )
+        self.plotting = PlottingConfig(**self.config.get("plotting", {}))
+        if self.plotting.num_jets_plotting is None:
+            self.plotting.num_jets_plotting = self.num_jets_estimate_plotting
+
         # reproducibility
-        self.git_hash = get_git_hash(Path(__file__).parent)
+        try:
+            self.git_hash = get_git_hash(Path(__file__).parent)
+        except (OSError, subprocess.CalledProcessError):
+            log.warning(
+                "Could not determine the git hash (is git installed and on PATH?); "
+                "using the UPP version for reproducibility metadata instead."
+            )
+            self.git_hash = None
         if self.git_hash is None:
             self.git_hash = __version__
         self.config["upp_hash"] = self.git_hash
@@ -263,12 +283,36 @@ class PreprocessingConfig:
     def is_test(self):
         return self.split == "test"
 
+    @property
+    def skip_resampling(self) -> bool:
+        """Return whether resampling is disabled (no block, or method none).
+
+        Returns
+        -------
+        bool
+            ``True`` if resampling should be skipped.
+        """
+        return self.sampl_cfg is None or self.sampl_cfg.method in (None, "none")
+
+    @property
+    def resampling_method(self) -> str:
+        """Resampling method recorded in the output metadata ("none" if skipped).
+
+        Returns
+        -------
+        str
+            The resampling method (e.g. ``"pdf"``/``"countup"``), or ``"none"``.
+        """
+        if self.skip_resampling:
+            return "none"
+        return self.sampl_cfg.method
+
     @functools.cached_property
     def global_cuts(self):
         cuts_list = self.config["global_cuts"].get("common", [])
         cuts_list += self.config["global_cuts"][self.split]
         if not self.is_test and self.config.get("resampling", None) is not None:
-            for resampling_var, cfg in self.config["resampling"]["variables"].items():
+            for resampling_var, cfg in self.config["resampling"].get("variables", {}).items():
                 cuts_list.append([resampling_var, ">", cfg["bins"][0][0]])
                 cuts_list.append([resampling_var, "<", cfg["bins"][-1][1]])
         return Cuts.from_list(cuts_list)

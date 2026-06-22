@@ -13,13 +13,21 @@ Remember to keep you fork [up to date](https://about.gitlab.com/blog/2016/12/01/
 
 It's good practice to document your code with module and function docstrings, and inline comments.
 Consider also providing type hints for the function in/outputs.
-It's also recommended to use [black](https://github.com/psf/black) to format your contributions.
-You can take a look at the [umami docs](https://umami-docs.web.cern.ch/setup/development/) for more guidelines on code style.
+Code formatting and linting is handled by [Ruff](https://docs.astral.sh/ruff/) (both the
+linter and the `ruff-format` formatter), with [mypy](https://mypy-lang.org/) for type
+checks. All of these run automatically through the project's pre-commit hooks, so you
+don't need to invoke them by hand.
 
-For the formatting in this project use pre-commit hooks:
+To format and lint your contribution, run the pre-commit hooks:
 
 ```bash
 pre-commit run --all-files
+```
+
+You can also install the hooks so they run automatically on every commit:
+
+```bash
+pre-commit install
 ```
 
 ### Testing
@@ -27,7 +35,7 @@ pre-commit run --all-files
 It is highly encouraged to adhere to provide unit and/or integration tests for every new added feature.
 You can test your code and check the coverage using.
 ```bash
-coverage run --source ftag -m pytest --show-capture=stdout
-coverage report 
+coverage run --source upp -m pytest --show-capture=stdout
+coverage report
 ```
 You may also find the [codecov](https://about.codecov.io/) tool helpful

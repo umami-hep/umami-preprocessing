@@ -1,8 +1,12 @@
-FROM python:3.11.10-bullseye
+FROM python:3.14-trixie
 
-RUN apt update && apt install -y vim nano
+WORKDIR /workspace
 
-# copy and install package
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git nano vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# copy and install package together with the dev dependency group (PEP 735)
 COPY . .
-RUN python -m pip install -e .[dev]
-
+RUN python -m pip install --no-cache-dir -e . \
+    && python -m pip install --no-cache-dir --group dev

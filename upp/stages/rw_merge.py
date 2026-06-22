@@ -49,6 +49,7 @@ class RWMerge:
                 "dsids": str(self.config.components.dsids),
                 "config": json.dumps(self.config.config),
                 "upp_hash": self.config.git_hash,
+                "resampling_method": "reweighting",
             },
         }
 
