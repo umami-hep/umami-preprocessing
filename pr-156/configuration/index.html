@@ -1121,7 +1121,7 @@ Note you will still need to run the resampling stage of the preprocessing pipeli
 </span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">  </span><span class="nt">linestyle_legend_anchor</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.55</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
 </span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">  </span><span class="nt">output_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">plots</span>
 </span></code></pre></div>
-<p>The <code>ylabel</code> setting supports a <code>{jets_name}</code> placeholder. Histogram normalisation and overflow handling can be controlled with <code>norm</code> and <code>underoverflow</code>.</p>
+<p>The <code>ylabel</code> setting supports a <code>{global_name}</code> placeholder. Histogram normalisation and overflow handling can be controlled with <code>norm</code> and <code>underoverflow</code>.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -1201,8 +1201,8 @@ default ttbar and zprime labels.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Label for the y-axis. The <code>{jets_name}</code> placeholder is replaced with the
-configured jet dataset name. By default "Normalised Number of {jets_name}".</p>
+                <p>Label for the y-axis. The <code>{global_name}</code> placeholder is replaced with the
+configured global object name. By default "Normalised Number of {global_name}".</p>
               </div>
             </td>
           </tr>
@@ -1431,7 +1431,7 @@ under the <code>global:</code> key. They are passed as kwargs to PreprocessingCo
 The config file is also copied to the output directory.</p>
 <p>For example:
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">global</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">jets_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">global_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_000_000</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5_000_000</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">base_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my/stuff/</span>
@@ -1633,13 +1633,14 @@ Is equal to num_jets_estimate by default.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.jets_name">jets_name</span></code></td>
+            <td><code><span title="upp.classes.preprocessing_config.PreprocessingConfig.global_name">global_name</span></code></td>
             <td>
                   <code>(<span title="str">str</span>, <span title="optional">optional</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the jets dataset in the input file. By default "jets".</p>
+                <p>Name of the global (per-object) dataset in the input file, e.g. the jets.
+By default "jets".</p>
               </div>
             </td>
           </tr>
