@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import glob
 import logging as log
 import re
 from dataclasses import dataclass
@@ -7,6 +8,8 @@ from itertools import pairwise
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import h5py
+import numpy as np
 from ftag import Cuts
 from ftag.hdf5 import H5Reader
 from puma import Histogram, HistogramPlot
@@ -418,6 +421,62 @@ def _stitching_regions(regions: list[PlotRegion], pt_variable: str | None) -> li
     return stitching_regions
 
 
+def _available_jet_fields(config: PreprocessingConfig, in_paths: Any) -> set[str]:
+    """Return the jet field names present in the first matching input file.
+
+    Parameters
+    ----------
+    config : PreprocessingConfig
+        Active preprocessing configuration.
+    in_paths : Any
+        Input HDF5 file path, glob, or list of paths.
+
+    Returns
+    -------
+    set[str]
+        Jet dtype field names of the first existing file, or an empty set.
+    """
+    paths = in_paths if isinstance(in_paths, list) else [in_paths]
+    for pattern in paths:
+        for fpath in sorted(glob.glob(str(pattern))):
+            with h5py.File(fpath, "r") as f:
+                if config.jets_name in f:
+                    return set(f[config.jets_name].dtype.names or ())
+    return set()
+
+
+def _reweight_weight_fields(config: PreprocessingConfig, available: set[str]) -> list[str]:
+    """Return per-jet weight columns to apply on the reweight route.
+
+    Combines ``physicalWeight`` (physics weight from --metadata) with the
+    reweight columns written by --rw-merge. Only columns present in ``available``
+    are returned, so the default resampling route (which has neither) stays
+    unweighted.
+
+    Parameters
+    ----------
+    config : PreprocessingConfig
+        Active preprocessing configuration.
+    available : set[str]
+        Jet field names present in the input being plotted.
+
+    Returns
+    -------
+    list[str]
+        Weight column names to multiply together when histogramming.
+    """
+    fields = []
+    if "physicalWeight" in available:
+        fields.append("physicalWeight")
+    rw_config = getattr(config, "rw_config", None)
+    if rw_config is not None:
+        for rw in rw_config.reweights:
+            name = repr(rw)
+            if name in available:
+                fields.append(name)
+    return fields
+
+
 def _load_jets(config: PreprocessingConfig, in_paths: Any, vars_to_load: list[str]) -> Any:
     """Load jet variables for plotting.
 
@@ -461,6 +520,7 @@ def make_hist(
     selection_cuts: Cuts | None = None,
     atlas_second_tag: str | None = None,
     plotting: PlottingConfig | None = None,
+    weight_fields: list[str] | None = None,
 ) -> None:
     """Make a flavour-split histogram for one variable.
 
@@ -502,8 +562,14 @@ def make_hist(
         centre-of-mass energy label is shown.
     plotting : PlottingConfig | None, optional
         Plot labels and style settings. If ``None``, use the defaults.
+    weight_fields : list[str] | None, optional
+        Jet weight columns multiplied per jet on the reweight route (e.g.
+        ``physicalWeight`` and the rw-merge weight column). ``physicalWeight`` is
+        capped at ``WEIGHT_CAP`` to match the reweight histograms. If ``None`` or
+        empty, histograms are unweighted (default resampling behaviour).
     """
     from upp.classes.plotting_config import PlottingConfig
+    from upp.stages.reweight import WEIGHT_CAP
 
     selection_cuts = selection_cuts or Cuts.empty()
     plotting = plotting or PlottingConfig()
@@ -541,9 +607,20 @@ def make_hist(
             selected_values = cuts(values).values
             histo_values = _display_values(variable, selected_values[variable])
 
+            # Reweight route: weight per jet by capped physicalWeight x rw-merge columns.
+            histo_weights = None
+            if weight_fields:
+                histo_weights = np.ones(len(selected_values), dtype=np.float64)
+                for field in weight_fields:
+                    column = selected_values[field].astype(np.float64)
+                    if field == "physicalWeight":
+                        column = np.clip(column, 0.0, WEIGHT_CAP)
+                    histo_weights *= column
+
             # Get the histogram object
             histo = Histogram(
                 values=histo_values,
+                weights=histo_weights,
                 bins=plotting.bins,
                 bins_range=bins_range,
                 norm=plotting.norm,
@@ -600,8 +677,12 @@ def _plot_initial(config: PreprocessingConfig) -> None:
             for flavour in config.components.flavours:
                 vars_to_load += flavour.cuts.variables
 
+            in_paths = list(sample.path)
+            weight_fields = _reweight_weight_fields(config, _available_jet_fields(config, in_paths))
+            vars_to_load += weight_fields
+            stage_status = "Pre Reweighting" if weight_fields else "Pre Resampling"
             values_dict = {
-                sample.name: _load_jets(config, list(sample.path), vars_to_load),
+                sample.name: _load_jets(config, in_paths, vars_to_load),
             }
             pt_range = _pt_bounds_from_cuts(selection_cuts, pt_var) if pt_var else None
 
@@ -627,10 +708,11 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                         num_jets=_plotting_num_jets(config, region_components.num_jets)
                         if config.plotting.show_num_jets
                         else None,
-                        resampling_status="Pre Resampling",
+                        resampling_status=stage_status,
                     ),
                     plotting=config.plotting,
                     out_dir=config.out_dir / config.plotting.output_directory,
+                    weight_fields=weight_fields,
                 )
 
 
@@ -680,6 +762,9 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
     if full_region := _full_region(base_regions, pt_var):
         plot_regions.append(full_region)
 
+    in_paths = _post_resampling_paths(config, stage)
+    weight_fields = _reweight_weight_fields(config, _available_jet_fields(config, in_paths))
+
     sample_names = [sample.name for sample in config.components.samples]
     atlas_second_tag = _atlas_second_tag(
         *sample_names,
@@ -687,15 +772,16 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
         num_jets=_plotting_num_jets(config, config.components.num_jets)
         if config.plotting.show_num_jets
         else None,
-        resampling_status="Post Resampling",
+        resampling_status="Post Reweighting" if weight_fields else "Post Resampling",
     )
 
     vars_to_load = list(config.sampl_cfg.vars) + ["flavour_label"]
     for region in plot_regions:
         vars_to_load += region.cuts.variables
 
+    vars_to_load += weight_fields
     values_dict = {
-        "": _load_jets(config, _post_resampling_paths(config, stage), vars_to_load),
+        "": _load_jets(config, in_paths, vars_to_load),
     }
 
     for variable in config.sampl_cfg.vars:
@@ -718,6 +804,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                 atlas_second_tag=atlas_second_tag,
                 plotting=config.plotting,
                 out_dir=config.out_dir / config.plotting.output_directory,
+                weight_fields=weight_fields,
             )
 
         if _is_pt_variable(variable):
@@ -735,6 +822,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                     atlas_second_tag=atlas_second_tag,
                     plotting=config.plotting,
                     out_dir=config.out_dir / config.plotting.output_directory,
+                    weight_fields=weight_fields,
                 )
 
 

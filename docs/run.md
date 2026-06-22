@@ -157,6 +157,8 @@ preprocess --config upp/configs/MetadataRW/metadata.yaml --metadata
 
 The downstream reweighting stage automatically uses the `physicalWeight` column when present, and otherwise falls back to uniform weights.
 
+On this route the plotting stage (`--plot`) also detects `physicalWeight` and the rw-merge weight columns and weights its histograms by their product (`physicalWeight` is capped at the reweight `WEIGHT_CAP` for consistency with the reweight histograms). When neither column is present (the default resampling route) plots remain unweighted.
+
 #### Full-ntuple passthrough (`global.keep_all_variables`)
 
 By default the split and rw-merge outputs only keep the variables declared in your `variables` config. Set `keep_all_variables: true` under `global` to instead preserve **all** top-level HDF5 datasets (e.g. `tracks`, `towers`, `flow`) and full `jets` fields in the train/val/test outputs, while still appending the reweight columns on `jets`:

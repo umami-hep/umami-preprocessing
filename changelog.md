@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Add `--metadata` stage (metadata injection + physicalWeight) and `global.keep_all_variables` full-ntuple passthrough for centrally produced inputs [#142](https://github.com/umami-hep/umami-preprocessing/pull/142)
+- Add `--metadata` stage (metadata injection + physicalWeight) and `global.keep_all_variables` full-ntuple passthrough for centrally produced inputs; `--plot` weights distributions by `physicalWeight` (capped) × reweight columns when present so plots reflect the reweight route [#142](https://github.com/umami-hep/umami-preprocessing/pull/142)
 ### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
 
 - Make skip-resampling work end-to-end; support `num_jets: -1` to write all jets passing cuts, and record the resampling method in the output metadata [#153](https://github.com/umami-hep/umami-preprocessing/pull/153)
