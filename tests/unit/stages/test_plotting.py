@@ -38,19 +38,19 @@ class TestClass:
             "test": H5Reader(
                 fname=self.fname1,
                 batch_size=self.config.batch_size,
-                jets_name=self.config.jets_name,
+                jets_name=self.config.global_name,
                 shuffle=False,
                 equal_jets=True,
             ).load(
                 {
-                    self.config.jets_name: [
+                    self.config.global_name: [
                         "pt",
                         "abs_eta",
                         "mass",
                         "HadronConeExclTruthLabelID",
                     ]
                 }
-            )[self.config.jets_name]
+            )[self.config.global_name]
         }
         print(f"setup_method, method: {method.__name__}")
 
@@ -241,7 +241,7 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
             bins={"pt": [[20_000, 250_000, 5]]},
         ),
         components=FakeComponents(),
-        jets_name="jets",
+        global_name="jets",
         batch_size=100,
         out_dir=tmp_path,
     )

@@ -48,7 +48,7 @@ class Reweight:
             f: H5Reader(
                 files_by_flavour[f],
                 batch_size=self.config.batch_size,
-                jets_name=self.config.jets_name,
+                jets_name=self.config.global_name,
             )
             for f in files_by_flavour
         }
@@ -117,8 +117,8 @@ class Reweight:
             all_vars[rw_group].extend(rw.reweight_vars)
             if "valid" in existing_vars[rw_group]:
                 all_vars[rw_group] += ["valid"]
-        if self.config.jets_name not in all_vars:
-            all_vars[self.config.jets_name] = ["pt"]
+        if self.config.global_name not in all_vars:
+            all_vars[self.config.global_name] = ["pt"]
         all_vars = {k: list(set(v)) for k, v in all_vars.items()}
         num_in_hists = {}
         all_histograms = {}

@@ -130,7 +130,7 @@ class SplitContainers:
     ):
         if isinstance(input_file, str):
             input_file = Path(input_file)
-        jets_name = self.config.jets_name
+        global_name = self.config.global_name
         add_flavour_label = flavour_label_list is not None
         # All variables for test file
         all_variables = get_all_datasets(input_file)
@@ -142,7 +142,7 @@ class SplitContainers:
         print("parsed variables: ", parsed_variables, flush=True)
         start = time.time()
         reader = H5Reader(
-            input_file, batch_size=batch_size, shuffle=False, jets_name=self.config.jets_name
+            input_file, batch_size=batch_size, shuffle=False, jets_name=self.config.global_name
         )
         if output_name is None:
             output_name = input_file.name
@@ -176,7 +176,7 @@ class SplitContainers:
                 variables=all_variables if "test" in split else parsed_variables,
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
-                jets_name=jets_name,
+                jets_name=global_name,
             )
             cuts_by_sample_components[split] = component_cuts
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
@@ -202,28 +202,29 @@ class SplitContainers:
             for sample_component in sample_components:
                 writer = writers_by_sample_components[sample_component]
                 cuts = cuts_by_sample_components[sample_component]
-                sel_idx = cuts(batch[jets_name]).idx
+                sel_idx = cuts(batch[global_name]).idx
                 sel_batch = {k: v[sel_idx] for k, v in batch.items()}
                 if add_flavour_label:
                     this_flavour_label = flavour_label_by_component[sample_component]
                     tfl_arr = (
-                        np.ones(sel_batch[jets_name].shape[0], dtype=np.int32) * this_flavour_label
+                        np.ones(sel_batch[global_name].shape[0], dtype=np.int32)
+                        * this_flavour_label
                     )
 
                     # I think this is only going to happen during tests, as the mock file has
                     # flavour_label in, but we wont
-                    if "flavour_label" in sel_batch[jets_name].dtype.names:
+                    if "flavour_label" in sel_batch[global_name].dtype.names:
                         if i == 0:
                             print(
                                 f"Warning: {sample_component} already has a flavour label. "
                                 "We will overwrite it now.",
                                 flush=True,
                             )
-                        sel_batch[jets_name]["flavour_label"] = tfl_arr
+                        sel_batch[global_name]["flavour_label"] = tfl_arr
                     else:
                         # Get the
-                        sel_batch[jets_name] = rfn.append_fields(
-                            sel_batch[jets_name],
+                        sel_batch[global_name] = rfn.append_fields(
+                            sel_batch[global_name],
                             "flavour_label",
                             tfl_arr,
                             usemask=False,
@@ -283,7 +284,7 @@ class SplitContainers:
             create_virtual_file(str(tmp_dir / "*.h5"), tmp_out_path, overwrite=True)
             h5vds = H5Reader(
                 tmp_out_path,
-                jets_name=self.config.jets_name,
+                jets_name=self.config.global_name,
             )
             print(
                 f"Created combined virtual dataset with {h5vds.num_jets} jets at {tmp_out_path}",
@@ -374,7 +375,7 @@ class SplitContainers:
 
         num_jets = {
             split: {
-                flavour: H5Reader(files[split][flavour], jets_name=self.config.jets_name).num_jets
+                flavour: H5Reader(files[split][flavour], jets_name=self.config.global_name).num_jets
                 for flavour in files[split]
             }
             for split in files

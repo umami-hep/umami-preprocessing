@@ -65,7 +65,7 @@ components:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: jets
+  global_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 25_000_000
   num_jets_per_output_file: 25_000_000

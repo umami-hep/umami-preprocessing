@@ -72,7 +72,7 @@ resampling:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: jets
+  global_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 2_000_000
   base_dir: /unix/atlastracking/samples/gn3v00/dr/

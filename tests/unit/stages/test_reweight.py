@@ -39,7 +39,7 @@ def _make_reweight_obj(tmpdir, jets_per_flavour, num_jets_estimate, batch_size=1
     config = MagicMock()
     config.batch_size = batch_size
     config.base_dir = str(tmpdir)
-    config.jets_name = "jets"
+    config.global_name = "jets"
 
     rw_config = SimpleNamespace(num_jets_estimate=num_jets_estimate, reweights=[])
 

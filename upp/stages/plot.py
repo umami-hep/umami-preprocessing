@@ -438,14 +438,14 @@ def _load_jets(config: PreprocessingConfig, in_paths: Any, vars_to_load: list[st
     return H5Reader(
         fname=in_paths,
         batch_size=config.batch_size,
-        jets_name=config.jets_name,
+        jets_name=config.global_name,
         shuffle=False,
         equal_jets=True,
         vds_dir=config.vds_dir,
     ).load(
-        {config.jets_name: list(dict.fromkeys(vars_to_load))},
+        {config.global_name: list(dict.fromkeys(vars_to_load))},
         num_jets=config.plotting.num_jets_plotting,
-    )[config.jets_name]
+    )[config.global_name]
 
 
 def make_hist(
@@ -454,7 +454,7 @@ def make_hist(
     flavours: list,
     variable: str,
     out_dir: Path,
-    jets_name: str = "jets",
+    global_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
     out_format_list: tuple[str, ...] | list[str] | None = None,
@@ -484,7 +484,7 @@ def make_hist(
         Variable that is to be histogrammed and plotted.
     out_dir : Path
         Output directory to which the plots are written.
-    jets_name: str, optional
+    global_name: str, optional
         Name of the jet dataset / the global objects
         by default "jets"
     bins_range : tuple | None, optional
@@ -510,7 +510,7 @@ def make_hist(
 
     # Setup the histogram
     plot = HistogramPlot(
-        ylabel=plotting.ylabel.replace("{jets_name}", jets_name),
+        ylabel=plotting.ylabel.replace("{global_name}", global_name),
         xlabel=plotting.variable_label(variable),
         y_scale=plotting.y_scale,
         figsize=plotting.figsize,
@@ -615,7 +615,7 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                 make_hist(
                     stage="initial",
                     values_dict=values_dict,
-                    jets_name=config.jets_name,
+                    global_name=config.global_name,
                     flavours=region_components.flavours,
                     variable=variable,
                     bins_range=bins_range,
@@ -709,7 +709,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
             make_hist(
                 stage=stage,
                 values_dict=values_dict,
-                jets_name=config.jets_name,
+                global_name=config.global_name,
                 flavours=config.components.flavours,
                 variable=variable,
                 bins_range=bins_range,
@@ -726,7 +726,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                 make_hist(
                     stage=stage,
                     values_dict=values_dict,
-                    jets_name=config.jets_name,
+                    global_name=config.global_name,
                     flavours=config.components.flavours,
                     variable=variable,
                     bins_range=_display_range(variable, stitching_region.pt_range),

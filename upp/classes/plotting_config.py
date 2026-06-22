@@ -39,8 +39,8 @@ class PlottingConfig:
         Display labels for input samples. User-provided labels are merged with the
         default ttbar and zprime labels.
     ylabel : str, optional
-        Label for the y-axis. The `{jets_name}` placeholder is replaced with the
-        configured jet dataset name. By default "Normalised Number of {jets_name}".
+        Label for the y-axis. The `{global_name}` placeholder is replaced with the
+        configured global object name. By default "Normalised Number of {global_name}".
     atlas_first_tag : str, optional
         First ATLAS plot label. By default "Simulation Internal".
     atlas_second_tag : str, optional
@@ -79,7 +79,7 @@ class PlottingConfig:
     num_jets_plotting: int | None = None
     variable_labels: dict[str, str] = field(default_factory=_default_variable_labels)
     sample_labels: dict[str, str] = field(default_factory=_default_sample_labels)
-    ylabel: str = "Normalised Number of {jets_name}"
+    ylabel: str = "Normalised Number of {global_name}"
     atlas_first_tag: str = "Simulation Internal"
     atlas_second_tag: str = "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$"
     show_num_jets: bool = True

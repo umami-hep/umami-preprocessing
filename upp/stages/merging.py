@@ -26,7 +26,7 @@ class Merging:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.jets_name = config.jets_name
+        self.global_name = config.global_name
         self.rng = np.random.default_rng(42)
         self.flavours = self.components.flavours
         self.num_jets_per_output_file = config.num_jets_per_output_file
@@ -167,14 +167,14 @@ class Merging:
                 expected_names = list(self.base_shapes.keys())
 
                 # Tolerate missing optional groups, but require the jet dataset at least
-                if self.jets_name not in f:
-                    log.warning(f"Missing dataset '{self.jets_name}' in {fname}")
+                if self.global_name not in f:
+                    log.warning(f"Missing dataset '{self.global_name}' in {fname}")
                     return False
 
-                # Determine observed length from anchor (jets_name) or first dataset
-                anchor = self.jets_name if self.jets_name in f else expected_names[0]
+                # Determine observed length from anchor (global_name) or first dataset
+                anchor = self.global_name if self.global_name in f else expected_names[0]
                 if anchor not in f:
-                    # if jets_name wasn't found, try any expected dataset that exists
+                    # if global_name wasn't found, try any expected dataset that exists
                     for nm in expected_names:
                         if nm in f:
                             anchor = nm
@@ -332,8 +332,8 @@ class Merging:
             fname,
             self.dtypes,
             shapes,
-            add_flavour_label=self.jets_name,
-            jets_name=self.jets_name,
+            add_flavour_label=self.global_name,
+            jets_name=self.global_name,
             num_jets=jets_in_file,
         )
 
@@ -341,7 +341,7 @@ class Merging:
         self.writer.add_attr(
             "flavour_label",
             [f.name for f in self.flavours],
-            self.jets_name,
+            self.global_name,
         )
         self.writer.add_attr("unique_jets", components.unique_jets)
         self.writer.add_attr("jet_counts", json.dumps(components.jet_counts))
@@ -385,8 +385,8 @@ class Merging:
                 try:
                     # shallow copy because we will add a field
                     batch = copy(next(component.stream))
-                    batch[self.jets_name] = self.add_jet_flavour_label(
-                        jets=batch[self.jets_name], component=component
+                    batch[self.global_name] = self.add_jet_flavour_label(
+                        jets=batch[self.global_name], component=component
                     )
                 except StopIteration:
                     component.complete = True
@@ -407,14 +407,14 @@ class Merging:
 
         # Apply track selections
         for name in self.variables.variables:
-            if name == self.jets_name:
+            if name == self.global_name:
                 continue
             if selector := self.variables.selectors.get(name):
                 merged[name] = selector(merged[name])
 
         # Get the total length of jets from the batch and how much
         # capacity is left in the file
-        merged_len = len(merged[self.jets_name])
+        merged_len = len(merged[self.global_name])
         capacity_left = self.writer.num_jets - self.writer.num_written
 
         if self._fast_forwarding:
@@ -508,7 +508,7 @@ class Merging:
         for component in components:
             if component.num_jets < 0:
                 component.setup_reader(
-                    self.batch_size, fname=component.out_path, jets_name=self.jets_name
+                    self.batch_size, fname=component.out_path, global_name=self.global_name
                 )
                 component.num_jets = component.reader.num_jets
 
@@ -518,7 +518,7 @@ class Merging:
             component.setup_reader(
                 batch_size,
                 fname=component.out_path,
-                jets_name=self.jets_name,
+                global_name=self.global_name,
             )
             component.stream = component.reader.stream(
                 self.variables.combined(),

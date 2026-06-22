@@ -165,7 +165,7 @@ def create_histograms(
             continue
 
         log.info(f"Estimating {component} PDF using {config.num_jets_estimate_hist:,} samples...")
-        component.setup_reader(batch_size=config.batch_size, jets_name=config.jets_name)
+        component.setup_reader(batch_size=config.batch_size, global_name=config.global_name)
         cuts_no_split = component.cuts.ignore(["eventNumber"])
 
         ###

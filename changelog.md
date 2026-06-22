@@ -2,7 +2,8 @@
 
 ### [Latest]
 
-- Honour the configured `jets_name` in the split, reweighting and merge stages so preprocessing works with object groups not named "jets" [#156](https://github.com/umami-hep/umami-preprocessing/pull/156)
+- Honour the configured global object name in the split, reweighting and merge stages so preprocessing works with object groups not named "jets" [#156](https://github.com/umami-hep/umami-preprocessing/pull/156)
+- Rename the `jets_name` config option to `global_name` to generalise the framework beyond jets (breaking: update existing configs) [#156](https://github.com/umami-hep/umami-preprocessing/pull/156)
 
 ### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
 

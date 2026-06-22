@@ -273,7 +273,7 @@ plotting:
   output_directory: plots
 ```
 
-The `ylabel` setting supports a `{jets_name}` placeholder. Histogram normalisation and overflow handling can be controlled with `norm` and `underoverflow`.
+The `ylabel` setting supports a `{global_name}` placeholder. Histogram normalisation and overflow handling can be controlled with `norm` and `underoverflow`.
 
 ::: upp.classes.plotting_config.PlottingConfig
 

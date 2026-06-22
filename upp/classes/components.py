@@ -66,7 +66,7 @@ class Component:
     def setup_reader(
         self,
         batch_size: int,
-        jets_name: str = "jets",
+        global_name: str = "jets",
         fname: Path | str | list[Path | str] | None = None,
         **kwargs,
     ) -> None:
@@ -76,7 +76,7 @@ class Component:
         ----------
         batch_size : int
             Batch size that is used for loading from file
-        jets_name : str, optional
+        global_name : str, optional
             Name of the group in which the jets are stored, by default "jets"
         fname : Path | str | list[Path | str] | None, optional
             Filename of the file(s) from which the jets are loaded, by default None
@@ -92,26 +92,26 @@ class Component:
         self.reader = H5Reader(
             fname=fname,
             batch_size=batch_size,
-            jets_name=jets_name,
+            jets_name=global_name,
             equal_jets=self.equal_jets,
             **kwargs,
         )
         log.debug(f"Setup component reader at: {fname}")
 
-    def setup_writer(self, variables: VariableConfig, jets_name: str = "jets") -> None:
+    def setup_writer(self, variables: VariableConfig, global_name: str = "jets") -> None:
         """Set up the writer of the jets to file.
 
         Parameters
         ----------
         variables : VariableConfig
             Instance of VariableConfig in which the variables are stored.
-        jets_name : str, optional
+        global_name : str, optional
             Name of the group in which the jets are stored, by default "jets"
         """
         dtypes = self.reader.dtypes(variables.combined())
         # num_jets == -1 ("write all") -> 0 leading dim so the writer grows dynamically
         shapes = self.reader.shapes(max(self.num_jets, 0), variables.keys())
-        self.writer = H5Writer(self.out_path, dtypes, shapes, jets_name=jets_name)
+        self.writer = H5Writer(self.out_path, dtypes, shapes, jets_name=global_name)
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property

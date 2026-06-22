@@ -52,7 +52,7 @@ class Resampling:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.jets_name = config.jets_name
+        self.global_name = config.global_name
         self.transform = config.transform
         self.rng = np.random.default_rng(42)
 
@@ -241,7 +241,7 @@ class Resampling:
                     continue
 
                 # Apply selections
-                comp_idx, _ = component.flavour.cuts(batch[self.variables.jets_name])
+                comp_idx, _ = component.flavour.cuts(batch[self.variables.global_name])
                 if len(comp_idx) == 0:
                     continue
 
@@ -249,14 +249,14 @@ class Resampling:
                 batch_out = select_batch(batch, comp_idx)
 
                 # Apply sampling
-                idx = np.arange(len(batch_out[self.variables.jets_name]))
+                idx = np.arange(len(batch_out[self.variables.global_name]))
 
                 # Check that the component is not the target and a resampling
                 # function is set.
                 if component != self.target and self.select_func:
                     # Apply the resampling
                     idx = self.select_func(
-                        jets=batch_out[self.variables.jets_name],
+                        jets=batch_out[self.variables.global_name],
                         component=component,
                     )
                     if len(idx) == 0:
@@ -350,7 +350,7 @@ class Resampling:
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
-                jets_name=self.jets_name,
+                jets_name=self.global_name,
                 equal_jets=equal_jets_flag,
                 transform=self.transform,
                 vds_dir=sample.vds_dir,
@@ -513,7 +513,7 @@ class Resampling:
 
             # Setup the reader for the components
             iter_component.setup_reader(
-                self.batch_size, jets_name=self.jets_name, transform=self.transform
+                self.batch_size, global_name=self.global_name, transform=self.transform
             )
 
             # If only one component is run, stop here for the target that needs to be
@@ -522,7 +522,7 @@ class Resampling:
                 continue
 
             # Setup the writer for the component
-            iter_component.setup_writer(self.variables, jets_name=self.jets_name)
+            iter_component.setup_writer(self.variables, global_name=self.global_name)
 
             # Set sampling fraction
             self.set_component_sampling_fractions(component=iter_component)

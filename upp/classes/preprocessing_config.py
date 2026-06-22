@@ -47,7 +47,7 @@ class PreprocessingConfig:
     For example:
     ```yaml
     global:
-        jets_name: jets
+        global_name: jets
         batch_size: 1_000_000
         num_jets_estimate: 5_000_000
         base_dir: /my/stuff/
@@ -104,8 +104,9 @@ class PreprocessingConfig:
         Is equal to num_jets_estimate by default.
     merge_test_samples : bool, optional
         Merge the test samples of the different processes into one file. By default False.
-    jets_name : str, optional
-        Name of the jets dataset in the input file. By default "jets".
+    global_name : str, optional
+        Name of the global (per-object) dataset in the input file, e.g. the jets.
+        By default "jets".
     flavour_config : Path | None, optional
         Flavour config yaml file which is to be used. By default None
     flavour_category : str, optional
@@ -141,7 +142,7 @@ class PreprocessingConfig:
     num_jets_estimate_norm: int | None = None
     num_jets_estimate_plotting: int | None = None
     merge_test_samples: bool = False
-    jets_name: str = "jets"
+    global_name: str = "jets"
     flavour_config: Path | None = None
     flavour_category: str = "standard"
     num_jets_per_output_file: int | None = None
@@ -209,7 +210,7 @@ class PreprocessingConfig:
 
         # configure variables
         self.variables = VariableConfig(
-            self.config["variables"], self.jets_name, self.is_test, selectors
+            self.config["variables"], self.global_name, self.is_test, selectors
         )
         if self.sampl_cfg is not None and self.sampl_cfg.variables:
             self.variables = self.variables.add_jet_vars(

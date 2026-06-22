@@ -64,7 +64,7 @@ resampling:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: nominal_Loose
+  global_name: nominal_Loose
   batch_size: 1_000_000
   num_jets_estimate: 5_000_000
   base_dir: /nfs/dust/atlas/user/nkumari/UPP_latest/umami-preprocessing/upp/configs/prep

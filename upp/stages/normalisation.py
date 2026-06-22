@@ -21,7 +21,7 @@ class Normalisation:
         self.config = config
         self.components = config.components
         self.variables = config.variables
-        self.jets_name = self.config.jets_name
+        self.global_name = self.config.global_name
         self.num_jets = config.num_jets_estimate_norm
         self.norm_fname = config.out_dir / config.config.get("norm_fname", "norm_dict.yaml")
         self.class_fname = config.out_dir / config.config.get("class_fname", "class_dict.yaml")
@@ -78,7 +78,7 @@ class Normalisation:
         """
         norm_dict: dict[str, dict] = {k: {} for k in self.variables}
         for name, array in batch.items():
-            if name != self.variables.jets_name:
+            if name != self.variables.global_name:
                 array = array[array["valid"]]
             for var in self.variables[name]["inputs"]:
                 if var in ["valid"]:
@@ -86,7 +86,7 @@ class Normalisation:
                 mean = float(np.nanmean(array[var]))
                 std = float(np.nanstd(array[var]))
                 norm_dict[name][var] = {"mean": mean, "std": std}
-        return norm_dict, len(batch[self.variables.jets_name])
+        return norm_dict, len(batch[self.variables.global_name])
 
     def combine_norm_dict(self, norm_A: dict, norm_B: dict, num_A: int, num_B: int) -> dict:
         """Combine two normalisation dicts into one.
@@ -148,10 +148,10 @@ class Normalisation:
         ]
         class_dict: dict[str, dict] = {k: {} for k in self.variables}
         for name, array in batch.items():
-            if name != self.variables.jets_name:
+            if name != self.variables.global_name:
                 array = array[array["valid"]]
             # separate case for flavour_label
-            if name == self.variables.jets_name and "flavour_label" in array.dtype.names:
+            if name == self.variables.global_name and "flavour_label" in array.dtype.names:
                 counts = np.unique(array["flavour_label"], return_counts=True)
                 class_dict[name]["flavour_label"] = counts
             for var in self.variables[name].get("labels", []):
@@ -252,7 +252,7 @@ class Normalisation:
             fname,
             self.config.batch_size,
             precision="full",
-            jets_name=self.jets_name,
+            jets_name=self.global_name,
         )
         log.debug(f"Setup reader at: {fname}")
 
@@ -261,8 +261,8 @@ class Normalisation:
         total = None
         vars = self.variables.combined()
         with h5py.File(reader.files[0]) as f:
-            if "flavour_label" in f[self.jets_name].dtype.names:
-                vars[self.jets_name].append("flavour_label")
+            if "flavour_label" in f[self.global_name].dtype.names:
+                vars[self.global_name].append("flavour_label")
         stream = reader.stream(vars, self.num_jets)
 
         with ProgressBar() as progress:
@@ -283,7 +283,7 @@ class Normalisation:
                     norm_dict = self.combine_norm_dict(norm_dict, this_norm_dict, total, num)
                     total += num
 
-                progress.update(task, advance=len(batch[self.variables.jets_name]))
+                progress.update(task, advance=len(batch[self.variables.global_name]))
 
         log.info(f"[bold green]Finished computing normalisation params on {self.num_jets:,} jets!")
         self.write_norm_dict(norm_dict)

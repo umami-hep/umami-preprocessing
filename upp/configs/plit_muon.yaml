@@ -50,7 +50,7 @@ resampling:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: muons
+  global_name: muons
   batch_size: 1_000_000
   num_jets_estimate: 5_000_000
   base_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/muons_40M

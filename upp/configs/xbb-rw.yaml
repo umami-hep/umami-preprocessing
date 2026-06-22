@@ -113,7 +113,7 @@ components:
 
 
 global:
-  jets_name: jets
+  global_name: jets
   batch_size: 1_000_000
   num_jets_estimate: 10_000_000
   num_jets_per_output_file: 25_000_000

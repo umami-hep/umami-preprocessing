@@ -136,7 +136,7 @@ class TestRunRW:
         """End-to-end reweighting with a non-"jets" object group name.
 
         Guards against hardcoded "jets" references: the input group is renamed
-        to "objects" and the config sets jets_name: objects. Every stage must
+        to "objects" and the config sets global_name: objects. Every stage must
         honour the configured name rather than assuming "jets".
         """
         for container in ["data1.h5", "data2.h5", "data3.h5"]:
