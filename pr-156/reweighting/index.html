@@ -740,7 +740,7 @@ First, you must setup a virtual environment to be packaged up and sent to the gr
 <h2 id="generate-weights">Generate weights<a class="headerlink" href="#generate-weights" title="Permanent link">#</a></h2>
 <p>Once all the samples are prepared, we can calculate the weights. An example config can be found in <code>upp/configs/GN3V01/GN3V01-RW.yaml</code>. We can look at the reweighting section:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">reweighting</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">num_jets_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_500_000</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">num_global_objects_estimate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1_500_000</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">merge_num_proc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">reweights</span><span class="p">:</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jets</span>
@@ -756,7 +756,7 @@ First, you must setup a virtual environment to be packaged up and sent to the gr
 </span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flavour_label</span>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">      </span><span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
 </span></code></pre></div>
-<p><code>num_jets_estimate</code> represents the number of each jet flavour used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevant in the next section of these docs.
+<p><code>num_global_objects_estimate</code> represents the number of each jet flavour used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevant in the next section of these docs.
 Then, you have the <code>reweights</code> section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
 The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max</code> which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
 The reweighting can also be performed over track variables, for example</p>
@@ -779,8 +779,8 @@ The reweighting can also be performed over track variables, for example</p>
 <p>Finally, we can merge all the relevant jets with their weights. This is done by</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>preprocess --config {config} --rwm --split {train/test/val}
 </span></code></pre></div>
-<p>This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the <code>global</code> section of the pre-processing config includes <code>num_jets_per_output_file</code> and the <code>reweighting</code> section has <code>merge_num_proc&gt;1</code>.
-This will then launch <code>merge_num_proc</code> processes, with approximately <code>num_jets_per_output_file</code> per file*.</p>
+<p>This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the <code>global</code> section of the pre-processing config includes <code>num_global_objects_per_output_file</code> and the <code>reweighting</code> section has <code>merge_num_proc&gt;1</code>.
+This will then launch <code>merge_num_proc</code> processes, with approximately <code>num_global_objects_per_output_file</code> per file*.</p>
 <ul>
 <li>Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.</li>
 </ul>
