@@ -11,8 +11,29 @@ from dotmap import DotMap
 from ftag import Extended_Flavours, Flavours, LabelContainer, get_mock_file
 
 from upp import __version__
-from upp.classes.preprocessing_config import PreprocessingConfig
+from upp.classes.preprocessing_config import (
+    PreprocessingConfig,
+    _rename_legacy_keys,
+)
 from upp.classes.resampling_config import ResamplingConfig
+
+
+def test_rename_legacy_keys_remaps_nested_and_records():
+    """Deprecated jet-named keys are remapped everywhere, others untouched."""
+    raw = {
+        "global": {"jets_name": "muons", "num_jets_estimate": 5},
+        "components": [{"num_jets": 10, "sample": {"equal_jets": True}, "flavours": ["bjets"]}],
+        "plotting": {"show_num_jets": False, "kept": 1},
+    }
+    found: set[str] = set()
+    out = _rename_legacy_keys(raw, found)
+
+    assert out["global"] == {"global_name": "muons", "num_global_objects_estimate": 5}
+    assert out["components"][0]["num_global_objects"] == 10
+    assert out["components"][0]["sample"]["equal_global_objects"] is True
+    assert out["components"][0]["flavours"] == ["bjets"]  # flavour names untouched
+    assert out["plotting"] == {"show_num_global_objects": False, "kept": 1}
+    assert found == {"jets_name", "num_jets_estimate", "num_jets", "equal_jets", "show_num_jets"}
 
 
 class TestPreprocessingConfig(unittest.TestCase):
@@ -57,7 +78,9 @@ class TestPreprocessingConfig(unittest.TestCase):
             skip_config_copy=True,
         )
 
-        self.assertEqual(config.plotting.num_jets_plotting, config.num_jets_estimate_plotting)
+        self.assertEqual(
+            config.plotting.num_global_objects_plotting, config.num_global_objects_estimate_plotting
+        )
 
     def test_plotting_config(self) -> None:
         config = PreprocessingConfig.from_file(
@@ -67,9 +90,9 @@ class TestPreprocessingConfig(unittest.TestCase):
             skip_config_copy=True,
         )
 
-        self.assertEqual(config.plotting.num_jets_plotting, 100)
+        self.assertEqual(config.plotting.num_global_objects_plotting, 100)
         self.assertEqual(config.plotting.variable_label("pt"), "$p_\\mathrm{T}$ [GeV]")
-        self.assertEqual(config.plotting.variable_label("mass"), "Jet Mass [GeV]")
+        self.assertEqual(config.plotting.variable_label("mass"), "Object Mass [GeV]")
         self.assertEqual(config.plotting.sample_label("ttbar"), "$t\\bar{t}$")
         self.assertEqual(config.plotting.output_formats, ["png"])
 

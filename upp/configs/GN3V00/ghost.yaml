@@ -3,7 +3,7 @@ global_cuts: !include splits/simple-split.yaml
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.wlai.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
     - "user.wlai.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc23a
@@ -11,7 +11,7 @@ ttbar: &ttbar
 
 zprime: &zprime
   name: zprime
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.wlai.800030.e7954_s3681_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
     - "user.wlai.800030.e7954_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-11-10_GN3v00_output.h5/*.h5" # mc20d
@@ -34,32 +34,32 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostbjets, ghostcjets, ghostujets]
-    num_jets: 6_000_000
-    num_jets_test: 2_000_000
+    num_global_objects: 6_000_000
+    num_global_objects_test: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghosttaujets]
-    num_jets: 2_000_000
-    num_jets_test: 500_000
+    num_global_objects: 2_000_000
+    num_global_objects_test: 500_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostbjets, ghostcjets, ghostujets]
-    num_jets: 3_000_000
-    num_jets_test: 2_000_000
+    num_global_objects: 3_000_000
+    num_global_objects_test: 2_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghosttaujets]
-    num_jets: 1_000_000
-    num_jets_test: 200_000
+    num_global_objects: 1_000_000
+    num_global_objects_test: 200_000
 
 resampling:
   target: ghostcjets
@@ -75,6 +75,6 @@ resampling:
 global:
   global_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 2_000_000
+  num_global_objects_estimate: 2_000_000
   base_dir: /unix/atlas2/weilai/datasets/atlas/upp_outs/ghost_correct
   ntuple_dir: /unix/atlas2/weilai/datasets/atlas/ntuples/gn3v00

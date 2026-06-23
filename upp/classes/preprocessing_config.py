@@ -34,6 +34,39 @@ YamlIncludeConstructor.add_to_loader_class(
 
 Split = Literal["train", "val", "test"]
 
+# Deprecated config keys mapped to their generalised (object-agnostic) names.
+# Old configs keep working: the keys are remapped on load (see from_file).
+LEGACY_KEY_MAP = {
+    "jets_name": "global_name",
+    "num_jets": "num_global_objects",
+    "num_jets_val": "num_global_objects_val",
+    "num_jets_test": "num_global_objects_test",
+    "num_jets_estimate": "num_global_objects_estimate",
+    "num_jets_estimate_available": "num_global_objects_estimate_available",
+    "num_jets_estimate_hist": "num_global_objects_estimate_hist",
+    "num_jets_estimate_norm": "num_global_objects_estimate_norm",
+    "num_jets_estimate_plotting": "num_global_objects_estimate_plotting",
+    "num_jets_per_output_file": "num_global_objects_per_output_file",
+    "num_jets_plotting": "num_global_objects_plotting",
+    "show_num_jets": "show_num_global_objects",
+    "equal_jets": "equal_global_objects",
+}
+
+
+def _rename_legacy_keys(obj, found: set[str]):
+    """Recursively rename deprecated object-named config keys to their new names."""
+    if isinstance(obj, dict):
+        out = {}
+        for key, value in obj.items():
+            if key in LEGACY_KEY_MAP:
+                found.add(key)
+                key = LEGACY_KEY_MAP[key]
+            out[key] = _rename_legacy_keys(value, found)
+        return out
+    if isinstance(obj, list):
+        return [_rename_legacy_keys(value, found) for value in obj]
+    return obj
+
 
 @dataclass
 class PreprocessingConfig:
@@ -47,9 +80,9 @@ class PreprocessingConfig:
     For example:
     ```yaml
     global:
-        global_name: jets
+        global_name: objects
         batch_size: 1_000_000
-        num_jets_estimate: 5_000_000
+        num_global_objects_estimate: 5_000_000
         base_dir: /my/stuff/
         ntuple_dir: h5-inputs # resolved path: /my/stuff/h5-inputs/
     ```
@@ -82,30 +115,31 @@ class PreprocessingConfig:
         `sampling_fraction*batch_size_after_cuts`. It is recommended to choose high batch sizes
         especially to the `countup` method to achive best agreement of target and resampled
         distributions. By default 100_000
-    num_jets_estimate : int, optional
+    num_global_objects_estimate : int, optional
         Any of the further three arguments that are not specified will default to this value
         Is equal to 1_000_000 by default.
-    num_jets_estimate_available : int | None, optional
-        A sabsample taken from the whole sample to estimate the number of jets after the cuts.
+    num_global_objects_estimate_available : int | None, optional
+        A sabsample taken from the whole sample to estimate the number of objects after the cuts.
         Please keep this number high in order to not get poisson error of more then 5%.
-        If time allows you can use -1 to get a precise number of jets and not just an estimate
-        although it will be slow for large datasets. Is equal to num_jets_estimate by default.
-    num_jets_estimate_hist : int | None, optional
-        Number of jets of each flavour that are used to construct histograms for probability
+        If time allows you can use -1 to get a precise number of objects and not just an estimate
+        although it will be slow for large datasets.
+        Is equal to num_global_objects_estimate by default.
+    num_global_objects_estimate_hist : int | None, optional
+        Number of objects of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
-        Is equal to num_jets_estimate by default.
-    num_jets_estimate_norm : int | None, optional
-        Number of jets of each flavour that are used to estimate shifting and scaling during
+        Is equal to num_global_objects_estimate by default.
+    num_global_objects_estimate_norm : int | None, optional
+        Number of objects of each flavour that are used to estimate shifting and scaling during
         normalisation step. Larger numbers give a better quality estmates.
-        Is equal to num_jets_estimate by default.
-    num_jets_estimate_plotting : int | None, optional
-        Number of jets of each flavour used for plotting the initial and the final resampling
+        Is equal to num_global_objects_estimate by default.
+    num_global_objects_estimate_plotting : int | None, optional
+        Number of objects of each flavour used for plotting the initial and the final resampling
         variable distributions. Larger numbers give a better estimate of the full distributions.
-        Is equal to num_jets_estimate by default.
+        Is equal to num_global_objects_estimate by default.
     merge_test_samples : bool, optional
         Merge the test samples of the different processes into one file. By default False.
     global_name : str, optional
-        Name of the global (per-object) dataset in the input file, e.g. the jets.
+        Name of the global (per-object) dataset in the input file, e.g. the objects.
         By default "jets".
     flavour_config : Path | None, optional
         Flavour config yaml file which is to be used. By default None
@@ -113,10 +147,10 @@ class PreprocessingConfig:
         Flavour categories that are to be used. By default, the "standard" (non-extended)
         labels are loaded. The extended labels can be used by setting this value to "extended".
         By default "standard". To use this option, flavour_config must be None.
-    num_jets_per_output_file : int | None, optional
-        Number of jets per final output file. If the number of total jets is larger
+    num_global_objects_per_output_file : int | None, optional
+        Number of objects per final output file. If the number of total objects is larger
         than this number, the final h5 output files are splitted in multiple smaller
-        files with this number of jets per file. By default None which produces one
+        files with this number of objects per file. By default None which produces one
         huge output file.
     skip_checks : bool, optional
         Skip checks for the input files. This is used for grid submission
@@ -136,31 +170,33 @@ class PreprocessingConfig:
     out_dir: Path = Path("output")
     out_fname: Path = Path("pp_output.h5")
     batch_size: int = 100_000
-    num_jets_estimate: int = 1_000_000
-    num_jets_estimate_available: int | None = None
-    num_jets_estimate_hist: int | None = None
-    num_jets_estimate_norm: int | None = None
-    num_jets_estimate_plotting: int | None = None
+    num_global_objects_estimate: int = 1_000_000
+    num_global_objects_estimate_available: int | None = None
+    num_global_objects_estimate_hist: int | None = None
+    num_global_objects_estimate_norm: int | None = None
+    num_global_objects_estimate_plotting: int | None = None
     merge_test_samples: bool = False
     global_name: str = "jets"
     flavour_config: Path | None = None
     flavour_category: str = "standard"
-    num_jets_per_output_file: int | None = None
+    num_global_objects_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
     vds_dir: Path | None = None
 
     def __post_init__(self):
         # postprocess paths
-        if self.num_jets_estimate:
-            if self.num_jets_estimate_available is None:
-                self.num_jets_estimate_available = max(self.num_jets_estimate, int(1e6))
-            if self.num_jets_estimate_hist is None:
-                self.num_jets_estimate_hist = self.num_jets_estimate
-            if self.num_jets_estimate_norm is None:
-                self.num_jets_estimate_norm = self.num_jets_estimate
-            if self.num_jets_estimate_plotting is None:
-                self.num_jets_estimate_plotting = self.num_jets_estimate
+        if self.num_global_objects_estimate:
+            if self.num_global_objects_estimate_available is None:
+                self.num_global_objects_estimate_available = max(
+                    self.num_global_objects_estimate, int(1e6)
+                )
+            if self.num_global_objects_estimate_hist is None:
+                self.num_global_objects_estimate_hist = self.num_global_objects_estimate
+            if self.num_global_objects_estimate_norm is None:
+                self.num_global_objects_estimate_norm = self.num_global_objects_estimate
+            if self.num_global_objects_estimate_plotting is None:
+                self.num_global_objects_estimate_plotting = self.num_global_objects_estimate
 
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":
@@ -213,7 +249,7 @@ class PreprocessingConfig:
             self.config["variables"], self.global_name, self.is_test, selectors
         )
         if self.sampl_cfg is not None and self.sampl_cfg.variables:
-            self.variables = self.variables.add_jet_vars(
+            self.variables = self.variables.add_global_vars(
                 list(self.config["resampling"]["variables"].keys()), "labels"
             )
         self.transform = (
@@ -228,8 +264,8 @@ class PreprocessingConfig:
             else None
         )
         self.plotting = PlottingConfig(**self.config.get("plotting", {}))
-        if self.plotting.num_jets_plotting is None:
-            self.plotting.num_jets_plotting = self.num_jets_estimate_plotting
+        if self.plotting.num_global_objects_plotting is None:
+            self.plotting.num_global_objects_plotting = self.num_global_objects_estimate_plotting
 
         # reproducibility
         try:
@@ -260,6 +296,14 @@ class PreprocessingConfig:
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
         with open(config_path) as file:
             config = yaml.safe_load(file)
+            legacy: set[str] = set()
+            config = _rename_legacy_keys(config, legacy)
+            if legacy:
+                log.warning(
+                    "Deprecated object-named config keys %s were remapped to their "
+                    "global-object names; please update your config.",
+                    sorted(legacy),
+                )
             return cls(
                 config_path=config_path,
                 split=split,

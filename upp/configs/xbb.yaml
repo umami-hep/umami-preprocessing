@@ -9,13 +9,13 @@ hcc: &hcc
   pattern: user.svanstro.801472.e8441_e7400_s3681_r13144_r13146_p5488.tdd.*/*.h5
 top: &top
   name: top
-  equal_jets: true
+  equal_global_objects: true
   pattern:
     - user.svanstro.426345.e6880_s3681_r13144_p5488.tdd.*/*.h5
     - user.svanstro.426345.e6880_s3681_r13145_p5488.tdd.*/*.h5
 qcd: &qcd
   name: qcd
-  equal_jets: true
+  equal_global_objects: true
   pattern:
     - user.svanstro.364703.e7142_s3681_r13144_p5488.tdd.*/*.h5
     - user.svanstro.364704.e7142_s3681_r13144_p5488.tdd.*/*.h5
@@ -31,28 +31,28 @@ components:
     sample:
       <<: *hbb
     flavours: [hbb]
-    num_jets: 30_000_000
+    num_global_objects: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
     flavours: [hcc]
-    num_jets: 30_000_000
+    num_global_objects: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
     flavours: [top]
-    num_jets: 30_000_000
+    num_global_objects: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 50_000_000
+    num_global_objects: 50_000_000
 
 resampling:
   target: hbb
@@ -71,6 +71,6 @@ resampling:
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   batch_size: 4_000_000
-  num_jets_estimate: 10_000_000
+  num_global_objects_estimate: 10_000_000
   base_dir: /unix/atlastracking/samples/xbb/dumps/p5488_ext/
   merge_test_samples: True

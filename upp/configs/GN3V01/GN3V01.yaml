@@ -3,7 +3,7 @@ global_cuts: !include GN3V01/simple-split.yaml
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.alfroch.601589.e8547_s3797_r13144_p6698.tdd.GN3_dev.25_2_48.GN3V01-Training_output.h5/*.h5" # MC20d
     - "user.alfroch.601589.e8549_s4162_r14622_p6698.tdd.GN3_dev.25_2_48.GN3V01-Training_output.h5/*.h5" # MC23a
@@ -11,7 +11,7 @@ ttbar: &ttbar
 
 zprime: &zprime
   name: zprime
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.alfroch.800030.e7954_s3797_r13144_p6698.tdd.GN3_dev.25_2_48.GN3V01-Training_output.h5/*.h5" # MC20d
     - "user.alfroch.800030.e8514_s4162_r14622_p6698.tdd.GN3_dev.25_2_48.GN3V01-Training_output.h5/*.h5" # MC23a
@@ -34,96 +34,96 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostbjets]
-    num_jets: 100_000_000
-    num_jets_test: 2_000_000
+    num_global_objects: 100_000_000
+    num_global_objects_test: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostcjets]
-    num_jets: 27_500_000
-    num_jets_test: 2_000_000
+    num_global_objects: 27_500_000
+    num_global_objects_test: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostsjets]
-    num_jets: 20_000_000
-    num_jets_test: 1_000_000
+    num_global_objects: 20_000_000
+    num_global_objects_test: 1_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostudjets]
-    num_jets: 55_000_000
-    num_jets_test: 1_000_000
+    num_global_objects: 55_000_000
+    num_global_objects_test: 1_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostgjets]
-    num_jets: 65_000_000
-    num_jets_test: 1_000_000
+    num_global_objects: 65_000_000
+    num_global_objects_test: 1_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghosttaujets]
-    num_jets: 11_000_000
-    num_jets_test: 500_000
+    num_global_objects: 11_000_000
+    num_global_objects_test: 500_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostbjets]
-    num_jets: 50_000_000
-    num_jets_test: 2_000_000
+    num_global_objects: 50_000_000
+    num_global_objects_test: 2_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostcjets]
-    num_jets: 13_750_000
-    num_jets_test: 2_000_000
+    num_global_objects: 13_750_000
+    num_global_objects_test: 2_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostsjets]
-    num_jets: 10_000_000
-    num_jets_test: 1_000_000
+    num_global_objects: 10_000_000
+    num_global_objects_test: 1_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostudjets]
-    num_jets: 27_500_000
-    num_jets_test: 1_000_000
+    num_global_objects: 27_500_000
+    num_global_objects_test: 1_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostgjets]
-    num_jets: 32_500_000
-    num_jets_test: 1_000_000
+    num_global_objects: 32_500_000
+    num_global_objects_test: 1_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghosttaujets]
-    num_jets: 5_500_000
-    num_jets_test: 200_000
+    num_global_objects: 5_500_000
+    num_global_objects_test: 200_000
 
 resampling:
   target: ghostcjets
@@ -139,6 +139,6 @@ resampling:
 global:
   global_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 25_000_000
+  num_global_objects_estimate: 25_000_000
   base_dir: GN3V01_Training_preprocessed/
   ntuple_dir: GN3V01_Training_h5/

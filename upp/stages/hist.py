@@ -18,13 +18,13 @@ if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
 
 
-def bin_jets(array: dict, bins: list) -> tuple[np.ndarray, np.ndarray]:
+def bin_global_objects(array: dict, bins: list) -> tuple[np.ndarray, np.ndarray]:
     """Create the histogram and bins for the given resampling variables.
 
     Parameters
     ----------
     array : dict
-        Dict with the loaded jets and the resampling
+        Dict with the loaded objects and the resampling
         variables.
     bins : list
         Flat list with the bins which are to be used.
@@ -61,7 +61,7 @@ class Hist:
 
     def write_hist(
         self,
-        jets: dict,
+        global_objects: dict,
         resampling_vars: list,
         bins: list,
     ) -> None:
@@ -70,8 +70,8 @@ class Hist:
 
         Parameters
         ----------
-        jets : dict
-            Dict with the loaded jets.
+        global_objects : dict
+            Dict with the loaded objects.
         resampling_vars : list
             List of the resampling variables.
         bins : list
@@ -85,16 +85,16 @@ class Hist:
         # make parent dir
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
-        # bin jets
-        hist = bin_jets(jets[resampling_vars], bins)[0]
-        pbin = hist / len(jets)  # probability (rate) of each bin
+        # bin objects
+        hist = bin_global_objects(global_objects[resampling_vars], bins)[0]
+        pbin = hist / len(global_objects)  # probability (rate) of each bin
         if not math.isclose(pbin.sum(), 1, rel_tol=1e-4, abs_tol=1e-4):
             raise ValueError(f"{pbin.sum()} != 1, check cuts and binning")
 
         with h5py.File(self.path, "w") as f:
             f.create_dataset("pbin", data=pbin)
             f.create_dataset("hist", data=hist)
-            f.attrs.create("num_jets", len(jets))
+            f.attrs.create("num_jets", len(global_objects))
             f.attrs.create("resampling_vars", resampling_vars)
             for i, v in enumerate(resampling_vars):
                 f.attrs.create(f"bins_{v}", bins[i])
@@ -153,7 +153,9 @@ def create_histograms(
 
     title = " Writing PDFs "
     log.info(f"[bold green]{title:-^100}")
-    log.info(f"[bold green]Estimating PDFs using {config.num_jets_estimate_hist:,} jets...")
+    log.info(
+        f"[bold green]Estimating PDFs using {config.num_global_objects_estimate_hist:,} objects..."
+    )
 
     # Create check variable to ensure at least one component was processed
     component_processed = not component_to_run
@@ -164,30 +166,33 @@ def create_histograms(
         if isinstance(component_to_run, str) and component_to_run != component.name:
             continue
 
-        log.info(f"Estimating {component} PDF using {config.num_jets_estimate_hist:,} samples...")
+        log.info(
+            f"Estimating {component} PDF using "
+            f"{config.num_global_objects_estimate_hist:,} samples..."
+        )
         component.setup_reader(batch_size=config.batch_size, global_name=config.global_name)
         cuts_no_split = component.cuts.ignore(["eventNumber"])
 
         ###
-        # TODO: return the number of jets here and pass to the next function to get started
+        # TODO: return the number of objects here and pass to the next function to get started
         ###
-        component.check_num_jets(
-            config.num_jets_estimate_hist,
+        component.check_num_global_objects(
+            config.num_global_objects_estimate_hist,
             cuts=cuts_no_split,
             silent=False,
             raise_error=False,
         )
 
-        # Load the jets from file used for resampling
-        jets = component.get_jets(
+        # Load the objects from file used for resampling
+        global_objects = component.get_global_objects(
             variables=sampl_vars,
-            num_jets=config.num_jets_estimate_hist,
+            num_global_objects=config.num_global_objects_estimate_hist,
             cuts=cuts_no_split,
         )
 
         # Write out the hist used for resampling
         component.hist.write_hist(
-            jets=jets,
+            global_objects=global_objects,
             resampling_vars=sampl_vars,
             bins=config.sampl_cfg.flat_bins,
         )

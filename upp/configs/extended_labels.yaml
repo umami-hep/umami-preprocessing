@@ -6,7 +6,7 @@ global_cuts: !include splits/simple-split.yaml
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.svanstro.410470.e6337_s3681_r13144_p5922.tdd.EMPFlow_kfold.24_2_27.23-11-10_kfoldtrain_output.h5/*.h5"
 
@@ -22,35 +22,35 @@ components:
     sample:
       <<: *ttbar
     flavours: [bjets]
-    num_jets: 25_000_000
+    num_global_objects: 25_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [D0meson]
-    num_jets: 12_500_000
+    num_global_objects: 12_500_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [nonD0meson]
-    num_jets: 12_500_000
+    num_global_objects: 12_500_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ujets]
-    num_jets: 50_000_000
+    num_global_objects: 50_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [taujets]
-    num_jets: 4_000_000
+    num_global_objects: 4_000_000
 
 resampling:
   target: bjets
@@ -66,6 +66,6 @@ resampling:
 global:
   global_name: nominal_Loose
   batch_size: 1_000_000
-  num_jets_estimate: 5_000_000
+  num_global_objects_estimate: 5_000_000
   base_dir: /nfs/dust/atlas/user/nkumari/UPP_latest/umami-preprocessing/upp/configs/prep
   ntuple_dir: /nfs/dust/atlas/user/nkumari/FTAG_tdd

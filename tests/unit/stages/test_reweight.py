@@ -32,7 +32,7 @@ def _make_organised_components(tmpdir, jets_per_flavour):
     return config_path
 
 
-def _make_reweight_obj(tmpdir, jets_per_flavour, num_jets_estimate, batch_size=1000):
+def _make_reweight_obj(tmpdir, jets_per_flavour, num_global_objects_estimate, batch_size=1000):
     """Create a Reweight instance with mocked config."""
     config_path = _make_organised_components(tmpdir, jets_per_flavour)
 
@@ -41,7 +41,9 @@ def _make_reweight_obj(tmpdir, jets_per_flavour, num_jets_estimate, batch_size=1
     config.base_dir = str(tmpdir)
     config.global_name = "jets"
 
-    rw_config = SimpleNamespace(num_jets_estimate=num_jets_estimate, reweights=[])
+    rw_config = SimpleNamespace(
+        num_global_objects_estimate=num_global_objects_estimate, reweights=[]
+    )
 
     rw = object.__new__(Reweight)
     rw.config = config
@@ -53,11 +55,11 @@ def _make_reweight_obj(tmpdir, jets_per_flavour, num_jets_estimate, batch_size=1
 
 class TestGetInputReaders:
     def test_caps_at_available_jets(self, tmp_path):
-        """When a reader has fewer jets than num_jets_estimate, cap to available."""
+        """When a reader has fewer jets than num_global_objects_estimate, cap to available."""
         rw = _make_reweight_obj(
             tmp_path,
             jets_per_flavour={"bjets": 50, "cjets": 200},
-            num_jets_estimate=100,
+            num_global_objects_estimate=100,
         )
         readers, per_reader_num_jets = rw.get_input_readers()
         assert len(readers) == 2
@@ -68,11 +70,11 @@ class TestGetInputReaders:
         assert per_reader_num_jets[1] == 100
 
     def test_all_above_estimate(self, tmp_path):
-        """When all readers have enough jets, use num_jets_estimate for all."""
+        """When all readers have enough jets, use num_global_objects_estimate for all."""
         rw = _make_reweight_obj(
             tmp_path,
             jets_per_flavour={"bjets": 500, "cjets": 300},
-            num_jets_estimate=100,
+            num_global_objects_estimate=100,
         )
         _, per_reader_num_jets = rw.get_input_readers()
         assert per_reader_num_jets == [100, 100]
@@ -86,7 +88,7 @@ class TestCalculateWeightsStopIteration:
         rw = _make_reweight_obj(
             tmp_path,
             jets_per_flavour={"bjets": 50, "cjets": 200},
-            num_jets_estimate=200,
+            num_global_objects_estimate=200,
             batch_size=100,
         )
 

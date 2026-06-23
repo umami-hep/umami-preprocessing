@@ -18,17 +18,17 @@ def test_plotting_config_labels():
 
 
 def test_plotting_config_default_pt_label():
-    assert PlottingConfig().variable_label("pt_btagJes") == "Jet $p_\\mathrm{T}$ [GeV]"
+    assert PlottingConfig().variable_label("pt_btagJes") == "Object $p_\\mathrm{T}$ [GeV]"
 
 
 def test_plotting_config_default_mass_label():
-    assert PlottingConfig().variable_label("mass") == "Jet Mass [GeV]"
+    assert PlottingConfig().variable_label("mass") == "Object Mass [GeV]"
 
 
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [
-        ({"num_jets_plotting": 0}, "plotting.num_jets_plotting"),
+        ({"num_global_objects_plotting": 0}, "plotting.num_global_objects_plotting"),
         ({"output_formats": []}, "plotting.output_formats"),
         ({"linestyles": []}, "plotting.linestyles"),
     ],

@@ -69,7 +69,7 @@ def check_within_factor(
     Raises
     ------
     ValueError
-        If n_jets is zero for a sample
+        If n_global_objects is zero for a sample
         If the spread factor is too high
         If the geometric mean deviation is too high
     """
@@ -80,7 +80,7 @@ def check_within_factor(
         # Check that each sample is not zero
         for inner_key, inner_value in inner.items():
             if inner_value == 0:
-                raise ValueError(f"Found zero jets in group {name} / sample {inner_key}!")
+                raise ValueError(f"Found zero objects in group {name} / sample {inner_key}!")
 
         inner_values = {k: v for k, v in inner.items() if v > 0}
 
@@ -112,7 +112,7 @@ def run_input_sample_check(
     deviation_factor: float,
     verbose: bool = True,
 ) -> None:
-    """Run the input sample checks on the number of the jets.
+    """Run the input sample checks on the number of the objects.
 
     Parameters
     ----------
@@ -158,7 +158,7 @@ def run_input_sample_check(
             sample_type_dict[config_blocks] = {}
             sample_type_dict[config_blocks]["pattern"] = config.config[config_blocks]["pattern"]
 
-    # Setup H5Reader for the different samples to read the total number of jets
+    # Setup H5Reader for the different samples to read the total number of objects
     for sample_type, sample_list in sample_type_dict.items():
         # Log the status
         if verbose:
@@ -206,7 +206,7 @@ def run_input_sample_check(
             else:
                 entry_name = sample
 
-            # Create the H5 reader for each sample and read the number of jets from it
+            # Create the H5 reader for each sample and read the number of objects from it
             sample_list[entry_name] = H5Reader(
                 fname=config.ntuple_dir / sample,
                 batch_size=config.batch_size,
@@ -220,15 +220,15 @@ def run_input_sample_check(
     # Check that all the samples per group are not too different
     check_within_factor(groups=sample_type_dict, factor=deviation_factor)
 
-    # Printing the dict with all the number of jets to the terminal, if wanted
+    # Printing the dict with all the number of objects to the terminal, if wanted
     if verbose:
-        log.info("Available jets in given groups:\n")
+        log.info("Available objects in given groups:\n")
 
         for sample_type, sample_dict in sample_type_dict.items():
             log.info(f"Group: {sample_type}")
 
-            for entry_name, n_jets in sample_dict.items():
-                log.info(f"  - Sample: {entry_name}, N_Jets: {n_jets:,}")
+            for entry_name, n_global_objects in sample_dict.items():
+                log.info(f"  - Sample: {entry_name}, N_Jets: {n_global_objects:,}")
 
 
 def main(args: Any | None = None) -> None:

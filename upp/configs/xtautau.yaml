@@ -15,7 +15,7 @@ top: &top
   pattern: /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.802423.e8514_s4159_r15530_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
 qcd: &qcd
   name: qcd
-  equal_jets: true
+  equal_global_objects: true
   pattern:
     - /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801168.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
     - /atlas_cloud/fujimoto/umamiMCd/user.mfujimot.801169.e8514_s4159_r15224_p6453.tdd.FatJets.25_2_34.prod_131224_output.h5/*.h5
@@ -31,35 +31,35 @@ components:
     sample:
       <<: *htauhad
     flavours: [htauhad]
-    num_jets: 5_000_000
+    num_global_objects: 5_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hbb
     flavours: [hbb]
-    num_jets: 14_500_000
+    num_global_objects: 14_500_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
     flavours: [hcc]
-    num_jets: 14_500_000
+    num_global_objects: 14_500_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
     flavours: [top]
-    num_jets: 8_000_000
+    num_global_objects: 8_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 22_000_000
+    num_global_objects: 22_000_000
 
 resampling:
   target: hbb
@@ -76,6 +76,6 @@ resampling:
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   batch_size: 4_000_000
-  num_jets_estimate: 5_000_000
+  num_global_objects_estimate: 5_000_000
   base_dir: /atlas_cloud/fujimoto/samplesMC23d/
   merge_test_samples: True

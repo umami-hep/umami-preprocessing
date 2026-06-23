@@ -22,7 +22,7 @@ class Normalisation:
         self.components = config.components
         self.variables = config.variables
         self.global_name = self.config.global_name
-        self.num_jets = config.num_jets_estimate_norm
+        self.num_global_objects = config.num_global_objects_estimate_norm
         self.norm_fname = config.out_dir / config.config.get("norm_fname", "norm_dict.yaml")
         self.class_fname = config.out_dir / config.config.get("class_fname", "class_dict.yaml")
 
@@ -48,9 +48,9 @@ class Normalisation:
         std_B : float
             Standard deviation of the variable B
         num_A : int
-            Number of jets for variable A
+            Number of objects for variable A
         num_B : int
-            Number of jets for variable B
+            Number of objects for variable B
 
         Returns
         -------
@@ -64,17 +64,17 @@ class Normalisation:
         return float(combined_mean), float(combined_std)
 
     def get_norm_dict(self, batch: dict) -> tuple[dict, int]:
-        """Get the normalisation dict with the mean and standard deviation for the given jets.
+        """Get the normalisation dict with the mean and standard deviation for the given objects.
 
         Parameters
         ----------
         batch : dict
-            Dict with the jets and all variables
+            Dict with the objects and all variables
 
         Returns
         -------
         tuple[dict, int]
-            Normalisation dict and the number of jets used to calculate it
+            Normalisation dict and the number of objects used to calculate it
         """
         norm_dict: dict[str, dict] = {k: {} for k in self.variables}
         for name, array in batch.items():
@@ -98,9 +98,9 @@ class Normalisation:
         norm_B : dict
             Normalisation dict B
         num_A : int
-            Number of jets used to calculate normalisation dict A
+            Number of objects used to calculate normalisation dict A
         num_B : int
-            Number of jets used to calculate normalisation dict B
+            Number of objects used to calculate normalisation dict B
 
         Returns
         -------
@@ -127,12 +127,12 @@ class Normalisation:
         return combined
 
     def get_class_dict(self, batch: dict) -> dict:
-        """Get the class dict for the given jets.
+        """Get the class dict for the given objects.
 
         Parameters
         ----------
         batch : dict
-            Dict with the jets and their variables
+            Dict with the objects and their variables
 
         Returns
         -------
@@ -237,7 +237,7 @@ class Normalisation:
             fname = str(self.config.out_fname).replace(".h5", "_vds.h5")
 
         # Get the correct output names if multiple output files were written
-        elif self.config.num_jets_per_output_file is not None:
+        elif self.config.num_global_objects_per_output_file is not None:
             fname = (
                 self.config.out_fname.parent
                 / self.config.split
@@ -263,12 +263,12 @@ class Normalisation:
         with h5py.File(reader.files[0]) as f:
             if "flavour_label" in f[self.global_name].dtype.names:
                 vars[self.global_name].append("flavour_label")
-        stream = reader.stream(vars, self.num_jets)
+        stream = reader.stream(vars, self.num_global_objects)
 
         with ProgressBar() as progress:
             task = progress.add_task(
-                f"[green]Computing normalisations using {self.num_jets:,} jets...",
-                total=self.num_jets,
+                f"[green]Computing normalisations using {self.num_global_objects:,} objects...",
+                total=self.num_global_objects,
             )
 
             for i, batch in enumerate(stream):
@@ -285,7 +285,10 @@ class Normalisation:
 
                 progress.update(task, advance=len(batch[self.variables.global_name]))
 
-        log.info(f"[bold green]Finished computing normalisation params on {self.num_jets:,} jets!")
+        log.info(
+            f"[bold green]Finished computing normalisation params on "
+            f"{self.num_global_objects:,} objects!"
+        )
         self.write_norm_dict(norm_dict)
         self.write_class_dict(class_dict)
         log.info(f"[bold green]Saved norm dict to {self.norm_fname}")

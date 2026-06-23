@@ -146,15 +146,17 @@ class SplitContainers:
         )
         if output_name is None:
             output_name = input_file.name
-        num_jets = reader.num_jets
-        num_batches = num_jets // batch_size + (1 if num_jets % batch_size != 0 else 0)
-        if num_jets == 0:
-            print(f"File {input_file} has no jets. Skipping it", flush=True)
+        num_global_objects = reader.num_jets
+        num_batches = num_global_objects // batch_size + (
+            1 if num_global_objects % batch_size != 0 else 0
+        )
+        if num_global_objects == 0:
+            print(f"File {input_file} has no objects. Skipping it", flush=True)
             return
         sample_components = []
         writers_by_sample_components = {}
         cuts_by_sample_components = {}
-        print(f"Input file: {input_file} has {num_jets} jets", flush=True)
+        print(f"Input file: {input_file} has {num_global_objects} objects", flush=True)
         print(f"Running {num_batches} batches of size {batch_size}", flush=True)
         print(f"Output directory: {output_dir}", flush=True)
 
@@ -252,7 +254,7 @@ class SplitContainers:
         message += "\n"
         for sample_component, writer in writers_by_sample_components.items():
             perc = 100 * (num_written_by_sample_components[sample_component] / sum_written)
-            message += f"{sample_component}: {writer.num_written} jets ({perc:.2f}%)\n"
+            message += f"{sample_component}: {writer.num_written} objects ({perc:.2f}%)\n"
 
             writer.close()
 
@@ -260,9 +262,9 @@ class SplitContainers:
         message += "-" * 20 + "\n"
         message += "Summary\n"
         message += "-" * 20 + "\n"
-        message += f"Total number of jets: {num_jets}\n"
+        message += f"Total number of objects: {num_global_objects}\n"
         message += f"Total number of batches: {num_batches}\n"
-        message += f"Total number of written jets: {sum_written}\n"
+        message += f"Total number of written objects: {sum_written}\n"
         message += f"Total time taken: {time_taken:.2f} seconds\n"
         message += "-" * 20
         print(message, flush=True)
@@ -287,7 +289,7 @@ class SplitContainers:
                 jets_name=self.config.global_name,
             )
             print(
-                f"Created combined virtual dataset with {h5vds.num_jets} jets at {tmp_out_path}",
+                f"Created combined virtual dataset with {h5vds.num_jets} objects at {tmp_out_path}",
                 flush=True,
             )
             yield tmp_out_path
@@ -373,7 +375,7 @@ class SplitContainers:
 
                     files[split][flavour].append(str(file[0]))
 
-        num_jets = {
+        num_global_objects = {
             split: {
                 flavour: H5Reader(files[split][flavour], jets_name=self.config.global_name).num_jets
                 for flavour in files[split]
@@ -382,7 +384,7 @@ class SplitContainers:
         }
         metadata = {
             "files": files,
-            "num_jets": num_jets,
+            "num_jets": num_global_objects,
         }
 
         output_file = output_dir / "organised-components.yaml"

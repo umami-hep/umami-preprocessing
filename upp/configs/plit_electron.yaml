@@ -3,7 +3,7 @@ variables: !include plit_electron_variables.yaml
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8547_s3797_r13144_p5934_TREE/*.h5"
     - "user.pgadow.LD_2023_11_28.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.e8549_s4159_r14799_p5934_TREE/*.h5"
@@ -28,14 +28,14 @@ components:
     sample:
       <<: *ttbar
     flavours: [elxprompt]
-    num_jets: 25_000_000
+    num_global_objects: 25_000_000
 
   - region:
       <<: *electron
     sample:
       <<: *ttbar
     flavours: [npxall]
-    num_jets: 13_000_000
+    num_global_objects: 13_000_000
 
 
 resampling:
@@ -52,7 +52,7 @@ resampling:
 global:
   global_name: electrons
   batch_size: 1_000_000
-  num_jets_estimate: 5_000
+  num_global_objects_estimate: 5_000
   base_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/electrons_38M
   ntuple_dir: /nfs/dust/atlas/user/pgadow/plit/data/ntuples
   out_dir: /nfs/dust/atlas/user/pgadow/plit/data/preprocessed/electrons_38M
