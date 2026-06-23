@@ -26,10 +26,10 @@ class Merging:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.jets_name = config.jets_name
+        self.global_name = config.global_name
         self.rng = np.random.default_rng(42)
         self.flavours = self.components.flavours
-        self.num_jets_per_output_file = config.num_jets_per_output_file
+        self.num_global_objects_per_output_file = config.num_global_objects_per_output_file
         self.file_tag = "split"
 
         # Auto-resume toggle (make configurable if you prefer opt-in)
@@ -48,10 +48,10 @@ class Merging:
         self.dtypes: dict[str, np.dtype] = {}
         self.base_shapes: dict[str, tuple[int, ...]] = {}
 
-        # Setup all the jet counters
+        # Setup all the object counters
         self._file_idx: int = 0
-        self.total_jets: int = 0
-        self.jets_written: int = 0
+        self.total_global_objects: int = 0
+        self.global_objects_written: int = 0
 
         # Setup the sample string
         self._sample: str | None = None
@@ -60,30 +60,32 @@ class Merging:
         self.current_components = cast("Components", None)
         self.writer = cast(H5Writer, None)
 
-    def add_jet_flavour_label(self, jets: np.ndarray, component: Component) -> np.ndarray:
-        """Add the jet flavour label to the jets.
+    def add_global_object_label(
+        self, global_objects: np.ndarray, component: Component
+    ) -> np.ndarray:
+        """Add the object flavour label to the objects.
 
-        If already present, jets will be returned without any changes.
+        If already present, objects will be returned without any changes.
 
         Parameters
         ----------
-        jets : np.ndarray
-            Structured array of with the jets and their variables
+        global_objects : np.ndarray
+            Structured array of with the objects and their variables
         component : Component
             Component instance of the
 
         Returns
         -------
         np.ndarray
-            Structured array of the jets and their variables with the
+            Structured array of the objects and their variables with the
             "flavour_label" added.
         """
-        if "flavour_label" in jets.dtype.names:
-            return jets
+        if "flavour_label" in global_objects.dtype.names:
+            return global_objects
         int_label = self.flavours.index(component.flavour)
-        label_array = np.full(len(jets), int_label, dtype=[("flavour_label", "i4")])
+        label_array = np.full(len(global_objects), int_label, dtype=[("flavour_label", "i4")])
 
-        return join_structured_arrays([jets, label_array])
+        return join_structured_arrays([global_objects, label_array])
 
     def _part_fname(self, sample: str | None, file_idx: int) -> Path:
         """Construct the exact output filename for a given part index.
@@ -115,7 +117,9 @@ class Merging:
         return fname.parent / self.config.split / fname.name
 
     def _expected_rows_for_part(self, part_idx: int) -> int:
-        """Return the expected number of rows for part `part_idx` given total_jets and split size.
+        """Return the expected number of rows for part `part_idx`.
+
+        Uses ``total_global_objects`` and the configured split size.
 
         Parameters
         ----------
@@ -128,13 +132,13 @@ class Merging:
             Expected number of rows for the given partial file
         """
         # Assert that the final output file will be splitted
-        assert self.num_jets_per_output_file is not None
+        assert self.num_global_objects_per_output_file is not None
 
-        # Remaining jets starting at this part
-        start = part_idx * int(self.num_jets_per_output_file)
-        remaining = max(0, self.total_jets - start)
+        # Remaining objects starting at this part
+        start = part_idx * int(self.num_global_objects_per_output_file)
+        remaining = max(0, self.total_global_objects - start)
 
-        return min(int(self.num_jets_per_output_file), remaining)
+        return min(int(self.num_global_objects_per_output_file), remaining)
 
     def _is_part_valid(self, sample: str | None, part_idx: int) -> bool:
         """Heuristically validate that a part file is complete and consistent.
@@ -166,15 +170,15 @@ class Merging:
                 # Collect expected dataset names from base_shapes (already computed)
                 expected_names = list(self.base_shapes.keys())
 
-                # Tolerate missing optional groups, but require the jet dataset at least
-                if self.jets_name not in f:
-                    log.warning(f"Missing dataset '{self.jets_name}' in {fname}")
+                # Tolerate missing optional groups, but require the object dataset at least
+                if self.global_name not in f:
+                    log.warning(f"Missing dataset '{self.global_name}' in {fname}")
                     return False
 
-                # Determine observed length from anchor (jets_name) or first dataset
-                anchor = self.jets_name if self.jets_name in f else expected_names[0]
+                # Determine observed length from anchor (global_name) or first dataset
+                anchor = self.global_name if self.global_name in f else expected_names[0]
                 if anchor not in f:
-                    # if jets_name wasn't found, try any expected dataset that exists
+                    # if global_name wasn't found, try any expected dataset that exists
                     for nm in expected_names:
                         if nm in f:
                             anchor = nm
@@ -193,7 +197,7 @@ class Merging:
                         return False
 
                 # Compare with expected rows for this part (if split mode)
-                if self.num_jets_per_output_file is not None:
+                if self.num_global_objects_per_output_file is not None:
                     exp_len = self._expected_rows_for_part(part_idx)
                     if obs_len != exp_len:
                         log.warning(
@@ -227,7 +231,7 @@ class Merging:
             The index of the first missing/invalid part.
         """
         # Check that multiple output files should be created
-        if self.num_jets_per_output_file is None:
+        if self.num_global_objects_per_output_file is None:
             return 0
 
         # Define a counter
@@ -267,11 +271,12 @@ class Merging:
         """A minimal writer that discards data while tracking how much would be written."""
 
         def __init__(self, capacity: int):
+            # Mirrors the ftag H5Writer API (assigned to self.writer)
             self.num_jets = capacity
             self.num_written = 0
 
         def write(self, batch: dict[str, np.ndarray]) -> None:
-            """Count the number of jets that would be written.
+            """Count the number of objects that would be written.
 
             Parameters
             ----------
@@ -296,7 +301,7 @@ class Merging:
     def _open_writer(
         self,
         sample: str | None,
-        jets_in_file: int,
+        global_objects_in_file: int,
         file_idx: int,
         components: Components,
     ) -> None:
@@ -306,15 +311,15 @@ class Merging:
         ----------
         sample : str | None
             Sample name (``None`` for the "train/val test" merge).
-        jets_in_file : int
+        global_objects_in_file : int
             Capacity of the new file (= leading dimension of every dataset).
         file_idx : int
             Running part index (0, 1, 2, …); used only for the filename suffix.
         components : Components
-            The `Components` object we are currently merging needed for `jet_counts`, etc.
+            The `Components` object we are currently merging needed for `global_object_counts`, etc.
         """
         # Construct the filename
-        if self.num_jets_per_output_file is not None:
+        if self.num_global_objects_per_output_file is not None:
             fname = self._part_fname(sample, file_idx)
         else:
             fname = Path(self.config.out_fname)
@@ -322,7 +327,9 @@ class Merging:
                 fname = path_append(fname, sample)
 
         # Adjust shapes to the capacity of this file
-        shapes = {name: (jets_in_file,) + shape[1:] for name, shape in self.base_shapes.items()}
+        shapes = {
+            name: (global_objects_in_file,) + shape[1:] for name, shape in self.base_shapes.items()
+        }
 
         # Ensure the output directory exists before opening the writer
         fname.parent.mkdir(parents=True, exist_ok=True)
@@ -332,19 +339,19 @@ class Merging:
             fname,
             self.dtypes,
             shapes,
-            add_flavour_label=self.jets_name,
-            jets_name=self.jets_name,
-            num_jets=jets_in_file,
+            add_flavour_label=self.global_name,
+            jets_name=self.global_name,
+            num_jets=global_objects_in_file,
         )
 
         # Copy the metadata attributes
         self.writer.add_attr(
             "flavour_label",
             [f.name for f in self.flavours],
-            self.jets_name,
+            self.global_name,
         )
-        self.writer.add_attr("unique_jets", components.unique_jets)
-        self.writer.add_attr("jet_counts", json.dumps(components.jet_counts))
+        self.writer.add_attr("unique_jets", components.unique_global_objects)
+        self.writer.add_attr("jet_counts", json.dumps(components.global_object_counts))
         self.writer.add_attr("dsids", str(components.dsids))
         self.writer.add_attr("config", json.dumps(self.config.config))
         self.writer.add_attr("upp_hash", self.config.git_hash)
@@ -368,7 +375,7 @@ class Merging:
         Returns
         -------
         int
-            The number of jets that were consumed from the components
+            The number of objects that were consumed from the components
             (== written to disk).  When all components are exhausted the
             function returns 0 so that the caller can stop its loop.
         """
@@ -385,8 +392,8 @@ class Merging:
                 try:
                     # shallow copy because we will add a field
                     batch = copy(next(component.stream))
-                    batch[self.jets_name] = self.add_jet_flavour_label(
-                        jets=batch[self.jets_name], component=component
+                    batch[self.global_name] = self.add_global_object_label(
+                        global_objects=batch[self.global_name], component=component
                     )
                 except StopIteration:
                     component.complete = True
@@ -407,28 +414,28 @@ class Merging:
 
         # Apply track selections
         for name in self.variables.variables:
-            if name == self.jets_name:
+            if name == self.global_name:
                 continue
             if selector := self.variables.selectors.get(name):
                 merged[name] = selector(merged[name])
 
-        # Get the total length of jets from the batch and how much
+        # Get the total length of objects from the batch and how much
         # capacity is left in the file
-        merged_len = len(merged[self.jets_name])
+        merged_len = len(merged[self.global_name])
         capacity_left = self.writer.num_jets - self.writer.num_written
 
         if self._fast_forwarding:
             # Limit consumption to the remaining discard quota
             if merged_len <= capacity_left:
                 self.writer.write(merged)
-                self.jets_written += merged_len
+                self.global_objects_written += merged_len
                 return merged_len
             else:
                 head = {n: a[:capacity_left] for n, a in merged.items()}
                 tail = {n: a[capacity_left:] for n, a in merged.items()}
                 self.writer.write(head)
                 self._ff_pending = tail  # keep remainder for next iteration
-                self.jets_written += capacity_left
+                self.global_objects_written += capacity_left
                 return capacity_left
 
         # If current file is full (and not fast-forwarding), roll to next file
@@ -438,15 +445,15 @@ class Merging:
 
             # open the next one
             self._file_idx += 1
-            remaining_total = self.total_jets - self.jets_written
+            remaining_total = self.total_global_objects - self.global_objects_written
 
-            # Quit writing when no jets are left to write
+            # Quit writing when no objects are left to write
             if remaining_total == 0:
                 return 0
 
             next_file_size = (
-                min(self.num_jets_per_output_file, remaining_total)
-                if self.num_jets_per_output_file
+                min(self.num_global_objects_per_output_file, remaining_total)
+                if self.num_global_objects_per_output_file
                 else remaining_total
             )
             self._open_writer(
@@ -470,12 +477,14 @@ class Merging:
             self.writer.write(head)
             self.writer.close()
 
-            # Open a fresh file sized for the remaining jets
+            # Open a fresh file sized for the remaining objects
             self._file_idx += 1
-            remaining_total = self.total_jets - (self.jets_written + capacity_left)
+            remaining_total = self.total_global_objects - (
+                self.global_objects_written + capacity_left
+            )
             next_file_size = (
-                min(self.num_jets_per_output_file, remaining_total)
-                if self.num_jets_per_output_file
+                min(self.num_global_objects_per_output_file, remaining_total)
+                if self.num_global_objects_per_output_file
                 else remaining_total
             )
             self._open_writer(self._sample, next_file_size, self._file_idx, self.current_components)
@@ -485,15 +494,15 @@ class Merging:
             self.writer.write(tail)
 
         # Updating the progress-bar
-        self.jets_written += merged_len
+        self.global_objects_written += merged_len
         return merged_len
 
     def write_components(self, sample: str | None, components: Components) -> None:
         """Merge *components* into one or more HDF5 files.
 
-        If ``self.num_jets_per_output_file`` is ``None`` the behaviour is identical to the
+        If ``self.num_global_objects_per_output_file`` is ``None`` the behaviour is identical to the
         original implementation (exactly one output file).  Otherwise the function
-        keeps opening new `H5Writer`s whenever the current file reaches that jet
+        keeps opening new `H5Writer`s whenever the current file reaches that object
         limit.  All heavy work (splitting batches, rolling files) is handled in
         ``self.write_chunk``.
 
@@ -504,21 +513,23 @@ class Merging:
         components : Components
             Components that are to be written
         """
-        # Resolve "write all" (num_jets < 0) to the actual number of jets on disk
+        # Resolve "write all" (num_global_objects < 0) to the actual number of objects on disk
         for component in components:
-            if component.num_jets < 0:
+            if component.num_global_objects < 0:
                 component.setup_reader(
-                    self.batch_size, fname=component.out_path, jets_name=self.jets_name
+                    self.batch_size, fname=component.out_path, global_name=self.global_name
                 )
-                component.num_jets = component.reader.num_jets
+                component.num_global_objects = component.reader.num_jets
 
         # Prepare every Component's reader
         for component in components:
-            batch_size = self.batch_size * component.num_jets // components.num_jets + 1
+            batch_size = (
+                self.batch_size * component.num_global_objects // components.num_global_objects + 1
+            )
             component.setup_reader(
                 batch_size,
                 fname=component.out_path,
-                jets_name=self.jets_name,
+                global_name=self.global_name,
             )
             component.stream = component.reader.stream(
                 self.variables.combined(),
@@ -528,30 +539,32 @@ class Merging:
 
         # Cache dtype / base shapes once (re-used for every new file)
         self.dtypes = components[0].reader.dtypes(self.variables.combined())
-        self.base_shapes = components[0].reader.shapes(components.num_jets, self.variables.keys())
+        self.base_shapes = components[0].reader.shapes(
+            components.num_global_objects, self.variables.keys()
+        )
 
         # Bookkeeping shared with write_chunk
-        self.total_jets = components.num_jets
-        self.jets_written = 0
+        self.total_global_objects = components.num_global_objects
+        self.global_objects_written = 0
         self._file_idx = 0
         self._sample = sample
         self.current_components = components
 
         # Auto-resume: detect contiguous valid parts; delete a corrupt last part if found
         resume_parts = 0
-        if self.resume and isinstance(self.num_jets_per_output_file, int):
+        if self.resume and isinstance(self.num_global_objects_per_output_file, int):
             resume_parts = self._detect_and_clean_completed_parts(sample)
 
-        if resume_parts and isinstance(self.num_jets_per_output_file, int):
-            to_discard = resume_parts * int(self.num_jets_per_output_file)
+        if resume_parts and isinstance(self.num_global_objects_per_output_file, int):
+            to_discard = resume_parts * int(self.num_global_objects_per_output_file)
             log.info(
                 f"[bold yellow]Resuming merge: found {resume_parts} completed part(s); "
-                f"skipping first {to_discard:,} jets."
+                f"skipping first {to_discard:,} objects."
             )
             # Use a NullWriter to pre-consume data via the exact same logic
             self._fast_forwarding = True
             self.writer = self._NullWriter(to_discard)
-            while self.jets_written < to_discard:
+            while self.global_objects_written < to_discard:
                 consumed = self.write_chunk(components)
                 if consumed == 0:
                     break
@@ -560,13 +573,13 @@ class Merging:
 
             # Align counters with the next missing part
             self._file_idx = resume_parts
-            self.jets_written = to_discard
+            self.global_objects_written = to_discard
 
         # Decide capacity of the first real file
-        remaining_total = self.total_jets - self.jets_written
+        remaining_total = self.total_global_objects - self.global_objects_written
         first_file_size = (
-            min(self.num_jets_per_output_file, remaining_total)
-            if self.num_jets_per_output_file
+            min(self.num_global_objects_per_output_file, remaining_total)
+            if self.num_global_objects_per_output_file
             else remaining_total
         )
 
@@ -576,11 +589,11 @@ class Merging:
         # Main merge loop with progress
         with ProgressBar() as progress:
             task = progress.add_task(
-                f"[green]Merging {components.num_jets:,} jets...",
-                total=components.num_jets,
+                f"[green]Merging {components.num_global_objects:,} objects...",
+                total=components.num_global_objects,
             )
-            if self.jets_written:
-                progress.update(task, advance=self.jets_written)
+            if self.global_objects_written:
+                progress.update(task, advance=self.global_objects_written)
 
             while True:
                 n = self.write_chunk(components)
@@ -591,7 +604,7 @@ class Merging:
         # Close Writer
         self.writer.close()
         label = "merged" if sample is None else sample
-        log.info(f"[bold green]Finished merging {components.num_jets:,} {label} jets!")
+        log.info(f"[bold green]Finished merging {components.num_global_objects:,} {label} objects!")
 
     def run(self):
         """Run merging of the components."""

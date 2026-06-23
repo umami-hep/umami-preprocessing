@@ -10,7 +10,7 @@ import yaml
 from ftag.hdf5 import H5Reader
 from yamlinclude import YamlIncludeConstructor
 
-from upp.stages.hist import bin_jets
+from upp.stages.hist import bin_global_objects
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
 from upp.utils.logger import ProgressBar
 
@@ -52,14 +52,14 @@ class Resampling:
         self.components = config.components
         self.variables = config.variables
         self.batch_size = config.batch_size
-        self.jets_name = config.jets_name
+        self.global_name = config.global_name
         self.transform = config.transform
         self.rng = np.random.default_rng(42)
 
         # Define what type self.target will be
         self.target = cast("Component", None)
 
-        # In skip mode no selection is applied; jets are written as-is (see sample())
+        # In skip mode no selection is applied; objects are written as-is (see sample())
         if self.skip:
             self.method = None
             self.upscale_pdf = 1
@@ -81,20 +81,20 @@ class Resampling:
             )
         self.select_func = self.methods_map[self.method]
 
-    def countup_select_func(self, jets: dict, component: Component) -> np.ndarray:
+    def countup_select_func(self, global_objects: dict, component: Component) -> np.ndarray:
         """Countup resampling function.
 
         Parameters
         ----------
-        jets : dict
-            Dict with the jets which are to be resampled.
+        global_objects : dict
+            Dict with the objects which are to be resampled.
         component : Component
             Component instance for a given flavour/class.
 
         Returns
         -------
         np.ndarray
-            Numpy array with the index numbers of the jets that are to be used.
+            Numpy array with the index numbers of the objects that are to be used.
 
         Raises
         ------
@@ -106,22 +106,22 @@ class Resampling:
         if self.upscale_pdf != 1:
             raise ValueError("Upscaling of histograms is not supported for countup method")
 
-        # Get the target number of jets and target PDF values
-        num_jets = int(len(jets) * component.sampling_fraction)
+        # Get the target number of objects and target PDF values
+        num_global_objects = int(len(global_objects) * component.sampling_fraction)
         target_pdf = self.target.hist.pbin
 
         # Get the target histograms
-        target_hist = target_pdf * num_jets
+        target_hist = target_pdf * num_global_objects
         target_hist = (np.floor(target_hist + self.rng.random(target_pdf.shape))).astype(int)
 
         # Create histogram and bins for the given resampling variables
-        _hist, binnumbers = bin_jets(
-            array=jets[self.config.vars],
+        _hist, binnumbers = bin_global_objects(
+            array=global_objects[self.config.vars],
             bins=self.config.flat_bins,
         )
         assert target_pdf.shape == _hist.shape
 
-        # Loop over bins and select relevant jets (indicies)
+        # Loop over bins and select relevant objects (indicies)
         all_idx = []
         for bin_id in np.ndindex(*target_hist.shape):
             idx = np.where((bin_id == binnumbers.T).all(axis=-1))[0][: target_hist[bin_id]]
@@ -130,25 +130,25 @@ class Resampling:
             all_idx.append(idx)
         idx = np.concatenate(all_idx).astype(int)
 
-        # If not enough jets are found, re-use randomly some of them
-        if len(idx) < num_jets:
-            idx = np.concatenate([idx, self.rng.choice(idx, num_jets - len(idx))])
+        # If not enough objects are found, re-use randomly some of them
+        if len(idx) < num_global_objects:
+            idx = np.concatenate([idx, self.rng.choice(idx, num_global_objects - len(idx))])
 
-        # Shuffle the jet indicies
+        # Shuffle the object indicies
         self.rng.shuffle(idx)
 
         return idx
 
-    def pdf_select_func(self, jets: dict, component: Component) -> np.ndarray:
-        # bin jets
+    def pdf_select_func(self, global_objects: dict, component: Component) -> np.ndarray:
+        # bin objects
         if self.upscale_pdf > 1:
             bins = [subdivide_bins(bins, self.upscale_pdf) for bins in self.config.flat_bins]
         else:
             bins = self.config.flat_bins
 
         # Create histogram and bins for the given resampling variables
-        _hist, binnumbers = bin_jets(
-            array=jets[self.config.vars],
+        _hist, binnumbers = bin_global_objects(
+            array=global_objects[self.config.vars],
             bins=bins,
         )
 
@@ -157,7 +157,7 @@ class Resampling:
             binnumbers = tuple(binnumbers[i] for i in range(len(binnumbers)))
 
         # importance sample with replacement
-        num_samples = int(len(jets) * component.sampling_fraction)
+        num_samples = int(len(global_objects) * component.sampling_fraction)
 
         # Calculate the ratios between the target and the to-be-resampled distribution
         ratios = safe_divide(a=self.target.hist.pbin, b=component.hist.pbin)
@@ -173,13 +173,13 @@ class Resampling:
         # Get the probabilities for the resampling from the ratios
         probs = ratios[binnumbers]
 
-        # Select the jets (indicies) for the resampled final output
-        idx = random.choices(np.arange(len(jets)), weights=probs, k=num_samples)
+        # Select the objects (indicies) for the resampled final output
+        idx = random.choices(np.arange(len(global_objects)), weights=probs, k=num_samples)
 
         return idx
 
     def track_upsampling_stats(self, idx: np.ndarray, component: Component) -> None:
-        """Tracking the upsampling ratio and update the number of unique jets.
+        """Tracking the upsampling ratio and update the number of unique objects.
 
         Parameters
         ----------
@@ -189,16 +189,16 @@ class Resampling:
             Component instance for a given flavour/class.
         """
         unique, ups_counts = np.unique(idx, return_counts=True)
-        component._unique_jets += len(unique)
+        component._unique_global_objects += len(unique)
         max_ups = ups_counts.max()
         component._ups_max = max_ups if max_ups > component._ups_max else component._ups_max
 
     def _finalise_component(self, component: Component) -> None:
         """Write metadata attrs and close the writer for a completed component."""
-        unique = component._unique_jets
+        unique = component._unique_global_objects
         component._ups_ratio = component.writer.num_written / unique if unique else 0.0
         component.writer.add_attr("upsampling_ratio", component._ups_ratio)
-        component.writer.add_attr("unique_jets", component._unique_jets)
+        component.writer.add_attr("unique_jets", component._unique_global_objects)
         component.writer.add_attr("dsid", str(component.sample.dsid))
         component.writer.close()
 
@@ -209,14 +209,14 @@ class Resampling:
         progress: Progress,
         selected_component: str | None = None,
     ) -> None:
-        """Sample the jets by the given selected indicies from the resampling function.
+        """Sample the objects by the given selected indicies from the resampling function.
 
         Parameters
         ----------
         components : Components
             Components instance of the components which are to be resampled.
         stream : Generator[Any, None, None]
-            Generator of the jets which are to be resampled.
+            Generator of the objects which are to be resampled.
         progress : Progress
             Progress bar instance for updating the shown progress bar.
         selected_component : str | None, optional
@@ -226,7 +226,7 @@ class Resampling:
         Raises
         ------
         ValueError
-            If not enough jets for a given component are present.
+            If not enough objects for a given component are present.
         """
         # Loop through input file
         for batch in stream:
@@ -241,34 +241,34 @@ class Resampling:
                     continue
 
                 # Apply selections
-                comp_idx, _ = component.flavour.cuts(batch[self.variables.jets_name])
+                comp_idx, _ = component.flavour.cuts(batch[self.variables.global_name])
                 if len(comp_idx) == 0:
                     continue
 
-                # Get the batch of jets as a separate dict
+                # Get the batch of objects as a separate dict
                 batch_out = select_batch(batch, comp_idx)
 
                 # Apply sampling
-                idx = np.arange(len(batch_out[self.variables.jets_name]))
+                idx = np.arange(len(batch_out[self.variables.global_name]))
 
                 # Check that the component is not the target and a resampling
                 # function is set.
                 if component != self.target and self.select_func:
                     # Apply the resampling
                     idx = self.select_func(
-                        jets=batch_out[self.variables.jets_name],
+                        global_objects=batch_out[self.variables.global_name],
                         component=component,
                     )
                     if len(idx) == 0:
                         continue
 
-                    # Get the resampled jets in the dict
+                    # Get the resampled objects in the dict
                     batch_out = select_batch(batch_out, idx)
 
-                # Check for completion (only when a finite num_jets is requested;
-                # num_jets < 0 means write all jets passing the cuts)
-                if 0 <= component.num_jets <= component.writer.num_written + len(idx):
-                    keep = component.num_jets - component.writer.num_written
+                # Check for completion (only when a finite num_global_objects is requested;
+                # num_global_objects < 0 means write all objects passing the cuts)
+                if 0 <= component.num_global_objects <= component.writer.num_written + len(idx):
+                    keep = component.num_global_objects - component.writer.num_written
                     idx = idx[:keep]
                     for name, array in batch_out.items():
                         batch_out[name] = array[:keep]
@@ -277,7 +277,7 @@ class Resampling:
                 # Track upsampling stats
                 self.track_upsampling_stats(idx=idx, component=component)
 
-                # Write the resampled jets to file
+                # Write the resampled objects to file
                 component.writer.write(batch_out)
 
                 # Update the progress bar
@@ -291,17 +291,17 @@ class Resampling:
             if all(component._complete for component in components):
                 break
 
-        # Finalise components: unbounded ones (num_jets < 0) are done once the input is
-        # exhausted; bounded ones that didn't reach their target ran out of jets.
+        # Finalise components: unbounded ones (num_global_objects < 0) are done once the input is
+        # exhausted; bounded ones that didn't reach their target ran out of objects.
         for component in components:
             if component._complete:
                 continue
-            if component.num_jets < 0:
+            if component.num_global_objects < 0:
                 component._complete = True
                 self._finalise_component(component)
             else:
                 raise ValueError(
-                    f"Ran out of {component} jets after writing {component.writer.num_written:,}"
+                    f"Ran out of {component} objects after writing {component.writer.num_written:,}"
                 )
 
     def run_on_region(
@@ -325,7 +325,7 @@ class Resampling:
         Raises
         ------
         ValueError
-            If the equal_jets flag is not the same for all components.
+            If the equal_global_objects flag is not the same for all components.
         """
         # Get the target component (not needed when resampling is skipped)
         if not self.skip:
@@ -337,26 +337,30 @@ class Resampling:
         grouped_samples = components.groupby_sample()
 
         for sample, components in grouped_samples:
-            # Ensure all components have the same equal_jets flag
-            equal_jets_flags = [component.equal_jets for component in components]
-            if len(set(equal_jets_flags)) != 1:
-                raise ValueError("equal_jets must be the same for all components in a sample")
-            equal_jets_flag = equal_jets_flags[0]
+            # Ensure all components have the same equal_global_objects flag
+            equal_global_objects_flags = [
+                component.equal_global_objects for component in components
+            ]
+            if len(set(equal_global_objects_flags)) != 1:
+                raise ValueError(
+                    "equal_global_objects must be the same for all components in a sample"
+                )
+            equal_global_objects_flag = equal_global_objects_flags[0]
 
             # Get the variables which are to be used
-            variables = self.variables.add_jet_vars(components.cuts.variables)
+            variables = self.variables.add_global_vars(components.cuts.variables)
 
-            # Setup the Reader for reading the jets
+            # Setup the Reader for reading the objects
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
-                jets_name=self.jets_name,
-                equal_jets=equal_jets_flag,
+                jets_name=self.global_name,
+                equal_jets=equal_global_objects_flag,
                 transform=self.transform,
                 vds_dir=sample.vds_dir,
             )
 
-            # Define a stream of jets with the cuts for the region and the variables used
+            # Define a stream of objects with the cuts for the region and the variables used
             stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
 
             # Run with progress bar
@@ -368,12 +372,12 @@ class Resampling:
                     if selected_component and selected_component != component.name:
                         component._complete = True
                         component._ups_max = 0.0
-                        component._unique_jets = 0
+                        component._unique_global_objects = 0
 
                     else:
                         component._complete = False
                         component._ups_max = 1.0
-                        component._unique_jets = 0
+                        component._unique_global_objects = 0
 
                 # Add each component to the progress bar
                 for component in components:
@@ -381,11 +385,11 @@ class Resampling:
                     if selected_component and selected_component != component.name:
                         continue
 
-                    unbounded = component.num_jets < 0
-                    label = "all" if unbounded else f"{component.num_jets:,}"
+                    unbounded = component.num_global_objects < 0
+                    label = "all" if unbounded else f"{component.num_global_objects:,}"
                     component.pbar = progress.add_task(
-                        f"[green]Sampling {label} jets from {component}...",
-                        total=None if unbounded else component.num_jets,
+                        f"[green]Sampling {label} objects from {component}...",
+                        total=None if unbounded else component.num_global_objects,
                     )
 
                 # Run the actual resampling sampling
@@ -406,8 +410,8 @@ class Resampling:
                 log.info(
                     f"{component} usampling ratio is {np.mean(component._ups_ratio):.3f}, with"
                     f" {written / np.mean(component._ups_ratio):,.0f}/"
-                    f"{written:,} written jets."
-                    f" Jets are upsampled at most {np.max(component._ups_max):.0f} times"
+                    f"{written:,} written objects."
+                    f" Objects are upsampled at most {np.max(component._ups_max):.0f} times"
                 )
 
     def set_component_sampling_fractions(self, component: Component) -> None:
@@ -441,7 +445,7 @@ class Resampling:
 
             else:
                 sam_frac = component.get_auto_sampling_fraction(
-                    num_jets=component.num_jets,
+                    num_global_objects=component.num_global_objects,
                     cuts=component.cuts,
                 )
 
@@ -513,7 +517,7 @@ class Resampling:
 
             # Setup the reader for the components
             iter_component.setup_reader(
-                self.batch_size, jets_name=self.jets_name, transform=self.transform
+                self.batch_size, global_name=self.global_name, transform=self.transform
             )
 
             # If only one component is run, stop here for the target that needs to be
@@ -522,20 +526,20 @@ class Resampling:
                 continue
 
             # Setup the writer for the component
-            iter_component.setup_writer(self.variables, jets_name=self.jets_name)
+            iter_component.setup_writer(self.variables, global_name=self.global_name)
 
             # Set sampling fraction
             self.set_component_sampling_fractions(component=iter_component)
 
-            # Check that enough jets are available
+            # Check that enough objects are available
             sampling_fraction = 1 if self.skip else self.config.sampling_fraction
             log.info(
-                "[bold green]Checking requested num_jets based on a sampling fraction of"
+                "[bold green]Checking requested num_global_objects based on a sampling fraction of"
                 f" {sampling_fraction}..."
             )
             frac = iter_component.sampling_fraction if self.select_func else 1
-            iter_component.check_num_jets(
-                iter_component.num_jets,
+            iter_component.check_num_global_objects(
+                iter_component.num_global_objects,
                 sampling_fraction=frac,
                 cuts=iter_component.cuts,
             )
@@ -576,9 +580,9 @@ class Resampling:
                     unique += iter_component.writer.get_attr("unique_jets")
             log.info(
                 f"[bold green]Finished resampling of region {region}. "
-                f"A total of {self.components.num_jets:,} jets!"
+                f"A total of {self.components.num_global_objects:,} objects!"
             )
-            log.info(f"[bold green]Estimated unique jets: {unique:,.0f}")
+            log.info(f"[bold green]Estimated unique objects: {unique:,.0f}")
             log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
         else:
@@ -586,9 +590,10 @@ class Resampling:
                 iter_component.writer.get_attr("unique_jets") for iter_component in self.components
             )
             log.info(
-                f"[bold green]Finished resampling a total of {self.components.num_jets:,} jets!"
+                f"[bold green]Finished resampling a total of "
+                f"{self.components.num_global_objects:,} objects!"
             )
-            log.info(f"[bold green]Estimated unique jets: {unique:,.0f}")
+            log.info(f"[bold green]Estimated unique objects: {unique:,.0f}")
             log.info(f"[bold green]Saved to {self.components.out_dir}/")
 
     def get_num_bins_from_config(self) -> list[list[int]]:

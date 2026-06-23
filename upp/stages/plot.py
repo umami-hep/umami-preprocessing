@@ -27,7 +27,7 @@ class PlotRegion:
     name : str
         Name used in output file suffixes and log messages.
     cuts : Cuts
-        Jet-level selection defining the region.
+        Object-level selection defining the region.
     pt_range : tuple[float, float] | None
         Raw pT range defining the region. Values follow the input ntuple units,
         usually MeV. If ``None``, the region has no explicit pT range.
@@ -157,35 +157,35 @@ def _sample_label(sample_name: str, plotting: PlottingConfig) -> str:
     return plotting.sample_label(sample_name)
 
 
-def _format_num_jets(num_jets: int) -> str:
-    """Format a jet count with compact suffixes.
+def _format_num_global_objects(num_global_objects: int) -> str:
+    """Format a object count with compact suffixes.
 
     Parameters
     ----------
-    num_jets : int
-        Number of jets to format.
+    num_global_objects : int
+        Number of objects to format.
 
     Returns
     -------
     str
         Compact count using ``k`` for thousands and ``M`` for millions.
     """
-    if num_jets >= 1_000_000:
-        value = num_jets / 1_000_000
+    if num_global_objects >= 1_000_000:
+        value = num_global_objects / 1_000_000
         return f"{value:g}M"
-    if num_jets >= 1_000:
-        value = num_jets / 1_000
+    if num_global_objects >= 1_000:
+        value = num_global_objects / 1_000
         return f"{value:g}k"
-    return str(num_jets)
+    return str(num_global_objects)
 
 
 def _atlas_second_tag(
     *sample_names: str,
     plotting: PlottingConfig,
-    num_jets: int | None = None,
+    num_global_objects: int | None = None,
     resampling_status: str | None = None,
 ) -> str:
-    """Build the second ATLAS tag with energy, sample labels, status, and jet count.
+    """Build the second ATLAS tag with energy, sample labels, status, and object count.
 
     Parameters
     ----------
@@ -193,8 +193,8 @@ def _atlas_second_tag(
         Sample names to include after the centre-of-mass energy.
     plotting : PlottingConfig
         Active plotting configuration.
-    num_jets : int | None, optional
-        Number of jets requested for plotting. If provided, it is added as an
+    num_global_objects : int | None, optional
+        Number of objects requested for plotting. If provided, it is added as an
         extra line using compact formatting.
     resampling_status : str | None, optional
         Resampling status added as an extra line.
@@ -204,37 +204,37 @@ def _atlas_second_tag(
     str
         Multiline ATLAS second tag. Sample labels share the first line with the
         centre-of-mass energy, followed by the optional resampling status and
-        jet count.
+        object count.
     """
     labels = [_sample_label(name, plotting) for name in dict.fromkeys(sample_names) if name]
     first_line = plotting.atlas_second_tag
     if labels:
-        first_line = f"{first_line}, {' + '.join(labels)} jets"
+        first_line = f"{first_line}, {' + '.join(labels)} objects"
     lines = [first_line]
     if resampling_status is not None:
         lines.append(resampling_status)
-    if num_jets is not None:
-        lines.append(f"{_format_num_jets(num_jets)} jets")
+    if num_global_objects is not None:
+        lines.append(f"{_format_num_global_objects(num_global_objects)} objects")
     return "\n".join(lines)
 
 
-def _plotting_num_jets(config: PreprocessingConfig, available_jets: int) -> int:
-    """Return the number of jets requested for plotting.
+def _plotting_num_global_objects(config: PreprocessingConfig, available_global_objects: int) -> int:
+    """Return the number of objects requested for plotting.
 
     Parameters
     ----------
     config : PreprocessingConfig
         Active preprocessing configuration.
-    available_jets : int
-        Number of jets available for the plotted selection.
+    available_global_objects : int
+        Number of objects available for the plotted selection.
 
     Returns
     -------
     int
-        Minimum of the available jets and ``plotting.num_jets_plotting``.
+        Minimum of the available objects and ``plotting.num_global_objects_plotting``.
     """
-    assert config.plotting.num_jets_plotting is not None
-    return min(available_jets, config.plotting.num_jets_plotting)
+    assert config.plotting.num_global_objects_plotting is not None
+    return min(available_global_objects, config.plotting.num_global_objects_plotting)
 
 
 def _pt_bounds_from_cuts(cuts: Cuts, pt_variable: str) -> tuple[float, float] | None:
@@ -243,7 +243,7 @@ def _pt_bounds_from_cuts(cuts: Cuts, pt_variable: str) -> tuple[float, float] | 
     Parameters
     ----------
     cuts : Cuts
-        Jet-level cuts associated with a component region.
+        Object-level cuts associated with a component region.
     pt_variable : str
         Name of the pT variable used for resampling.
 
@@ -418,8 +418,10 @@ def _stitching_regions(regions: list[PlotRegion], pt_variable: str | None) -> li
     return stitching_regions
 
 
-def _load_jets(config: PreprocessingConfig, in_paths: Any, vars_to_load: list[str]) -> Any:
-    """Load jet variables for plotting.
+def _load_global_objects(
+    config: PreprocessingConfig, in_paths: Any, vars_to_load: list[str]
+) -> Any:
+    """Load object variables for plotting.
 
     Parameters
     ----------
@@ -428,24 +430,24 @@ def _load_jets(config: PreprocessingConfig, in_paths: Any, vars_to_load: list[st
     in_paths : Any
         Input HDF5 file path, glob, or list of paths passed to ``H5Reader``.
     vars_to_load : list[str]
-        Jet variables needed for plotting and selections.
+        Object variables needed for plotting and selections.
 
     Returns
     -------
     Any
-        Structured jet array loaded from the input files.
+        Structured object array loaded from the input files.
     """
     return H5Reader(
         fname=in_paths,
         batch_size=config.batch_size,
-        jets_name=config.jets_name,
+        jets_name=config.global_name,
         shuffle=False,
         equal_jets=True,
         vds_dir=config.vds_dir,
     ).load(
-        {config.jets_name: list(dict.fromkeys(vars_to_load))},
-        num_jets=config.plotting.num_jets_plotting,
-    )[config.jets_name]
+        {config.global_name: list(dict.fromkeys(vars_to_load))},
+        num_jets=config.plotting.num_global_objects_plotting,
+    )[config.global_name]
 
 
 def make_hist(
@@ -454,7 +456,7 @@ def make_hist(
     flavours: list,
     variable: str,
     out_dir: Path,
-    jets_name: str = "jets",
+    global_name: str = "jets",
     bins_range: tuple | None = None,
     suffix: str = "",
     out_format_list: tuple[str, ...] | list[str] | None = None,
@@ -484,8 +486,8 @@ def make_hist(
         Variable that is to be histogrammed and plotted.
     out_dir : Path
         Output directory to which the plots are written.
-    jets_name: str, optional
-        Name of the jet dataset / the global objects
+    global_name: str, optional
+        Name of the object dataset / the global objects
         by default "jets"
     bins_range : tuple | None, optional
         bins_range argument from from puma.HistogramPlot,
@@ -510,7 +512,7 @@ def make_hist(
 
     # Setup the histogram
     plot = HistogramPlot(
-        ylabel=plotting.ylabel.replace("{jets_name}", jets_name),
+        ylabel=plotting.ylabel.replace("{global_name}", global_name),
         xlabel=plotting.variable_label(variable),
         y_scale=plotting.y_scale,
         figsize=plotting.figsize,
@@ -601,7 +603,7 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                 vars_to_load += flavour.cuts.variables
 
             values_dict = {
-                sample.name: _load_jets(config, list(sample.path), vars_to_load),
+                sample.name: _load_global_objects(config, list(sample.path), vars_to_load),
             }
             pt_range = _pt_bounds_from_cuts(selection_cuts, pt_var) if pt_var else None
 
@@ -615,7 +617,7 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                 make_hist(
                     stage="initial",
                     values_dict=values_dict,
-                    jets_name=config.jets_name,
+                    global_name=config.global_name,
                     flavours=region_components.flavours,
                     variable=variable,
                     bins_range=bins_range,
@@ -624,8 +626,10 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                     atlas_second_tag=_atlas_second_tag(
                         sample.name,
                         plotting=config.plotting,
-                        num_jets=_plotting_num_jets(config, region_components.num_jets)
-                        if config.plotting.show_num_jets
+                        num_global_objects=_plotting_num_global_objects(
+                            config, region_components.num_global_objects
+                        )
+                        if config.plotting.show_num_global_objects
                         else None,
                         resampling_status="Pre Resampling",
                     ),
@@ -653,13 +657,13 @@ def _post_resampling_paths(config: PreprocessingConfig, stage: str) -> list[Path
         return [
             (
                 config.out_fname.parent / config.split / f"{config.out_fname.stem}*.h5"
-                if config.num_jets_per_output_file is not None
+                if config.num_global_objects_per_output_file is not None
                 else config.out_fname
             )
         ]
 
     paths = [path_append(config.out_fname, sample.name) for sample in config.components.samples]
-    if config.num_jets_per_output_file is not None:
+    if config.num_global_objects_per_output_file is not None:
         return [path.parent / config.split / f"{path.stem}*.h5" for path in paths]
     return paths
 
@@ -684,8 +688,10 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
     atlas_second_tag = _atlas_second_tag(
         *sample_names,
         plotting=config.plotting,
-        num_jets=_plotting_num_jets(config, config.components.num_jets)
-        if config.plotting.show_num_jets
+        num_global_objects=_plotting_num_global_objects(
+            config, config.components.num_global_objects
+        )
+        if config.plotting.show_num_global_objects
         else None,
         resampling_status="Post Resampling",
     )
@@ -695,7 +701,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
         vars_to_load += region.cuts.variables
 
     values_dict = {
-        "": _load_jets(config, _post_resampling_paths(config, stage), vars_to_load),
+        "": _load_global_objects(config, _post_resampling_paths(config, stage), vars_to_load),
     }
 
     for variable in config.sampl_cfg.vars:
@@ -709,7 +715,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
             make_hist(
                 stage=stage,
                 values_dict=values_dict,
-                jets_name=config.jets_name,
+                global_name=config.global_name,
                 flavours=config.components.flavours,
                 variable=variable,
                 bins_range=bins_range,
@@ -726,7 +732,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                 make_hist(
                     stage=stage,
                     values_dict=values_dict,
-                    jets_name=config.jets_name,
+                    global_name=config.global_name,
                     flavours=config.components.flavours,
                     variable=variable,
                     bins_range=_display_range(variable, stitching_region.pt_range),

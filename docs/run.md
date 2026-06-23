@@ -51,7 +51,7 @@ The stages are described below.
 #### 1. Prepare
 The prepare stage (`--prep`) checks first the number of initial jets that are available per group/sample. For each of the entries in the `pattern` of the group, it checks how many jets are in total available. If this differs too much between the entries in `pattern`, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in `pattern` are different MC campaigns and by using drastically different numbers of initial jets, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument `--skip-sample-check`. If you run the script the first time and you want to run the prepare stage in parallel, please let this script run first! It creates virtual datasets for each entry in `pattern` which could become corrupted if you do run this script in parallel multiple times! Instructions on how to run this check stand-alone can be found in [here](#additional-scripts-initial-sample-check).
 
-Afterwards, the prepare stage reads a specified number of jets (`num_jets_estimate_hist`) for each flavor and constructs histograms of the resampling variables. These histograms are stored in `<base_dir>/hists`.
+Afterwards, the prepare stage reads a specified number of jets (`num_global_objects_estimate_hist`) for each flavor and constructs histograms of the resampling variables. These histograms are stored in `<base_dir>/hists`.
 
 ???info "Paralellisation"
     This step can be parallelized to speed up the histogram creation. To do so, you need to provide the additional `--component` flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the `components` part of the config file. As an example, we take the `ghost-highstat.yaml` config file from the `gn3` folder in `configs/`:
@@ -62,8 +62,8 @@ Afterwards, the prepare stage reads a specified number of jets (`num_jets_estima
         sample:
         <<: *ttbar
         flavours: [ghostsplitbjets]
-        num_jets: 22_000_000
-        num_jets_test: 2_000_000
+        num_global_objects: 22_000_000
+        num_global_objects_test: 2_000_000
     ```
 
     The argument for the component flag can be constructed by taking the name of the region (this is defined in the definition of `lowpt`)
@@ -81,7 +81,7 @@ Afterwards, the prepare stage reads a specified number of jets (`num_jets_estima
     ```yaml
     ttbar: &ttbar
     name: ttbar
-    equal_jets: False
+    equal_global_objects: False
     pattern:
         - "user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc20d
         - "user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5" # mc23a
@@ -127,7 +127,7 @@ The merge stage (`--merge`) combines the resampled samples into a single file na
 It also handles shuffling.
 
 #### 4. Normalise 
-The normalize stage (`--norm`) calculates scaling and shifting values for all variables intended for training based on (`num_jets_estimate_norm`). The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
+The normalize stage (`--norm`) calculates scaling and shifting values for all variables intended for training based on (`num_global_objects_estimate_norm`). The results are stored in` <tbase_dir>/<out_dir>/norm_dict.yaml`.
 
 #### 5. Plotting 
 

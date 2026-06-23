@@ -3,7 +3,7 @@ global_cuts: !include /home/users/r/reisch/production/slurm-scripts/umami-prepro
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.treisch.601589.e8547_s3797_r13144_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC20d
     - "user.treisch.601589.e8549_s4159_r15530_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23d
@@ -13,7 +13,7 @@ ttbar: &ttbar
 
 zprime: &zprime
   name: zprime
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "user.treisch.802818.e8599_s3797_r13144_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC20d
     - "user.treisch.802818.e8599_s4159_r15530_p7085.tdd.GN3_dev.25_2_76.26-01-07_CentralDump_p7085_output.h5/*.h5" # MC23d
@@ -38,108 +38,108 @@ components:
     sample:
       <<: *ttbar
     flavours: [ghostbjets]
-    num_jets: 168_968_784
-    num_jets_test: 2_000_000
-    num_jets_val: 2_000_000
+    num_global_objects: 168_968_784
+    num_global_objects_test: 2_000_000
+    num_global_objects_val: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostcjets]
-    num_jets: 38_872_067
-    num_jets_test: 2_000_000
-    num_jets_val: 2_000_000
+    num_global_objects: 38_872_067
+    num_global_objects_test: 2_000_000
+    num_global_objects_val: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostsjets]
-    num_jets: 30_714_894
-    num_jets_test: 1_706_567
-    num_jets_val: 1_706_567
+    num_global_objects: 30_714_894
+    num_global_objects_test: 1_706_567
+    num_global_objects_val: 1_706_567
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostudjets]
-    num_jets: 78_352_864
-    num_jets_test: 2_000_000
-    num_jets_val: 2_000_000
+    num_global_objects: 78_352_864
+    num_global_objects_test: 2_000_000
+    num_global_objects_val: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghostgjets]
-    num_jets: 92_319_320
-    num_jets_test: 2_000_000
-    num_jets_val: 2_000_000
+    num_global_objects: 92_319_320
+    num_global_objects_test: 2_000_000
+    num_global_objects_val: 2_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ghosttaujets]
-    num_jets: 16_261_627
-    num_jets_test: 896_611
-    num_jets_val: 896_611
+    num_global_objects: 16_261_627
+    num_global_objects_test: 896_611
+    num_global_objects_val: 896_611
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostbjets]
-    num_jets: 40_230_662 #40_696_238
-    num_jets_test: 476_190
-    num_jets_val: 476_190
+    num_global_objects: 40_230_662 #40_696_238
+    num_global_objects_test: 476_190
+    num_global_objects_val: 476_190
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostcjets]
-    num_jets: 9_255_254 #39_928_286
-    num_jets_test: 476_190
-    num_jets_val: 476_190
+    num_global_objects: 9_255_254 #39_928_286
+    num_global_objects_test: 476_190
+    num_global_objects_val: 476_190
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostsjets]
-    num_jets: 7_313_070 #25_814_913
-    num_jets_test: 406_325
-    num_jets_val: 406_325
+    num_global_objects: 7_313_070 #25_814_913
+    num_global_objects_test: 406_325
+    num_global_objects_val: 406_325
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostudjets]
-    num_jets: 18_655_443 #28_206_672
-    num_jets_test: 476_190
-    num_jets_val: 476_190
+    num_global_objects: 18_655_443 #28_206_672
+    num_global_objects_test: 476_190
+    num_global_objects_val: 476_190
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghostgjets]
-    num_jets: 21_980_790 #55_036_052
-    num_jets_test: 476_190
-    num_jets_val: 476_190
+    num_global_objects: 21_980_790 #55_036_052
+    num_global_objects_test: 476_190
+    num_global_objects_val: 476_190
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ghosttaujets]
-    num_jets: 3_871_815 #25_623_679
-    num_jets_test: 213_478
-    num_jets_val: 213_478
+    num_global_objects: 3_871_815 #25_623_679
+    num_global_objects_test: 213_478
+    num_global_objects_val: 213_478
 
 resampling:
   target: ghostcjets
@@ -153,11 +153,11 @@ resampling:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: jets
+  global_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 50_000_000
-  num_jets_estimate_plotting: 10_000_000
-  num_jets_per_output_file: 5_000_000
+  num_global_objects_estimate: 50_000_000
+  num_global_objects_estimate_plotting: 10_000_000
+  num_global_objects_per_output_file: 5_000_000
   base_dir: /srv/beegfs/scratch/groups/rodem/DAOD_FTAG/
   out_dir: p7085/upp/
   ntuple_dir: p7085/

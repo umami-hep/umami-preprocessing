@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Generalise the framework beyond jets: honour the configured global object name in all stages, and rename every jet-named config option and code identifier to object-agnostic `global_object` names (e.g. `jets_name`→`global_name`, `num_jets`→`num_global_objects`, `equal_jets`→`equal_global_objects`). Old configs keep working — deprecated keys are remapped automatically on load with a warning [#156](https://github.com/umami-hep/umami-preprocessing/pull/156)
+
 ### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
 
 - Make skip-resampling work end-to-end; support `num_jets: -1` to write all jets passing cuts, and record the resampling method in the output metadata [#153](https://github.com/umami-hep/umami-preprocessing/pull/153)

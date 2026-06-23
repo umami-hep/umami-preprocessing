@@ -52,7 +52,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
             self.config = {"blockX": {"pattern": [missing_dsid, missing_rtag, missing_both]}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -89,7 +89,7 @@ def test_run_input_sample_check_unsupported_pattern_type_is_logged_and_skipped(
             self.config = {"blockY": {"pattern": {"oops": "dict-not-supported"}}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -112,7 +112,7 @@ def test_main_calls_pipeline_with_parsed_args(monkeypatch, tmp_path):
             self.config = {}
             self.ntuple_dir = tmp_path
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     called = {"run": False, "cfg": None, "df": None, "v": None}
@@ -178,7 +178,7 @@ def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
             self.config = {"block": {"pattern": ["x.123456.y_r13167.z.h5"]}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -224,7 +224,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
             self.config = {"block": {"pattern": [sample]}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -258,7 +258,7 @@ def test_script_entry_point_executes_main(tmp_path):
             self.config = {}
             self.ntuple_dir = tmp_path
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
         @classmethod
