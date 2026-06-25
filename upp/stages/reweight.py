@@ -293,9 +293,9 @@ class Reweight:
             idx_below_min = None
             for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
                 this_idx_below_min = hist == 0  # | (all_targets[rw_group][rw_rep] == 0)
-                output_weights[rw_group][rw_rep]["weights"][cls] = np.where(
-                    hist > 0, all_targets[rw_group][rw_rep] / hist, 0
-                )
+                weights = np.zeros_like(hist, dtype=float)
+                np.divide(all_targets[rw_group][rw_rep], hist, out=weights, where=hist > 0)
+                output_weights[rw_group][rw_rep]["weights"][cls] = weights
                 if idx_below_min is None:
                     idx_below_min = this_idx_below_min
                 else:

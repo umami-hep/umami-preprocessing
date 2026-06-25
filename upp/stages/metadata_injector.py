@@ -68,6 +68,13 @@ class MetadataInjector:
                     # 3. Read original jets and their attributes
                     old_jets_ds = f["jets"]
                     original_attrs = dict(old_jets_ds.attrs)  # Backup all attribute metadata
+                    # Preserve source storage layout so rewrite keeps compression/chunking.
+                    create_kwargs = {
+                        "compression": old_jets_ds.compression,
+                        "compression_opts": old_jets_ds.compression_opts,
+                        "chunks": old_jets_ds.chunks,
+                        "shuffle": old_jets_ds.shuffle,
+                    }
                     jets_data = old_jets_ds[:]
 
                     # 4. Calculate Physical Weight
@@ -88,7 +95,7 @@ class MetadataInjector:
 
                     # 6. Delete and recreate the dataset while restoring attributes
                     del f["jets"]
-                    new_ds = f.create_dataset("jets", data=updated_jets, compression="gzip")
+                    new_ds = f.create_dataset("jets", data=updated_jets, **create_kwargs)
 
                     # Restore all original attributes (e.g., descriptions for eventNumber, etc.)
                     for k, v in original_attrs.items():
