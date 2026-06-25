@@ -134,6 +134,42 @@ The normalize stage (`--norm`) calculates scaling and shifting values for all va
 The plotting stage (`--plot`) produces histograms of resampled variables to verify the resampling quality.
 You can find these plots in `<tbase_dir>/plots/`.
 
+### Centrally produced inputs: metadata + reweighting workflow
+
+Centrally produced `.h5` ntuples from TDD often lack pre-computed cross-section metadata and a `physicalWeight` column. For these inputs UPP provides an alternative chain that replaces resample/merge with a metadata injection and a histogram-based reweighting:
+
+`--metadata` &rarr; `--split-components` &rarr; `--reweight` (`--rw`) &rarr; `--rw-merge` (`--rwm`) &rarr; `--norm`
+
+An example config is provided in [`upp/configs/MetadataRW/metadata.yaml`](https://github.com/umami-hep/umami-preprocessing/blob/main/upp/configs/MetadataRW/metadata.yaml).
+
+#### Metadata injection (`--metadata`)
+
+The metadata stage injects cross section, k-factor and generator filter efficiency (via `ftag.find_metadata.MetadataFinder`) and appends a `physicalWeight` column to the `jets` dataset:
+
+$$\text{physicalWeight} = \frac{\text{XS} \times \text{eff} \times \text{kfactor}}{\text{SOW}} \times \text{mcEventWeight}$$
+
+```bash
+preprocess --config upp/configs/MetadataRW/metadata.yaml --metadata
+```
+
+!!!warning "In-place modification"
+    The metadata stage edits the input files in place (a `.bak` backup is created per file and removed on success). Run it on **workspace copies**, not on central originals. If the sum-of-weights is zero or any metadata value is non-finite the stage raises, and any per-file failures are reported as a summary at the end of the run.
+
+The downstream reweighting stage automatically uses the `physicalWeight` column when present, and otherwise falls back to uniform weights.
+
+On this route the plotting stage (`--plot`) also detects `physicalWeight` and the rw-merge weight columns and weights its histograms by their product (`physicalWeight` is capped at the reweight `WEIGHT_CAP` for consistency with the reweight histograms). When neither column is present (the default resampling route) plots remain unweighted.
+
+#### Full-ntuple passthrough (`global.keep_all_variables`)
+
+By default the split and rw-merge outputs only keep the variables declared in your `variables` config. Set `keep_all_variables: true` under `global` to instead preserve **all** top-level HDF5 datasets (e.g. `tracks`, `towers`, `flow`) and full `jets` fields in the train/val/test outputs, while still appending the reweight columns on `jets`:
+
+```yaml
+global:
+  keep_all_variables: true
+```
+
+The `test` split always keeps all variables regardless of this flag.
+
 ### Additional Scripts: Initial Sample Check
 
 The check for the initial samples from the prepare stage can also be run stand-alone. This is important if you plan to run in parallel mode. To do so, you can simply use the following command:

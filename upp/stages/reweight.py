@@ -14,6 +14,9 @@ from puma import Histogram, HistogramPlot
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.stages.hist import bin_jets
 
+# Upper bound for physical weights and reweight factors, which can span many orders of magnitude.
+WEIGHT_CAP = 1e4
+
 
 class Reweight:
     def __init__(self, config: PreprocessingConfig):
@@ -107,6 +110,7 @@ class Reweight:
         print("N per file : ", self.num_jets_estimate)
 
         # Get the variables we need to reweight
+        use_physical_weight = False
         for rw in reweights:
             rw_group = rw.group
             if rw_group not in all_vars:
@@ -116,6 +120,9 @@ class Reweight:
             all_vars[rw_group].extend(rw.reweight_vars)
             if "valid" in existing_vars[rw_group]:
                 all_vars[rw_group] += ["valid"]
+            if "physicalWeight" in existing_vars.get(rw_group, []):
+                all_vars[rw_group] += ["physicalWeight"]
+                use_physical_weight = True
         if "jets" not in all_vars:
             all_vars["jets"] = ["pt"]
         all_vars = {k: list(set(v)) for k, v in all_vars.items()}
@@ -171,10 +178,23 @@ class Reweight:
                         assert "valid" in data.dtype.names
                         data = data[data["valid"]]
                 classes = np.unique(data[rw.class_var]) if rw.class_var is not None else [None]
-
                 for cls in classes:
                     mask = data[rw.class_var] == cls
-                    hist, _outbins = bin_jets(data[mask][rw.reweight_vars], rw.flat_bins)
+                    data_masked = data[mask]
+
+                    # Use physicalWeight if present, else uniform weights.
+                    if "physicalWeight" in data_masked.dtype.names:
+                        w = np.asarray(data_masked["physicalWeight"], dtype=np.float64)
+                        w = np.clip(w, 0, WEIGHT_CAP)
+                    else:
+                        w = np.ones(mask.sum(), dtype=float)
+
+                    hist, _outbins = bin_jets(
+                        data_masked[rw.reweight_vars],
+                        rw.flat_bins,
+                        weights=w,
+                    )
+
                     if rw.class_var is not None:
                         cls = str(cls)
                     if rw_group not in all_histograms:
@@ -274,12 +294,7 @@ class Reweight:
             for cls, hist in all_histograms[rw_group][rw_rep]["histograms"].items():
                 this_idx_below_min = hist == 0  # | (all_targets[rw_group][rw_rep] == 0)
                 weights = np.zeros_like(hist, dtype=float)
-                np.divide(
-                    all_targets[rw_group][rw_rep],
-                    hist,
-                    out=weights,
-                    where=hist > 0,
-                )
+                np.divide(all_targets[rw_group][rw_rep], hist, out=weights, where=hist > 0)
                 output_weights[rw_group][rw_rep]["weights"][cls] = weights
                 if idx_below_min is None:
                     idx_below_min = this_idx_below_min
@@ -290,6 +305,15 @@ class Reweight:
             if np.any(idx_below_min):
                 for cls in all_histograms[rw_group][rw_rep]["histograms"]:
                     output_weights[rw_group][rw_rep]["weights"][cls][idx_below_min] = 0
+            # Cap final factors only on the physicalWeight path; default path unchanged.
+            if use_physical_weight:
+                for cls in output_weights[rw_group][rw_rep]["weights"]:
+                    np.clip(
+                        output_weights[rw_group][rw_rep]["weights"][cls],
+                        0,
+                        WEIGHT_CAP,
+                        out=output_weights[rw_group][rw_rep]["weights"][cls],
+                    )
 
         return output_weights
 
