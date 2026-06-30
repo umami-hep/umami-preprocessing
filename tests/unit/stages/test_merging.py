@@ -22,21 +22,21 @@ from upp.classes.preprocessing_config import PreprocessingConfig
 
 # Stub H5Writer that just records calls, does NO real IO
 class MemWriter:
-    def __init__(self, dst, dtypes, shapes, jets_name, **_):
+    def __init__(self, dst, dtypes, shapes, global_objects_name, **_):
         self.dst = Path(dst)
         self.dtypes = dtypes
         self.shapes = shapes
-        self.num_jets = next(iter(shapes.values()))[0]
-        self.jets_name = jets_name
+        self.num_global_objects = next(iter(shapes.values()))[0]
+        self.global_objects_name = global_objects_name
         self.num_written = 0
         self.attrs = {}
 
     # API that Merging calls
     def write(self, data: dict):
-        self.num_written += len(data[self.jets_name])
+        self.num_written += len(data[self.global_objects_name])
 
     def close(self):
-        assert self.num_written == self.num_jets
+        assert self.num_written == self.num_global_objects
 
     def add_attr(self, name, value, *_):
         self.attrs[name] = value
@@ -153,7 +153,7 @@ def test_open_writer_names_and_shapes(monkeypatch):
 
     writer = merge.writer
     assert isinstance(writer, MemWriter)
-    assert writer.num_jets == 7
+    assert writer.num_global_objects == 7
     assert writer.dst.name.startswith("merged_split_000")
     assert writer.dst.parent.name == "train"
     assert "flavour_label" in writer.attrs
@@ -261,9 +261,9 @@ def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
     merge.dtypes = {"jets": jets_batch["jets"].dtype}
     merge.base_shapes = {"jets": (4,)}
 
-    # Open a writer that is already full (num_written == num_jets)
+    # Open a writer that is already full (num_written == num_global_objects)
     merge._open_writer(None, 4, 0, merge.current_components)
-    merge.writer.num_written = merge.writer.num_jets
+    merge.writer.num_written = merge.writer.num_global_objects
 
     n_written = merge.write_chunk(comps)
 
@@ -272,7 +272,7 @@ def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
 
     # _file_idx is incremented once, but _open_writer was not called again
     assert merge._file_idx == 1
-    assert merge.writer.num_written == merge.writer.num_jets
+    assert merge.writer.num_written == merge.writer.num_global_objects
 
 
 class ReaderStub:
@@ -280,7 +280,7 @@ class ReaderStub:
 
     def __init__(self, batches: list[dict[str, np.ndarray]]):
         self._batches = batches
-        self.num_jets = sum(len(b["jets"]) for b in batches)
+        self.num_global_objects = sum(len(b["jets"]) for b in batches)
 
     def dtypes(self, _vars):
         # Assume at least one batch exists
@@ -290,7 +290,7 @@ class ReaderStub:
         # Base-shapes are used only for dataset names and leading dim
         return {"jets": (total_global_objects,)}
 
-    def stream(self, _vars, _num_jets):
+    def stream(self, _vars, _num_global_objects):
         def _gen():
             yield from self._batches
 
@@ -589,7 +589,7 @@ def test_resume_skips_completed_parts_and_opens_next(monkeypatch, tmp_path):
 
     # The MemWriter should have written exactly 3 jets in that last file
     assert isinstance(merge.writer, MemWriter)
-    assert merge.writer.num_jets == 3
+    assert merge.writer.num_global_objects == 3
     assert merge.writer.num_written == 3
 
 
@@ -680,7 +680,7 @@ def test_write_components_single_file_mode(monkeypatch, tmp_path):
     merge.write_components(sample=None, components=comps)
 
     assert isinstance(merge.writer, MemWriter)
-    assert merge.writer.num_jets == 7
+    assert merge.writer.num_global_objects == 7
     assert merge.writer.num_written == 7
     assert merge.writer.dst.name == "merged.h5"
 

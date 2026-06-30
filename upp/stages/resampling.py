@@ -198,7 +198,7 @@ class Resampling:
         unique = component._unique_global_objects
         component._ups_ratio = component.writer.num_written / unique if unique else 0.0
         component.writer.add_attr("upsampling_ratio", component._ups_ratio)
-        component.writer.add_attr("unique_jets", component._unique_global_objects)
+        component.writer.add_attr("unique_global_objects", component._unique_global_objects)
         component.writer.add_attr("dsid", str(component.sample.dsid))
         component.writer.close()
 
@@ -354,14 +354,14 @@ class Resampling:
             reader = H5Reader(
                 sample.path,
                 self.batch_size,
-                jets_name=self.global_name,
-                equal_jets=equal_global_objects_flag,
+                global_objects_name=self.global_name,
+                equal_global_objects=equal_global_objects_flag,
                 transform=self.transform,
                 vds_dir=sample.vds_dir,
             )
 
             # Define a stream of objects with the cuts for the region and the variables used
-            stream = reader.stream(variables.combined(), reader.num_jets, region.cuts)
+            stream = reader.stream(variables.combined(), reader.num_global_objects, region.cuts)
 
             # Run with progress bar
             with ProgressBar() as progress:
@@ -577,7 +577,7 @@ class Resampling:
                     # If a component is given, skip all components that are not selected
                     if component and iter_component.name != component:
                         continue
-                    unique += iter_component.writer.get_attr("unique_jets")
+                    unique += iter_component.writer.get_attr("unique_global_objects")
             log.info(
                 f"[bold green]Finished resampling of region {region}. "
                 f"A total of {self.components.num_global_objects:,} objects!"
@@ -587,7 +587,8 @@ class Resampling:
 
         else:
             unique = sum(
-                iter_component.writer.get_attr("unique_jets") for iter_component in self.components
+                iter_component.writer.get_attr("unique_global_objects")
+                for iter_component in self.components
             )
             log.info(
                 f"[bold green]Finished resampling a total of "

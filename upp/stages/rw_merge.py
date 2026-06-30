@@ -37,14 +37,16 @@ class RWMerge:
         with open(self.organised_components_config) as f:
             organised_components = yaml.safe_load(f)
 
-        num_global_objects = sum(organised_components["num_jets"][self.config.split].values())
+        num_global_objects = sum(
+            organised_components["num_global_objects"][self.config.split].values()
+        )
         self.attr_to_write = {
             self.config.global_name: {
                 "flavour_label": [f.name for f in self.config.components.flavours],
             },
             None: {
-                "unique_jets": num_global_objects,
-                "jet_counts": num_global_objects,
+                "unique_global_objects": num_global_objects,
+                "global_object_counts": num_global_objects,
                 "dsids": str(self.config.components.dsids),
                 "config": json.dumps(self.config.config),
                 "upp_hash": self.config.git_hash,
@@ -59,7 +61,9 @@ class RWMerge:
             organised_components = yaml.safe_load(f)
         # Get the number of objects per flavour
         files_by_flavour = organised_components["files"][self.config.split]
-        num_global_objects_per_flavours = organised_components["num_jets"][self.config.split]
+        num_global_objects_per_flavours = organised_components["num_global_objects"][
+            self.config.split
+        ]
         all_files = []
         for f in files_by_flavour:
             all_files.extend(files_by_flavour[f])
@@ -70,7 +74,7 @@ class RWMerge:
             "fname": all_files,
             "batch_size": batch_size,
             "shuffle": False,
-            "jets_name": self.config.global_name,
+            "global_objects_name": self.config.global_name,
         }
         output_dir = self.config.out_dir / self.config.split
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -227,7 +231,7 @@ class RWMerge:
         )
         batch_size = reader.batch_size
         # reader = H5Reader(input_file)
-        # num_global_objects = reader.num_jets if N == -1 else N
+        # num_global_objects = reader.num_global_objects if N == -1 else N
         writer: H5Writer = None
         additional_vars = {}
 
@@ -276,7 +280,7 @@ class RWMerge:
                     shapes,
                     shuffle=True,
                     compression="gzip",
-                    jets_name=global_name,
+                    global_objects_name=global_name,
                 )
                 for group, g_attrs in attrs.items():
                     for attr, value in g_attrs.items():

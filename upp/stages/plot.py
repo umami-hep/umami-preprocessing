@@ -440,13 +440,13 @@ def _load_global_objects(
     return H5Reader(
         fname=in_paths,
         batch_size=config.batch_size,
-        jets_name=config.global_name,
+        global_objects_name=config.global_name,
         shuffle=False,
-        equal_jets=True,
+        equal_global_objects=True,
         vds_dir=config.vds_dir,
     ).load(
         {config.global_name: list(dict.fromkeys(vars_to_load))},
-        num_jets=config.plotting.num_global_objects_plotting,
+        num_global_objects=config.plotting.num_global_objects_plotting,
     )[config.global_name]
 
 

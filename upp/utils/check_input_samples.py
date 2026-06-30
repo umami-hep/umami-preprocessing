@@ -210,9 +210,9 @@ def run_input_sample_check(
             sample_list[entry_name] = H5Reader(
                 fname=config.ntuple_dir / sample,
                 batch_size=config.batch_size,
-                jets_name=config.global_name,
+                global_objects_name=config.global_name,
                 vds_dir=config.vds_dir,
-            ).num_jets
+            ).num_global_objects
 
         # Drop the pattern
         del sample_list["pattern"]

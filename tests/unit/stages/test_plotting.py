@@ -38,9 +38,9 @@ class TestClass:
             "test": H5Reader(
                 fname=self.fname1,
                 batch_size=self.config.batch_size,
-                jets_name=self.config.global_name,
+                global_objects_name=self.config.global_name,
                 shuffle=False,
-                equal_jets=True,
+                equal_global_objects=True,
             ).load(
                 {
                     self.config.global_name: [
@@ -169,7 +169,11 @@ def test_make_hist_adds_sample_linestyle_legend(monkeypatch, tmp_path):
     fname, file = get_mock_file(num_jets=100, fname=tmp_path / "sample.h5")
     file.close()
     values = H5Reader(
-        fname=fname, batch_size=100, jets_name="jets", shuffle=False, equal_jets=True
+        fname=fname,
+        batch_size=100,
+        global_objects_name="jets",
+        shuffle=False,
+        equal_global_objects=True,
     ).load({"jets": ["pt", "HadronConeExclTruthLabelID"]})["jets"]
     calls = []
     monkeypatch.setattr(

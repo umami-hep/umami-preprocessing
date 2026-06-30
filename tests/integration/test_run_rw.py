@@ -168,15 +168,15 @@ class TestRunRW:
                 assert "flavour_label" in f["objects"].attrs
                 assert "flavour_label" in f["objects"].dtype.names
 
-    def test_rw_unequal_jets(self):
-        """Test reweighting when a file has fewer jets than num_jets_estimate.
+    def test_rw_unequal_objects(self):
+        """Test reweighting when a file has fewer objects than num_global_objects_estimate.
 
         Previously this would crash with an assertion error. After the fix,
-        get_input_readers() caps per-reader jet counts at available jets and
+        get_input_readers() caps per-reader object counts at available objects and
         the batch loop handles StopIteration from shorter readers.
         """
         # Overwrite data1.h5 with a smaller mock — after per-flavour splitting
-        # some flavour files will have fewer jets than num_jets_estimate
+        # some flavour files will have fewer objects than num_global_objects_estimate
         self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5", N=500)
         self._run_split()
         self._calculate_weights()

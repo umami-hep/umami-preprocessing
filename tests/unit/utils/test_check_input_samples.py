@@ -35,7 +35,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
     # H5Reader stub: we don't care about values here, just that it's called
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 123
+            self.num_global_objects = 123
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
@@ -160,7 +160,7 @@ def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
     # H5Reader stub
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 10
+            self.num_global_objects = 10
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
@@ -205,7 +205,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
 
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 10
+            self.num_global_objects = 10
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
@@ -247,7 +247,7 @@ def test_script_entry_point_executes_main(tmp_path):
 
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 1
+            self.num_global_objects = 1
 
     fake_hdf5.H5Reader = _H5
 

@@ -48,20 +48,20 @@ class Reweight:
             f: H5Reader(
                 files_by_flavour[f],
                 batch_size=self.config.batch_size,
-                jets_name=self.config.global_name,
+                global_objects_name=self.config.global_name,
             )
             for f in files_by_flavour
         }
         per_reader_num_global_objects = []
         for f, r in input_readers.items():
-            n = min(self.num_global_objects_estimate, r.num_jets)
-            if r.num_jets < self.num_global_objects_estimate:
+            n = min(self.num_global_objects_estimate, r.num_global_objects)
+            if r.num_global_objects < self.num_global_objects_estimate:
                 print(
                     f"WARNING: Requested {self.num_global_objects_estimate} objects for {f}, "
-                    f"but only {r.num_jets} available. Using {r.num_jets}."
+                    f"but only {r.num_global_objects} available. Using {r.num_global_objects}."
                 )
             print(
-                f"Flavour {f} has {r.num_jets} objects, using {n}, "
+                f"Flavour {f} has {r.num_global_objects} objects, using {n}, "
                 f"reading in batches of {self.config.batch_size}"
             )
             per_reader_num_global_objects.append(n)
@@ -124,7 +124,7 @@ class Reweight:
         all_histograms = {}
         print("Setting up streams with vars: ", all_vars, flush=True)
         reader_streams = [
-            r.stream(all_vars, num_jets=n)
+            r.stream(all_vars, num_global_objects=n)
             for r, n in zip(readers, per_reader_num_global_objects, strict=False)
         ]
         max_num_global_objects = max(per_reader_num_global_objects)

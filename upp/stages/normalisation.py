@@ -252,7 +252,7 @@ class Normalisation:
             fname,
             self.config.batch_size,
             precision="full",
-            jets_name=self.global_name,
+            global_objects_name=self.global_name,
         )
         log.debug(f"Setup reader at: {fname}")
 

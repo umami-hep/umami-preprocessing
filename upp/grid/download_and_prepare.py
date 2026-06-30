@@ -134,8 +134,8 @@ def create_meta_data(
         split: {
             flavour: H5Reader(
                 files_by_component[split][flavour],
-                jets_name=pp_config.global_name,
-            ).num_jets
+                global_objects_name=pp_config.global_name,
+            ).num_global_objects
             for flavour in files_by_component[split]
         }
         for split in files_by_component
@@ -145,7 +145,7 @@ def create_meta_data(
         yaml.dump(
             {
                 "files": files_by_component,
-                "num_jets": num_global_objects,
+                "num_global_objects": num_global_objects,
             },
             f,
             default_flow_style=False,

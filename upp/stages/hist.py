@@ -94,7 +94,7 @@ class Hist:
         with h5py.File(self.path, "w") as f:
             f.create_dataset("pbin", data=pbin)
             f.create_dataset("hist", data=hist)
-            f.attrs.create("num_jets", len(global_objects))
+            f.attrs.create("num_global_objects", len(global_objects))
             f.attrs.create("resampling_vars", resampling_vars)
             for i, v in enumerate(resampling_vars):
                 f.attrs.create(f"bins_{v}", bins[i])

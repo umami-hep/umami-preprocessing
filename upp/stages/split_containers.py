@@ -142,11 +142,14 @@ class SplitContainers:
         print("parsed variables: ", parsed_variables, flush=True)
         start = time.time()
         reader = H5Reader(
-            input_file, batch_size=batch_size, shuffle=False, jets_name=self.config.global_name
+            input_file,
+            batch_size=batch_size,
+            shuffle=False,
+            global_objects_name=self.config.global_name,
         )
         if output_name is None:
             output_name = input_file.name
-        num_global_objects = reader.num_jets
+        num_global_objects = reader.num_global_objects
         num_batches = num_global_objects // batch_size + (
             1 if num_global_objects % batch_size != 0 else 0
         )
@@ -170,7 +173,7 @@ class SplitContainers:
 
             writers_by_sample_components[split] = H5Writer.from_file(
                 input_file,
-                num_jets=None,
+                num_global_objects=None,
                 dst=output_file,
                 precision="half",
                 full_precision_vars=fp_vars,
@@ -178,7 +181,7 @@ class SplitContainers:
                 variables=all_variables if "test" in split else parsed_variables,
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
-                jets_name=global_name,
+                global_objects_name=global_name,
             )
             cuts_by_sample_components[split] = component_cuts
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
@@ -286,10 +289,11 @@ class SplitContainers:
             create_virtual_file(str(tmp_dir / "*.h5"), tmp_out_path, overwrite=True)
             h5vds = H5Reader(
                 tmp_out_path,
-                jets_name=self.config.global_name,
+                global_objects_name=self.config.global_name,
             )
             print(
-                f"Created combined virtual dataset with {h5vds.num_jets} objects at {tmp_out_path}",
+                f"Created combined virtual dataset with {h5vds.num_global_objects} "
+                f"objects at {tmp_out_path}",
                 flush=True,
             )
             yield tmp_out_path
@@ -377,14 +381,16 @@ class SplitContainers:
 
         num_global_objects = {
             split: {
-                flavour: H5Reader(files[split][flavour], jets_name=self.config.global_name).num_jets
+                flavour: H5Reader(
+                    files[split][flavour], global_objects_name=self.config.global_name
+                ).num_global_objects
                 for flavour in files[split]
             }
             for split in files
         }
         metadata = {
             "files": files,
-            "num_jets": num_global_objects,
+            "num_global_objects": num_global_objects,
         }
 
         output_file = output_dir / "organised-components.yaml"

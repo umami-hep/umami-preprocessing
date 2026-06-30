@@ -92,8 +92,8 @@ class Component:
         self.reader = H5Reader(
             fname=fname,
             batch_size=batch_size,
-            jets_name=global_name,
-            equal_jets=self.equal_global_objects,
+            global_objects_name=global_name,
+            equal_global_objects=self.equal_global_objects,
             **kwargs,
         )
         log.debug(f"Setup component reader at: {fname}")
@@ -111,7 +111,7 @@ class Component:
         dtypes = self.reader.dtypes(variables.combined())
         # num_global_objects == -1 ("write all") -> 0 leading dim so the writer grows dynamically
         shapes = self.reader.shapes(max(self.num_global_objects, 0), variables.keys())
-        self.writer = H5Writer(self.out_path, dtypes, shapes, jets_name=global_name)
+        self.writer = H5Writer(self.out_path, dtypes, shapes, global_objects_name=global_name)
         log.debug(f"Setup component writer at: {self.out_path}")
 
     @property
@@ -181,7 +181,7 @@ class Component:
         dict
             Dict with the loaded objects
         """
-        jn = self.reader.jets_name
+        jn = self.reader.global_objects_name
         return self.reader.load({jn: variables}, num_global_objects, cuts)[jn]
 
     def check_num_global_objects(
@@ -225,7 +225,7 @@ class Component:
             if self.num_global_objects_estimate_available <= 0
             else self.num_global_objects_estimate_available
         )
-        total = self.reader.estimate_available_jets(cuts, num_est)
+        total = self.reader.estimate_available_global_objects(cuts, num_est)
         available = total
         if sampling_fraction:
             available = int(total * sampling_fraction)
@@ -243,7 +243,7 @@ class Component:
             log.debug(f"Sampling fraction {sampling_fraction}")
             log.info(
                 f"Estimated {available:,} {self} objects available - {num_req:,} requested"
-                f"({self.reader.num_jets:,} in {self.sample})"
+                f"({self.reader.num_global_objects:,} in {self.sample})"
             )
 
     def get_auto_sampling_fraction(
@@ -273,7 +273,7 @@ class Component:
             if self.num_global_objects_estimate_available <= 0
             else self.num_global_objects_estimate_available
         )
-        total = self.reader.estimate_available_jets(cuts, num_est)
+        total = self.reader.estimate_available_global_objects(cuts, num_est)
         auto_sampling_frac = round(1.1 * num_global_objects / total, 3)  # 1.1 is a tolerance factor
         if not silent:
             log.debug(f"optimal sampling fraction {auto_sampling_frac:.3f}")
@@ -300,7 +300,7 @@ class Component:
         """
         if self._unique_global_objects == -1:
             self._unique_global_objects = sum(
-                [r.get_attr("unique_jets") for r in self.reader.readers]
+                [r.get_attr("unique_global_objects") for r in self.reader.readers]
             )
 
         return self._unique_global_objects
@@ -490,14 +490,14 @@ class Components:
     def global_object_counts(self):
         num_dict = {
             c.name: {
-                "num_jets": int(c.num_global_objects),
-                "unique_jets": int(c.unique_global_objects),
+                "num_global_objects": int(c.num_global_objects),
+                "unique_global_objects": int(c.unique_global_objects),
             }
             for c in self
         }
         num_dict["total"] = {
-            "num_jets": int(self.num_global_objects),
-            "unique_jets": int(self.unique_global_objects),
+            "num_global_objects": int(self.num_global_objects),
+            "unique_global_objects": int(self.unique_global_objects),
         }
         return num_dict
 

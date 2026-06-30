@@ -272,7 +272,7 @@ class Merging:
 
         def __init__(self, capacity: int):
             # Mirrors the ftag H5Writer API (assigned to self.writer)
-            self.num_jets = capacity
+            self.num_global_objects = capacity
             self.num_written = 0
 
         def write(self, batch: dict[str, np.ndarray]) -> None:
@@ -288,7 +288,7 @@ class Merging:
                 return
             any_arr = next(iter(batch.values()))
             k = len(any_arr)
-            self.num_written = min(self.num_written + k, self.num_jets)
+            self.num_written = min(self.num_written + k, self.num_global_objects)
 
         def add_attr(self, *args, **kwargs):
             """Skip the attribute addition."""
@@ -340,8 +340,8 @@ class Merging:
             self.dtypes,
             shapes,
             add_flavour_label=self.global_name,
-            jets_name=self.global_name,
-            num_jets=global_objects_in_file,
+            global_objects_name=self.global_name,
+            num_global_objects=global_objects_in_file,
         )
 
         # Copy the metadata attributes
@@ -350,8 +350,8 @@ class Merging:
             [f.name for f in self.flavours],
             self.global_name,
         )
-        self.writer.add_attr("unique_jets", components.unique_global_objects)
-        self.writer.add_attr("jet_counts", json.dumps(components.global_object_counts))
+        self.writer.add_attr("unique_global_objects", components.unique_global_objects)
+        self.writer.add_attr("global_object_counts", json.dumps(components.global_object_counts))
         self.writer.add_attr("dsids", str(components.dsids))
         self.writer.add_attr("config", json.dumps(self.config.config))
         self.writer.add_attr("upp_hash", self.config.git_hash)
@@ -422,7 +422,7 @@ class Merging:
         # Get the total length of objects from the batch and how much
         # capacity is left in the file
         merged_len = len(merged[self.global_name])
-        capacity_left = self.writer.num_jets - self.writer.num_written
+        capacity_left = self.writer.num_global_objects - self.writer.num_written
 
         if self._fast_forwarding:
             # Limit consumption to the remaining discard quota
@@ -464,7 +464,7 @@ class Merging:
             )
 
             # Recompute free space in the freshly-opened file
-            capacity_left = self.writer.num_jets - self.writer.num_written
+            capacity_left = self.writer.num_global_objects - self.writer.num_written
 
         # Write (or discard) the batch
         if merged_len <= capacity_left or self._fast_forwarding:
@@ -519,7 +519,7 @@ class Merging:
                 component.setup_reader(
                     self.batch_size, fname=component.out_path, global_name=self.global_name
                 )
-                component.num_global_objects = component.reader.num_jets
+                component.num_global_objects = component.reader.num_global_objects
 
         # Prepare every Component's reader
         for component in components:
@@ -533,7 +533,7 @@ class Merging:
             )
             component.stream = component.reader.stream(
                 self.variables.combined(),
-                component.reader.num_jets,
+                component.reader.num_global_objects,
             )
             component.complete = False
 
