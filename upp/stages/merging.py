@@ -350,8 +350,11 @@ class Merging:
             [f.name for f in self.flavours],
             self.global_name,
         )
-        self.writer.add_attr("unique_global_objects", components.unique_global_objects)
-        self.writer.add_attr("global_object_counts", json.dumps(components.global_object_counts))
+        self.writer.add_attr(f"unique_{self.global_name}", components.unique_global_objects)
+        self.writer.add_attr(
+            f"{self.global_name}_counts",
+            json.dumps(components.global_object_counts(self.global_name)),
+        )
         self.writer.add_attr("dsids", str(components.dsids))
         self.writer.add_attr("config", json.dumps(self.config.config))
         self.writer.add_attr("upp_hash", self.config.git_hash)

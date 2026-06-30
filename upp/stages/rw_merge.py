@@ -45,8 +45,8 @@ class RWMerge:
                 "flavour_label": [f.name for f in self.config.components.flavours],
             },
             None: {
-                "unique_global_objects": num_global_objects,
-                "global_object_counts": num_global_objects,
+                f"unique_{self.config.global_name}": num_global_objects,
+                f"{self.config.global_name}_counts": num_global_objects,
                 "dsids": str(self.config.components.dsids),
                 "config": json.dumps(self.config.config),
                 "upp_hash": self.config.git_hash,

@@ -198,7 +198,7 @@ class Resampling:
         unique = component._unique_global_objects
         component._ups_ratio = component.writer.num_written / unique if unique else 0.0
         component.writer.add_attr("upsampling_ratio", component._ups_ratio)
-        component.writer.add_attr("unique_global_objects", component._unique_global_objects)
+        component.writer.add_attr(f"unique_{self.global_name}", component._unique_global_objects)
         component.writer.add_attr("dsid", str(component.sample.dsid))
         component.writer.close()
 
@@ -577,7 +577,7 @@ class Resampling:
                     # If a component is given, skip all components that are not selected
                     if component and iter_component.name != component:
                         continue
-                    unique += iter_component.writer.get_attr("unique_global_objects")
+                    unique += iter_component.writer.get_attr(f"unique_{self.global_name}")
             log.info(
                 f"[bold green]Finished resampling of region {region}. "
                 f"A total of {self.components.num_global_objects:,} objects!"
@@ -587,7 +587,7 @@ class Resampling:
 
         else:
             unique = sum(
-                iter_component.writer.get_attr("unique_global_objects")
+                iter_component.writer.get_attr(f"unique_{self.global_name}")
                 for iter_component in self.components
             )
             log.info(

@@ -299,9 +299,8 @@ class Component:
             Number of unique objects for this component
         """
         if self._unique_global_objects == -1:
-            self._unique_global_objects = sum(
-                [r.get_attr("unique_global_objects") for r in self.reader.readers]
-            )
+            attr = f"unique_{self.reader.global_objects_name}"
+            self._unique_global_objects = sum([r.get_attr(attr) for r in self.reader.readers])
 
         return self._unique_global_objects
 
@@ -486,18 +485,29 @@ class Components:
         assert len(out_dir) == 1
         return next(iter(out_dir))
 
-    @property
-    def global_object_counts(self):
+    def global_object_counts(self, global_name: str = "jets") -> dict:
+        """Return per-component and total object counts.
+
+        Parameters
+        ----------
+        global_name : str, optional
+            Name of the global object, used to key the counts, by default "jets".
+
+        Returns
+        -------
+        dict
+            Counts keyed by ``num_{global_name}`` and ``unique_{global_name}``.
+        """
         num_dict = {
             c.name: {
-                "num_global_objects": int(c.num_global_objects),
-                "unique_global_objects": int(c.unique_global_objects),
+                f"num_{global_name}": int(c.num_global_objects),
+                f"unique_{global_name}": int(c.unique_global_objects),
             }
             for c in self
         }
         num_dict["total"] = {
-            "num_global_objects": int(self.num_global_objects),
-            "unique_global_objects": int(self.unique_global_objects),
+            f"num_{global_name}": int(self.num_global_objects),
+            f"unique_{global_name}": int(self.unique_global_objects),
         }
         return num_dict
 

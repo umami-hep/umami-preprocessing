@@ -148,7 +148,9 @@ def test_open_writer_names_and_shapes(monkeypatch):
         sample=None,
         global_objects_in_file=7,
         file_idx=0,
-        components=SimpleNamespace(unique_global_objects=True, global_object_counts={}, dsids=[]),
+        components=SimpleNamespace(
+            unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+        ),
     )
 
     writer = merge.writer
@@ -179,7 +181,7 @@ def test_write_chunk_splits(monkeypatch):
     merge._file_idx = 0
     merge.global_objects_written = 0
     merge.current_components = SimpleNamespace(
-        unique_global_objects=True, global_object_counts={}, dsids=[]
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
     )
     merge._sample = None
 
@@ -223,7 +225,7 @@ def test_write_chunk_rollover(monkeypatch):
     merge._file_idx = 0
     merge._sample = None
     merge.current_components = SimpleNamespace(
-        unique_global_objects=True, global_object_counts={}, dsids=[]
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
     )
 
     # Open the first writer with capacity 5 and mark it as "full"
@@ -253,7 +255,7 @@ def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
     merge.global_objects_written = 4
     merge._file_idx = 0
     merge.current_components = SimpleNamespace(
-        unique_global_objects=True, global_object_counts={}, dsids=[]
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
     )
     merge._sample = None
 
@@ -319,8 +321,10 @@ class ComponentsStub:
         self._comps = comps
         self.num_global_objects = sum(c.num_global_objects for c in comps)
         self.unique_global_objects = True
-        self.global_object_counts: dict[str, int] = {}
         self.dsids: list[int] = []
+
+    def global_object_counts(self, _global_name="jets"):
+        return {}
 
     def __iter__(self):
         return iter(self._comps)
@@ -658,7 +662,7 @@ def test_write_chunk_all_components_complete_early_return(monkeypatch):
     merge._file_idx = 0
     merge.global_objects_written = 0
     merge.current_components = SimpleNamespace(
-        unique_global_objects=True, global_object_counts={}, dsids=[]
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
     )
     merge._sample = None
     merge._open_writer(None, 0, 0, merge.current_components)

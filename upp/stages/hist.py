@@ -64,6 +64,7 @@ class Hist:
         global_objects: dict,
         resampling_vars: list,
         bins: list,
+        global_name: str = "jets",
     ) -> None:
         """
         Write the histogram to file.
@@ -76,6 +77,8 @@ class Hist:
             List of the resampling variables.
         bins : list
             Flat list with the bins.
+        global_name : str, optional
+            Name of the global object, used for the count attribute, by default "jets".
 
         Raises
         ------
@@ -94,7 +97,7 @@ class Hist:
         with h5py.File(self.path, "w") as f:
             f.create_dataset("pbin", data=pbin)
             f.create_dataset("hist", data=hist)
-            f.attrs.create("num_global_objects", len(global_objects))
+            f.attrs.create(f"num_{global_name}", len(global_objects))
             f.attrs.create("resampling_vars", resampling_vars)
             for i, v in enumerate(resampling_vars):
                 f.attrs.create(f"bins_{v}", bins[i])
@@ -195,6 +198,7 @@ def create_histograms(
             global_objects=global_objects,
             resampling_vars=sampl_vars,
             bins=config.sampl_cfg.flat_bins,
+            global_name=config.global_name,
         )
 
         # Set the check variable to true
