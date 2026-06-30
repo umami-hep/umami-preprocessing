@@ -228,7 +228,7 @@ def run_input_sample_check(
             log.info(f"Group: {sample_type}")
 
             for entry_name, n_global_objects in sample_dict.items():
-                log.info(f"  - Sample: {entry_name}, N_Jets: {n_global_objects:,}")
+                log.info(f"  - Sample: {entry_name}, N_Objects: {n_global_objects:,}")
 
 
 def main(args: Any | None = None) -> None:

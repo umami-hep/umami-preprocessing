@@ -92,7 +92,7 @@ class TestPreprocessingConfig(unittest.TestCase):
 
         self.assertEqual(config.plotting.num_global_objects_plotting, 100)
         self.assertEqual(config.plotting.variable_label("pt"), "$p_\\mathrm{T}$ [GeV]")
-        self.assertEqual(config.plotting.variable_label("mass"), "Object Mass [GeV]")
+        self.assertEqual(config.plotting.variable_label("mass"), "Jet Mass [GeV]")
         self.assertEqual(config.plotting.sample_label("ttbar"), "$t\\bar{t}$")
         self.assertEqual(config.plotting.output_formats, ["png"])
 

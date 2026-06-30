@@ -18,11 +18,11 @@ def test_plotting_config_labels():
 
 
 def test_plotting_config_default_pt_label():
-    assert PlottingConfig().variable_label("pt_btagJes") == "Object $p_\\mathrm{T}$ [GeV]"
+    assert PlottingConfig().variable_label("pt_btagJes") == "Jet $p_\\mathrm{T}$ [GeV]"
 
 
 def test_plotting_config_default_mass_label():
-    assert PlottingConfig().variable_label("mass") == "Object Mass [GeV]"
+    assert PlottingConfig().variable_label("mass") == "Jet Mass [GeV]"
 
 
 @pytest.mark.parametrize(
