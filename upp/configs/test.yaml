@@ -30,14 +30,14 @@ components:
     sample:
       <<: *ttbar
     flavours: [bjets, cjets, ujets]
-    num_jets: 10_000
+    num_global_objects: 10_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets, cjets, ujets]
-    num_jets: 10_000
+    num_global_objects: 10_000
 
 resampling:
   target: cjets
@@ -51,7 +51,7 @@ resampling:
 
 global:
   batch_size: 10_000
-  num_jets_estimate: 10_000
+  num_global_objects_estimate: 10_000
   base_dir: /unix/atlastracking/samples/gnn_training/martino/v1/
   out_dir: test_out
   ntuple_dir: source_data

@@ -127,15 +127,56 @@ class TestRunRW:
         self._calculate_weights()
         self._rw_merge()
 
-    def test_rw_unequal_jets(self):
-        """Test reweighting when a file has fewer jets than num_jets_estimate.
+    def _rename_mock_group(self, fname, old="jets", new="objects"):
+        """Rename the main object group in a mock file (jets -> objects)."""
+        with h5py.File(fname, "a") as f:
+            f.move(old, new)
+
+    def test_rw_custom_object_name(self):
+        """End-to-end reweighting with a non-"jets" object group name.
+
+        Guards against hardcoded "jets" references: the input group is renamed
+        to "objects" and the config sets global_name: objects. Every stage must
+        honour the configured name rather than assuming "jets".
+        """
+        for container in ["data1.h5", "data2.h5", "data3.h5"]:
+            self._rename_mock_group(f"tmp/upp-tests/integration/temp_workspace/ntuples/{container}")
+
+        config = str(Path(this_dir / "fixtures/test_config_rw_custom_name.yaml"))
+
+        # Split
+        main(["--config", config, "--split", "train", "--split-components", *self.no])
+
+        # Calculate weights
+        main(["--config", config, "--rw", *self.no])
+        hist_file = Path("tmp/upp-tests/integration/temp_workspace/test_out/histograms.h5")
+        with h5py.File(hist_file, "r") as f:
+            assert f.keys() == {"objects", "tracks"}, (
+                f"Expected 'objects'/'tracks' groups, found {f.keys()}"
+            )
+
+        # Merge with weights
+        for split in ["train", "val", "test"]:
+            main(["--config", config, "--rwm", "--split", split, *self.no])
+            outfile = Path(
+                f"tmp/upp-tests/integration/temp_workspace/test_out/pp_output_{split}_vds.h5"
+            )
+            assert outfile.exists()
+            with h5py.File(outfile, "r") as f:
+                assert "objects" in f, "Expected 'objects' group in output file"
+                assert "jets" not in f, "Output must not contain a hardcoded 'jets' group"
+                assert "flavour_label" in f["objects"].attrs
+                assert "flavour_label" in f["objects"].dtype.names
+
+    def test_rw_unequal_objects(self):
+        """Test reweighting when a file has fewer objects than num_global_objects_estimate.
 
         Previously this would crash with an assertion error. After the fix,
-        get_input_readers() caps per-reader jet counts at available jets and
+        get_input_readers() caps per-reader object counts at available objects and
         the batch loop handles StopIteration from shorter readers.
         """
         # Overwrite data1.h5 with a smaller mock — after per-flavour splitting
-        # some flavour files will have fewer jets than num_jets_estimate
+        # some flavour files will have fewer objects than num_global_objects_estimate
         self.generate_mock("tmp/upp-tests/integration/temp_workspace/ntuples/data1.h5", N=500)
         self._run_split()
         self._calculate_weights()

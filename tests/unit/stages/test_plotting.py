@@ -38,19 +38,19 @@ class TestClass:
             "test": H5Reader(
                 fname=self.fname1,
                 batch_size=self.config.batch_size,
-                jets_name=self.config.jets_name,
+                global_objects_name=self.config.global_name,
                 shuffle=False,
-                equal_jets=True,
+                equal_global_objects=True,
             ).load(
                 {
-                    self.config.jets_name: [
+                    self.config.global_name: [
                         "pt",
                         "abs_eta",
                         "mass",
                         "HadronConeExclTruthLabelID",
                     ]
                 }
-            )[self.config.jets_name]
+            )[self.config.global_name]
         }
         print(f"setup_method, method: {method.__name__}")
 
@@ -85,19 +85,19 @@ class TestClass:
 
 def test_plot_helpers_format_labels_and_ranges():
     """Check compact labels and GeV unit conversion helpers."""
-    assert plot_mod._format_num_jets(999) == "999"
-    assert plot_mod._format_num_jets(100_000) == "100k"
-    assert plot_mod._format_num_jets(10_000_000) == "10M"
+    assert plot_mod._format_num_global_objects(999) == "999"
+    assert plot_mod._format_num_global_objects(100_000) == "100k"
+    assert plot_mod._format_num_global_objects(10_000_000) == "10M"
     assert (
         plot_mod._atlas_second_tag(
             "ttbar",
             "zprime",
             plotting=PlottingConfig(),
-            num_jets=100_000,
+            num_global_objects=100_000,
             resampling_status="Pre Resampling",
         )
-        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ + $Z'$ jets"
-        "\nPre Resampling\n100k jets"
+        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ + $Z'$ objects"
+        "\nPre Resampling\n100k objects"
     )
     assert plot_mod._display_range("pt_btagJes", (20_000, 250_000)) == (20, 250)
     assert plot_mod._display_range("JetFitterSecondaryVertex_mass", (0, 25_000)) == (0, 25)
@@ -169,7 +169,11 @@ def test_make_hist_adds_sample_linestyle_legend(monkeypatch, tmp_path):
     fname, file = get_mock_file(num_jets=100, fname=tmp_path / "sample.h5")
     file.close()
     values = H5Reader(
-        fname=fname, batch_size=100, jets_name="jets", shuffle=False, equal_jets=True
+        fname=fname,
+        batch_size=100,
+        global_objects_name="jets",
+        shuffle=False,
+        equal_global_objects=True,
     ).load({"jets": ["pt", "HadronConeExclTruthLabelID"]})["jets"]
     calls = []
     monkeypatch.setattr(
@@ -198,7 +202,7 @@ def test_post_resampling_paths_split_mode(tmp_path):
         out_fname=tmp_path / "pp_output_test.h5",
         split="test",
         merge_test_samples=False,
-        num_jets_per_output_file=10,
+        num_global_objects_per_output_file=10,
         components=components,
     )
 
@@ -229,19 +233,19 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
             )
             region_components = SimpleNamespace(
                 flavours=[Flavours["bjets"]],
-                num_jets=100_000,
+                num_global_objects=100_000,
             )
             return [(region, region_components)]
 
     config = SimpleNamespace(
         split="val",
-        plotting=PlottingConfig(num_jets_plotting=10_000),
+        plotting=PlottingConfig(num_global_objects_plotting=10_000),
         sampl_cfg=SimpleNamespace(
             vars=["pt"],
             bins={"pt": [[20_000, 250_000, 5]]},
         ),
         components=FakeComponents(),
-        jets_name="jets",
+        global_name="jets",
         batch_size=100,
         out_dir=tmp_path,
     )
@@ -254,7 +258,7 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
     def fake_make_hist(**kwargs):
         calls.append(kwargs)
 
-    monkeypatch.setattr(plot_mod, "_load_jets", fake_load_jets)
+    monkeypatch.setattr(plot_mod, "_load_global_objects", fake_load_jets)
     monkeypatch.setattr(plot_mod, "make_hist", fake_make_hist)
 
     plot_mod._plot_initial(config)
@@ -263,5 +267,5 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
     assert calls[0]["suffix"] == "_val_ttbar_lowpt"
     assert calls[0]["bins_range"] == (20, 250)
     assert calls[0]["atlas_second_tag"] == (
-        "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ jets\nPre Resampling\n10k jets"
+        "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ objects\nPre Resampling\n10k objects"
     )

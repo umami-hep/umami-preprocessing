@@ -3,14 +3,14 @@ global_cuts: !include GN3V01/simple-split.yaml
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "data1.h5"
     - "data3.h5"
 
 zprime: &zprime
   name: zprime
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "data2.h5"
 
@@ -31,14 +31,14 @@ components:
     sample:
       <<: *ttbar
     flavours: [bjets, cjets, ujets, taujets]
-    num_jets: -1
+    num_global_objects: -1
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets, cjets, ujets, taujets]
-    num_jets: -1
+    num_global_objects: -1
 
 resampling:
   target: ghostcjets
@@ -56,7 +56,7 @@ resampling:
       bins: [[0, 2.5, 10]]
 
 reweighting:
-  num_jets_estimate: 100
+  num_global_objects_estimate: 100
   merge_num_proc: 1
   reweights:
     - group: jets
@@ -69,8 +69,8 @@ reweighting:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: jets
+  global_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 25_000_000
+  num_global_objects_estimate: 25_000_000
   base_dir: /tmp/upp-tests/integration/temp_workspace/
   out_dir: test_out

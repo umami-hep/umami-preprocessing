@@ -35,7 +35,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
     # H5Reader stub: we don't care about values here, just that it's called
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 123
+            self.num_global_objects = 123
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
@@ -52,7 +52,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
             self.config = {"blockX": {"pattern": [missing_dsid, missing_rtag, missing_both]}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -89,7 +89,7 @@ def test_run_input_sample_check_unsupported_pattern_type_is_logged_and_skipped(
             self.config = {"blockY": {"pattern": {"oops": "dict-not-supported"}}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -112,7 +112,7 @@ def test_main_calls_pipeline_with_parsed_args(monkeypatch, tmp_path):
             self.config = {}
             self.ntuple_dir = tmp_path
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     called = {"run": False, "cfg": None, "df": None, "v": None}
@@ -160,7 +160,7 @@ def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
     # H5Reader stub
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 10
+            self.num_global_objects = 10
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
@@ -178,7 +178,7 @@ def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
             self.config = {"block": {"pattern": ["x.123456.y_r13167.z.h5"]}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -205,7 +205,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
 
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 10
+            self.num_global_objects = 10
 
     monkeypatch.setattr(cis, "H5Reader", _H5)
 
@@ -224,7 +224,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
             self.config = {"block": {"pattern": [sample]}}
             self.ntuple_dir = ntuple_dir
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
@@ -247,7 +247,7 @@ def test_script_entry_point_executes_main(tmp_path):
 
     class _H5:
         def __init__(self, **_kwargs):
-            self.num_jets = 1
+            self.num_global_objects = 1
 
     fake_hdf5.H5Reader = _H5
 
@@ -258,7 +258,7 @@ def test_script_entry_point_executes_main(tmp_path):
             self.config = {}
             self.ntuple_dir = tmp_path
             self.batch_size = 1
-            self.jets_name = "jets"
+            self.global_name = "jets"
             self.vds_dir = None
 
         @classmethod

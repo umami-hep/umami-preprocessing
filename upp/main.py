@@ -1,13 +1,14 @@
 """
-Preprocessing pipeline for jet tagging.
+Preprocessing pipeline for object tagging.
 
 By default all stages for the training split are run.
 To run with only specific stages enabled, include the flag for the required stages.
 To run without certain stages, include the corresponding negative flag.
 
-To disable resampling, omit the `resampling` block or set `method: none`. The jets passing
-the cuts are then written directly, capped at each component's `num_jets` (use `num_jets: -1`
-to keep all of them). The `--no-resample` flag only skips the resampling *stage* (e.g. to
+To disable resampling, omit the `resampling` block or set `method: none`. The objects passing
+the cuts are then written directly, capped at each component's `num_global_objects`
+(use `num_global_objects: -1` to keep all of them). The `--no-resample` flag only skips
+the resampling *stage* (e.g. to
 re-run later stages); it does not disable resampling.
 """
 

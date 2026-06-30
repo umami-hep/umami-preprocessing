@@ -3,35 +3,35 @@ global_cuts: !include splits/simple-split.yaml
 
 htautauhad: &htautauhad
   name: htautauhad
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - user.edcritel.802168.e8558_s3797_r13144_p6453.tdd.*/*.h5
     - user.edcritel.802168.e8558_s4159_r15530_p6453.tdd.*/*.h5
 
 hbb: &hbb
   name: hbb
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - group.perf-flavtag.801471.e8441_s3681_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.801972.e8514_s4159_r15224_p6453.tdd.*/*.h5
 
 hcc: &hcc
   name: hcc
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - group.perf-flavtag.801472.e8441_s3681_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.801973.e8514_s4159_r15224_p6453.tdd.*/*.h5
 
 top: &Zprime
   name: Zprime
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - group.perf-flavtag.426345.e6880_s3681_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.802423.e8514_s4159_r15530_p6453.tdd.*/*.h5
 
 qcd: &qcd
   name: qcd
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - group.perf-flavtag.364703.e7142_s3681_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.364704.e7142_s3681_r13144_p6453.tdd.*/*.h5
@@ -46,7 +46,7 @@ qcd: &qcd
 
 Wqq: &Wqq
   name: Wqq
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - group.perf-flavtag.802017.e8482_s3797_r13144_p6453.tdd.*/*.h5
     - group.perf-flavtag.802017.e8557_s4159_r15224_p6453.tdd.*/*.h5
@@ -62,42 +62,42 @@ components:
     sample:
       <<: *htautauhad
     flavours: [htautauhad]
-    num_jets: 10_000_000
+    num_global_objects: 10_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hbb
     flavours: [hbb]
-    num_jets: 40_000_000
+    num_global_objects: 40_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
     flavours: [hcc]
-    num_jets: 40_000_000
+    num_global_objects: 40_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *Zprime
     flavours: [top]
-    num_jets: 35_000_000
+    num_global_objects: 35_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
     flavours: [qcd]
-    num_jets: 80_000_000
+    num_global_objects: 80_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *Wqq
     flavours: [Wqq]
-    num_jets: 5_000_000
+    num_global_objects: 5_000_000
 
 
 resampling:
@@ -117,7 +117,7 @@ resampling:
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
   batch_size: 4_000_000
-  num_jets_estimate: 10_000_000
+  num_global_objects_estimate: 10_000_000
   base_dir: /share/lustre/ecritelli/xbb_upp_Zprimeonly_withRegr/base_dir
   ntuple_dir: /share/lustre/ecritelli/ntuples/gn3xv00
   out_dir: /share/lustre/ecritelli/xbb_upp_Zprimeonly_withRegr/output

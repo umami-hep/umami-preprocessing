@@ -6,7 +6,7 @@ global_cuts: !include splits/simple-split.yaml
 
 ttbar: &ttbar
   name: ttbar
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "/atlas_cloud/triglion/data/TDD_ttbar_DiLep/user.tstreble.601230.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562989._*.output.h5"
     - "/atlas_cloud/triglion/data/TDD_ttbar_SingleLep/user.tstreble.601229.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562988._*.output.h5"
@@ -14,7 +14,7 @@ ttbar: &ttbar
 
 zprime: &zprime
   name: zprime
-  equal_jets: False
+  equal_global_objects: False
   pattern:
     - "/atlas_cloud/triglion/data/TDD_Zprime/user.tstreble.800030.e8481_s4446_r16176_p6677.tdd.upgrade.25_0_29.25-05-06_Run4_May6_output.h5/user.tstreble.44562987._*.output.h5"
 
@@ -37,42 +37,42 @@ components:
     sample:
       <<: *ttbar
     flavours: [bjets, cjets]
-    num_jets: 14_500_000
+    num_global_objects: 14_500_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [ujets]
-    num_jets: 29_000_000
+    num_global_objects: 29_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
     flavours: [taujets]
-    num_jets: 2_013_889
+    num_global_objects: 2_013_889
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [bjets, cjets]
-    num_jets: 5_800_000
+    num_global_objects: 5_800_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [ujets]
-    num_jets: 11_600_000
+    num_global_objects: 11_600_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
     flavours: [taujets]
-    num_jets: 805_555
+    num_global_objects: 805_555
 
 
 
@@ -88,8 +88,8 @@ resampling:
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
 global:
-  jets_name: jets
+  global_name: jets
   batch_size: 1_000_000
-  num_jets_estimate: 25_000_000
+  num_global_objects_estimate: 25_000_000
   base_dir: /atlas_cloud/triglion/preprocessing
   ntuple_dir: /atlas_cloud/triglion/preprocessing

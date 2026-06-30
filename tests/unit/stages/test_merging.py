@@ -22,21 +22,21 @@ from upp.classes.preprocessing_config import PreprocessingConfig
 
 # Stub H5Writer that just records calls, does NO real IO
 class MemWriter:
-    def __init__(self, dst, dtypes, shapes, jets_name, **_):
+    def __init__(self, dst, dtypes, shapes, global_objects_name, **_):
         self.dst = Path(dst)
         self.dtypes = dtypes
         self.shapes = shapes
-        self.num_jets = next(iter(shapes.values()))[0]
-        self.jets_name = jets_name
+        self.num_global_objects = next(iter(shapes.values()))[0]
+        self.global_objects_name = global_objects_name
         self.num_written = 0
         self.attrs = {}
 
     # API that Merging calls
     def write(self, data: dict):
-        self.num_written += len(data[self.jets_name])
+        self.num_written += len(data[self.global_objects_name])
 
     def close(self):
-        assert self.num_written == self.num_jets
+        assert self.num_written == self.num_global_objects
 
     def add_attr(self, name, value, *_):
         self.attrs[name] = value
@@ -59,7 +59,7 @@ class DummyComponent(SimpleNamespace):
     Simulates the subset of the real Component interface that Merging uses:
     - flavour
     - stream  (generator of batches)
-    - num_jets
+    - num_global_objects
     - complete flag
     """
 
@@ -67,7 +67,7 @@ class DummyComponent(SimpleNamespace):
         super().__init__()
         self.flavour = Flavours[flavour]
         self._batches = list(jet_batches)
-        self.num_jets = sum(len(b["jets"]) for b in self._batches)
+        self.num_global_objects = sum(len(b["jets"]) for b in self._batches)
         self.complete = False
         self.out_path = Path("/dev/null")
 
@@ -104,8 +104,8 @@ def _minimal_merging(monkeypatch, jets_per_file=10) -> merging_mod.Merging:
         components=SimpleNamespace(flavours=[Flavours["bjets"]]),
         variables=variables,
         batch_size=100,
-        jets_name="jets",
-        num_jets_per_output_file=jets_per_file,
+        global_name="jets",
+        num_global_objects_per_output_file=jets_per_file,
         file_tag="split",
         out_fname=Path("/tmp/merged.h5"),
         split="train",
@@ -126,13 +126,13 @@ def test_add_jet_flavour_label(monkeypatch):
 
     jets = _jets_struct(5)
     comp = SimpleNamespace(flavour=Flavours["bjets"])
-    tagged = merge.add_jet_flavour_label(jets, comp)
+    tagged = merge.add_global_object_label(jets, comp)
 
     assert "flavour_label" in tagged.dtype.names
     assert np.all(tagged["flavour_label"] == 0)
 
     # Calling again must not duplicate the column
-    same = merge.add_jet_flavour_label(tagged, comp)
+    same = merge.add_global_object_label(tagged, comp)
     assert same.dtype == tagged.dtype
 
 
@@ -146,14 +146,16 @@ def test_open_writer_names_and_shapes(monkeypatch):
 
     merge._open_writer(
         sample=None,
-        jets_in_file=7,
+        global_objects_in_file=7,
         file_idx=0,
-        components=SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[]),
+        components=SimpleNamespace(
+            unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+        ),
     )
 
     writer = merge.writer
     assert isinstance(writer, MemWriter)
-    assert writer.num_jets == 7
+    assert writer.num_global_objects == 7
     assert writer.dst.name.startswith("merged_split_000")
     assert writer.dst.parent.name == "train"
     assert "flavour_label" in writer.attrs
@@ -162,7 +164,7 @@ def test_open_writer_names_and_shapes(monkeypatch):
 def test_write_chunk_splits(monkeypatch):
     """Test split writing of write_chunk.
 
-    With num_jets_per_output_file=5 and a batch of 8 jets, write_chunk must
+    With num_global_objects_per_output_file=5 and a batch of 8 jets, write_chunk must
     create two MemWriter instances and write all jets.
     """
     merge = _minimal_merging(monkeypatch, jets_per_file=5)
@@ -175,10 +177,12 @@ def test_write_chunk_splits(monkeypatch):
     # Fake dtypes / shapes and open first writer
     merge.dtypes = {"jets": jets1["jets"].dtype}
     merge.base_shapes = {"jets": (8,)}
-    merge.total_jets = 8
+    merge.total_global_objects = 8
     merge._file_idx = 0
-    merge.jets_written = 0
-    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+    merge.global_objects_written = 0
+    merge.current_components = SimpleNamespace(
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+    )
     merge._sample = None
 
     merge._open_writer(None, 5, 0, merge.current_components)
@@ -203,7 +207,7 @@ def test_write_chunk_rollover(monkeypatch):
     1. close that writer,
     2. open a fresh one (file_idx increments),
     3. write the incoming batch into the new file,
-    4. update jets_written.
+    4. update global_objects_written.
     """
     # Create a merger with 5 jets / file
     merge = _minimal_merging(monkeypatch, jets_per_file=5)
@@ -216,11 +220,13 @@ def test_write_chunk_rollover(monkeypatch):
     # Fake the bookkeeping exactly as write_components() would
     merge.dtypes = {"jets": batch["jets"].dtype}
     merge.base_shapes = {"jets": (8,)}
-    merge.total_jets = 8
-    merge.jets_written = 5
+    merge.total_global_objects = 8
+    merge.global_objects_written = 5
     merge._file_idx = 0
     merge._sample = None
-    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+    merge.current_components = SimpleNamespace(
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+    )
 
     # Open the first writer with capacity 5 and mark it as "full"
     merge._open_writer(None, 5, 0, merge.current_components)
@@ -232,7 +238,7 @@ def test_write_chunk_rollover(monkeypatch):
     assert n == 3
     assert merge._file_idx == 1
     assert merge.writer.num_written == 3
-    assert merge.jets_written == 8
+    assert merge.global_objects_written == 8
 
 
 def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
@@ -245,19 +251,21 @@ def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
     comps = [comp]
 
     # Mimic state after everything has already been written
-    merge.total_jets = 4
-    merge.jets_written = 4
+    merge.total_global_objects = 4
+    merge.global_objects_written = 4
     merge._file_idx = 0
-    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+    merge.current_components = SimpleNamespace(
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+    )
     merge._sample = None
 
     # We still need valid dtypes / shapes for _open_writer
     merge.dtypes = {"jets": jets_batch["jets"].dtype}
     merge.base_shapes = {"jets": (4,)}
 
-    # Open a writer that is already full (num_written == num_jets)
+    # Open a writer that is already full (num_written == num_global_objects)
     merge._open_writer(None, 4, 0, merge.current_components)
-    merge.writer.num_written = merge.writer.num_jets
+    merge.writer.num_written = merge.writer.num_global_objects
 
     n_written = merge.write_chunk(comps)
 
@@ -266,7 +274,7 @@ def test_write_chunk_returns_zero_when_no_space_left(monkeypatch):
 
     # _file_idx is incremented once, but _open_writer was not called again
     assert merge._file_idx == 1
-    assert merge.writer.num_written == merge.writer.num_jets
+    assert merge.writer.num_written == merge.writer.num_global_objects
 
 
 class ReaderStub:
@@ -274,17 +282,17 @@ class ReaderStub:
 
     def __init__(self, batches: list[dict[str, np.ndarray]]):
         self._batches = batches
-        self.num_jets = sum(len(b["jets"]) for b in batches)
+        self.num_global_objects = sum(len(b["jets"]) for b in batches)
 
     def dtypes(self, _vars):
         # Assume at least one batch exists
         return {"jets": self._batches[0]["jets"].dtype}
 
-    def shapes(self, total_jets: int, _keys):
+    def shapes(self, total_global_objects: int, _keys):
         # Base-shapes are used only for dataset names and leading dim
-        return {"jets": (total_jets,)}
+        return {"jets": (total_global_objects,)}
 
-    def stream(self, _vars, _num_jets):
+    def stream(self, _vars, _num_global_objects):
         def _gen():
             yield from self._batches
 
@@ -297,7 +305,7 @@ class ComponentStub:
     def __init__(self, flavour: str, batches: list[dict[str, np.ndarray]]):
         self.flavour = Flavours[flavour]
         self._batches = batches
-        self.num_jets = sum(len(b["jets"]) for b in batches)
+        self.num_global_objects = sum(len(b["jets"]) for b in batches)
         self.complete = False
         self.out_path = Path("/dev/null")
         self.reader = None
@@ -311,10 +319,12 @@ class ComponentsStub:
 
     def __init__(self, comps: list[ComponentStub]):
         self._comps = comps
-        self.num_jets = sum(c.num_jets for c in comps)
-        self.unique_jets = True
-        self.jet_counts: dict[str, int] = {}
+        self.num_global_objects = sum(c.num_global_objects for c in comps)
+        self.unique_global_objects = True
         self.dsids: list[int] = []
+
+    def global_object_counts(self, _global_name="jets"):
+        return {}
 
     def __iter__(self):
         return iter(self._comps)
@@ -338,8 +348,8 @@ def _mk_merge_for_path(monkeypatch, out_path: Path, jets_per_file=5):
         components=SimpleNamespace(flavours=[Flavours["bjets"]]),
         variables=variables,
         batch_size=100,
-        jets_name="jets",
-        num_jets_per_output_file=jets_per_file,
+        global_name="jets",
+        num_global_objects_per_output_file=jets_per_file,
         file_tag="split",
         out_fname=out_path,
         split="train",
@@ -390,7 +400,7 @@ def test_part_fname_formatting(monkeypatch, tmp_path):
 
 def test_detect_and_clean_completed_parts_empty_dir(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 10
+    merge.total_global_objects = 10
     merge.base_shapes = {"jets": (10,)}
     # no files exist
     idx = merge._detect_and_clean_completed_parts(None)
@@ -399,7 +409,7 @@ def test_detect_and_clean_completed_parts_empty_dir(monkeypatch, tmp_path):
 
 def test_expected_rows_for_part_middle_and_tail(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 12  # 5 + 5 + 2
+    merge.total_global_objects = 12  # 5 + 5 + 2
     assert merge._expected_rows_for_part(0) == 5
     assert merge._expected_rows_for_part(1) == 5
     assert merge._expected_rows_for_part(2) == 2
@@ -408,7 +418,7 @@ def test_expected_rows_for_part_middle_and_tail(monkeypatch, tmp_path):
 
 def test_is_part_valid_happy_path(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 12
+    merge.total_global_objects = 12
     merge.base_shapes = {"jets": (12,)}  # dataset names only; length unused here
 
     f0 = merge._part_fname(None, 0)
@@ -419,7 +429,7 @@ def test_is_part_valid_happy_path(monkeypatch, tmp_path):
 
 def test_is_part_valid_multiple_datasets(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 5
+    merge.total_global_objects = 5
     merge.base_shapes = {"jets": (5,), "tracks": (5,)}
 
     f0 = merge._part_fname(None, 0)
@@ -432,7 +442,7 @@ def test_is_part_valid_multiple_datasets(monkeypatch, tmp_path):
 
 def test_is_part_valid_wrong_length(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 12
+    merge.total_global_objects = 12
     merge.base_shapes = {"jets": (12,)}
 
     f1 = merge._part_fname(None, 1)
@@ -442,7 +452,7 @@ def test_is_part_valid_wrong_length(monkeypatch, tmp_path):
 
 def test_is_part_valid_missing_jets_dataset(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 5
+    merge.total_global_objects = 5
     merge.base_shapes = {"jets": (5,)}
 
     f0 = merge._part_fname(None, 0)
@@ -454,7 +464,7 @@ def test_is_part_valid_missing_jets_dataset(monkeypatch, tmp_path):
 
 def test_is_part_valid_mismatched_lengths(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 5
+    merge.total_global_objects = 5
     # Declare two expected datasets; only those present are compared
     merge.base_shapes = {"jets": (5,), "tracks": (5,)}
 
@@ -468,7 +478,7 @@ def test_is_part_valid_mismatched_lengths(monkeypatch, tmp_path):
 
 def test_is_part_valid_corrupt_file(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 5
+    merge.total_global_objects = 5
     merge.base_shapes = {"jets": (5,)}
 
     f0 = merge._part_fname(None, 0)
@@ -478,7 +488,7 @@ def test_is_part_valid_corrupt_file(monkeypatch, tmp_path):
 
 def test_detect_and_clean_completed_parts_counts_and_deletes(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 13  # parts: [5, 5, 3]
+    merge.total_global_objects = 13  # parts: [5, 5, 3]
     merge.base_shapes = {"jets": (13,)}
 
     # Create two valid parts 0 and 1
@@ -503,7 +513,7 @@ def test_detect_and_clean_completed_parts_counts_and_deletes(monkeypatch, tmp_pa
 
 def test_detect_and_clean_completed_parts_no_delete_when_disabled(monkeypatch, tmp_path):
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 10
+    merge.total_global_objects = 10
     merge.base_shapes = {"jets": (10,)}
 
     _write_valid_part(merge._part_fname(None, 0), rows=5)
@@ -519,7 +529,7 @@ def test_detect_and_clean_completed_parts_no_delete_when_disabled(monkeypatch, t
 def test_detect_and_clean_handles_unlink_error(monkeypatch, tmp_path):
     """Simulate OSError during unlink to cover error logging branch."""
     merge = _mk_merge_for_path(monkeypatch, tmp_path / "merged.h5", jets_per_file=5)
-    merge.total_jets = 10
+    merge.total_global_objects = 10
     merge.base_shapes = {"jets": (10,)}
 
     # Valid part 0
@@ -564,11 +574,11 @@ def test_resume_skips_completed_parts_and_opens_next(monkeypatch, tmp_path):
     open_calls = []
     _orig_open = merging_mod.Merging._open_writer
 
-    def _wrapped_open(self, sample, jets_in_file, file_idx, components):
+    def _wrapped_open(self, sample, global_objects_in_file, file_idx, components):
         # Fast-forward must be finished when we open a real writer
         assert self._fast_forwarding is False
-        open_calls.append((sample, jets_in_file, file_idx))
-        return _orig_open(self, sample, jets_in_file, file_idx, components)
+        open_calls.append((sample, global_objects_in_file, file_idx))
+        return _orig_open(self, sample, global_objects_in_file, file_idx, components)
 
     monkeypatch.setattr(merging_mod.Merging, "_open_writer", _wrapped_open)
 
@@ -577,13 +587,13 @@ def test_resume_skips_completed_parts_and_opens_next(monkeypatch, tmp_path):
 
     # We expect the first (and only) open to be for part index 2 with capacity 3
     assert len(open_calls) >= 1
-    _, jets_in_file, file_idx = open_calls[0]
+    _, global_objects_in_file, file_idx = open_calls[0]
     assert file_idx == 2
-    assert jets_in_file == 3
+    assert global_objects_in_file == 3
 
     # The MemWriter should have written exactly 3 jets in that last file
     assert isinstance(merge.writer, MemWriter)
-    assert merge.writer.num_jets == 3
+    assert merge.writer.num_global_objects == 3
     assert merge.writer.num_written == 3
 
 
@@ -606,11 +616,11 @@ def test_fast_forward_does_not_open_real_writer(monkeypatch, tmp_path):
     call_times = {"count": 0}
     _orig_open = merging_mod.Merging._open_writer
 
-    def _wrapped_open(self, sample, jets_in_file, file_idx, components):
+    def _wrapped_open(self, sample, global_objects_in_file, file_idx, components):
         # Must never be invoked while fast-forwarding
         assert self._fast_forwarding is False
         call_times["count"] += 1
-        return _orig_open(self, sample, jets_in_file, file_idx, components)
+        return _orig_open(self, sample, global_objects_in_file, file_idx, components)
 
     monkeypatch.setattr(merging_mod.Merging, "_open_writer", _wrapped_open)
 
@@ -648,10 +658,12 @@ def test_write_chunk_all_components_complete_early_return(monkeypatch):
     jets0 = _jets_struct(0)
     merge.dtypes = {"jets": jets0.dtype}
     merge.base_shapes = {"jets": (0,)}
-    merge.total_jets = 0
+    merge.total_global_objects = 0
     merge._file_idx = 0
-    merge.jets_written = 0
-    merge.current_components = SimpleNamespace(unique_jets=True, jet_counts={}, dsids=[])
+    merge.global_objects_written = 0
+    merge.current_components = SimpleNamespace(
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+    )
     merge._sample = None
     merge._open_writer(None, 0, 0, merge.current_components)
 
@@ -660,10 +672,10 @@ def test_write_chunk_all_components_complete_early_return(monkeypatch):
 
 
 def test_write_components_single_file_mode(monkeypatch, tmp_path):
-    """When num_jets_per_output_file is None, no split suffix is added."""
+    """When num_global_objects_per_output_file is None, no split suffix is added."""
     out = tmp_path / "merged.h5"
     merge = _mk_merge_for_path(monkeypatch, out, jets_per_file=None)
-    merge.num_jets_per_output_file = None  # ensure single-file mode
+    merge.num_global_objects_per_output_file = None  # ensure single-file mode
 
     jets = {"jets": _jets_struct(7)}
     comp = ComponentStub("bjets", [jets])
@@ -672,7 +684,7 @@ def test_write_components_single_file_mode(monkeypatch, tmp_path):
     merge.write_components(sample=None, components=comps)
 
     assert isinstance(merge.writer, MemWriter)
-    assert merge.writer.num_jets == 7
+    assert merge.writer.num_global_objects == 7
     assert merge.writer.num_written == 7
     assert merge.writer.dst.name == "merged.h5"
 
@@ -704,8 +716,8 @@ def test_run_groupby_sample_calls_write_components(monkeypatch, tmp_path):
         components=FakeComponents(),
         variables=variables,
         batch_size=100,
-        jets_name="jets",
-        num_jets_per_output_file=10,
+        global_name="jets",
+        num_global_objects_per_output_file=10,
         file_tag="split",
         out_fname=tmp_path / "merged.h5",
         split="train",
@@ -720,7 +732,7 @@ def test_run_groupby_sample_calls_write_components(monkeypatch, tmp_path):
     called = []
 
     def _wc(self, sample, components):  # noqa: ARG001
-        called.append((sample, components.num_jets))
+        called.append((sample, components.num_global_objects))
 
     monkeypatch.setattr(merging_mod.Merging, "write_components", _wc)
 

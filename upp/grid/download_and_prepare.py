@@ -129,12 +129,13 @@ def create_meta_data(
 
     output_file = output_dir / "organised-components.yaml"
 
-    # Create a reader for each components to get num jets
-    num_jets = {
+    # Create a reader for each components to get num objects
+    num_global_objects = {
         split: {
             flavour: H5Reader(
                 files_by_component[split][flavour],
-            ).num_jets
+                global_objects_name=pp_config.global_name,
+            ).num_global_objects
             for flavour in files_by_component[split]
         }
         for split in files_by_component
@@ -144,7 +145,7 @@ def create_meta_data(
         yaml.dump(
             {
                 "files": files_by_component,
-                "num_jets": num_jets,
+                "num_global_objects": num_global_objects,
             },
             f,
             default_flow_style=False,
