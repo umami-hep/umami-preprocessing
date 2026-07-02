@@ -315,3 +315,20 @@ class TestPreprocessingConfig(unittest.TestCase):
             config.flavour_cont,
             LabelContainer.from_yaml(yaml_path=self.CFG_DIR / "test_flavour_config.yaml"),
         )
+
+    def test_relative_class_config_resolved_against_base_dir(self) -> None:
+        config = PreprocessingConfig(
+            config_path=self.CFG_DIR / "test.yaml",
+            split="train",
+            config={
+                "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=self.CFG_DIR,
+            class_config=Path("test_flavour_config.yaml"),
+            skip_checks=True,
+        )
+        expected = (self.CFG_DIR / "test_flavour_config.yaml").absolute()
+        self.assertEqual(config.class_config, expected)
+        self.assertEqual(config.flavour_cont, LabelContainer.from_yaml(yaml_path=expected))

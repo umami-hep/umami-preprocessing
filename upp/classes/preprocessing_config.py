@@ -214,6 +214,9 @@ class PreprocessingConfig:
         # vds_dir is optional (Path | None), so the loop above skips it; resolve it here
         if self.vds_dir is not None:
             self.vds_dir = self.get_path(Path(self.vds_dir))
+        # class_config is optional (Path | None) and also skipped above; resolve it too
+        if self.class_config is not None:
+            self.class_config = self.get_path(Path(self.class_config))
         if not self.ntuple_dir.exists() and not self.skip_checks:
             raise FileNotFoundError(f"Path {self.ntuple_dir} does not exist")
         self.components_dir = self.components_dir / self.split
