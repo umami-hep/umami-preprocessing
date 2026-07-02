@@ -182,6 +182,7 @@ def _format_num_global_objects(num_global_objects: int) -> str:
 def _atlas_second_tag(
     *sample_names: str,
     plotting: PlottingConfig,
+    global_name: str = "jets",
     num_global_objects: int | None = None,
     resampling_status: str | None = None,
 ) -> str:
@@ -193,6 +194,9 @@ def _atlas_second_tag(
         Sample names to include after the centre-of-mass energy.
     plotting : PlottingConfig
         Active plotting configuration.
+    global_name : str, optional
+        Name of the global object used to label the sample and count lines,
+        by default "jets".
     num_global_objects : int | None, optional
         Number of objects requested for plotting. If provided, it is added as an
         extra line using compact formatting.
@@ -209,12 +213,12 @@ def _atlas_second_tag(
     labels = [_sample_label(name, plotting) for name in dict.fromkeys(sample_names) if name]
     first_line = plotting.atlas_second_tag
     if labels:
-        first_line = f"{first_line}, {' + '.join(labels)} objects"
+        first_line = f"{first_line}, {' + '.join(labels)} {global_name}"
     lines = [first_line]
     if resampling_status is not None:
         lines.append(resampling_status)
     if num_global_objects is not None:
-        lines.append(f"{_format_num_global_objects(num_global_objects)} objects")
+        lines.append(f"{_format_num_global_objects(num_global_objects)} {global_name}")
     return "\n".join(lines)
 
 
@@ -626,6 +630,7 @@ def _plot_initial(config: PreprocessingConfig) -> None:
                     atlas_second_tag=_atlas_second_tag(
                         sample.name,
                         plotting=config.plotting,
+                        global_name=config.global_name,
                         num_global_objects=_plotting_num_global_objects(
                             config, region_components.num_global_objects
                         )
@@ -688,6 +693,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
     atlas_second_tag = _atlas_second_tag(
         *sample_names,
         plotting=config.plotting,
+        global_name=config.global_name,
         num_global_objects=_plotting_num_global_objects(
             config, config.components.num_global_objects
         )

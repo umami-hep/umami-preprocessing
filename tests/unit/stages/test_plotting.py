@@ -96,8 +96,20 @@ def test_plot_helpers_format_labels_and_ranges():
             num_global_objects=100_000,
             resampling_status="Pre Resampling",
         )
-        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ + $Z'$ objects"
-        "\nPre Resampling\n100k objects"
+        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ + $Z'$ jets"
+        "\nPre Resampling\n100k jets"
+    )
+    assert (
+        plot_mod._atlas_second_tag(
+            "ttbar",
+            "zprime",
+            plotting=PlottingConfig(),
+            global_name="tracks",
+            num_global_objects=100_000,
+            resampling_status="Pre Resampling",
+        )
+        == "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ + $Z'$ tracks"
+        "\nPre Resampling\n100k tracks"
     )
     assert plot_mod._display_range("pt_btagJes", (20_000, 250_000)) == (20, 250)
     assert plot_mod._display_range("JetFitterSecondaryVertex_mass", (0, 25_000)) == (0, 25)
@@ -267,5 +279,5 @@ def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_
     assert calls[0]["suffix"] == "_val_ttbar_lowpt"
     assert calls[0]["bins_range"] == (20, 250)
     assert calls[0]["atlas_second_tag"] == (
-        "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ objects\nPre Resampling\n10k objects"
+        "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$, $t\\bar{t}$ jets\nPre Resampling\n10k jets"
     )
