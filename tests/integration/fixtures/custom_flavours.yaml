@@ -1,0 +1,13 @@
+# Custom, non-jet flavour definitions used by test_rw_custom_flavours.
+# Names deliberately differ from the atlas-ftag-tools bundled flavours to prove
+# the container is loaded from this file. Cuts select on the mock truth variable.
+- name: heavy
+  label: Heavy objects
+  cuts: ["HadronConeExclTruthLabelID == 5"]
+  colour: tab:red
+  category: custom
+- name: light
+  label: Light objects
+  cuts: ["HadronConeExclTruthLabelID == 0"]
+  colour: tab:blue
+  category: custom

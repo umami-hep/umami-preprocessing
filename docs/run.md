@@ -61,7 +61,7 @@ Afterwards, the prepare stage reads a specified number of jets (`num_global_obje
         <<: *lowpt
         sample:
         <<: *ttbar
-        flavours: [ghostsplitbjets]
+        classes: [ghostsplitbjets]
         num_global_objects: 22_000_000
         num_global_objects_test: 2_000_000
     ```

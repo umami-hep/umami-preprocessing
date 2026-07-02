@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -167,6 +168,44 @@ class TestRunRW:
                 assert "jets" not in f, "Output must not contain a hardcoded 'jets' group"
                 assert "flavour_label" in f["objects"].attrs
                 assert "flavour_label" in f["objects"].dtype.names
+
+    def test_rw_custom_flavours(self):
+        """End-to-end reweighting with a user-supplied custom class_config.
+
+        The mock "jets" group is renamed to "objects" and the config points
+        class_config at a custom classes yaml (given as a path relative to
+        base_dir) defining non-standard classes (heavy/light). Proves custom
+        classes work end-to-end for a non-jet object and that a relative
+        class_config path resolves against base_dir.
+        """
+        for container in ["data1.h5", "data2.h5", "data3.h5"]:
+            self._rename_mock_group(f"tmp/upp-tests/integration/temp_workspace/ntuples/{container}")
+
+        # Copy the custom classes file into base_dir so the relative
+        # class_config path in the config resolves against base_dir.
+        base_dir = Path("tmp/upp-tests/integration/temp_workspace")
+        shutil.copy(this_dir / "fixtures/custom_flavours.yaml", base_dir / "custom_flavours.yaml")
+
+        config = str(Path(this_dir / "fixtures/test_config_rw_custom_flavours.yaml"))
+
+        main(["--config", config, "--split", "train", "--split-components", *self.no])
+        main(["--config", config, "--rw", *self.no])
+
+        for split in ["train", "val", "test"]:
+            main(["--config", config, "--rwm", "--split", split, *self.no])
+            outfile = Path(
+                f"tmp/upp-tests/integration/temp_workspace/test_out/pp_output_{split}_vds.h5"
+            )
+            assert outfile.exists()
+            with h5py.File(outfile, "r") as f:
+                assert "objects" in f, "Expected 'objects' group in output file"
+                assert "jets" not in f, "Output must not contain a hardcoded 'jets' group"
+                assert "flavour_label" in f["objects"].dtype.names
+                labels = [
+                    x.decode() if isinstance(x, bytes) else str(x)
+                    for x in f["objects"].attrs["flavour_label"]
+                ]
+                assert labels == ["heavy", "light"], f"Expected custom flavours, found {labels}"
 
     def test_rw_unequal_objects(self):
         """Test reweighting when a file has fewer objects than num_global_objects_estimate.

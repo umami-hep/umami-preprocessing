@@ -123,14 +123,14 @@ components:
     <<: *lowpt
     sample:
     <<: *ttbar
-    flavours: [bjets, cjets, ujets]
+    classes: [bjets, cjets, ujets]
     num_global_objects: 10_000_000
 
 - region:
     <<: *highpt
     sample:
     <<: *zprime
-    flavours: [bjets, cjets, ujets]
+    classes: [bjets, cjets, ujets]
     num_global_objects: 5_000_000
 ```
 
@@ -140,12 +140,46 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 | ------- | ---- | ----------- |
 | `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
 | `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
-| `flavours` | `list[str]` | One or more jet flavours, e.g. `[bjets]` or `[ujets]`. The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each flavour.|
+| `classes` | `list[str]` | One or more object classes (flavours), e.g. `[bjets]` or `[ujets]`. Each name must exist in the active class container (the atlas-ftag-tools bundled flavours by default, or your own file via `class_config` — see [Custom classes](#custom-classes)). The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each class.|
 |`num_global_objects`|`int`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts.|
 |`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`) number of jets of this component in validation set.|
 |`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`) number of jets of this component in a test set.|
 
 
+
+### Custom classes
+
+By default the class definitions come from the flavour labels bundled with
+`atlas-ftag-tools`, selected with `class_category` (`standard` or `extended`).
+These are jet flavours, but the framework itself is object-agnostic: to classify
+any other object type, point `class_config` at your own classes yaml. It is a
+list of class definitions, each with a `name`, plotting `label`, selection
+`cuts`, a `colour`, a `category`, and an optional `_px` probability name:
+
+```yaml
+- name: heavy
+  label: Heavy objects
+  cuts: ["HadronConeExclTruthLabelID == 5"]
+  colour: tab:red
+  category: custom
+- name: light
+  label: Light objects
+  cuts: ["HadronConeExclTruthLabelID == 0"]
+  colour: tab:blue
+  category: custom
+```
+
+Reference it from the global config; a relative path is resolved against
+`base_dir`, and `class_config` takes precedence over `class_category`:
+
+```yaml
+global:
+  global_name: objects
+  class_config: custom_flavours.yaml
+```
+
+The `classes` listed for each component then refer to the `name` entries in this
+file (e.g. `classes: [heavy, light]`).
 
 ### Variables
 
