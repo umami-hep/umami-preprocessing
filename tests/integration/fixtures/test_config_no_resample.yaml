@@ -29,21 +29,21 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets]
+    classes: [bjets]
     num_global_objects: 1_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [cjets]
+    classes: [cjets]
     num_global_objects: 1_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ujets]
+    classes: [ujets]
     num_global_objects: -1
 
 global:

@@ -37,7 +37,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostbjets]
+    classes: [ghostbjets]
     num_global_objects: 168_968_784
     num_global_objects_test: 2_000_000
     num_global_objects_val: 2_000_000
@@ -46,7 +46,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostcjets]
+    classes: [ghostcjets]
     num_global_objects: 38_872_067
     num_global_objects_test: 2_000_000
     num_global_objects_val: 2_000_000
@@ -55,7 +55,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsjets]
+    classes: [ghostsjets]
     num_global_objects: 30_714_894
     num_global_objects_test: 1_706_567
     num_global_objects_val: 1_706_567
@@ -64,7 +64,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostudjets]
+    classes: [ghostudjets]
     num_global_objects: 78_352_864
     num_global_objects_test: 2_000_000
     num_global_objects_val: 2_000_000
@@ -73,7 +73,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostgjets]
+    classes: [ghostgjets]
     num_global_objects: 92_319_320
     num_global_objects_test: 2_000_000
     num_global_objects_val: 2_000_000
@@ -82,7 +82,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghosttaujets]
+    classes: [ghosttaujets]
     num_global_objects: 16_261_627
     num_global_objects_test: 896_611
     num_global_objects_val: 896_611
@@ -91,7 +91,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostbjets]
+    classes: [ghostbjets]
     num_global_objects: 40_230_662 #40_696_238
     num_global_objects_test: 476_190
     num_global_objects_val: 476_190
@@ -100,7 +100,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostcjets]
+    classes: [ghostcjets]
     num_global_objects: 9_255_254 #39_928_286
     num_global_objects_test: 476_190
     num_global_objects_val: 476_190
@@ -109,7 +109,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsjets]
+    classes: [ghostsjets]
     num_global_objects: 7_313_070 #25_814_913
     num_global_objects_test: 406_325
     num_global_objects_val: 406_325
@@ -118,7 +118,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostudjets]
+    classes: [ghostudjets]
     num_global_objects: 18_655_443 #28_206_672
     num_global_objects_test: 476_190
     num_global_objects_val: 476_190
@@ -127,7 +127,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostgjets]
+    classes: [ghostgjets]
     num_global_objects: 21_980_790 #55_036_052
     num_global_objects_test: 476_190
     num_global_objects_val: 476_190
@@ -136,7 +136,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghosttaujets]
+    classes: [ghosttaujets]
     num_global_objects: 3_871_815 #25_623_679
     num_global_objects_test: 213_478
     num_global_objects_val: 213_478

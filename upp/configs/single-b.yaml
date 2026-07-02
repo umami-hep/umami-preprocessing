@@ -37,42 +37,42 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets, cjets]
+    classes: [bjets, cjets]
     num_global_objects: 45_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ujets]
+    classes: [ujets]
     num_global_objects: 90_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [taujets]
+    classes: [taujets]
     num_global_objects: 6_250_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [bjets, cjets]
+    classes: [bjets, cjets]
     num_global_objects: 18_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ujets]
+    classes: [ujets]
     num_global_objects: 36_000_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [taujets]
+    classes: [taujets]
     num_global_objects: 2_500_000
 
 

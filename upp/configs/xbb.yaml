@@ -30,28 +30,28 @@ components:
       <<: *inclusive
     sample:
       <<: *hbb
-    flavours: [hbb]
+    classes: [hbb]
     num_global_objects: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
-    flavours: [hcc]
+    classes: [hcc]
     num_global_objects: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *top
-    flavours: [top]
+    classes: [top]
     num_global_objects: 30_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
-    flavours: [qcd]
+    classes: [qcd]
     num_global_objects: 50_000_000
 
 resampling:

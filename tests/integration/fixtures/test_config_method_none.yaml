@@ -27,21 +27,21 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets]
+    classes: [bjets]
     num_global_objects: 1_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [cjets]
+    classes: [cjets]
     num_global_objects: 2_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ujets]
+    classes: [ujets]
     num_global_objects: 3_000
 
 # Resampling explicitly disabled - no target or variables required.

@@ -21,35 +21,35 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets]
+    classes: [bjets]
     num_global_objects: 25_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [D0meson]
+    classes: [D0meson]
     num_global_objects: 12_500_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [nonD0meson]
+    classes: [nonD0meson]
     num_global_objects: 12_500_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ujets]
+    classes: [ujets]
     num_global_objects: 50_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [taujets]
+    classes: [taujets]
     num_global_objects: 4_000_000
 
 resampling:

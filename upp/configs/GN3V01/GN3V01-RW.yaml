@@ -37,7 +37,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours:
+    classes:
       [
         ghostbjets,
         ghostcjets,
@@ -52,7 +52,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours:
+    classes:
       [
         ghostbjets,
         ghostcjets,

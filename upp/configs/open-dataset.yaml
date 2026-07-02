@@ -63,21 +63,21 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets, cjets]
+    classes: [bjets, cjets]
     num_global_objects: 13_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ujets]
+    classes: [ujets]
     num_global_objects: 26_000_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [taujets]
+    classes: [taujets]
     num_global_objects: 1_500_000
 
 resampling:

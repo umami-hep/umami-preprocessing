@@ -61,42 +61,42 @@ components:
       <<: *inclusive
     sample:
       <<: *htautauhad
-    flavours: [htautauhad]
+    classes: [htautauhad]
     num_global_objects: 10_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hbb
-    flavours: [hbb]
+    classes: [hbb]
     num_global_objects: 40_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *hcc
-    flavours: [hcc]
+    classes: [hcc]
     num_global_objects: 40_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *Zprime
-    flavours: [top]
+    classes: [top]
     num_global_objects: 35_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *qcd
-    flavours: [qcd]
+    classes: [qcd]
     num_global_objects: 80_000_000
 
   - region:
       <<: *inclusive
     sample:
       <<: *Wqq
-    flavours: [Wqq]
+    classes: [Wqq]
     num_global_objects: 5_000_000
 
 

@@ -50,6 +50,9 @@ LEGACY_KEY_MAP = {
     "num_jets_plotting": "num_global_objects_plotting",
     "show_num_jets": "show_num_global_objects",
     "equal_jets": "equal_global_objects",
+    "flavours": "classes",
+    "flavour_config": "class_config",
+    "flavour_category": "class_category",
 }
 
 
@@ -141,12 +144,19 @@ class PreprocessingConfig:
     global_name : str, optional
         Name of the global (per-object) dataset in the input file, e.g. the objects.
         By default "jets".
-    flavour_config : Path | None, optional
-        Flavour config yaml file which is to be used. By default None
-    flavour_category : str, optional
-        Flavour categories that are to be used. By default, the "standard" (non-extended)
-        labels are loaded. The extended labels can be used by setting this value to "extended".
-        By default "standard". To use this option, flavour_config must be None.
+    class_config : Path | None, optional
+        Path to a custom class-definition yaml, used instead of the flavour labels
+        bundled with atlas-ftag-tools. This lets the framework classify any object type,
+        not just jets. The file is a list of class dicts with keys ``name``, ``label``,
+        ``cuts``, ``colour`` and ``category`` (plus an optional ``_px`` probability name);
+        the ``classes`` listed per component must match the ``name`` entries here. A
+        relative path is resolved against ``base_dir``. Takes precedence over
+        ``class_category``. By default None
+    class_category : str, optional
+        Class categories that are to be used from the atlas-ftag-tools bundled labels.
+        By default, the "standard" (non-extended) labels are loaded. The extended labels
+        can be used by setting this value to "extended". By default "standard". To use
+        this option, class_config must be None.
     num_global_objects_per_output_file : int | None, optional
         Number of objects per final output file. If the number of total objects is larger
         than this number, the final h5 output files are splitted in multiple smaller
@@ -177,8 +187,8 @@ class PreprocessingConfig:
     num_global_objects_estimate_plotting: int | None = None
     merge_test_samples: bool = False
     global_name: str = "jets"
-    flavour_config: Path | None = None
-    flavour_category: str = "standard"
+    class_config: Path | None = None
+    class_category: str = "standard"
     num_global_objects_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
@@ -209,22 +219,22 @@ class PreprocessingConfig:
         self.components_dir = self.components_dir / self.split
         self.out_fname = self.out_dir / path_append(self.out_fname, self.split)
         # Define the content of the flavour label container
-        if self.flavour_config:
+        if self.class_config:
             self.flavour_cont = LabelContainer.from_yaml(
-                yaml_path=self.flavour_config,
+                yaml_path=self.class_config,
             )
 
-        elif self.flavour_category == "standard":
+        elif self.class_category == "standard":
             self.flavour_cont = Flavours
 
-        elif self.flavour_category == "extended":
+        elif self.class_category == "extended":
             self.flavour_cont = Extended_Flavours
 
         else:
             raise ValueError(
-                f"flavour_category {self.flavour_category} is not supported in the default "
-                "flavours! If you want to use your own flavour config yaml file, please "
-                "provide flavour_config!"
+                f"class_category {self.class_category} is not supported in the default "
+                "flavours! If you want to use your own class config yaml file, please "
+                "provide class_config!"
             )
         # configure classes
         if sampl_cfg := self.config.get("resampling", None):

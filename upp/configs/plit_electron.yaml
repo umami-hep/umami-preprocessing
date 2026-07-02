@@ -27,14 +27,14 @@ components:
       <<: *electron
     sample:
       <<: *ttbar
-    flavours: [elxprompt]
+    classes: [elxprompt]
     num_global_objects: 25_000_000
 
   - region:
       <<: *electron
     sample:
       <<: *ttbar
-    flavours: [npxall]
+    classes: [npxall]
     num_global_objects: 13_000_000
 
 

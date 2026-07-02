@@ -33,7 +33,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsplitbjets]
+    classes: [ghostsplitbjets]
     num_global_objects: 79_000_000
     num_global_objects_test: 2_000_000
 
@@ -41,7 +41,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsplitcjets]
+    classes: [ghostsplitcjets]
     num_global_objects: 26_500_000
     num_global_objects_test: 2_000_000
 
@@ -49,7 +49,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsplitsjets]
+    classes: [ghostsplitsjets]
     num_global_objects: 21_000_000
     num_global_objects_test: 1_000_000
 
@@ -57,7 +57,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsplitudjets]
+    classes: [ghostsplitudjets]
     num_global_objects: 54_000_000
     num_global_objects_test: 1_000_000
 
@@ -65,7 +65,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsplitgjets]
+    classes: [ghostsplitgjets]
     num_global_objects: 46_000_000
     num_global_objects_test: 1_000_000
 
@@ -73,7 +73,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsplittaujets]
+    classes: [ghostsplittaujets]
     num_global_objects: 9_000_000
     num_global_objects_test: 500_000
 
@@ -81,7 +81,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsplitbjets]
+    classes: [ghostsplitbjets]
     num_global_objects: 39_500_000
     num_global_objects_test: 2_000_000
 
@@ -89,7 +89,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsplitcjets]
+    classes: [ghostsplitcjets]
     num_global_objects: 13_250_000
     num_global_objects_test: 2_000_000
 
@@ -97,7 +97,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsplitsjets]
+    classes: [ghostsplitsjets]
     num_global_objects: 10_500_000
     num_global_objects_test: 1_000_000
 
@@ -105,7 +105,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsplitudjets]
+    classes: [ghostsplitudjets]
     num_global_objects: 27_000_000
     num_global_objects_test: 1_000_000
 
@@ -113,7 +113,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsplitgjets]
+    classes: [ghostsplitgjets]
     num_global_objects: 23_000_000
     num_global_objects_test: 1_000_000
 
@@ -121,7 +121,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsplittaujets]
+    classes: [ghostsplittaujets]
     num_global_objects: 4_500_000
     num_global_objects_test: 200_000
 

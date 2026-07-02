@@ -356,7 +356,7 @@ class Components:
             )
 
             # Create the Component instances for the different flavours
-            for name in component["flavours"]:
+            for name in component["classes"]:
                 num_global_objects = component["num_global_objects"]
                 if config.split == "val":
                     num_global_objects = component.get(

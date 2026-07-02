@@ -29,14 +29,14 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets, cjets, ujets]
+    classes: [bjets, cjets, ujets]
     num_global_objects: 10_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [bjets, cjets, ujets]
+    classes: [bjets, cjets, ujets]
     num_global_objects: 10_000
 
 resampling:

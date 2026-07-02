@@ -33,7 +33,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostbjets]
+    classes: [ghostbjets]
     num_global_objects: 100_000_000
     num_global_objects_test: 2_000_000
 
@@ -41,7 +41,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostcjets]
+    classes: [ghostcjets]
     num_global_objects: 27_500_000
     num_global_objects_test: 2_000_000
 
@@ -49,7 +49,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostsjets]
+    classes: [ghostsjets]
     num_global_objects: 20_000_000
     num_global_objects_test: 1_000_000
 
@@ -57,7 +57,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostudjets]
+    classes: [ghostudjets]
     num_global_objects: 55_000_000
     num_global_objects_test: 1_000_000
 
@@ -65,7 +65,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghostgjets]
+    classes: [ghostgjets]
     num_global_objects: 65_000_000
     num_global_objects_test: 1_000_000
 
@@ -73,7 +73,7 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ghosttaujets]
+    classes: [ghosttaujets]
     num_global_objects: 11_000_000
     num_global_objects_test: 500_000
 
@@ -81,7 +81,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostbjets]
+    classes: [ghostbjets]
     num_global_objects: 50_000_000
     num_global_objects_test: 2_000_000
 
@@ -89,7 +89,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostcjets]
+    classes: [ghostcjets]
     num_global_objects: 13_750_000
     num_global_objects_test: 2_000_000
 
@@ -97,7 +97,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostsjets]
+    classes: [ghostsjets]
     num_global_objects: 10_000_000
     num_global_objects_test: 1_000_000
 
@@ -105,7 +105,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostudjets]
+    classes: [ghostudjets]
     num_global_objects: 27_500_000
     num_global_objects_test: 1_000_000
 
@@ -113,7 +113,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghostgjets]
+    classes: [ghostgjets]
     num_global_objects: 32_500_000
     num_global_objects_test: 1_000_000
 
@@ -121,7 +121,7 @@ components:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ghosttaujets]
+    classes: [ghosttaujets]
     num_global_objects: 5_500_000
     num_global_objects_test: 200_000
 

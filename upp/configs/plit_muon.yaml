@@ -27,14 +27,14 @@ components:
       <<: *muon
     sample:
       <<: *ttbar
-    flavours: [muxprompt]
+    classes: [muxprompt]
     num_global_objects: 30_000_000
 
   - region:
       <<: *muon
     sample:
       <<: *ttbar
-    flavours: [npxall]
+    classes: [npxall]
     num_global_objects: 10_000_000
 
 
