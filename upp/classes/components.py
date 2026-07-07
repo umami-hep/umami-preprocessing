@@ -370,7 +370,7 @@ class Components:
         components = cls(component_list)
 
         # Check the flavour ratios (not meaningful when resampling is skipped)
-        if not config.skip_resampling:
+        if not config.skip_resampling and not config.is_estimating_jets:
             components.check_flavour_ratios()
 
         return components

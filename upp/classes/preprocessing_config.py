@@ -148,6 +148,7 @@ class PreprocessingConfig:
     skip_checks: bool = False
     skip_config_copy: bool = False
     vds_dir: Path | None = None
+    is_estimating_jets: bool = False
 
     def __post_init__(self):
         # postprocess paths
@@ -254,6 +255,7 @@ class PreprocessingConfig:
         split: Split,
         skip_checks: bool = False,
         skip_config_copy: bool = False,
+        is_estimating_jets: bool = False,
     ):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
@@ -266,6 +268,7 @@ class PreprocessingConfig:
                 skip_config_copy=skip_config_copy,
                 **config["global"],
                 skip_checks=skip_checks,
+                is_estimating_jets=is_estimating_jets,
             )
 
     def get_path(self, path: Path):
