@@ -107,8 +107,6 @@ def run_estimate_jets(config_path: Path | str) -> None:
             # We must create a new object but retain formatting if possible.
             # However ruamel.yaml makes it slightly tricky to duplicate.
             # We can use a trick: dump the block to string and reload it.
-            import io
-
             buf = io.StringIO()
             yaml.dump(comp, buf)
             buf.seek(0)
