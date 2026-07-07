@@ -13,7 +13,10 @@ from upp.utils.logger import setup_logger
 
 
 def run_estimate_jets(config_path: Path | str) -> None:
-    """Read the config, estimate max resampled jets, and rewrite the config file with the new scaled values."""
+    """Read the config, estimate max resampled jets, and rewrite the config file.
+
+    Rewrites the config file with the new scaled values.
+    """
     setup_logger()
     config_path = Path(config_path)
 

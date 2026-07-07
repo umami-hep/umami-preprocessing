@@ -10,7 +10,8 @@ from upp.stages.estimate_jets import run_estimate_jets
 
 def parse_args(args: Any) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Calculate the maximum number of jets available per component and scale regions to match flavour ratios.",
+        description="Calculate the maximum number of jets available per component "
+                    "and scale regions to match flavour ratios.",
         formatter_class=HelpFormatter,
     )
     parser.add_argument(
