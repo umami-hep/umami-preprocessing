@@ -350,7 +350,7 @@ class Components:
 
             # Create the Component instances for the different flavours
             for name in component["flavours"]:
-                num_jets = component["num_jets"]
+                num_jets = component.get("num_jets", 0)
                 if config.split == "val":
                     num_jets = component.get("num_jets_val", num_jets // 10)
                 elif config.split == "test":
@@ -370,7 +370,7 @@ class Components:
         components = cls(component_list)
 
         # Check the flavour ratios (not meaningful when resampling is skipped)
-        if not config.skip_resampling:
+        if not config.skip_resampling and not config.is_estimating_jets:
             components.check_flavour_ratios()
 
         return components
