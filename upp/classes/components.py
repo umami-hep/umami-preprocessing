@@ -350,7 +350,7 @@ class Components:
 
             # Create the Component instances for the different flavours
             for name in component["flavours"]:
-                num_jets = component["num_jets"]
+                num_jets = component.get("num_jets", 0)
                 if config.split == "val":
                     num_jets = component.get("num_jets_val", num_jets // 10)
                 elif config.split == "test":
