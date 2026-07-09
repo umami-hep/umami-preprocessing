@@ -21,6 +21,11 @@ def parse_args(args: Any) -> argparse.Namespace:
         help="Path to config file",
     )
     parser.add_argument(
+        "--output",
+        default="max_num_jets.log",
+        help="Path to output log file",
+    )
+    parser.add_argument(
         "--no-prep",
         action="store_true",
         help="Do not estimate and write PDFs/create histograms",
@@ -30,7 +35,11 @@ def parse_args(args: Any) -> argparse.Namespace:
 
 def main(args: Any | None = None) -> None:
     parsed_args = parse_args(args)
-    run_estimate_jets(parsed_args.config, prep=not parsed_args.no_prep)
+    run_estimate_jets(
+        parsed_args.config,
+        output_path=parsed_args.output,
+        prep=not parsed_args.no_prep,
+    )
 
 
 if __name__ == "__main__":
