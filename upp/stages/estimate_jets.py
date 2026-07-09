@@ -67,9 +67,9 @@ def run_estimate_jets(
                 resampling.run(region=c.region.name, component=c.name)
             except ValueError as e:
                 msg = str(e)
-                if "Ran out of" in msg and "jets after writing" in msg:
-                    # msg format: "Ran out of {component} jets after writing {number}"
-                    num_str = msg.split("after writing")[-1].strip().replace(",", "")
+                match = re.search(r"but only ([\d,]+)", msg)
+                if match:
+                    num_str = match.group(1).replace(",", "")
                     max_jets[c.name] = int(num_str)
                 else:
                     raise e
