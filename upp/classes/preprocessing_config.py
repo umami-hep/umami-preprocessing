@@ -124,6 +124,9 @@ class PreprocessingConfig:
     vds_dir : Path | None, optional
         Directory name for creation of virtual datasets. By default None
         If none is given, virtual datasets is created next to input ntuples
+    is_estimating_jets : bool, optional
+        Skips checks for consistent flavour ratio when estimating max number of jets
+        to avoid premature failure.
     """
 
     config_path: Path

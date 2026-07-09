@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import logging as log
 import math
-from pathlib import Path
 import re
-
+from pathlib import Path
 
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.stages.hist import create_histograms
@@ -23,13 +22,13 @@ def run_estimate_jets(
     """
     setup_logger()
 
-
     output_path = Path(output_path)
     if output_path.parent:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
     file_handler = log.FileHandler(output_path, mode="w")
     try:
+
         class StripMarkupFormatter(log.Formatter):
             def format(self, record):
                 message = super().format(record)
@@ -77,7 +76,8 @@ def run_estimate_jets(
             c.num_jets = orig_num_jets
             log.info(f"Component {c.name} has a maximum of {max_jets[c.name]:,} resampled jets.")
 
-        regions = {}
+        regions: dict = {}
+
         for c in config.components:
             if c.region.name not in regions:
                 regions[c.region.name] = {}
@@ -85,7 +85,9 @@ def run_estimate_jets(
 
         if "lowpt" not in regions:
             lowpt_name = next(iter(regions.keys()))
-            log.warning(f"No 'lowpt' region found. Using '{lowpt_name}' to find target flavour ratios.")
+            log.warning(
+                f"No 'lowpt' region found. Using '{lowpt_name}' to find target flavour ratios."
+            )
         else:
             lowpt_name = "lowpt"
 
