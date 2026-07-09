@@ -39,7 +39,7 @@ def run_estimate_jets(config_path: Path | str, prep: bool = True) -> None:
 
     for c in config.components:
         orig_num_jets = c.num_jets
-        c.num_jets = 1_000_000_000
+        c.num_jets = 1_000_000_000_000
 
         resampling = Resampling(config)
         # Suppress stdout to avoid spam
