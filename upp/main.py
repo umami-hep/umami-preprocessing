@@ -161,11 +161,6 @@ def parse_args(args: Any) -> argparse.Namespace:
         "--grid", action="store_true", help="Use when running the split stage on the grid. "
     )
     parser.add_argument(
-        "--estimate-jets",
-        action="store_true",
-        help="Estimate the maximum available jets per component and update the config file",
-    )
-    parser.add_argument(
         "--container",
         default=None,
         type=str,
@@ -192,7 +187,6 @@ def parse_args(args: Any) -> argparse.Namespace:
         "reweight",
         "rw_merge",
         "rw_merge_idx",
-        "estimate_jets",
     ]
     if not any(v for a, v in d.items() if a not in ignore):
         for v in d:
@@ -215,11 +209,6 @@ def run_pp(args: argparse.Namespace) -> None:
     log.info("[bold green]Starting preprocessing...")
     start = datetime.now()
     log.info(f"Start time: {start.strftime('%Y-%m-%d %H:%M:%S')}")
-
-    if args.estimate_jets:
-        from upp.stages.estimate_jets import run_estimate_jets
-        log.info("Running estimate-jets before other stages...")
-        run_estimate_jets(args.config)
 
     # load config
     config = PreprocessingConfig.from_file(args.config, args.split, skip_checks=args.grid)
