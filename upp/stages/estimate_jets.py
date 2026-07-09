@@ -12,7 +12,7 @@ from upp.stages.resampling import Resampling
 from upp.utils.logger import setup_logger
 
 
-def run_estimate_jets(config_path: Path | str) -> None:
+def run_estimate_jets(config_path: Path | str, prep: bool = True) -> None:
     """Read the config, estimate max resampled jets, and rewrite the config file.
 
     Rewrites the config file with the new scaled values.
@@ -32,7 +32,8 @@ def run_estimate_jets(config_path: Path | str) -> None:
         return
 
     # Create 2D histograms (prep step)
-    create_histograms(config)
+    if prep:
+        create_histograms(config)
 
     max_jets = {}
 

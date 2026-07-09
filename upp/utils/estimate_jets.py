@@ -20,12 +20,17 @@ def parse_args(args: Any) -> argparse.Namespace:
         type=valid_path,
         help="Path to config file",
     )
+    parser.add_argument(
+        "--no-prep",
+        action="store_true",
+        help="Do not estimate and write PDFs/create histograms",
+    )
     return parser.parse_args(args)
 
 
 def main(args: Any | None = None) -> None:
     parsed_args = parse_args(args)
-    run_estimate_jets(parsed_args.config)
+    run_estimate_jets(parsed_args.config, prep=not parsed_args.no_prep)
 
 
 if __name__ == "__main__":
