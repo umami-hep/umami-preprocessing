@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import logging as log
 import math
 from pathlib import Path
@@ -29,15 +28,15 @@ def run_estimate_jets(
     if output_path.parent:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    file_handler = logging.FileHandler(output_path, mode="w")
+    file_handler = log.FileHandler(output_path, mode="w")
     try:
-        class StripMarkupFormatter(logging.Formatter):
+        class StripMarkupFormatter(log.Formatter):
             def format(self, record):
                 message = super().format(record)
                 return re.sub(r"\[/?[a-z_ ]+\]", "", message)
 
         file_handler.setFormatter(StripMarkupFormatter("%(message)s"))
-        logging.getLogger().addHandler(file_handler)
+        log.getLogger().addHandler(file_handler)
 
         config_path = Path(config_path)
 
@@ -116,5 +115,5 @@ def run_estimate_jets(
         for (r, f), count in new_counts_by_region_flavour.items():
             log.info(f"  {r} {f}: {count:,}")
     finally:
-        logging.getLogger().removeHandler(file_handler)
+        log.getLogger().removeHandler(file_handler)
         file_handler.close()
