@@ -16,9 +16,7 @@ def run_estimate_jets(
     output_path: Path | str,
     prep: bool = True,
 ) -> None:
-    """Read the config, estimate max resampled jets, and rewrite the config file.
-
-    Rewrites the config file with the new scaled values.
+    """Read the config and estimate max resampled jets.
     """
     setup_logger()
 
@@ -97,7 +95,7 @@ def run_estimate_jets(
             raise ValueError(f"Total jets in region '{lowpt_name}' is 0. Aborting.")
 
         ratios = {f: c / total_lowpt for f, c in lowpt_counts.items()}
-        log.info(f"[bold green]Flavour ratios in {lowpt_name} region:")
+        log.info(f"[bold green]Flavour fractions in {lowpt_name} region:")
         for f, r in ratios.items():
             log.info(f"  {f}: {r:.4f}")
 
