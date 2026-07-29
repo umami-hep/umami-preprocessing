@@ -11,11 +11,17 @@ class ReweightConfig:
     # Number of jets to estimate, if None, use the global num jets estimate
     num_jets_estimate: None | int = None
     merge_num_proc: int = 1  # Number of processes to use for merging
+    # Upper bound for physical weights and reweight factors,
+    # which can span many orders of magnitude
+    weight_cap: float = 1e4
     reweights: list[SingleReweightConfig] = field(default_factory=list)
 
     def __post_init__(self):
         if self.num_jets_estimate is not None and self.num_jets_estimate <= 0:
             raise ValueError("num_jets_estimate must be a positive integer or None")
+
+        if self.weight_cap <= 0:
+            raise ValueError("weight_cap must be a positive number")
 
         parsed_reweights = []
         for rw in self.reweights:

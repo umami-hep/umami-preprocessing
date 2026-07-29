@@ -14,7 +14,8 @@ from puma import Histogram, HistogramPlot
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.stages.hist import bin_jets
 
-# Upper bound for physical weights and reweight factors, which can span many orders of magnitude.
+# Default upper bound for physical weights and reweight factors, which can span
+# many orders of magnitude. Configurable via `reweighting.weight_cap`.
 WEIGHT_CAP = 1e4
 
 
@@ -26,6 +27,7 @@ class Reweight:
         assert self.rw_config is not None, (
             "Reweighting configuration is not set in the preprocessing config"
         )
+        self.weight_cap = self.rw_config.weight_cap
         self.organised_components_config = (
             Path(config.base_dir) / "split-components/organised-components.yaml"
         )
@@ -185,7 +187,7 @@ class Reweight:
                     # Use physicalWeight if present, else uniform weights.
                     if "physicalWeight" in data_masked.dtype.names:
                         w = np.asarray(data_masked["physicalWeight"], dtype=np.float64)
-                        w = np.clip(w, 0, WEIGHT_CAP)
+                        w = np.clip(w, 0, self.weight_cap)
                     else:
                         w = np.ones(mask.sum(), dtype=float)
 
@@ -311,7 +313,7 @@ class Reweight:
                     np.clip(
                         output_weights[rw_group][rw_rep]["weights"][cls],
                         0,
-                        WEIGHT_CAP,
+                        self.weight_cap,
                         out=output_weights[rw_group][rw_rep]["weights"][cls],
                     )
 

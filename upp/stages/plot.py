@@ -521,6 +521,7 @@ def make_hist(
     atlas_second_tag: str | None = None,
     plotting: PlottingConfig | None = None,
     weight_fields: list[str] | None = None,
+    weight_cap: float | None = None,
 ) -> None:
     """Make a flavour-split histogram for one variable.
 
@@ -565,14 +566,19 @@ def make_hist(
     weight_fields : list[str] | None, optional
         Jet weight columns multiplied per jet on the reweight route (e.g.
         ``physicalWeight`` and the rw-merge weight column). ``physicalWeight`` is
-        capped at ``WEIGHT_CAP`` to match the reweight histograms. If ``None`` or
+        capped at ``weight_cap`` to match the reweight histograms. If ``None`` or
         empty, histograms are unweighted (default resampling behaviour).
+    weight_cap : float | None, optional
+        Upper bound applied to ``physicalWeight``. If ``None``, the default
+        ``WEIGHT_CAP`` from the reweight stage is used.
     """
     from upp.classes.plotting_config import PlottingConfig
     from upp.stages.reweight import WEIGHT_CAP
 
     selection_cuts = selection_cuts or Cuts.empty()
     plotting = plotting or PlottingConfig()
+    if weight_cap is None:
+        weight_cap = WEIGHT_CAP
 
     # Setup the histogram
     plot = HistogramPlot(
@@ -614,7 +620,7 @@ def make_hist(
                 for field in weight_fields:
                     column = selected_values[field].astype(np.float64)
                     if field == "physicalWeight":
-                        column = np.clip(column, 0.0, WEIGHT_CAP)
+                        column = np.clip(column, 0.0, weight_cap)
                     histo_weights *= column
 
             # Get the histogram object
@@ -805,6 +811,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                 plotting=config.plotting,
                 out_dir=config.out_dir / config.plotting.output_directory,
                 weight_fields=weight_fields,
+                weight_cap=config.rw_config.weight_cap if config.rw_config else None,
             )
 
         if _is_pt_variable(variable):
@@ -823,6 +830,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
                     plotting=config.plotting,
                     out_dir=config.out_dir / config.plotting.output_directory,
                     weight_fields=weight_fields,
+                    weight_cap=config.rw_config.weight_cap if config.rw_config else None,
                 )
 
 
