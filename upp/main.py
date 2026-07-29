@@ -22,6 +22,7 @@ from ftag.cli_utils import HelpFormatter, valid_path
 from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.stages.hist import create_histograms
 from upp.stages.merging import Merging
+from upp.stages.metadata_injector import MetadataInjector
 from upp.stages.normalisation import Normalisation
 from upp.stages.plot import plot_resampling_dists
 from upp.stages.resampling import Resampling
@@ -54,6 +55,12 @@ def parse_args(args: Any) -> argparse.Namespace:
         required=True,
         type=valid_path,
         help="Path to config file",
+    )
+    parser.add_argument(
+        "--metadata",
+        action="store_true",
+        default=False,
+        help="Run metadata injection stage before reweighting",
     )
     parser.add_argument(
         "--prep",
@@ -212,6 +219,12 @@ def run_pp(args: argparse.Namespace) -> None:
     # load config
     config = PreprocessingConfig.from_file(args.config, args.split, skip_checks=args.grid)
 
+    # run metadata injection
+    if getattr(args, "metadata", False):
+        log.info("Running metadata injection...")
+        injector = MetadataInjector(config)
+        injector.run()
+
     if args.split_components:
         log.info("Splitting containers...")
         split = SplitContainers(args.config)
@@ -223,6 +236,7 @@ def run_pp(args: argparse.Namespace) -> None:
         # If we aren't running on the grid, we create the metadata after splitting
         if not args.grid:
             split.create_meta_data()
+
     if args.reweight:
         log.info("Running reweighting...")
         reweight = Reweight(config)

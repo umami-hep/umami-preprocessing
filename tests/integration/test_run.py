@@ -9,6 +9,7 @@ import h5py
 import numpy as np
 import pytest
 from ftag import get_mock_file
+from numpy.lib import recfunctions as rfn
 
 from upp.main import main
 
@@ -16,8 +17,20 @@ this_dir = Path(__file__).parent
 
 
 class TestClass:
-    def generate_mock(self, out_file, N=100_000):
+    def generate_mock(self, out_file, N=100_000, with_physical_weight=False):
+        # Inject physicalWeight only on demand; the weighted route is covered in test_run_rw.py.
         _, f = get_mock_file(num_jets=N, fname=out_file)
+        if with_physical_weight:
+            jets = f["jets"][:]
+            if "physicalWeight" not in jets.dtype.names:
+                jets2 = rfn.append_fields(
+                    jets,
+                    "physicalWeight",
+                    np.ones(jets.shape[0], dtype="f4"),
+                    usemask=False,
+                )
+                del f["jets"]
+                f.create_dataset("jets", data=jets2)
         f.close()
 
     def setup_method(self, method):

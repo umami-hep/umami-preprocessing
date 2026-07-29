@@ -210,6 +210,85 @@ def test_post_resampling_paths_split_mode(tmp_path):
     assert paths == [tmp_path / "test" / "pp_output_test*.h5"]
 
 
+def test_reweight_weight_fields_detects_present_columns():
+    """Check reweight-route weight columns are picked up only when present."""
+    from upp.classes.reweight_config import SingleReweightConfig
+
+    rw = SingleReweightConfig(
+        group="jets",
+        reweight_vars=["pt"],
+        bins={"pt": [[20_000, 250_000, 5]]},
+        class_var="flavour_label",
+        class_target="uniform",
+    )
+    rw_name = repr(rw)
+    assert rw_name == "weight_jets_pt_target_uniform_flavour_label"
+    config = SimpleNamespace(rw_config=SimpleNamespace(reweights=[rw]))
+
+    # both physicalWeight and the rw-merge column present
+    assert plot_mod._reweight_weight_fields(config, {"physicalWeight", rw_name, "pt"}) == [
+        "physicalWeight",
+        rw_name,
+    ]
+    # rw column absent (e.g. raw ntuple after --metadata) -> only physicalWeight
+    assert plot_mod._reweight_weight_fields(config, {"physicalWeight", "pt"}) == ["physicalWeight"]
+    # default resampling route: no rw_config and no physicalWeight -> unweighted
+    assert plot_mod._reweight_weight_fields(SimpleNamespace(), {"pt"}) == []
+
+
+def test_make_hist_applies_capped_weights(monkeypatch, tmp_path):
+    """Check make_hist multiplies weight columns and caps physicalWeight."""
+    import numpy as np
+
+    from upp.stages.reweight import WEIGHT_CAP
+
+    dtype = [("pt", "f4"), ("HadronConeExclTruthLabelID", "i4"), ("physicalWeight", "f4")]
+    arr = np.zeros(5, dtype=dtype)
+    arr["pt"] = [10_000, 20_000, 30_000, 40_000, 50_000]
+    arr["HadronConeExclTruthLabelID"] = 5  # bjets
+    arr["physicalWeight"] = [1.0, 2.0, 3.0 * WEIGHT_CAP, 4.0, 5.0]
+
+    captured = {}
+
+    class FakeHist:
+        def __init__(self, **kwargs):
+            captured["weights"] = kwargs.get("weights")
+            self.bin_edges = np.array([0.0, 100.0])
+
+    class FakePlot:
+        def __init__(self, **kwargs):
+            pass
+
+        def add(self, **kwargs):
+            pass
+
+        def draw(self):
+            pass
+
+        def make_linestyle_legend(self, **kwargs):
+            pass
+
+        def savefig(self, _path):
+            pass
+
+    monkeypatch.setattr(plot_mod, "Histogram", FakeHist)
+    monkeypatch.setattr(plot_mod, "HistogramPlot", FakePlot)
+
+    make_hist(
+        stage="initial",
+        values_dict={"": arr},
+        flavours=[Flavours["bjets"]],
+        variable="pt",
+        out_dir=tmp_path,
+        out_format_list=["png"],
+        weight_fields=["physicalWeight"],
+    )
+
+    expected = np.clip(arr["physicalWeight"].astype(float), 0.0, WEIGHT_CAP)
+    assert captured["weights"] is not None
+    assert np.allclose(captured["weights"], expected)
+
+
 def test_plot_initial_uses_split_suffix_and_plotting_jet_count(monkeypatch, tmp_path):
     """Check initial plot calls include split-specific suffixes and plotting counts."""
 

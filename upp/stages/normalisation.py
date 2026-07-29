@@ -259,9 +259,19 @@ class Normalisation:
         norm_dict = None
         class_dict = None
         total = None
-        vars = self.variables.combined()
+        combined_partial = self.variables.combined()
+        vars: dict[str, list[str] | None] = {}
+        for name in self.variables:
+            cols = combined_partial[name]
+            if cols is None:
+                # keep_all_variables: explicit stream columns; norm still on yaml inputs/labels
+                cols = self.variables[name]["inputs"] + self.variables[name].get("labels", [])
+            vars[name] = list(cols)
         with h5py.File(reader.files[0]) as f:
-            if "flavour_label" in f[self.jets_name].dtype.names:
+            if (
+                "flavour_label" in f[self.jets_name].dtype.names
+                and "flavour_label" not in vars[self.jets_name]
+            ):
                 vars[self.jets_name].append("flavour_label")
         stream = reader.stream(vars, self.num_jets)
 
