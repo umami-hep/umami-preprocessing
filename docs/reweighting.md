@@ -94,16 +94,16 @@ The reweighting can also be performed over track variables, for example
 
 ```yaml
 
-group: jets
-reweight_vars: [pt_frac]
-bins:
-    pt_frac:
-        [
-        [0, 0.5, 50],
-        [0.5, 1.0, 20]
-        ]
-class_var: ftagTruthOriginLabel
-class_target: mean
+- group: tracks
+  reweight_vars: [pt_frac]
+  bins:
+      pt_frac:
+          [
+          [0, 0.5, 50],
+          [0.5, 1.0, 20]
+          ]
+  class_var: ftagTruthOriginLabel
+  class_target: mean
 ```
 
 Would calculate weights such that we have equivalent pt_frac distributions across the track labels.
