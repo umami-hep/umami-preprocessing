@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from upp.stages.hist import Hist, bin_jets, create_histograms
+from upp.stages.hist import Hist, bin_global_objects, create_histograms
 from upp.stages.interpolation import subdivide_bins, upscale_array, upscale_array_regionally
 from upp.stages.merging import Merging
 from upp.stages.normalisation import Normalisation
@@ -14,7 +14,7 @@ __all__ = [
     "Merging",
     "Normalisation",
     "Resampling",
-    "bin_jets",
+    "bin_global_objects",
     "create_histograms",
     "make_hist",
     "plot_resampling_dists",

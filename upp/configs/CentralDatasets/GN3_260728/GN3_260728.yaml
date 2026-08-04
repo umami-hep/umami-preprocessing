@@ -1,0 +1,185 @@
+variables: !include /home/users/r/reisch/production/slurm-scripts/umami-preprocessing/260728/configs/variables-ghost.yaml
+global_cuts: !include /home/users/r/reisch/production/slurm-scripts/umami-preprocessing/260728/configs/simple-split.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_jets: False
+  pattern:
+    - "user.treisch.601589.e8547_s3797_r13144_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC20d
+    - "user.treisch.601589.e8549_s4159_r15530_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23d
+    - "user.treisch.601589.e8549_s4162_r14622_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23a
+    - "user.treisch.601589.e8549_s4369_r16083_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23e
+    - "user.treisch.601589.e8549_s4618_r17610_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23g
+
+
+zprime: &zprime
+  name: zprime
+  equal_jets: False
+  pattern:
+    - "user.treisch.802818.e8514_s4618_r17610_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC20d
+    - "user.treisch.802818.e8599_s3797_r13144_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23d
+    - "user.treisch.802818.e8599_s4159_r15530_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23a
+    - "user.treisch.802818.e8599_s4162_r15540_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23e
+    - "user.treisch.802818.e8599_s4369_r16083_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23g
+    - "user.treisch.800030.e7954_s3797_r13144_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC20d
+    - "user.treisch.800030.e8514_s4159_r15530_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23d
+    - "user.treisch.800030.e8514_s4162_r14622_p7349.tdd.GN3_dev.25_2_97.26-07-14_CentralProduction_p7349_output.h5/*.h5" # MC23a
+    - "user.treisch.800030.e8514_s4369_r16083_p7349.tdd.GN3_dev.25_2_97.26-07-16_CentralProduction_p7349_output.h5/*.h5" # MC23e
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostbjets]
+    # avail (pre-split) 246,163,504 | train uses 100% of ceiling
+    num_jets: 210_469_795
+    num_jets_test: 11_692_766
+    num_jets_val: 11_692_766
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostcjets]
+    # avail (pre-split) 56,596,467 | train uses 100% of ceiling
+    num_jets: 48_389_979
+    num_jets_test: 2_688_332
+    num_jets_val: 2_688_332
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostsjets]
+    # avail (pre-split) 44,739,813 | train uses 100% of ceiling
+    num_jets: 38_252_540
+    num_jets_test: 2_125_141
+    num_jets_val: 2_125_141
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostudjets]
+    # avail (pre-split) 114,413,319 | train uses 100% of ceiling
+    num_jets: 97_823_387
+    num_jets_test: 5_434_632
+    num_jets_val: 5_434_632
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghostgjets]
+    # avail (pre-split) 134,653,370 | train uses 100% of ceiling
+    num_jets: 115_128_631
+    num_jets_test: 6_396_035
+    num_jets_val: 6_396_035
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    flavours: [ghosttaujets]
+    # avail (pre-split) 23,657,240 | train uses 100% of ceiling
+    num_jets: 20_226_940
+    num_jets_test: 1_123_718
+    num_jets_val: 1_123_718
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostbjets]
+    # highpt b:  50% of lowpt (2:1 target); pre-split avail re-measured by prep (was 56.6M)
+    num_jets: 105_234_898
+    num_jets_test: 5_846_383
+    num_jets_val: 5_846_383
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostcjets]
+    # highpt c:  50% of lowpt (2:1 target); pre-split avail re-measured by prep (was 55.7M)
+    num_jets: 24_194_990
+    num_jets_test: 1_344_166
+    num_jets_val: 1_344_166
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostsjets]
+    # highpt s:  50% of lowpt (2:1 target); pre-split avail re-measured by prep (was 35.9M)
+    num_jets: 19_126_270
+    num_jets_test: 1_062_571
+    num_jets_val: 1_062_571
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostudjets]
+    # highpt ud: 50% of lowpt (2:1 target); pre-split avail re-measured by prep (was 39.2M)
+    num_jets: 48_911_694
+    num_jets_test: 2_717_316
+    num_jets_val: 2_717_316
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghostgjets]
+    # highpt g:  50% of lowpt (2:1 target); pre-split avail re-measured by prep (was 76.7M)
+    num_jets: 57_564_316
+    num_jets_test: 3_198_018
+    num_jets_val: 3_198_018
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    flavours: [ghosttaujets]
+    # highpt tau:50% of lowpt (2:1 target); pre-split avail re-measured by prep (was 35.7M)
+    num_jets: 10_113_470
+    num_jets_test: 561_859
+    num_jets_val: 561_859
+
+resampling:
+  target: ghostcjets
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 46], [250_000, 1_000_000, 30], [1_000_000, 6_000_000, 20]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 10]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  jets_name: jets
+  batch_size: 1_000_000
+  num_jets_estimate: 50_000_000
+  num_jets_estimate_plotting: 10_000_000
+  num_jets_per_output_file: 5_000_000
+  base_dir: /srv/beegfs/scratch/groups/rodem/DAOD_FTAG/p7349/upp_260728/
+  out_dir: /srv/beegfs/scratch/groups/rodem/DAOD_FTAG/p7349/upp_260728/out/
+  ntuple_dir: /srv/beegfs/scratch/groups/rodem/DAOD_FTAG/p7349/
+
+# Setting for plotting
+plotting:
+  num_jets_plotting: 10_000_000
+  show_num_jets: false

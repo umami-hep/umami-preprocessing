@@ -9,7 +9,7 @@ from ftag.track_selector import TrackSelector
 @dataclass(frozen=True)
 class VariableConfig:
     variables: dict[str, dict[str, list[str]]]
-    jets_name: str = "jets"
+    global_name: str = "jets"
     keep_all: bool = False
     selectors: dict[str, TrackSelector] | None = None
 
@@ -27,17 +27,19 @@ class VariableConfig:
         return combined
 
     @property
-    def jets(self):
-        return self[self.jets_name]
+    def global_objects(self):
+        return self[self.global_name]
 
     @property
     def tracks(self):
-        return {name: var for name, var in self.variables.items() if name != self.jets_name}
+        return {name: var for name, var in self.variables.items() if name != self.global_name}
 
-    def add_jet_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
+    def add_global_vars(self, variables: list[str], kind: str = "inputs") -> VariableConfig:
         """Return a new VariableConfig instance."""
-        vc = VariableConfig(deepcopy(self.variables), self.jets_name, self.keep_all, self.selectors)
-        vc.jets[kind] = list(dict.fromkeys(vc.jets[kind] + variables))
+        vc = VariableConfig(
+            deepcopy(self.variables), self.global_name, self.keep_all, self.selectors
+        )
+        vc.global_objects[kind] = list(dict.fromkeys(vc.global_objects[kind] + variables))
         return vc
 
     def items(self):

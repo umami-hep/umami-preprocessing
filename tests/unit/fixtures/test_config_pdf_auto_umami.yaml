@@ -32,43 +32,43 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [bjets]
-    num_jets: 7_000
+    classes: [bjets]
+    num_global_objects: 7_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [cjets]
-    num_jets: 7_000
+    classes: [cjets]
+    num_global_objects: 7_000
 
   - region:
       <<: *lowpt
     sample:
       <<: *ttbar
-    flavours: [ ujets]
-    num_jets: 7_000
+    classes: [ ujets]
+    num_global_objects: 7_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [bjets]
-    num_jets: 3_000
+    classes: [bjets]
+    num_global_objects: 3_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [cjets]
-    num_jets: 3_000
+    classes: [cjets]
+    num_global_objects: 3_000
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    flavours: [ujets]
-    num_jets: 3_000
+    classes: [ujets]
+    num_global_objects: 3_000
 
 resampling:
   target: bjets
@@ -82,10 +82,10 @@ resampling:
 
 global:
   batch_size: 10_000
-  num_jets_estimate: 5000
+  num_global_objects_estimate: 5000
   base_dir: /tmp/upp-tests/integration/temp_workspace/
   out_dir: test_out
-  flavour_category: standard
+  class_category: standard
 
 variables:
   jets:

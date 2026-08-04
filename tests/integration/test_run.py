@@ -119,14 +119,14 @@ class TestClass:
         assert os.path.exists(fname)
         with h5py.File(fname, "r") as f:
             jets = f["jets"][:]
-            jet_counts = json.loads(f.attrs["jet_counts"])
+            jets_counts = json.loads(f.attrs["jets_counts"])
             assert f.attrs["resampling_method"] == "none"
 
-        # capped components write exactly num_jets; the -1 component writes all its jets
-        assert jet_counts["lowpt_ttbar_bjets"]["num_jets"] == 1_000
-        assert jet_counts["lowpt_ttbar_cjets"]["num_jets"] == 1_000
-        assert jet_counts["lowpt_ttbar_ujets"]["num_jets"] > 1_000
-        assert jet_counts["total"]["num_jets"] == len(jets)
+        # capped components write exactly num_jets; -1 writes all its objects
+        assert jets_counts["lowpt_ttbar_bjets"]["num_jets"] == 1_000
+        assert jets_counts["lowpt_ttbar_cjets"]["num_jets"] == 1_000
+        assert jets_counts["lowpt_ttbar_ujets"]["num_jets"] > 1_000
+        assert jets_counts["total"]["num_jets"] == len(jets)
 
     def test_run_method_none(self):
         args = [

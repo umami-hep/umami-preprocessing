@@ -28,9 +28,9 @@ class PlottingConfig:
 
     Attributes
     ----------
-    num_jets_plotting : int | None, optional
-        Number of jets loaded for plotting. If not set, use the global
-        `num_jets_estimate_plotting` value. By default None.
+    num_global_objects_plotting : int | None, optional
+        Number of objects loaded for plotting. If not set, use the global
+        `num_global_objects_estimate_plotting` value. By default None.
     variable_labels : dict[str, str], optional
         Display labels for plotted variables. Keys are matched case-insensitively
         against variable names, with the longest matching key taking precedence.
@@ -39,14 +39,14 @@ class PlottingConfig:
         Display labels for input samples. User-provided labels are merged with the
         default ttbar and zprime labels.
     ylabel : str, optional
-        Label for the y-axis. The `{jets_name}` placeholder is replaced with the
-        configured jet dataset name. By default "Normalised Number of {jets_name}".
+        Label for the y-axis. The `{global_name}` placeholder is replaced with the
+        configured global object name. By default "Normalised Number of {global_name}".
     atlas_first_tag : str, optional
         First ATLAS plot label. By default "Simulation Internal".
     atlas_second_tag : str, optional
         Second ATLAS plot label. By default "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$".
-    show_num_jets : bool, optional
-        Decide, if the number of jets is shown in the ATLAS second tag
+    show_num_global_objects : bool, optional
+        Decide, if the number of objects is shown in the ATLAS second tag
     output_formats : list[str], optional
         File formats in which each plot is saved. By default `["pdf", "png"]`.
     linestyles : list[str], optional
@@ -76,13 +76,13 @@ class PlottingConfig:
         By default "plots".
     """
 
-    num_jets_plotting: int | None = None
+    num_global_objects_plotting: int | None = None
     variable_labels: dict[str, str] = field(default_factory=_default_variable_labels)
     sample_labels: dict[str, str] = field(default_factory=_default_sample_labels)
-    ylabel: str = "Normalised Number of {jets_name}"
+    ylabel: str = "Normalised Number of {global_name}"
     atlas_first_tag: str = "Simulation Internal"
     atlas_second_tag: str = "$\\sqrt{s} = 13/13.6\\,\\mathrm{TeV}$"
-    show_num_jets: bool = True
+    show_num_global_objects: bool = True
     output_formats: list[str] = field(default_factory=lambda: ["pdf", "png"])
     linestyles: list[str] = field(default_factory=lambda: ["-", "--", "-.", ":"])
     bins: int = 50
@@ -99,8 +99,10 @@ class PlottingConfig:
     def __post_init__(self) -> None:
         self.variable_labels = {**_default_variable_labels(), **self.variable_labels}
         self.sample_labels = {**_default_sample_labels(), **self.sample_labels}
-        if self.num_jets_plotting is not None and self.num_jets_plotting <= 0:
-            raise ValueError("plotting.num_jets_plotting must be a positive integer or None")
+        if self.num_global_objects_plotting is not None and self.num_global_objects_plotting <= 0:
+            raise ValueError(
+                "plotting.num_global_objects_plotting must be a positive integer or None"
+            )
         if not self.output_formats:
             raise ValueError("plotting.output_formats must contain at least one format")
         if not self.linestyles:

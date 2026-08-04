@@ -130,6 +130,7 @@ class SplitContainers:
     ):
         if isinstance(input_file, str):
             input_file = Path(input_file)
+        global_name = self.config.global_name
         add_flavour_label = flavour_label_list is not None
         # All variables for test file
         all_variables = get_all_datasets(input_file)
@@ -140,18 +141,25 @@ class SplitContainers:
         )
         print("parsed variables: ", parsed_variables, flush=True)
         start = time.time()
-        reader = H5Reader(input_file, batch_size=batch_size, shuffle=False)
+        reader = H5Reader(
+            input_file,
+            batch_size=batch_size,
+            shuffle=False,
+            global_objects_name=self.config.global_name,
+        )
         if output_name is None:
             output_name = input_file.name
-        num_jets = reader.num_jets
-        num_batches = num_jets // batch_size + (1 if num_jets % batch_size != 0 else 0)
-        if num_jets == 0:
-            print(f"File {input_file} has no jets. Skipping it", flush=True)
+        num_global_objects = reader.num_global_objects
+        num_batches = num_global_objects // batch_size + (
+            1 if num_global_objects % batch_size != 0 else 0
+        )
+        if num_global_objects == 0:
+            print(f"File {input_file} has no objects. Skipping it", flush=True)
             return
         sample_components = []
         writers_by_sample_components = {}
         cuts_by_sample_components = {}
-        print(f"Input file: {input_file} has {num_jets} jets", flush=True)
+        print(f"Input file: {input_file} has {num_global_objects} objects", flush=True)
         print(f"Running {num_batches} batches of size {batch_size}", flush=True)
         print(f"Output directory: {output_dir}", flush=True)
 
@@ -165,7 +173,7 @@ class SplitContainers:
 
             writers_by_sample_components[split] = H5Writer.from_file(
                 input_file,
-                num_jets=None,
+                num_global_objects=None,
                 dst=output_file,
                 precision="half",
                 full_precision_vars=fp_vars,
@@ -173,6 +181,7 @@ class SplitContainers:
                 variables=all_variables if "test" in split else parsed_variables,
                 compression="gzip",
                 add_flavour_label=add_flavour_label,
+                global_objects_name=global_name,
             )
             cuts_by_sample_components[split] = component_cuts
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
@@ -198,28 +207,29 @@ class SplitContainers:
             for sample_component in sample_components:
                 writer = writers_by_sample_components[sample_component]
                 cuts = cuts_by_sample_components[sample_component]
-                sel_idx = cuts(batch["jets"]).idx
+                sel_idx = cuts(batch[global_name]).idx
                 sel_batch = {k: v[sel_idx] for k, v in batch.items()}
                 if add_flavour_label:
                     this_flavour_label = flavour_label_by_component[sample_component]
                     tfl_arr = (
-                        np.ones(sel_batch["jets"].shape[0], dtype=np.int32) * this_flavour_label
+                        np.ones(sel_batch[global_name].shape[0], dtype=np.int32)
+                        * this_flavour_label
                     )
 
                     # I think this is only going to happen during tests, as the mock file has
                     # flavour_label in, but we wont
-                    if "flavour_label" in sel_batch["jets"].dtype.names:
+                    if "flavour_label" in sel_batch[global_name].dtype.names:
                         if i == 0:
                             print(
                                 f"Warning: {sample_component} already has a flavour label. "
                                 "We will overwrite it now.",
                                 flush=True,
                             )
-                        sel_batch["jets"]["flavour_label"] = tfl_arr
+                        sel_batch[global_name]["flavour_label"] = tfl_arr
                     else:
                         # Get the
-                        sel_batch["jets"] = rfn.append_fields(
-                            sel_batch["jets"],
+                        sel_batch[global_name] = rfn.append_fields(
+                            sel_batch[global_name],
                             "flavour_label",
                             tfl_arr,
                             usemask=False,
@@ -247,7 +257,7 @@ class SplitContainers:
         message += "\n"
         for sample_component, writer in writers_by_sample_components.items():
             perc = 100 * (num_written_by_sample_components[sample_component] / sum_written)
-            message += f"{sample_component}: {writer.num_written} jets ({perc:.2f}%)\n"
+            message += f"{sample_component}: {writer.num_written} objects ({perc:.2f}%)\n"
 
             writer.close()
 
@@ -255,9 +265,9 @@ class SplitContainers:
         message += "-" * 20 + "\n"
         message += "Summary\n"
         message += "-" * 20 + "\n"
-        message += f"Total number of jets: {num_jets}\n"
+        message += f"Total number of objects: {num_global_objects}\n"
         message += f"Total number of batches: {num_batches}\n"
-        message += f"Total number of written jets: {sum_written}\n"
+        message += f"Total number of written objects: {sum_written}\n"
         message += f"Total time taken: {time_taken:.2f} seconds\n"
         message += "-" * 20
         print(message, flush=True)
@@ -279,9 +289,11 @@ class SplitContainers:
             create_virtual_file(str(tmp_dir / "*.h5"), tmp_out_path, overwrite=True)
             h5vds = H5Reader(
                 tmp_out_path,
+                global_objects_name=self.config.global_name,
             )
             print(
-                f"Created combined virtual dataset with {h5vds.num_jets} jets at {tmp_out_path}",
+                f"Created combined virtual dataset with {h5vds.num_global_objects} "
+                f"objects at {tmp_out_path}",
                 flush=True,
             )
             yield tmp_out_path
@@ -367,13 +379,18 @@ class SplitContainers:
 
                     files[split][flavour].append(str(file[0]))
 
-        num_jets = {
-            split: {flavour: H5Reader(files[split][flavour]).num_jets for flavour in files[split]}
+        num_global_objects = {
+            split: {
+                flavour: H5Reader(
+                    files[split][flavour], global_objects_name=self.config.global_name
+                ).num_global_objects
+                for flavour in files[split]
+            }
             for split in files
         }
         metadata = {
             "files": files,
-            "num_jets": num_jets,
+            "num_global_objects": num_global_objects,
         }
 
         output_file = output_dir / "organised-components.yaml"

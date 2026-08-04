@@ -3,6 +3,8 @@
 ### [Latest]
 
 - Add container image documentation and generic Slurm submission scripts with config-driven component enumeration [#160](https://github.com/umami-hep/umami-preprocessing/pull/160)
+- Add new configs for central dataset [#159](https://github.com/umami-hep/umami-preprocessing/pull/159)
+- Generalise the framework beyond jets to arbitrary global objects [#156](https://github.com/umami-hep/umami-preprocessing/pull/156)
 
 ### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
 

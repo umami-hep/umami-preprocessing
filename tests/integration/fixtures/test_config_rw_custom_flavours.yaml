@@ -1,5 +1,5 @@
 variables:
-  jets:
+  objects:
     inputs:
       - pt
       - eta
@@ -51,21 +51,21 @@ components:
       <<: *lowpt
     sample:
       <<: *ttbar
-    classes: [bjets, cjets, ujets, taujets]
+    classes: [heavy, light]
     num_global_objects: -1
 
   - region:
       <<: *highpt
     sample:
       <<: *zprime
-    classes: [bjets, cjets, ujets, taujets]
+    classes: [heavy, light]
     num_global_objects: -1
 
 reweighting:
   num_global_objects_estimate: 200
   merge_num_proc: 1
   reweights:
-    - group: jets
+    - group: objects
       reweight_vars: [pt, eta]
       bins:
         pt:
@@ -77,66 +77,6 @@ reweighting:
         eta: [[-2.5, 2.5, 40]]
       class_var: flavour_label
       class_target: mean
-    - group: jets
-      reweight_vars: [pt, eta]
-      bins:
-        pt:
-          [
-            [20_000, 250_000, 50],
-            [250_000, 1_000_000, 50],
-            [1_000_000, 6_000_000, 50],
-          ]
-        eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
-      class_target: min
-    - group: jets
-      reweight_vars: [pt, eta]
-      bins:
-        pt:
-          [
-            [20_000, 250_000, 50],
-            [250_000, 1_000_000, 50],
-            [1_000_000, 6_000_000, 50],
-          ]
-        eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
-      class_target: max
-    - group: jets
-      reweight_vars: [pt, eta]
-      bins:
-        pt:
-          [
-            [20_000, 250_000, 50],
-            [250_000, 1_000_000, 50],
-            [1_000_000, 6_000_000, 50],
-          ]
-        eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
-      class_target: uniform
-    - group: jets
-      reweight_vars: [pt, eta]
-      bins:
-        pt:
-          [
-            [20_000, 250_000, 50],
-            [250_000, 1_000_000, 50],
-            [1_000_000, 6_000_000, 50],
-          ]
-        eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
-      class_target: [0, 1]
-    - group: jets
-      reweight_vars: [pt, eta]
-      bins:
-        pt:
-          [
-            [20_000, 250_000, 50],
-            [250_000, 1_000_000, 50],
-            [1_000_000, 6_000_000, 50],
-          ]
-        eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
-      class_target: 0
     - group: tracks
       reweight_vars: [deta]
       bins:
@@ -145,8 +85,10 @@ reweighting:
       class_target: mean
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor
+# class_config is a relative path, resolved against base_dir
 global:
-  global_name: jets
+  global_name: objects
+  class_config: custom_flavours.yaml
   batch_size: 1_000_000
   num_global_objects_estimate: 25_000_000
   base_dir: tmp/upp-tests/integration/temp_workspace/

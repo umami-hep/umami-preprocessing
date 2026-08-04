@@ -11,8 +11,48 @@ from dotmap import DotMap
 from ftag import Extended_Flavours, Flavours, LabelContainer, get_mock_file
 
 from upp import __version__
-from upp.classes.preprocessing_config import PreprocessingConfig
+from upp.classes.preprocessing_config import (
+    PreprocessingConfig,
+    _rename_legacy_keys,
+)
 from upp.classes.resampling_config import ResamplingConfig
+
+
+def test_rename_legacy_keys_remaps_nested_and_records():
+    """Deprecated jet-named keys are remapped everywhere, others untouched."""
+    raw = {
+        "global": {
+            "jets_name": "muons",
+            "num_jets_estimate": 5,
+            "flavour_config": "my_flavours.yaml",
+            "flavour_category": "extended",
+        },
+        "components": [{"num_jets": 10, "sample": {"equal_jets": True}, "flavours": ["bjets"]}],
+        "plotting": {"show_num_jets": False, "kept": 1},
+    }
+    found: set[str] = set()
+    out = _rename_legacy_keys(raw, found)
+
+    assert out["global"] == {
+        "global_name": "muons",
+        "num_global_objects_estimate": 5,
+        "class_config": "my_flavours.yaml",
+        "class_category": "extended",
+    }
+    assert out["components"][0]["num_global_objects"] == 10
+    assert out["components"][0]["sample"]["equal_global_objects"] is True
+    assert out["components"][0]["classes"] == ["bjets"]  # class names (values) untouched
+    assert out["plotting"] == {"show_num_global_objects": False, "kept": 1}
+    assert found == {
+        "jets_name",
+        "num_jets_estimate",
+        "num_jets",
+        "equal_jets",
+        "show_num_jets",
+        "flavours",
+        "flavour_config",
+        "flavour_category",
+    }
 
 
 class TestPreprocessingConfig(unittest.TestCase):
@@ -57,7 +97,9 @@ class TestPreprocessingConfig(unittest.TestCase):
             skip_config_copy=True,
         )
 
-        self.assertEqual(config.plotting.num_jets_plotting, config.num_jets_estimate_plotting)
+        self.assertEqual(
+            config.plotting.num_global_objects_plotting, config.num_global_objects_estimate_plotting
+        )
 
     def test_plotting_config(self) -> None:
         config = PreprocessingConfig.from_file(
@@ -67,7 +109,7 @@ class TestPreprocessingConfig(unittest.TestCase):
             skip_config_copy=True,
         )
 
-        self.assertEqual(config.plotting.num_jets_plotting, 100)
+        self.assertEqual(config.plotting.num_global_objects_plotting, 100)
         self.assertEqual(config.plotting.variable_label("pt"), "$p_\\mathrm{T}$ [GeV]")
         self.assertEqual(config.plotting.variable_label("mass"), "Jet Mass [GeV]")
         self.assertEqual(config.plotting.sample_label("ttbar"), "$t\\bar{t}$")
@@ -189,7 +231,7 @@ class TestPreprocessingConfig(unittest.TestCase):
                 "variables": {"jets": {"labels": ["test"]}},
             },
             base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
-            flavour_category="standard",
+            class_category="standard",
         )
         self.assertEqual(config.flavour_cont, Flavours)
 
@@ -203,7 +245,7 @@ class TestPreprocessingConfig(unittest.TestCase):
                 "variables": {"jets": {"labels": ["test"]}},
             },
             base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
-            flavour_category="extended",
+            class_category="extended",
         )
         self.assertEqual(config.flavour_cont, Extended_Flavours)
 
@@ -247,13 +289,13 @@ class TestPreprocessingConfig(unittest.TestCase):
                     "variables": {"jets": {"labels": ["test"]}},
                 },
                 base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
-                flavour_category="error",
+                class_category="error",
             )
 
         self.assertEqual(
-            "flavour_category error is not supported in the default "
-            + "flavours! If you want to use your own flavour config yaml file, please "
-            + "provide flavour_config!",
+            "class_category error is not supported in the default "
+            + "flavours! If you want to use your own class config yaml file, please "
+            + "provide class_config!",
             str(ctx.exception),
         )
 
@@ -267,9 +309,26 @@ class TestPreprocessingConfig(unittest.TestCase):
                 "variables": {"jets": {"labels": ["test"]}},
             },
             base_dir=Path("/tmp/upp-tests/integration/temp_workspace/"),
-            flavour_config=self.CFG_DIR / "test_flavour_config.yaml",
+            class_config=self.CFG_DIR / "test_flavour_config.yaml",
         )
         self.assertEqual(
             config.flavour_cont,
             LabelContainer.from_yaml(yaml_path=self.CFG_DIR / "test_flavour_config.yaml"),
         )
+
+    def test_relative_class_config_resolved_against_base_dir(self) -> None:
+        config = PreprocessingConfig(
+            config_path=self.CFG_DIR / "test.yaml",
+            split="train",
+            config={
+                "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=self.CFG_DIR,
+            class_config=Path("test_flavour_config.yaml"),
+            skip_checks=True,
+        )
+        expected = (self.CFG_DIR / "test_flavour_config.yaml").absolute()
+        self.assertEqual(config.class_config, expected)
+        self.assertEqual(config.flavour_cont, LabelContainer.from_yaml(yaml_path=expected))

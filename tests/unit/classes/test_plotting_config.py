@@ -28,7 +28,7 @@ def test_plotting_config_default_mass_label():
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [
-        ({"num_jets_plotting": 0}, "plotting.num_jets_plotting"),
+        ({"num_global_objects_plotting": 0}, "plotting.num_global_objects_plotting"),
         ({"output_formats": []}, "plotting.output_formats"),
         ({"linestyles": []}, "plotting.linestyles"),
     ],

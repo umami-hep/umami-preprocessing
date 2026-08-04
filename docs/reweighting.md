@@ -69,7 +69,7 @@ Once all the samples are prepared, we can calculate the weights. An example conf
 ```yaml
 
 reweighting:
-  num_jets_estimate: 1_500_000
+  num_global_objects_estimate: 1_500_000
   merge_num_proc: 20
   reweights:
     - group: jets
@@ -87,7 +87,7 @@ reweighting:
 
 ```
 
-`num_jets_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
+`num_global_objects_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
 Then, you have the `reweights` section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
 The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
 The reweighting can also be performed over track variables, for example
@@ -122,7 +122,7 @@ Finally, we can merge all the relevant jets with their weights. This is done by
 preprocess --config {config} --rwm --split {train/test/val}
 ```
 
-This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the `global` section of the pre-processing config includes `num_jets_per_output_file` and the `reweighting` section has `merge_num_proc>1`.
-This will then launch `merge_num_proc` processes, with approximately `num_jets_per_output_file` per file*.
+This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the `global` section of the pre-processing config includes `num_global_objects_per_output_file` and the `reweighting` section has `merge_num_proc>1`.
+This will then launch `merge_num_proc` processes, with approximately `num_global_objects_per_output_file` per file*.
 
 * Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.

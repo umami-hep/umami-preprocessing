@@ -8,14 +8,14 @@ import numpy as np
 
 @dataclass
 class ReweightConfig:
-    # Number of jets to estimate, if None, use the global num jets estimate
-    num_jets_estimate: None | int = None
+    # Number of objects to estimate, if None, use the global num objects estimate
+    num_global_objects_estimate: None | int = None
     merge_num_proc: int = 1  # Number of processes to use for merging
     reweights: list[SingleReweightConfig] = field(default_factory=list)
 
     def __post_init__(self):
-        if self.num_jets_estimate is not None and self.num_jets_estimate <= 0:
-            raise ValueError("num_jets_estimate must be a positive integer or None")
+        if self.num_global_objects_estimate is not None and self.num_global_objects_estimate <= 0:
+            raise ValueError("num_global_objects_estimate must be a positive integer or None")
 
         parsed_reweights = []
         for rw in self.reweights:

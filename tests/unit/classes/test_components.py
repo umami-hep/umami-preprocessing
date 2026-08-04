@@ -20,9 +20,9 @@ def make_component(tmp_path: Path, vds_dir: Path | None) -> Component:
         flavour=Flavours.bjets,
         global_cuts=Cuts.empty(),
         dirname=tmp_path / "components" / "sub",
-        num_jets=100,
-        num_jets_estimate_available=0,
-        equal_jets=True,
+        num_global_objects=100,
+        num_global_objects_estimate_available=0,
+        equal_global_objects=True,
     )
 
 
