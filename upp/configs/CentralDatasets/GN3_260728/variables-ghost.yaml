@@ -1,0 +1,184 @@
+jets:
+  inputs:
+    - pt_btagJes
+    - eta_btagJes
+  labels:
+    - HadronConeExclTruthLabelID
+    - HadronConeExclExtendedTruthLabelID
+    - HadronConeExclTruthLabelPt
+    - HadronConeExclTruthLabelLxy
+    - HadronConeExclTruthLabelDR
+    - HadronGhostTruthLabelID
+    - HadronGhostExtendedTruthLabelID
+    - HadronGhostTruthLabelPt
+    - HadronGhostTruthLabelLxy
+    - HadronGhostTruthLabelDR
+    - HadronGhostInitialTruthLabelID
+    - HadronGhostInitialTruthLabelPdgId
+    - HadronGhostInitialExtendedTruthLabelID
+    - PartonExtendedTruthLabelID
+    - PartonTruthLabelID
+    - pt
+    - eta
+    - mass
+    - n_tracks_ghost
+    - n_truth_promptLepton
+    - eventNumber
+    - jetFoldHash
+    - ptFromTruthJet
+    - matchedToTruthJet
+    - ptFromTruthDressedWZJet
+    - matchedToTruthDressedWZJet
+    - decayModeFromTruthTaus
+    - matchedToTruthTaus
+    - pt_visFromTruthTaus
+    - matchedToTauJet
+    - ptFinalCalibFromTauJet
+
+tracks_ghost:
+  inputs:
+    - d0
+    - z0SinTheta
+    - dphi
+    - deta
+    - qOverP
+    - lifetimeSignedD0Significance
+    - lifetimeSignedZ0SinThetaSignificance
+    - phiUncertainty
+    - thetaUncertainty
+    - qOverPUncertainty
+    - numberOfPixelHits
+    - numberOfSCTHits
+    - numberOfInnermostPixelLayerHits
+    - numberOfNextToInnermostPixelLayerHits
+    - numberOfInnermostPixelLayerSharedHits
+    - numberOfInnermostPixelLayerSplitHits
+    - numberOfPixelSharedHits
+    - numberOfPixelSplitHits
+    - numberOfSCTSharedHits
+    # Soft Muon variables
+    - leptonID
+    - muon_quality
+    - muon_qOverPratio
+    - muon_momentumBalanceSignificance
+    - muon_scatteringNeighbourSignificance
+
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
+    - ftagTruthVertexIndex
+
+flows:
+  inputs:
+    - pt
+    - energy
+    - deta
+    - dphi
+    - isCharged
+
+calo:
+  inputs:
+    - "usedInChargedFlow"
+    - "ENG_BAD_CELLS"
+    - "ISOLATION"
+    - "CENTER_MAG"
+    - "CELL_SIGNIFICANCE"
+    - "ENG_FRAC_MAX"
+    - "LATERAL"
+    - "SIGNIFICANCE"
+    - "LONGITUDINAL"
+    - "ENG_POS"
+    - "EM_PROBABILITY"
+    - "CENTER_LAMBDA"
+    - "SECOND_LAMBDA"
+    - "FIRST_ENG_DENS"
+    - "SECOND_R"
+    - "AVG_LAR_Q"
+    - "MASS"
+    - "rawPhi"
+    - "calPhi"
+    - "rawEta"
+    - "calEta"
+    - "rawE"
+    - "calE"
+    - "PreSamplerB"
+    - "EMB1"
+    - "EMB2"
+    - "EMB3"
+    - "PreSamplerE"
+    - "EME1"
+    - "EME2"
+    - "EME3"
+    - "HEC0"
+    - "HEC1"
+    - "HEC2"
+    - "HEC3"
+    - "TileBar0"
+    - "TileBar1"
+    - "TileBar2"
+    - "TileGap1"
+    - "TileGap2"
+    - "TileGap3"
+    - "TileExt0"
+    - "TileExt1"
+    - "TileExt2"
+    - "FCAL0"
+    - "FCAL1"
+    - "FCAL2"
+
+electrons:
+  inputs:
+    - pt
+    - ptfrac
+    - ptrel
+    - dr
+    - deta
+    - dphi
+    - ftag_et
+    - qOverP
+    - d0RelativeToBeamspot
+    - d0RelativeToBeamspotSignificance
+    - ftag_ptVarCone30OverPt
+    - numberOfPixelHits
+    - numberOfSCTHitsInclDead
+    - ftag_deltaPOverP
+    - eProbabilityHT
+    - deltaEta1
+    - deltaPhiRescaled2
+    - ftag_energyOverP
+    - Rhad
+    - Rhad1
+    - Eratio
+    - weta2
+    - Rphi
+    - Reta
+    - wtots1
+    - f1
+    - f3
+
+  labels:
+    - ftagTruthOriginLabel
+    - ftagTruthTypeLabel
+    - ftagTruthSourceLabel
+    - ftagTruthVertexIndex
+
+muons:
+  inputs:
+    - quality
+    - pt
+    - eta
+    - phi
+    - momentumBalanceSignificance
+    - scatteringNeighbourSignificance
+    - ptfrac
+    - ptrel
+    - dr
+    - qOverP
+    - qOverPratio
+    - numberOfPixelHits
+    - eProbabilityHT
+    - lifetimeSignedD0
+    - lifetimeSignedZ0SinTheta
+    - lifetimeSignedD0Significance
+    - lifetimeSignedZ0SinThetaSignificance
