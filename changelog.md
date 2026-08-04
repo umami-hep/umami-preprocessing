@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Add container image documentation and generic Slurm submission scripts with config-driven component enumeration [#XXX](https://github.com/umami-hep/umami-preprocessing/pull/XXX)
+- Add container image documentation and generic Slurm submission scripts with config-driven component enumeration [#160](https://github.com/umami-hep/umami-preprocessing/pull/160)
 
 ### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
 
