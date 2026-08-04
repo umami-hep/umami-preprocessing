@@ -1,0 +1,133 @@
+# Running on HPC clusters
+
+The preprocessing stages can be parallelized over components, regions and splits using the
+`--component`, `--region` and `--split` flags described in [Run](run.md). On a Slurm cluster, each
+of these units of work can run as its own batch job inside the [container image](setup.md#container-image).
+UPP ships a small set of submission scripts in `scripts/slurm/` that automate this.
+
+## Prerequisites
+
+- A cluster with Slurm and apptainer.
+- The UPP container image (see [Container image](setup.md#container-image)). By default the scripts
+  use `docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest`. To avoid the
+  repeated `docker://` to SIF conversion in every job, pull the image once and point `UPP_IMAGE` at
+  the local file:
+
+  ```bash
+  apptainer pull upp_latest.sif docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest
+  export UPP_IMAGE=/path/to/upp_latest.sif
+  ```
+
+## Interactive use
+
+For quick tests, run UPP inside the container on an interactive allocation:
+
+```bash
+salloc --ntasks 1 --cpus-per-task 4 --time 2:00:00
+srun apptainer exec --contain --pwd "$PWD" -B /home -B /tmp \
+    "$UPP_IMAGE" preprocess --config <path/to/config.yaml> --prep
+```
+
+## Batch submission scripts
+
+The `scripts/slurm/` directory contains three scripts:
+
+- `submit.sh` runs on the login node. It reads the components from your preprocessing config and
+  submits one Slurm job per unit of work via `sbatch`.
+- `batch.sh` is the sbatch payload. It carries the `#SBATCH` resource header and starts the
+  container on the compute node.
+- `run_stage.sh` runs inside the container and maps the submitted mode onto the `preprocess`
+  command line flags.
+
+To use them, create a run directory, copy the scripts, and adapt the `#SBATCH` header in `batch.sh`
+to your cluster (partition, account, time and memory limits):
+
+```bash
+mkdir my_preprocessing && cd my_preprocessing
+cp -r <path/to/umami-preprocessing>/scripts/slurm .
+$EDITOR slurm/batch.sh
+```
+
+Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
+next:
+
+```bash
+./slurm/submit.sh --config <path/to/config.yaml> --dry-run prepare  # preview only
+./slurm/submit.sh --config <path/to/config.yaml> prepare
+./slurm/submit.sh --config <path/to/config.yaml> resampling
+./slurm/submit.sh --config <path/to/config.yaml> merge
+./slurm/submit.sh --config <path/to/config.yaml> normalise
+./slurm/submit.sh --config <path/to/config.yaml> plotting
+```
+
+Job logs are written to `logs/` in the current directory. Running `submit.sh` without a mode enters
+an interactive prompt for the mode and filters.
+
+The available modes and the jobs they submit:
+
+| Mode | Jobs | `preprocess` flags per job |
+|------|------|----------------------------|
+| `sequential` | 1 | full chain (`--prep`, `--resample`, `--merge`, `--norm`, `--plot`) |
+| `prepare` | one per component and split | `--prep --component <c> --split <s>` |
+| `resampling` | one per region and split | `--resample --region <r> --split <s>` |
+| `fine_resampling` | one per component and split | `--resample --region <r> --component <c> --split <s>` |
+| `merge` | one per split | `--merge --split <s>` |
+| `normalise` | 1 | `--norm` |
+| `plotting` | one per split | `--plot --split <s>` |
+
+!!!warning "Stage ordering and parallel h5py access"
+
+    All jobs of a stage must finish before the next stage is submitted, e.g. all `prepare` jobs
+    before `resampling`. Also run the [initial sample check](run.md#additional-scripts-initial-sample-check)
+    once before submitting `prepare` jobs in parallel — it creates the virtual datasets which can
+    get corrupted when created by multiple jobs at once.
+
+## Config-driven job lists
+
+`submit.sh` never hardcodes which components exist. It calls the `list_components` script (part of
+UPP) to enumerate the components defined in the `components:` block of your config:
+
+```bash
+list_components --config <path/to/config.yaml>
+```
+
+```text
+lowpt   ttbar   bjets   lowpt_ttbar_bjets
+highpt  zprime  bjets   highpt_zprime_bjets
+...
+```
+
+Only combinations actually defined in the config are submitted. The selection can be narrowed with
+filter flags, each taking a comma- or space-separated list:
+
+```bash
+./slurm/submit.sh --config <path/to/config.yaml> --regions lowpt --splits train prepare
+./slurm/submit.sh --config <path/to/config.yaml> --samples ttbar --flavs "bjets,cjets" fine_resampling
+```
+
+Note that enumerating the components fully validates the config, so a broken config fails directly
+on the login node instead of inside the batch jobs.
+
+## Environment variables
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `UPP_IMAGE` | `docker://...upp-images/upp:latest` | Container image (`docker://` URI or local `.sif`) |
+| `UPP_BINDS` | `/home,/tmp` | Comma-separated paths bound into the container |
+| `THROTTLE` | `30` | Seconds between `sbatch` calls (`0` disables) |
+| `DRY_RUN` | `0` | Set to `1` to print the `sbatch` commands instead of submitting |
+
+Make sure `UPP_BINDS` covers your input ntuples and output directory if they live outside `/home`
+(e.g. on a scratch filesystem), and export `UPP_IMAGE`/`UPP_BINDS` in your shell so they are also
+picked up by the batch jobs.
+
+!!!warning "Keep the throttle enabled"
+
+    The delay between `sbatch` calls avoids hammering the scheduler and gives jobs time to start
+    up without all of them hitting the shared filesystem at once. Only disable it for small
+    submissions.
+
+!!!info "Configs outside the repository"
+
+    When you copy a config out of the repository, `!include` directives with relative paths no
+    longer resolve. Use absolute paths in `!include` lines of copied configs.

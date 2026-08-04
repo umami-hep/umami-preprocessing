@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Add container image documentation and generic Slurm submission scripts with config-driven component enumeration [#XXX](https://github.com/umami-hep/umami-preprocessing/pull/XXX)
+
 ### [v0.3.1](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.1) (19.06.2026)
 
 - Make skip-resampling work end-to-end; support `num_jets: -1` to write all jets passing cuts, and record the resampling method in the output metadata [#153](https://github.com/umami-hep/umami-preprocessing/pull/153)

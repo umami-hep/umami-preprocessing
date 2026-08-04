@@ -18,6 +18,7 @@ nav = [
   { "Reweighting" = "reweighting.md" },
   { "Configuration" = "configuration.md" },
   { "Run" = "run.md" },
+  { "Running on HPC" = "hpc.md" },
   { "Umami integration" = "umami_int.md" },
   { "Contributing" = "contributing.md" },
   { "Docs development" = "docs_development.md" },
