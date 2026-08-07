@@ -124,7 +124,8 @@ next:
 ./batch/submit.sh --config <path/to/config.yaml> plotting
 ```
 
-Job logs are written to `logs/` in the current directory. Running `submit.sh` without a mode enters
+Job logs are written to the `logs/output/` and `logs/error/` subdirectories of the current
+directory. Running `submit.sh` without a mode enters
 an interactive prompt for the mode and filters, and `./batch/submit.sh --help` prints all modes and
 options.
 

@@ -216,8 +216,8 @@ submit() {
   local -a cmd=(
     sbatch
     --job-name="$jobname"
-    --output="${PWD}/logs/%j_%x.out"
-    --error="${PWD}/logs/%j_%x.err"
+    --output="${PWD}/logs/output/%j_%x.out"
+    --error="${PWD}/logs/error/%j_%x.err"
     "${SCRIPT_DIR}/slurm_batch.sh"
     "$CONFIG"
     "$@"
@@ -427,7 +427,7 @@ main() {
   fi
 
   if [[ "$DRY_RUN" != "1" ]]; then
-    mkdir -p "${PWD}/logs"
+    mkdir -p "${PWD}/logs/output" "${PWD}/logs/error"
   fi
 
   local split

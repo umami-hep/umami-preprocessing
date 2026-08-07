@@ -13,8 +13,8 @@ executable     = $(batch_dir)/condor_batch.sh
 arguments      = $(args)
 batch_name     = $(batch_name)
 environment    = "UPP_IMAGE=$(upp_image) UPP_BINDS=$(upp_binds)"
-output         = logs/$(ClusterId).$(ProcId).out
-error          = logs/$(ClusterId).$(ProcId).err
+output         = logs/output/$(ClusterId).$(ProcId).out
+error          = logs/error/$(ClusterId).$(ProcId).err
 log            = logs/$(ClusterId).log
 
 # Assumes a shared filesystem between submit and worker nodes
