@@ -767,19 +767,17 @@ from there:</p>
 </div>
 </div>
 </div>
-<p>Then adapt the resources to your cluster (partition/pool, account, time and memory limits) — the
-<code>#SBATCH</code> header in <code>slurm_batch.sh</code> for Slurm, or the requests at the top of <code>condor_job.sub</code> for
-HTCondor:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">$EDITOR</span><span class="w"> </span>batch/slurm_batch.sh<span class="w">   </span><span class="c1"># or batch/condor_job.sub</span>
-</span></code></pre></div>
+<p>Adapt the resource specifications (number of CPUs, memory allocation, time limit, partition or
+account etc.) in the <code>slurm_batch.sh</code> (Slurm) or <code>condor_job.sub</code> (HTCondor) files to fit your
+needs.</p>
 <p>Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
 next:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
 </span></code></pre></div>
 <p>Job logs are written to <code>logs/</code> in the current directory. Running <code>submit.sh</code> without a mode enters
 an interactive prompt for the mode and filters, and <code>./batch/submit.sh --help</code> prints all modes and
@@ -843,17 +841,21 @@ get corrupted when created by multiple jobs at once.</p>
 </div>
 <h2 id="config-driven-job-lists">Config-driven job lists<a class="headerlink" href="#config-driven-job-lists" title="Permanent link">#</a></h2>
 <p><code>submit.sh</code> never hardcodes which components exist. It calls the <code>list_components</code> script (part of
-UPP) to enumerate the components defined in the <code>components:</code> block of your config:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+UPP) to enumerate the components defined in the <code>components:</code> block of your config. No local UPP
+installation is needed for this: when <code>list_components</code> is not on the <code>PATH</code>, it is run inside the
+container image automatically. Only the <code>prepare</code>, <code>fine_resampling</code> and <code>resampling</code> modes (and
+the interactive mode) enumerate at all — the other modes submit without running UPP on the login
+node.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>...
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>...
 </span></code></pre></div>
 <p>Only combinations actually defined in the config are submitted. The selection can be narrowed with
 filter flags, each taking a comma- or space-separated list:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">&quot;bjets,cjets&quot;</span><span class="w"> </span>fine_resampling
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">&quot;bjets,cjets&quot;</span><span class="w"> </span>fine_resampling
 </span></code></pre></div>
 <p>Note that enumerating the components fully validates the config, so a broken config fails directly
 on the login node instead of inside the batch jobs.</p>
