@@ -31,6 +31,12 @@ cluster, each of these units of work can run as its own batch job inside the
     pool space of the job instead of writing to EOS directly — see
     [Data flows](https://batchdocs.web.cern.ch/concepts/dataflow.html) and
     [EOS](https://batchdocs.web.cern.ch/troubleshooting/eos.html) in the CERN batch docs.
+
+    If the run directory has to live on EOS, the experimental
+    [EosSubmit schedds](https://batchdocs.web.cern.ch/local/eossubmit.html)
+    (`module load lxbatch/eossubmit`) accept submit files with EOS paths, transferring all job
+    files via xrootd instead of using a shared filesystem. All submit file paths must then be on
+    EOS, and this mode has not been tested with these scripts.
 - The UPP container image (see [Container image](setup.md#container-image)). The scripts default to
   the CVMFS-unpacked image
   `/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest` when
