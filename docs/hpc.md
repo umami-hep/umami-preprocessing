@@ -100,7 +100,8 @@ next:
 ```
 
 Job logs are written to `logs/` in the current directory. Running `submit.sh` without a mode enters
-an interactive prompt for the mode and filters.
+an interactive prompt for the mode and filters, and `./batch/submit.sh --help` prints all modes and
+options.
 
 On Slurm each job is submitted with its own `sbatch` call and job name. On HTCondor all jobs of one
 `submit.sh` invocation are submitted as a single cluster (one `condor_submit` with one process per
