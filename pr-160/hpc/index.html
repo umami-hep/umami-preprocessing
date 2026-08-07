@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.52">
+      <meta name="generator" content="zensical-0.0.53">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/classic/main.4c04d108.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.39e53929.min.css">
       
         
           
@@ -700,16 +700,19 @@
 
 <h1 id="running-on-hpc-clusters">Running on HPC clusters<a class="headerlink" href="#running-on-hpc-clusters" title="Permanent link">#</a></h1>
 <p>The preprocessing stages can be parallelized over components, regions and splits using the
-<code>--component</code>, <code>--region</code> and <code>--split</code> flags described in <a href="../run/">Run</a>. On a Slurm cluster, each
-of these units of work can run as its own batch job inside the <a href="../setup/#container-image">container image</a>.
-UPP ships a small set of submission scripts in <code>scripts/slurm/</code> that automate this.</p>
+<code>--component</code>, <code>--region</code> and <code>--split</code> flags described in <a href="../run/">Run</a>. On a Slurm or HTCondor
+cluster, each of these units of work can run as its own batch job inside the
+<a href="../setup/#container-image">container image</a>. UPP ships a small set of submission scripts in
+<code>scripts/batch/</code> that automate this.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h2>
 <ul>
-<li>A cluster with Slurm and apptainer.</li>
-<li>The UPP container image (see <a href="../setup/#container-image">Container image</a>). By default the scripts
-  use <code>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code>. To avoid the
-  repeated <code>docker://</code> to SIF conversion in every job, pull the image once and point <code>UPP_IMAGE</code> at
-  the local file:</li>
+<li>A cluster with Slurm or HTCondor and apptainer.</li>
+<li>The UPP container image (see <a href="../setup/#container-image">Container image</a>). The scripts default to
+  the CVMFS-unpacked image
+  <code>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code> when
+  it exists and fall back to <code>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code>
+  otherwise. On clusters without CVMFS, avoid the repeated <code>docker://</code> to SIF conversion in every
+  job by pulling the image once and pointing <code>UPP_IMAGE</code> at the local file:</li>
 </ul>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>apptainer<span class="w"> </span>pull<span class="w"> </span>upp_latest.sif<span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UPP_IMAGE</span><span class="o">=</span>/path/to/upp_latest.sif
@@ -721,32 +724,60 @@ UPP ships a small set of submission scripts in <code>scripts/slurm/</code> that 
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$UPP_IMAGE</span><span class="s2">&quot;</span><span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--prep
 </span></code></pre></div>
 <h2 id="batch-submission-scripts">Batch submission scripts<a class="headerlink" href="#batch-submission-scripts" title="Permanent link">#</a></h2>
-<p>The <code>scripts/slurm/</code> directory contains three scripts:</p>
+<p>The <code>scripts/batch/</code> directory contains:</p>
 <ul>
 <li><code>submit.sh</code> runs on the login node. It reads the components from your preprocessing config and
-  submits one Slurm job per unit of work via <code>sbatch</code>.</li>
-<li><code>batch.sh</code> is the sbatch payload. It carries the <code>#SBATCH</code> resource header and starts the
+  submits one batch job per unit of work. The scheduler is auto-detected (<code>sbatch</code> found → Slurm,
+  <code>condor_submit</code> found → HTCondor) and can be forced with <code>--scheduler slurm|condor</code>.</li>
+<li><code>slurm_batch.sh</code> is the sbatch payload. It carries the <code>#SBATCH</code> resource header and starts the
   container on the compute node.</li>
+<li><code>condor_job.sub</code> and <code>condor_batch.sh</code> are the HTCondor equivalents: the submit description with
+  the resource requests, and the job executable starting the container.</li>
 <li><code>run_stage.sh</code> runs inside the container and maps the submitted mode onto the <code>preprocess</code>
   command line flags.</li>
 </ul>
-<p>To use them, create a run directory, copy the scripts, and adapt the <code>#SBATCH</code> header in <code>batch.sh</code>
-to your cluster (partition, account, time and memory limits):</p>
+<p>To use them, create a run directory and copy the scripts. A clone of the repository is not
+required — the image contains the repository at <code>/workspace</code>, so the scripts can be taken straight
+from there:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">CVMFS</label><label for="__tabbed_1_2">apptainer</label><label for="__tabbed_1_3">local clone</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>&lt;path/to/umami-preprocessing&gt;/scripts/slurm<span class="w"> </span>.
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">$EDITOR</span><span class="w"> </span>slurm/batch.sh
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest/workspace/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>cp<span class="w"> </span>-r<span class="w"> </span>/workspace/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>&lt;path/to/umami-preprocessing&gt;/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Then adapt the resources to your cluster (partition/pool, account, time and memory limits) — the
+<code>#SBATCH</code> header in <code>slurm_batch.sh</code> for Slurm, or the requests at the top of <code>condor_job.sub</code> for
+HTCondor:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">$EDITOR</span><span class="w"> </span>batch/slurm_batch.sh<span class="w">   </span><span class="c1"># or batch/condor_job.sub</span>
 </span></code></pre></div>
 <p>Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
 next:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
 </span></code></pre></div>
 <p>Job logs are written to <code>logs/</code> in the current directory. Running <code>submit.sh</code> without a mode enters
 an interactive prompt for the mode and filters.</p>
+<p>On Slurm each job is submitted with its own <code>sbatch</code> call and job name. On HTCondor all jobs of one
+<code>submit.sh</code> invocation are submitted as a single cluster (one <code>condor_submit</code> with one process per
+job), with the job arguments written to <code>logs/condor_&lt;mode&gt;.args</code>.</p>
 <p>The available modes and the jobs they submit:</p>
 <table>
 <thead>
@@ -804,16 +835,16 @@ get corrupted when created by multiple jobs at once.</p>
 <h2 id="config-driven-job-lists">Config-driven job lists<a class="headerlink" href="#config-driven-job-lists" title="Permanent link">#</a></h2>
 <p><code>submit.sh</code> never hardcodes which components exist. It calls the <code>list_components</code> script (part of
 UPP) to enumerate the components defined in the <code>components:</code> block of your config:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>...
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>...
 </span></code></pre></div>
 <p>Only combinations actually defined in the config are submitted. The selection can be narrowed with
 filter flags, each taking a comma- or space-separated list:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>./slurm/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">&quot;bjets,cjets&quot;</span><span class="w"> </span>fine_resampling
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">&quot;bjets,cjets&quot;</span><span class="w"> </span>fine_resampling
 </span></code></pre></div>
 <p>Note that enumerating the components fully validates the config, so a broken config fails directly
 on the login node instead of inside the batch jobs.</p>
@@ -829,8 +860,8 @@ on the login node instead of inside the batch jobs.</p>
 <tbody>
 <tr>
 <td><code>UPP_IMAGE</code></td>
-<td><code>docker://...upp-images/upp:latest</code></td>
-<td>Container image (<code>docker://</code> URI or local <code>.sif</code>)</td>
+<td>CVMFS-unpacked image if present, else <code>docker://...upp-images/upp:latest</code></td>
+<td>Container image (unpacked directory, local <code>.sif</code> or <code>docker://</code> URI)</td>
 </tr>
 <tr>
 <td><code>UPP_BINDS</code></td>
@@ -840,12 +871,12 @@ on the login node instead of inside the batch jobs.</p>
 <tr>
 <td><code>THROTTLE</code></td>
 <td><code>30</code></td>
-<td>Seconds between <code>sbatch</code> calls (<code>0</code> disables)</td>
+<td>Seconds between <code>sbatch</code> calls (<code>0</code> disables; Slurm only)</td>
 </tr>
 <tr>
 <td><code>DRY_RUN</code></td>
 <td><code>0</code></td>
-<td>Set to <code>1</code> to print the <code>sbatch</code> commands instead of submitting</td>
+<td>Set to <code>1</code> to print the submission commands instead of submitting</td>
 </tr>
 </tbody>
 </table>
@@ -927,7 +958,7 @@ longer resolve. Use absolute paths in <code>!include</code> lines of copied conf
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.ed145cee.min.js"></script>
+      <script src="../assets/javascripts/bundle.69c251d7.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       

@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.52">
+      <meta name="generator" content="zensical-0.0.53">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/classic/main.4c04d108.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.39e53929.min.css">
       
         
           
@@ -826,18 +826,25 @@ while. If you run UPP repeatedly, pull the image once and use the local file ins
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>apptainer<span class="w"> </span>pull<span class="w"> </span>upp_latest.sif<span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>upp_latest.sif<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
+<p>On machines with CVMFS (lxplus, most HPC sites) the image is also distributed pre-unpacked
+via <a href="https://gitlab.cern.ch/unpacked/sync">unpacked.cern.ch</a>, which skips the pull and
+conversion entirely:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span></code></pre></div>
+<p>The release tags are available there as well (e.g. <code>upp:v0.3.2</code>).</p>
 <p>By default apptainer shares your home directory and working directory with the container. For a
 cleaner environment use <code>--contain</code> and bind only the paths you need (your input ntuples and
 output directory) with <code>-B</code>, keeping the working directory with <code>--pwd</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span>-B<span class="w"> </span>&lt;path/to/data&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>upp_latest.sif<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span>-B<span class="w"> </span>&lt;path/to/data&gt;<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span>upp_latest.sif<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
 <p>With docker, mount your working directory and data paths into the container:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-v<span class="w"> </span><span class="nv">$PWD</span>:<span class="nv">$PWD</span><span class="w"> </span>-w<span class="w"> </span><span class="nv">$PWD</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span>gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-v<span class="w"> </span><span class="nv">$PWD</span>:<span class="nv">$PWD</span><span class="w"> </span>-w<span class="w"> </span><span class="nv">$PWD</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span>gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
 </div>
 </div>
@@ -847,16 +854,16 @@ output directory) with <code>-B</code>, keeping the working directory with <code
 <p><code>upp:latest</code> follows the <code>main</code> branch and changes over time. For reproducible production
 preprocessing, use a tagged release image like <code>upp:v0.3.1</code> instead.</p>
 </div>
-<p>For running UPP as batch jobs on Slurm clusters with the container image, see
+<p>For running UPP as batch jobs on Slurm or HTCondor clusters with the container image, see
 <a href="../hpc/">Running on HPC</a>.</p>
 <h3 id="run-the-tests-optional">Run the tests (Optional)<a class="headerlink" href="#run-the-tests-optional" title="Permanent link">#</a></h3>
 <p>To ensure that the package is working correctly, you can run the tests using the pytest framework. </p>
 <p>Use <code>pytest</code> to run the tests to make sure the package works</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>pytest<span class="w"> </span>tests<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>pytest<span class="w"> </span>tests<span class="w"> </span>
 </span></code></pre></div>
 <p>If you want to measure test coverage you can use the commands:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
 </span></code></pre></div></p>
 
 
@@ -922,7 +929,7 @@ preprocessing, use a tagged release image like <code>upp:v0.3.1</code> instead.<
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.ed145cee.min.js"></script>
+      <script src="../assets/javascripts/bundle.69c251d7.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
