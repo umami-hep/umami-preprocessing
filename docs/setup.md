@@ -145,11 +145,13 @@ and its command line scripts (`preprocess`, `check_input_samples`, `list_compone
     ```
 
     The first `docker://` invocation converts the image to apptainer's SIF format, which takes a
-    while. If you run UPP repeatedly, pull the image once and use the local file instead:
+    while. The result is cached (default `~/.apptainer/cache`), so later invocations start quickly
+    and only download again when a new image version is published. If your home quota is small
+    (e.g. on lxplus), point the cache and the conversion scratch space to a larger filesystem:
 
     ```bash
-    apptainer pull upp_latest.sif docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest
-    apptainer exec upp_latest.sif preprocess --config <path/to/config.yaml>
+    export APPTAINER_CACHEDIR=/path/to/big/storage/apptainer_cache
+    export APPTAINER_TMPDIR=/path/to/big/storage/apptainer_tmp
     ```
 
     On machines with CVMFS (lxplus, most HPC sites) the image is also distributed pre-unpacked
@@ -169,8 +171,10 @@ and its command line scripts (`preprocess`, `check_input_samples`, `list_compone
 
     ```bash
     apptainer exec --contain --pwd "$PWD" -B /home -B /tmp -B <path/to/data> \
-        upp_latest.sif preprocess --config <path/to/config.yaml>
+        <image> preprocess --config <path/to/config.yaml>
     ```
+
+    where `<image>` is any of the above (`docker://` URL, CVMFS path or local `.sif` file).
 
 === "docker"
 

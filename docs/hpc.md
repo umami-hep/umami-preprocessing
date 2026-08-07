@@ -12,14 +12,22 @@ cluster, each of these units of work can run as its own batch job inside the
 - The UPP container image (see [Container image](setup.md#container-image)). The scripts default to
   the CVMFS-unpacked image
   `/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest` when
-  it exists and fall back to `docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest`
-  otherwise. On clusters without CVMFS, avoid the repeated `docker://` to SIF conversion in every
-  job by pulling the image once and pointing `UPP_IMAGE` at the local file:
+  it exists (no download or conversion needed) and fall back to
+  `docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest` otherwise. Running
+  from `docker://` directly is fine: apptainer caches the converted image and only downloads again
+  when a new version is published. Alternatively, pin a specific local file with
+  `export UPP_IMAGE=/path/to/upp.sif` after an `apptainer pull`.
 
-  ```bash
-  apptainer pull upp_latest.sif docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest
-  export UPP_IMAGE=/path/to/upp_latest.sif
-  ```
+!!!info "Apptainer cache location"
+
+    The apptainer cache defaults to `~/.apptainer/cache` and the conversion uses `/tmp` as
+    scratch space. On clusters with a small home quota (e.g. lxplus) point them to a larger
+    filesystem:
+
+    ```bash
+    export APPTAINER_CACHEDIR=/path/to/big/storage/apptainer_cache
+    export APPTAINER_TMPDIR=/path/to/big/storage/apptainer_tmp
+    ```
 
 ## Interactive use
 
