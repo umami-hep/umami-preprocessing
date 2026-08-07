@@ -706,7 +706,28 @@ cluster, each of these units of work can run as its own batch job inside the
 <code>scripts/batch/</code> that automate this.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h2>
 <ul>
-<li>A cluster with Slurm or HTCondor and apptainer.</li>
+<li>A cluster with Slurm or HTCondor and apptainer. On lxplus, HTCondor is provided by the CERN
+  batch service — see the <a href="https://batchdocs.web.cern.ch/local/quick.html">quickstart</a> and
+  <a href="https://batchdocs.web.cern.ch/local/submit.html">job submission</a> documentation.</li>
+<li>A shared filesystem between the submitting node and the workers — the input, intermediate and
+  output files must be visible to all jobs. This is the case on lxplus (AFS/EOS) and typical
+  institute clusters.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Input/output data on lxplus (AFS/EOS)</p>
+<p>HTCondor on lxplus rejects submit files that reference EOS paths (executable, <code>output</code>,
+<code>error</code>, <code>log</code>), so create the run directory — with the copied scripts and the <code>logs/</code>
+directory — in your AFS work area and submit from there. The jobs themselves run with your
+Kerberos credentials and can read and write <code>/afs</code> and <code>/eos</code> directly, so keep the large
+input ntuples and outputs on EOS and bind both filesystems into the container:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UPP_BINDS</span><span class="o">=</span>/afs,/eos,/tmp
+</span></code></pre></div>
+<p>For very I/O-heavy workflows the batch service recommends staging data through the local
+pool space of the job instead of writing to EOS directly — see
+<a href="https://batchdocs.web.cern.ch/concepts/dataflow.html">Data flows</a> and
+<a href="https://batchdocs.web.cern.ch/troubleshooting/eos.html">EOS</a> in the CERN batch docs.</p>
+</div>
+<ul>
 <li>The UPP container image (see <a href="../setup/#container-image">Container image</a>). The scripts default to
   the CVMFS-unpacked image
   <code>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code> when
@@ -721,15 +742,15 @@ cluster, each of these units of work can run as its own batch job inside the
 <p>The apptainer cache defaults to <code>~/.apptainer/cache</code> and the conversion uses <code>/tmp</code> as
 scratch space. On clusters with a small home quota (e.g. lxplus) point them to a larger
 filesystem:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_CACHEDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_cache
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_TMPDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_tmp
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_CACHEDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_cache
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_TMPDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_tmp
 </span></code></pre></div>
 </div>
 <h2 id="interactive-use">Interactive use<a class="headerlink" href="#interactive-use" title="Permanent link">#</a></h2>
 <p>For quick tests, run UPP inside the container on an interactive allocation:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>salloc<span class="w"> </span>--ntasks<span class="w"> </span><span class="m">1</span><span class="w"> </span>--cpus-per-task<span class="w"> </span><span class="m">4</span><span class="w"> </span>--time<span class="w"> </span><span class="m">2</span>:00:00
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>srun<span class="w"> </span>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$UPP_IMAGE</span><span class="s2">&quot;</span><span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--prep
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>salloc<span class="w"> </span>--ntasks<span class="w"> </span><span class="m">1</span><span class="w"> </span>--cpus-per-task<span class="w"> </span><span class="m">4</span><span class="w"> </span>--time<span class="w"> </span><span class="m">2</span>:00:00
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>srun<span class="w"> </span>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$UPP_IMAGE</span><span class="s2">&quot;</span><span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--prep
 </span></code></pre></div>
 <h2 id="batch-submission-scripts">Batch submission scripts<a class="headerlink" href="#batch-submission-scripts" title="Permanent link">#</a></h2>
 <p>The <code>scripts/batch/</code> directory contains:</p>
@@ -750,34 +771,35 @@ from there:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">CVMFS</label><label for="__tabbed_1_2">apptainer</label><label for="__tabbed_1_3">local clone</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest/workspace/scripts/batch<span class="w"> </span>.
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>cp<span class="w"> </span>-r<span class="w"> </span>/workspace/scripts/batch<span class="w"> </span>.
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest/workspace/scripts/batch<span class="w"> </span>.
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>&lt;path/to/umami-preprocessing&gt;/scripts/batch<span class="w"> </span>.
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>cp<span class="w"> </span>-r<span class="w"> </span>/workspace/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>&lt;path/to/umami-preprocessing&gt;/scripts/batch<span class="w"> </span>.
 </span></code></pre></div>
 </div>
 </div>
 </div>
 <p>Adapt the resource specifications (number of CPUs, memory allocation, time limit, partition or
 account etc.) in the <code>slurm_batch.sh</code> (Slurm) or <code>condor_job.sub</code> (HTCondor) files to fit your
-needs.</p>
+needs. The <code>+JobFlavour</code> walltime flavours available on lxplus are listed in the
+<a href="https://batchdocs.web.cern.ch/local/submit.html">CERN batch documentation</a>.</p>
 <p>Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
 next:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
 </span></code></pre></div>
 <p>Job logs are written to <code>logs/</code> in the current directory. Running <code>submit.sh</code> without a mode enters
 an interactive prompt for the mode and filters, and <code>./batch/submit.sh --help</code> prints all modes and
@@ -846,16 +868,16 @@ installation is needed for this: when <code>list_components</code> is not on the
 container image automatically. Only the <code>prepare</code>, <code>fine_resampling</code> and <code>resampling</code> modes (and
 the interactive mode) enumerate at all — the other modes submit without running UPP on the login
 node.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>...
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>...
 </span></code></pre></div>
 <p>Only combinations actually defined in the config are submitted. The selection can be narrowed with
 filter flags, each taking a comma- or space-separated list:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">&quot;bjets,cjets&quot;</span><span class="w"> </span>fine_resampling
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">&quot;bjets,cjets&quot;</span><span class="w"> </span>fine_resampling
 </span></code></pre></div>
 <p>Note that enumerating the components fully validates the config, so a broken config fails directly
 on the login node instead of inside the batch jobs.</p>
