@@ -8,7 +8,12 @@ cluster, each of these units of work can run as its own batch job inside the
 
 ## Prerequisites
 
-- A cluster with Slurm or HTCondor and apptainer.
+- A cluster with Slurm or HTCondor and apptainer. On lxplus, HTCondor is provided by the CERN
+  batch service — see the [quickstart](https://batchdocs.web.cern.ch/local/quick.html) and
+  [job submission](https://batchdocs.web.cern.ch/local/submit.html) documentation.
+- A shared filesystem between the submitting node and the workers — the input, intermediate and
+  output files must be visible to all jobs. This is the case on lxplus (AFS/EOS) and typical
+  institute clusters.
 - The UPP container image (see [Container image](setup.md#container-image)). The scripts default to
   the CVMFS-unpacked image
   `/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest` when
@@ -81,7 +86,8 @@ from there:
 
 Adapt the resource specifications (number of CPUs, memory allocation, time limit, partition or
 account etc.) in the `slurm_batch.sh` (Slurm) or `condor_job.sub` (HTCondor) files to fit your
-needs.
+needs. The `+JobFlavour` walltime flavours available on lxplus are listed in the
+[CERN batch documentation](https://batchdocs.web.cern.ch/local/submit.html).
 
 Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
 next:
