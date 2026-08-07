@@ -79,13 +79,9 @@ from there:
     cp -r <path/to/umami-preprocessing>/scripts/batch .
     ```
 
-Then adapt the resources to your cluster (partition/pool, account, time and memory limits) — the
-`#SBATCH` header in `slurm_batch.sh` for Slurm, or the requests at the top of `condor_job.sub` for
-HTCondor:
-
-```bash
-$EDITOR batch/slurm_batch.sh   # or batch/condor_job.sub
-```
+Adapt the resource specifications (number of CPUs, memory allocation, time limit, partition or
+account etc.) in the `slurm_batch.sh` (Slurm) or `condor_job.sub` (HTCondor) files to fit your
+needs.
 
 Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
 next:
