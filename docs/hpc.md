@@ -14,6 +14,23 @@ cluster, each of these units of work can run as its own batch job inside the
 - A shared filesystem between the submitting node and the workers — the input, intermediate and
   output files must be visible to all jobs. This is the case on lxplus (AFS/EOS) and typical
   institute clusters.
+
+!!!info "Input/output data on lxplus (AFS/EOS)"
+
+    HTCondor on lxplus rejects submit files that reference EOS paths (executable, `output`,
+    `error`, `log`), so create the run directory — with the copied scripts and the `logs/`
+    directory — in your AFS work area and submit from there. The jobs themselves run with your
+    Kerberos credentials and can read and write `/afs` and `/eos` directly, so keep the large
+    input ntuples and outputs on EOS and bind both filesystems into the container:
+
+    ```bash
+    export UPP_BINDS=/afs,/eos,/tmp
+    ```
+
+    For very I/O-heavy workflows the batch service recommends staging data through the local
+    pool space of the job instead of writing to EOS directly — see
+    [Data flows](https://batchdocs.web.cern.ch/concepts/dataflow.html) and
+    [EOS](https://batchdocs.web.cern.ch/troubleshooting/eos.html) in the CERN batch docs.
 - The UPP container image (see [Container image](setup.md#container-image)). The scripts default to
   the CVMFS-unpacked image
   `/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest` when
