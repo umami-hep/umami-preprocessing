@@ -726,6 +726,11 @@ input ntuples and outputs on EOS and bind both filesystems into the container:</
 pool space of the job instead of writing to EOS directly — see
 <a href="https://batchdocs.web.cern.ch/concepts/dataflow.html">Data flows</a> and
 <a href="https://batchdocs.web.cern.ch/troubleshooting/eos.html">EOS</a> in the CERN batch docs.</p>
+<p>If the run directory has to live on EOS, the experimental
+<a href="https://batchdocs.web.cern.ch/local/eossubmit.html">EosSubmit schedds</a>
+(<code>module load lxbatch/eossubmit</code>) accept submit files with EOS paths, transferring all job
+files via xrootd instead of using a shared filesystem. All submit file paths must then be on
+EOS, and this mode has not been tested with these scripts.</p>
 </div>
 <ul>
 <li>The UPP container image (see <a href="../setup/#container-image">Container image</a>). The scripts default to
