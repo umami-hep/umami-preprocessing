@@ -125,7 +125,11 @@ The available modes and the jobs they submit:
 ## Config-driven job lists
 
 `submit.sh` never hardcodes which components exist. It calls the `list_components` script (part of
-UPP) to enumerate the components defined in the `components:` block of your config:
+UPP) to enumerate the components defined in the `components:` block of your config. No local UPP
+installation is needed for this: when `list_components` is not on the `PATH`, it is run inside the
+container image automatically. Only the `prepare`, `fine_resampling` and `resampling` modes (and
+the interactive mode) enumerate at all — the other modes submit without running UPP on the login
+node.
 
 ```bash
 list_components --config <path/to/config.yaml>

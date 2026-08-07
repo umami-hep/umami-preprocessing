@@ -85,6 +85,25 @@ enumerate() {
   fi
 }
 
+ensure_enumerated() {
+  # Fill ALL_ROWS/ALL_REGIONS/ALL_SAMPLES/ALL_FLAVS from the config (TSV rows), once
+  if [[ ${#ALL_ROWS[@]} -gt 0 ]]; then
+    return 0
+  fi
+  mapfile -t ALL_ROWS < <(enumerate)
+  if [[ ${#ALL_ROWS[@]} -eq 0 ]]; then
+    echo "ERROR: no components found in $CONFIG" >&2
+    exit 1
+  fi
+  local row region sample flavour name
+  for row in "${ALL_ROWS[@]}"; do
+    IFS=$'\t' read -r region sample flavour name <<< "$row"
+    add_unique "$region" ALL_REGIONS
+    add_unique "$sample" ALL_SAMPLES
+    add_unique "$flavour" ALL_FLAVS
+  done
+}
+
 append_list() {
   # Append a comma/space separated list to the named array
   local input="$1"
@@ -136,7 +155,9 @@ print_resolved_config() {
   printf '  SCHEDULER  : %s\n' "$SCHEDULER"
   printf '  IMAGE      : %s\n' "$IMAGE"
   printf '  THROTTLE   : %s\n' "$THROTTLE"
-  printf '  COMPONENTS : %s\n' "${#COMPONENTS[@]}"
+  if [[ ${#ALL_ROWS[@]} -gt 0 ]]; then
+    printf '  COMPONENTS : %s\n' "${#COMPONENTS[@]}"
+  fi
   printf '  SPLITS     : %s\n' "${SPLITS[*]}"
   printf '\n'
 }
@@ -373,34 +394,24 @@ main() {
 
   detect_scheduler
 
-  # Enumerate all components defined in the config (TSV: region sample flavour name)
-  local -a ALL_ROWS=()
-  mapfile -t ALL_ROWS < <(enumerate)
-  if [[ ${#ALL_ROWS[@]} -eq 0 ]]; then
-    echo "ERROR: no components found in $CONFIG" >&2
-    exit 1
-  fi
-
-  local -a ALL_REGIONS=() ALL_SAMPLES=() ALL_FLAVS=()
-  local row region sample flavour name
-  for row in "${ALL_ROWS[@]}"; do
-    IFS=$'\t' read -r region sample flavour name <<< "$row"
-    add_unique "$region" ALL_REGIONS
-    add_unique "$sample" ALL_SAMPLES
-    add_unique "$flavour" ALL_FLAVS
-  done
+  declare -a ALL_ROWS=() ALL_REGIONS=() ALL_SAMPLES=() ALL_FLAVS=()
 
   MODE="${1:-}"
   declare -a SPLITS=(train val test)
   if [[ -z "$MODE" ]]; then
+    ensure_enumerated
     interactive_mode
   fi
   if [[ ${#SPLIT_FILTER[@]} -gt 0 ]]; then
     SPLITS=("${SPLIT_FILTER[@]}")
   fi
 
-  # Apply the filters
+  # Only the component/region level modes need the component list from the config
   declare -a COMPONENTS=() REGIONS=()
+  local row region sample flavour name
+  case "$MODE" in prepare|fine_resampling|resampling)
+    ensure_enumerated
+  esac
   for row in "${ALL_ROWS[@]}"; do
     IFS=$'\t' read -r region sample flavour name <<< "$row"
     if in_list "$region" "${REGION_FILTER[@]}" \
