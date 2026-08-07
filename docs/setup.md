@@ -152,6 +152,17 @@ and its command line scripts (`preprocess`, `check_input_samples`, `list_compone
     apptainer exec upp_latest.sif preprocess --config <path/to/config.yaml>
     ```
 
+    On machines with CVMFS (lxplus, most HPC sites) the image is also distributed pre-unpacked
+    via [unpacked.cern.ch](https://gitlab.cern.ch/unpacked/sync), which skips the pull and
+    conversion entirely:
+
+    ```bash
+    apptainer exec /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest \
+        preprocess --config <path/to/config.yaml>
+    ```
+
+    The release tags are available there as well (e.g. `upp:v0.3.2`).
+
     By default apptainer shares your home directory and working directory with the container. For a
     cleaner environment use `--contain` and bind only the paths you need (your input ntuples and
     output directory) with `-B`, keeping the working directory with `--pwd`:
@@ -176,7 +187,7 @@ and its command line scripts (`preprocess`, `check_input_samples`, `list_compone
     `upp:latest` follows the `main` branch and changes over time. For reproducible production
     preprocessing, use a tagged release image like `upp:v0.3.1` instead.
 
-For running UPP as batch jobs on Slurm clusters with the container image, see
+For running UPP as batch jobs on Slurm or HTCondor clusters with the container image, see
 [Running on HPC](hpc.md).
 
 ### Run the tests (Optional)

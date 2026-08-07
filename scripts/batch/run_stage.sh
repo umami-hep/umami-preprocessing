@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs one preprocessing stage inside the container. Called by batch.sh.
+# Runs one preprocessing stage inside the container. Called by slurm_batch.sh / condor_batch.sh.
 set -e
 
 usage() {

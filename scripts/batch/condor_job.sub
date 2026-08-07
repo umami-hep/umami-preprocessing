@@ -1,0 +1,20 @@
+# HTCondor submit description used by submit.sh:
+#   condor_submit batch_dir=... batch_name=... upp_image=... upp_binds=... \
+#       condor_job.sub -queue "args from <args-file>"
+# Edit the resources below for your pool.
+request_cpus   = 4
+request_memory = 32 GB
+# CERN lxplus walltime flavour; ignored on other pools
++JobFlavour    = "tomorrow"
+
+universe       = vanilla
+executable     = $(batch_dir)/condor_batch.sh
+arguments      = $(args)
+batch_name     = $(batch_name)
+environment    = "UPP_IMAGE=$(upp_image) UPP_BINDS=$(upp_binds)"
+output         = logs/$(ClusterId).$(ProcId).out
+error          = logs/$(ClusterId).$(ProcId).err
+log            = logs/$(ClusterId).log
+
+# Assumes a shared filesystem between submit and worker nodes
+should_transfer_files = NO

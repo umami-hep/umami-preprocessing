@@ -2,9 +2,19 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE="${UPP_IMAGE:-docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest}"
 
-# Throttle between sbatch calls (seconds). Set to 0 to disable.
+# Prefer the CVMFS-unpacked image when available, fall back to the registry
+DEFAULT_IMAGE="/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest"
+if [[ ! -e "${DEFAULT_IMAGE}" ]]; then
+  DEFAULT_IMAGE="docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest"
+fi
+IMAGE="${UPP_IMAGE:-${DEFAULT_IMAGE}}"
+BINDS="${UPP_BINDS:-/home,/tmp}"
+
+# Batch scheduler: slurm or condor; empty means auto-detect
+SCHEDULER=""
+
+# Throttle between sbatch calls (seconds, Slurm only). Set to 0 to disable.
 THROTTLE="${THROTTLE:-30}"
 
 # Dry-run: if 1, print commands but do not execute sbatch.
@@ -17,6 +27,9 @@ declare -a REGION_FILTER=()
 declare -a SAMPLE_FILTER=()
 declare -a FLAV_FILTER=()
 declare -a SPLIT_FILTER=()
+
+# Argument lines collected for a single condor_submit call
+declare -a CONDOR_JOBS=()
 
 # ---- Helpers --------------------------------------------------------------
 slugify() {
@@ -40,6 +53,26 @@ build_job_name() {
     normalise|normalize) slugify "${prefix}-normalise" ;;
     plotting)        slugify "${prefix}-plotting-${1:-split}" ;;
     sequential|*)    slugify "${prefix}-seq" ;;
+  esac
+}
+
+detect_scheduler() {
+  if [[ -z "$SCHEDULER" ]]; then
+    if command -v sbatch >/dev/null 2>&1; then
+      SCHEDULER="slurm"
+    elif command -v condor_submit >/dev/null 2>&1; then
+      SCHEDULER="condor"
+    else
+      echo "ERROR: neither sbatch nor condor_submit found; use --scheduler slurm|condor" >&2
+      exit 2
+    fi
+  fi
+  case "$SCHEDULER" in
+    slurm|condor) ;;
+    *)
+      echo "ERROR: unknown scheduler: '$SCHEDULER' (expected slurm or condor)" >&2
+      exit 2
+      ;;
   esac
 }
 
@@ -100,6 +133,7 @@ in_list() {
 print_resolved_config() {
   printf '\nResolved configuration:\n'
   printf '  CONFIG     : %s\n' "$CONFIG"
+  printf '  SCHEDULER  : %s\n' "$SCHEDULER"
   printf '  IMAGE      : %s\n' "$IMAGE"
   printf '  THROTTLE   : %s\n' "$THROTTLE"
   printf '  COMPONENTS : %s\n' "${#COMPONENTS[@]}"
@@ -145,7 +179,16 @@ interactive_mode() {
 }
 
 submit() {
-  # Usage: submit [mode args...]
+  # Usage: submit [mode args...]; Slurm submits directly, condor collects for one condor_submit
+  if [[ "$SCHEDULER" == "condor" ]]; then
+    local line="$CONFIG"
+    if [[ $# -gt 0 ]]; then
+      line+=" $*"
+    fi
+    CONDOR_JOBS+=("$line")
+    return 0
+  fi
+
   local jobname
   jobname="$(build_job_name "$@")"
 
@@ -154,7 +197,7 @@ submit() {
     --job-name="$jobname"
     --output="${PWD}/logs/%j_%x.out"
     --error="${PWD}/logs/%j_%x.err"
-    "${SCRIPT_DIR}/batch.sh"
+    "${SCRIPT_DIR}/slurm_batch.sh"
     "$CONFIG"
     "$@"
   )
@@ -170,6 +213,41 @@ submit() {
     if [[ "$THROTTLE" != "0" ]]; then
       sleep "$THROTTLE"
     fi
+  fi
+}
+
+condor_submit_all() {
+  # Submit all collected jobs as a single condor cluster
+  if [[ ${#CONDOR_JOBS[@]} -eq 0 ]]; then
+    echo "Nothing to submit."
+    return 0
+  fi
+
+  local bname
+  bname="$(slugify "upp-$(basename "${CONFIG%.*}")-${MODE:-sequential}")"
+  local args_file="${PWD}/logs/condor_${MODE:-sequential}.args"
+
+  local -a cmd=(
+    condor_submit
+    "batch_dir=${SCRIPT_DIR}"
+    "batch_name=${bname}"
+    "upp_image=${IMAGE}"
+    "upp_binds=${BINDS}"
+    "${SCRIPT_DIR}/condor_job.sub"
+    -queue "args from ${args_file}"
+  )
+
+  echo "Submitting ${#CONDOR_JOBS[@]} job(s) as batch $bname"
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf 'DRY-RUN: job arguments:\n'
+    printf '  %s\n' "${CONDOR_JOBS[@]}"
+    printf 'DRY-RUN: '
+    printf '%q ' "${cmd[@]}"
+    printf '\n'
+  else
+    printf '%s\n' "${CONDOR_JOBS[@]}" > "$args_file"
+    "${cmd[@]}"
   fi
 }
 
@@ -190,15 +268,17 @@ Modes:
 
 Options:
   --config <yaml>        # preprocessing config (required)
-  --dry-run              # do not call sbatch; print commands instead
+  --scheduler <name>     # slurm or condor (default: auto-detect)
+  --dry-run              # do not submit; print commands instead
   --regions "<list>"     # only submit components in these regions
   --samples "<list>"     # only submit components from these samples
   --flavs "<list>"       # only submit components with these flavours
   --splits "<list>"      # only submit these splits (default: train val test)
-  --throttle N           # seconds between sbatch calls (default 30; 0 disables)
+  --throttle N           # seconds between sbatch calls (default 30; 0 disables; Slurm only)
 
 Env (still supported):
-  UPP_IMAGE=<uri>        # container image (docker:// URI or local .sif)
+  UPP_IMAGE=<uri>        # container image (unpacked dir, local .sif or docker:// URI)
+  UPP_BINDS=<paths>      # comma-separated bind paths (default: /home,/tmp)
   THROTTLE=<seconds>     # same as --throttle
   DRY_RUN=1              # same as --dry-run
 
@@ -223,6 +303,11 @@ parse_args() {
       --config)
         [[ $# -ge 2 ]] || { echo "ERROR: --config requires a value" >&2; exit 2; }
         CONFIG="$2"
+        shift 2
+        ;;
+      --scheduler)
+        [[ $# -ge 2 ]] || { echo "ERROR: --scheduler requires a value" >&2; exit 2; }
+        SCHEDULER="$2"
         shift 2
         ;;
       --dry-run)
@@ -285,6 +370,8 @@ main() {
     usage
     exit 2
   fi
+
+  detect_scheduler
 
   # Enumerate all components defined in the config (TSV: region sample flavour name)
   local -a ALL_ROWS=()
@@ -393,6 +480,10 @@ main() {
       exit 2
       ;;
   esac
+
+  if [[ "$SCHEDULER" == "condor" ]]; then
+    condor_submit_all
+  fi
   echo "Done!"
 }
 
