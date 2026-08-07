@@ -45,13 +45,37 @@ The `scripts/batch/` directory contains:
 - `run_stage.sh` runs inside the container and maps the submitted mode onto the `preprocess`
   command line flags.
 
-To use them, create a run directory, copy the scripts, and adapt the resources to your cluster
-(partition/pool, account, time and memory limits) — the `#SBATCH` header in `slurm_batch.sh` for
-Slurm, or the requests at the top of `condor_job.sub` for HTCondor:
+To use them, create a run directory and copy the scripts. A clone of the repository is not
+required — the image contains the repository at `/workspace`, so the scripts can be taken straight
+from there:
+
+=== "CVMFS"
+
+    ```bash
+    mkdir my_preprocessing && cd my_preprocessing
+    cp -r /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest/workspace/scripts/batch .
+    ```
+
+=== "apptainer"
+
+    ```bash
+    mkdir my_preprocessing && cd my_preprocessing
+    apptainer exec docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest \
+        cp -r /workspace/scripts/batch .
+    ```
+
+=== "local clone"
+
+    ```bash
+    mkdir my_preprocessing && cd my_preprocessing
+    cp -r <path/to/umami-preprocessing>/scripts/batch .
+    ```
+
+Then adapt the resources to your cluster (partition/pool, account, time and memory limits) — the
+`#SBATCH` header in `slurm_batch.sh` for Slurm, or the requests at the top of `condor_job.sub` for
+HTCondor:
 
 ```bash
-mkdir my_preprocessing && cd my_preprocessing
-cp -r <path/to/umami-preprocessing>/scripts/batch .
 $EDITOR batch/slurm_batch.sh   # or batch/condor_job.sub
 ```
 
