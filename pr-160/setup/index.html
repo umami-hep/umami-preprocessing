@@ -822,9 +822,11 @@ and its command line scripts (<code>preprocess</code>, <code>check_input_samples
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
 <p>The first <code>docker://</code> invocation converts the image to apptainer's SIF format, which takes a
-while. If you run UPP repeatedly, pull the image once and use the local file instead:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>apptainer<span class="w"> </span>pull<span class="w"> </span>upp_latest.sif<span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>upp_latest.sif<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+while. The result is cached (default <code>~/.apptainer/cache</code>), so later invocations start quickly
+and only download again when a new image version is published. If your home quota is small
+(e.g. on lxplus), point the cache and the conversion scratch space to a larger filesystem:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_CACHEDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_cache
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_TMPDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_tmp
 </span></code></pre></div>
 <p>On machines with CVMFS (lxplus, most HPC sites) the image is also distributed pre-unpacked
 via <a href="https://gitlab.cern.ch/unpacked/sync">unpacked.cern.ch</a>, which skips the pull and
@@ -837,8 +839,9 @@ conversion entirely:</p>
 cleaner environment use <code>--contain</code> and bind only the paths you need (your input ntuples and
 output directory) with <code>-B</code>, keeping the working directory with <code>--pwd</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span>-B<span class="w"> </span>&lt;path/to/data&gt;<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span>upp_latest.sif<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span>&lt;image&gt;<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
 </span></code></pre></div>
+<p>where <code>&lt;image&gt;</code> is any of the above (<code>docker://</code> URL, CVMFS path or local <code>.sif</code> file).</p>
 </div>
 <div class="tabbed-block">
 <p>With docker, mount your working directory and data paths into the container:</p>
