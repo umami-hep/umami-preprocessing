@@ -806,7 +806,8 @@ next:</p>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
 </span></code></pre></div>
-<p>Job logs are written to <code>logs/</code> in the current directory. Running <code>submit.sh</code> without a mode enters
+<p>Job logs are written to the <code>logs/output/</code> and <code>logs/error/</code> subdirectories of the current
+directory. Running <code>submit.sh</code> without a mode enters
 an interactive prompt for the mode and filters, and <code>./batch/submit.sh --help</code> prints all modes and
 options.</p>
 <p>On Slurm each job is submitted with its own <code>sbatch</code> call and job name. On HTCondor all jobs of one
