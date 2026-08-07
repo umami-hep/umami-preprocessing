@@ -754,7 +754,7 @@ filesystem:</p>
 <h2 id="interactive-use">Interactive use<a class="headerlink" href="#interactive-use" title="Permanent link">#</a></h2>
 <p>For quick tests, run UPP inside the container on an interactive allocation:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>salloc<span class="w"> </span>--ntasks<span class="w"> </span><span class="m">1</span><span class="w"> </span>--cpus-per-task<span class="w"> </span><span class="m">4</span><span class="w"> </span>--time<span class="w"> </span><span class="m">2</span>:00:00
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>srun<span class="w"> </span>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>srun<span class="w"> </span>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$UPP_IMAGE</span><span class="s2">&quot;</span><span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--prep
 </span></code></pre></div>
 <h2 id="batch-submission-scripts">Batch submission scripts<a class="headerlink" href="#batch-submission-scripts" title="Permanent link">#</a></h2>
@@ -904,7 +904,7 @@ on the login node instead of inside the batch jobs.</p>
 <tr>
 <td><code>UPP_BINDS</code></td>
 <td><code>/home,/tmp</code></td>
-<td>Comma-separated paths bound into the container</td>
+<td>Comma-separated paths bound into the container (the run and script directories are always bound in addition)</td>
 </tr>
 <tr>
 <td><code>THROTTLE</code></td>
