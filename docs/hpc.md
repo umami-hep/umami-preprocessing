@@ -63,7 +63,7 @@ For quick tests, run UPP inside the container on an interactive allocation:
 
 ```bash
 salloc --ntasks 1 --cpus-per-task 4 --time 2:00:00
-srun apptainer exec --contain --pwd "$PWD" -B /home -B /tmp \
+srun apptainer exec --contain --pwd "$PWD" -B "$PWD" -B /home -B /tmp \
     "$UPP_IMAGE" preprocess --config <path/to/config.yaml> --prep
 ```
 
@@ -186,7 +186,7 @@ on the login node instead of inside the batch jobs.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `UPP_IMAGE` | CVMFS-unpacked image if present, else `docker://...upp-images/upp:latest` | Container image (unpacked directory, local `.sif` or `docker://` URI) |
-| `UPP_BINDS` | `/home,/tmp` | Comma-separated paths bound into the container |
+| `UPP_BINDS` | `/home,/tmp` | Comma-separated paths bound into the container (the run and script directories are always bound in addition) |
 | `THROTTLE` | `30` | Seconds between `sbatch` calls (`0` disables; Slurm only) |
 | `DRY_RUN` | `0` | Set to `1` to print the submission commands instead of submitting |
 

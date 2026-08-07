@@ -170,7 +170,7 @@ and its command line scripts (`preprocess`, `check_input_samples`, `list_compone
     output directory) with `-B`, keeping the working directory with `--pwd`:
 
     ```bash
-    apptainer exec --contain --pwd "$PWD" -B /home -B /tmp -B <path/to/data> \
+    apptainer exec --contain --pwd "$PWD" -B "$PWD" -B /home -B /tmp -B <path/to/data> \
         <image> preprocess --config <path/to/config.yaml>
     ```
 

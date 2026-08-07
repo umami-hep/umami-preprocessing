@@ -11,5 +11,5 @@ fi
 IMAGE="${UPP_IMAGE:-${DEFAULT_IMAGE}}"
 BINDS="${UPP_BINDS:-/home,/tmp}"
 
-apptainer exec --contain --pwd "${PWD}" -B "${BINDS}" \
+apptainer exec --contain --pwd "${PWD}" -B "${BINDS}" -B "${PWD}" -B "${SCRIPT_DIR}" \
     "${IMAGE}" "${SCRIPT_DIR}/run_stage.sh" "$@"
