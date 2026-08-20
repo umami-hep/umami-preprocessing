@@ -1,0 +1,1006 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the umami preprocessing framework">
+      
+      
+        <meta name="author" content="Umami Team">
+      
+      
+        <link rel="canonical" href="https://umami-hep.github.io/umami-preprocessing/hpc/">
+      
+      
+        <link rel="prev" href="../run/">
+      
+      
+        <link rel="next" href="../umami_int/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.56">
+    
+    
+      
+        <title>Running on HPC clusters - UPP: Umami Preprocessing</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.39e53929.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/classic/palette.7dc9a0ad.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#running-on-hpc-clusters" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="UPP: Umami Preprocessing" class="md-header__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            UPP: Umami Preprocessing
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Running on HPC clusters
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/umami-hep/umami-preprocessing" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="UPP: Umami Preprocessing" class="md-nav__button md-logo" aria-label="UPP: Umami Preprocessing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    UPP: Umami Preprocessing
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/umami-hep/umami-preprocessing" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Introduction
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Setup
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Sampling methods
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reweighting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Reweighting
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Configuration
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Run
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+        <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Running on HPC
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Running on HPC
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Prerequisites
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Interactive use
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-submission-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Batch submission scripts
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-driven-job-lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Config-driven job lists
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Environment variables
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../umami_int/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Umami integration
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Docs development
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Prerequisites
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Interactive use
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-submission-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Batch submission scripts
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-driven-job-lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Config-driven job lists
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Environment variables
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+  
+
+
+<h1 id="running-on-hpc-clusters">Running on HPC clusters<a class="headerlink" href="#running-on-hpc-clusters" title="Permanent link">#</a></h1>
+<p>The preprocessing stages can be parallelized over components, regions and splits using the
+<code>--component</code>, <code>--region</code> and <code>--split</code> flags described in <a href="../run/">Run</a>. On a Slurm or HTCondor
+cluster, each of these units of work can run as its own batch job inside the
+<a href="../setup/#container-image">container image</a>. UPP ships a small set of submission scripts in
+<code>scripts/batch/</code> that automate this.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h2>
+<ul>
+<li>A cluster with Slurm or HTCondor and apptainer. On lxplus, HTCondor is provided by the CERN
+  batch service — see the <a href="https://batchdocs.web.cern.ch/local/quick.html">quickstart</a> and
+  <a href="https://batchdocs.web.cern.ch/local/submit.html">job submission</a> documentation.</li>
+<li>A shared filesystem between the submitting node and the workers — the input, intermediate and
+  output files must be visible to all jobs. This is the case on lxplus (AFS/EOS) and typical
+  institute clusters.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Input/output data on lxplus (AFS/EOS)</p>
+<p>HTCondor on lxplus rejects submit files that reference EOS paths (executable, <code>output</code>,
+<code>error</code>, <code>log</code>), so create the run directory — with the copied scripts and the <code>logs/</code>
+directory — in your AFS work area and submit from there. The jobs themselves run with your
+Kerberos credentials and can read and write <code>/afs</code> and <code>/eos</code> directly, so keep the large
+input ntuples and outputs on EOS and bind both filesystems into the container:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UPP_BINDS</span><span class="o">=</span>/afs,/eos,/tmp
+</span></code></pre></div>
+<p>For very I/O-heavy workflows the batch service recommends staging data through the local
+pool space of the job instead of writing to EOS directly — see
+<a href="https://batchdocs.web.cern.ch/concepts/dataflow.html">Data flows</a> and
+<a href="https://batchdocs.web.cern.ch/troubleshooting/eos.html">EOS</a> in the CERN batch docs.</p>
+<p>If the run directory has to live on EOS, the experimental
+<a href="https://batchdocs.web.cern.ch/local/eossubmit.html">EosSubmit schedds</a>
+(<code>module load lxbatch/eossubmit</code>) accept submit files with EOS paths, transferring all job
+files via xrootd instead of using a shared filesystem. All submit file paths must then be on
+EOS, and this mode has not been tested with these scripts.</p>
+</div>
+<ul>
+<li>The UPP container image (see <a href="../setup/#container-image">Container image</a>). The scripts default to
+  the CVMFS-unpacked image
+  <code>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code> when
+  it exists (no download or conversion needed) and fall back to
+  <code>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code> otherwise. Running
+  from <code>docker://</code> directly is fine: apptainer caches the converted image and only downloads again
+  when a new version is published. Alternatively, pin a specific local file with
+  <code>export UPP_IMAGE=/path/to/upp.sif</code> after an <code>apptainer pull</code>.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Apptainer cache location</p>
+<p>The apptainer cache defaults to <code>~/.apptainer/cache</code> and the conversion uses <code>/tmp</code> as
+scratch space. On clusters with a small home quota (e.g. lxplus) point them to a larger
+filesystem:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_CACHEDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_cache
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_TMPDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_tmp
+</span></code></pre></div>
+</div>
+<h2 id="interactive-use">Interactive use<a class="headerlink" href="#interactive-use" title="Permanent link">#</a></h2>
+<p>For quick tests, run UPP inside the container on an interactive allocation:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>salloc<span class="w"> </span>--ntasks<span class="w"> </span><span class="m">1</span><span class="w"> </span>--cpus-per-task<span class="w"> </span><span class="m">4</span><span class="w"> </span>--time<span class="w"> </span><span class="m">2</span>:00:00
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>srun<span class="w"> </span>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span>-B<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="s2">"</span><span class="nv">$UPP_IMAGE</span><span class="s2">"</span><span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--prep
+</span></code></pre></div>
+<h2 id="batch-submission-scripts">Batch submission scripts<a class="headerlink" href="#batch-submission-scripts" title="Permanent link">#</a></h2>
+<p>The <code>scripts/batch/</code> directory contains:</p>
+<ul>
+<li><code>submit.sh</code> runs on the login node. It reads the components from your preprocessing config and
+  submits one batch job per unit of work. The scheduler is auto-detected (<code>sbatch</code> found → Slurm,
+  <code>condor_submit</code> found → HTCondor) and can be forced with <code>--scheduler slurm|condor</code>.</li>
+<li><code>slurm_batch.sh</code> is the sbatch payload. It carries the <code>#SBATCH</code> resource header and starts the
+  container on the compute node.</li>
+<li><code>condor_job.sub</code> and <code>condor_batch.sh</code> are the HTCondor equivalents: the submit description with
+  the resource requests, and the job executable starting the container.</li>
+<li><code>run_stage.sh</code> runs inside the container and maps the submitted mode onto the <code>preprocess</code>
+  command line flags.</li>
+</ul>
+<p>To use them, create a run directory and copy the scripts. A clone of the repository is not
+required — the image contains the repository at <code>/workspace</code>, so the scripts can be taken straight
+from there:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">CVMFS</label><label for="__tabbed_1_2">apptainer</label><label for="__tabbed_1_3">local clone</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest/workspace/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>cp<span class="w"> </span>-r<span class="w"> </span>/workspace/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>my_preprocessing<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>my_preprocessing
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>cp<span class="w"> </span>-r<span class="w"> </span>&lt;path/to/umami-preprocessing&gt;/scripts/batch<span class="w"> </span>.
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Adapt the resource specifications (number of CPUs, memory allocation, time limit, partition or
+account etc.) in the <code>slurm_batch.sh</code> (Slurm) or <code>condor_job.sub</code> (HTCondor) files to fit your
+needs. The <code>+JobFlavour</code> walltime flavours available on lxplus are listed in the
+<a href="https://batchdocs.web.cern.ch/local/submit.html">CERN batch documentation</a>.</p>
+<p>Then submit the stages in order, waiting for all jobs of one stage to finish before submitting the
+next:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--dry-run<span class="w"> </span>prepare<span class="w">  </span><span class="c1"># preview only</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>prepare
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>resampling
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>merge
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>normalise
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>plotting
+</span></code></pre></div>
+<p>Job logs are written to the <code>logs/output/</code> and <code>logs/error/</code> subdirectories of the current
+directory. Running <code>submit.sh</code> without a mode enters
+an interactive prompt for the mode and filters, and <code>./batch/submit.sh --help</code> prints all modes and
+options.</p>
+<p>On Slurm each job is submitted with its own <code>sbatch</code> call and job name. On HTCondor all jobs of one
+<code>submit.sh</code> invocation are submitted as a single cluster (one <code>condor_submit</code> with one process per
+job), with the job arguments written to <code>logs/condor_&lt;mode&gt;.args</code>.</p>
+<p>The available modes and the jobs they submit:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Jobs</th>
+<th><code>preprocess</code> flags per job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sequential</code></td>
+<td>1</td>
+<td>full chain (<code>--prep</code>, <code>--resample</code>, <code>--merge</code>, <code>--norm</code>, <code>--plot</code>)</td>
+</tr>
+<tr>
+<td><code>prepare</code></td>
+<td>one per component and split</td>
+<td><code>--prep --component &lt;c&gt; --split &lt;s&gt;</code></td>
+</tr>
+<tr>
+<td><code>resampling</code></td>
+<td>one per region and split</td>
+<td><code>--resample --region &lt;r&gt; --split &lt;s&gt;</code></td>
+</tr>
+<tr>
+<td><code>fine_resampling</code></td>
+<td>one per component and split</td>
+<td><code>--resample --region &lt;r&gt; --component &lt;c&gt; --split &lt;s&gt;</code></td>
+</tr>
+<tr>
+<td><code>merge</code></td>
+<td>one per split</td>
+<td><code>--merge --split &lt;s&gt;</code></td>
+</tr>
+<tr>
+<td><code>normalise</code></td>
+<td>1</td>
+<td><code>--norm</code></td>
+</tr>
+<tr>
+<td><code>plotting</code></td>
+<td>one per split</td>
+<td><code>--plot --split &lt;s&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Stage ordering and parallel h5py access</p>
+<p>All jobs of a stage must finish before the next stage is submitted, e.g. all <code>prepare</code> jobs
+before <code>resampling</code>. Also run the <a href="../run/#additional-scripts-initial-sample-check">initial sample check</a>
+once before submitting <code>prepare</code> jobs in parallel — it creates the virtual datasets which can
+get corrupted when created by multiple jobs at once.</p>
+</div>
+<h2 id="config-driven-job-lists">Config-driven job lists<a class="headerlink" href="#config-driven-job-lists" title="Permanent link">#</a></h2>
+<p><code>submit.sh</code> never hardcodes which components exist. It calls the <code>list_components</code> script (part of
+UPP) to enumerate the components defined in the <code>components:</code> block of your config. No local UPP
+installation is needed for this: when <code>list_components</code> is not on the <code>PATH</code>, it is run inside the
+container image automatically. Only the <code>prepare</code>, <code>fine_resampling</code> and <code>resampling</code> modes (and
+the interactive mode) enumerate at all — the other modes submit without running UPP on the login
+node.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lowpt   ttbar   bjets   lowpt_ttbar_bjets
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>highpt  zprime  bjets   highpt_zprime_bjets
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>...
+</span></code></pre></div>
+<p>Only combinations actually defined in the config are submitted. The selection can be narrowed with
+filter flags, each taking a comma- or space-separated list:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--regions<span class="w"> </span>lowpt<span class="w"> </span>--splits<span class="w"> </span>train<span class="w"> </span>prepare
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>./batch/submit.sh<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;<span class="w"> </span>--samples<span class="w"> </span>ttbar<span class="w"> </span>--flavs<span class="w"> </span><span class="s2">"bjets,cjets"</span><span class="w"> </span>fine_resampling
+</span></code></pre></div>
+<p>Note that enumerating the components fully validates the config, so a broken config fails directly
+on the login node instead of inside the batch jobs.</p>
+<h2 id="environment-variables">Environment variables<a class="headerlink" href="#environment-variables" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UPP_IMAGE</code></td>
+<td>CVMFS-unpacked image if present, else <code>docker://...upp-images/upp:latest</code></td>
+<td>Container image (unpacked directory, local <code>.sif</code> or <code>docker://</code> URI)</td>
+</tr>
+<tr>
+<td><code>UPP_BINDS</code></td>
+<td><code>/home,/tmp</code></td>
+<td>Comma-separated paths bound into the container (the run and script directories are always bound in addition)</td>
+</tr>
+<tr>
+<td><code>THROTTLE</code></td>
+<td><code>30</code></td>
+<td>Seconds between <code>sbatch</code> calls (<code>0</code> disables; Slurm only)</td>
+</tr>
+<tr>
+<td><code>DRY_RUN</code></td>
+<td><code>0</code></td>
+<td>Set to <code>1</code> to print the submission commands instead of submitting</td>
+</tr>
+</tbody>
+</table>
+<p>Make sure <code>UPP_BINDS</code> covers your input ntuples and output directory if they live outside <code>/home</code>
+(e.g. on a scratch filesystem), and export <code>UPP_IMAGE</code>/<code>UPP_BINDS</code> in your shell so they are also
+picked up by the batch jobs.</p>
+<div class="admonition warning">
+<p class="admonition-title">Keep the throttle enabled</p>
+<p>The delay between <code>sbatch</code> calls avoids hammering the scheduler and gives jobs time to start
+up without all of them hitting the shared filesystem at once. Only disable it for small
+submissions.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Configs outside the repository</p>
+<p>When you copy a config out of the repository, <code>!include</code> directives with relative paths no
+longer resolve. Use absolute paths in <code>!include</code> lines of copied configs.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 - 2026 CERN for the benefit of the ATLAS collaboration
+    </div>
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e886cdf1.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>

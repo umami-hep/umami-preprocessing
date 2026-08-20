@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.52">
+      <meta name="generator" content="zensical-0.0.56">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/classic/main.4c04d108.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.39e53929.min.css">
       
         
           
@@ -367,6 +367,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#container-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Container image
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-the-tests-optional" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -478,6 +489,32 @@
     
   
   Run
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hpc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Running on HPC
 
     
   </span>
@@ -638,6 +675,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#container-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Container image
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#run-the-tests-optional" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -701,7 +749,7 @@ Create a fresh virtual environment and activate it using</p>
 <div class="tabbed-block">
 <p>If you don't want to use conda environments on lxplus, you can setup python via</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>setupATLAS
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>lsetup<span class="w"> </span><span class="s2">&quot;python 3.11.9-x86_64-el9&quot;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>lsetup<span class="w"> </span><span class="s2">"python 3.11.9-x86_64-el9"</span>
 </span></code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">You can also <a href="https://abpcomputing.web.cern.ch/guides/python_inst/">set up conda on lxplus</a></p>
@@ -751,7 +799,7 @@ environment with <code>source .venv/bin/activate</code>.</p>
 <p class="admonition-title">Note for running on lxplus</p>
 <p>Again, you may have to use <code>python3</code> here.</p>
 <p>You may also see a warning like this:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>WARNING: The script preprocess is installed in &#39;/afs/cern.ch/user/X/Y/.local/bin&#39; which is not on PATH.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>WARNING: The script preprocess is installed in '/afs/cern.ch/user/X/Y/.local/bin' which is not on PATH.
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
 </span></code></pre></div>
 <p>if you do, you can add the directory to your path using</p>
@@ -761,14 +809,64 @@ environment with <code>source .venv/bin/activate</code>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>upp/main.py
 </span></code></pre></div>
 </div>
+<h3 id="container-image">Container image<a class="headerlink" href="#container-image" title="Permanent link">#</a></h3>
+<p>If you don't want to set up a Python environment at all, you can use the UPP container image.
+The CI builds <code>gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code> on every merge to
+<code>main</code> and a tagged image <code>upp:&lt;tag&gt;</code> (e.g. <code>upp:v0.3.1</code>) for every release. The image comes with UPP
+and its command line scripts (<code>preprocess</code>, <code>check_input_samples</code>, <code>list_components</code>) pre-installed.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">apptainer</label><label for="__tabbed_3_2">docker</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>On clusters (lxplus, HPC sites), apptainer can run the image directly from the registry:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>docker://gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span></code></pre></div>
+<p>The first <code>docker://</code> invocation converts the image to apptainer's SIF format, which takes a
+while. The result is cached (default <code>~/.apptainer/cache</code>), so later invocations start quickly
+and only download again when a new image version is published. If your home quota is small
+(e.g. on lxplus), point the cache and the conversion scratch space to a larger filesystem:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_CACHEDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_cache
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">APPTAINER_TMPDIR</span><span class="o">=</span>/path/to/big/storage/apptainer_tmp
+</span></code></pre></div>
+<p>On machines with CVMFS (lxplus, most HPC sites) the image is also distributed pre-unpacked
+via <a href="https://gitlab.cern.ch/unpacked/sync">unpacked.cern.ch</a>, which skips the pull and
+conversion entirely:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span></code></pre></div>
+<p>The release tags are available there as well (e.g. <code>upp:v0.3.2</code>).</p>
+<p>By default apptainer shares your home directory and working directory with the container. For a
+cleaner environment use <code>--contain</code> and bind only the paths you need (your input ntuples and
+output directory) with <code>-B</code>, keeping the working directory with <code>--pwd</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>apptainer<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--contain<span class="w"> </span>--pwd<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span>-B<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>-B<span class="w"> </span>/tmp<span class="w"> </span>-B<span class="w"> </span>&lt;path/to/data&gt;<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span>&lt;image&gt;<span class="w"> </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span></code></pre></div>
+<p>where <code>&lt;image&gt;</code> is any of the above (<code>docker://</code> URL, CVMFS path or local <code>.sif</code> file).</p>
+</div>
+<div class="tabbed-block">
+<p>With docker, mount your working directory and data paths into the container:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-v<span class="w"> </span><span class="nv">$PWD</span>:<span class="nv">$PWD</span><span class="w"> </span>-w<span class="w"> </span><span class="nv">$PWD</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span>gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span>preprocess<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/config.yaml&gt;
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Pin a release tag for production</p>
+<p><code>upp:latest</code> follows the <code>main</code> branch and changes over time. For reproducible production
+preprocessing, use a tagged release image like <code>upp:v0.3.1</code> instead.</p>
+</div>
+<p>For running UPP as batch jobs on Slurm or HTCondor clusters with the container image, see
+<a href="../hpc/">Running on HPC</a>.</p>
 <h3 id="run-the-tests-optional">Run the tests (Optional)<a class="headerlink" href="#run-the-tests-optional" title="Permanent link">#</a></h3>
 <p>To ensure that the package is working correctly, you can run the tests using the pytest framework. </p>
 <p>Use <code>pytest</code> to run the tests to make sure the package works</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest<span class="w"> </span>tests<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>pytest<span class="w"> </span>tests<span class="w"> </span>
 </span></code></pre></div>
 <p>If you want to measure test coverage you can use the commands:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="w"> </span>upp<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>--show-capture<span class="o">=</span>stdout
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>coverage<span class="w"> </span>report<span class="w"> </span>
 </span></code></pre></div></p>
 
 
@@ -834,7 +932,7 @@ environment with <code>source .venv/bin/activate</code>.</p>
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.ed145cee.min.js"></script>
+      <script src="../assets/javascripts/bundle.e886cdf1.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
