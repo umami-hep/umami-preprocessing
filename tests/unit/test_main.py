@@ -41,6 +41,7 @@ def test_parse_args_with_config(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -67,6 +68,7 @@ def test_parse_args_flags_not_given(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
     assert parsed_args == expected_args
 
@@ -104,6 +106,7 @@ def test_parse_args_flags_negative(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -139,6 +142,7 @@ def test_parse_args_flags_positive(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -176,6 +180,7 @@ def test_parse_args_component(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -213,6 +218,7 @@ def test_parse_args_region(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
