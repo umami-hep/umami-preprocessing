@@ -4,7 +4,8 @@ from argparse import Namespace
 
 from pytest import fixture
 
-from upp.main import parse_args
+import upp.main
+from upp.main import main, parse_args
 
 
 @fixture
@@ -222,3 +223,21 @@ def test_parse_args_region(config_file):
     )
 
     assert parsed_args == expected_args
+
+
+def test_main_runs_all_splits(config_file, monkeypatch):
+    splits = []
+    monkeypatch.setattr(upp.main, "run_pp", lambda args: splits.append(args.split))
+
+    main(["--config", str(config_file), "--split", "all"])
+
+    assert splits == ["train", "val", "test"]
+
+
+def test_main_runs_single_split(config_file, monkeypatch):
+    splits = []
+    monkeypatch.setattr(upp.main, "run_pp", lambda args: splits.append(args.split))
+
+    main(["--config", str(config_file), "--split", "val"])
+
+    assert splits == ["val"]
