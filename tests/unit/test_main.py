@@ -4,7 +4,8 @@ from argparse import Namespace
 
 from pytest import fixture
 
-from upp.main import parse_args
+import upp.main
+from upp.main import main, parse_args
 
 
 @fixture
@@ -41,6 +42,7 @@ def test_parse_args_with_config(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -67,6 +69,7 @@ def test_parse_args_flags_not_given(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
     assert parsed_args == expected_args
 
@@ -104,6 +107,7 @@ def test_parse_args_flags_negative(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -139,6 +143,7 @@ def test_parse_args_flags_positive(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -176,6 +181,7 @@ def test_parse_args_component(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
@@ -213,6 +219,25 @@ def test_parse_args_region(config_file):
         rw_merge_idx=None,
         files=None,
         skip_sample_check=False,
+        log_level=None,
     )
 
     assert parsed_args == expected_args
+
+
+def test_main_runs_all_splits(config_file, monkeypatch):
+    splits = []
+    monkeypatch.setattr(upp.main, "run_pp", lambda args: splits.append(args.split))
+
+    main(["--config", str(config_file), "--split", "all"])
+
+    assert splits == ["train", "val", "test"]
+
+
+def test_main_runs_single_split(config_file, monkeypatch):
+    splits = []
+    monkeypatch.setattr(upp.main, "run_pp", lambda args: splits.append(args.split))
+
+    main(["--config", str(config_file), "--split", "val"])
+
+    assert splits == ["val"]

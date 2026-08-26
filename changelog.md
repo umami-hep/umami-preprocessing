@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Make the log level configurable via `UPP_LOG_LEVEL` or `--log-level`, add timestamps to all log messages and write warnings and errors to stderr [#163](https://github.com/umami-hep/umami-preprocessing/pull/163)
 - Add container image documentation and generic Slurm/HTCondor submission scripts with config-driven component enumeration [#160](https://github.com/umami-hep/umami-preprocessing/pull/160)
 ### [v0.3.2](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.2) (04.08.2026)
 

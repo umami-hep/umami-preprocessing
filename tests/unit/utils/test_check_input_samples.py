@@ -30,7 +30,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
         def error(self, *_a, **_k):
             pass
 
-    monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
+    monkeypatch.setattr(cis, "setup_logger", lambda *_: _Log())
 
     # H5Reader stub: we don't care about values here, just that it's called
     class _H5:
@@ -74,7 +74,7 @@ def test_run_input_sample_check_unsupported_pattern_type_is_logged_and_skipped(
             self._errors += 1
 
     log = _Log()
-    monkeypatch.setattr(cis, "setup_logger", lambda: log)
+    monkeypatch.setattr(cis, "setup_logger", lambda *_: log)
 
     # H5Reader never called since pattern is invalid type
     class _H5:
@@ -100,7 +100,9 @@ def test_run_input_sample_check_unsupported_pattern_type_is_logged_and_skipped(
 
 def test_main_calls_pipeline_with_parsed_args(monkeypatch, tmp_path):
     # Build fake args returned by parse_args
-    ns = Namespace(config_path=tmp_path / "cfg.yaml", deviation_factor=3.0, verbose=True)
+    ns = Namespace(
+        config_path=tmp_path / "cfg.yaml", deviation_factor=3.0, verbose=True, log_level=None
+    )
     ns.config_path.write_text("")  # so valid path conversion is happy if reached
 
     # Monkeypatch parse_args to return our namespace regardless of input
@@ -155,7 +157,7 @@ def test_builds_entry_name_with_dsid_and_rtag(monkeypatch, tmp_path):
         def error(self, *_a, **_k):
             pass
 
-    monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
+    monkeypatch.setattr(cis, "setup_logger", lambda *_: _Log())
 
     # H5Reader stub
     class _H5:
@@ -201,7 +203,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
         def error(self, *_a, **_k):
             pass
 
-    monkeypatch.setattr(cis, "setup_logger", lambda: _Log())
+    monkeypatch.setattr(cis, "setup_logger", lambda *_: _Log())
 
     class _H5:
         def __init__(self, **_kwargs):
@@ -276,7 +278,7 @@ def test_script_entry_point_executes_main(tmp_path):
         def error(self, *_a, **_k):
             pass
 
-    fake_logger.setup_logger = lambda: _Log()
+    fake_logger.setup_logger = lambda *_: _Log()
 
     # Inject fakes into sys.modules so the script can import them
     fakes = {
