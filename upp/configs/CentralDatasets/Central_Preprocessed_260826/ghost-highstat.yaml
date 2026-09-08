@@ -1,0 +1,185 @@
+variables: !include /home/users/f/froch/flav_tag/submission_scripts/umami-preprocessing/260826/configs/variables-ghost.yaml
+global_cuts: !include /home/users/f/froch/flav_tag/submission_scripts/umami-preprocessing/260826/configs/simple-split.yaml
+
+ttbar: &ttbar
+  name: ttbar
+  equal_global_objects: False
+  pattern:
+    - "group.perf-flavtag.601589.e8547_s3797_r13144_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC20d
+    - "group.perf-flavtag.601589.e8549_s4159_r15530_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23d
+    - "group.perf-flavtag.601589.e8549_s4162_r14622_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23a
+    - "group.perf-flavtag.601589.e8549_s4369_r16083_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23e
+    - "group.perf-flavtag.601589.e8549_s4618_r17610_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23g
+
+
+zprime: &zprime
+  name: zprime
+  equal_global_objects: False
+  pattern:
+    - "group.perf-flavtag.802818.e8514_s4618_r17610_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC20d
+    - "group.perf-flavtag.802818.e8599_s3797_r13144_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23d
+    - "group.perf-flavtag.802818.e8599_s4159_r15530_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23a
+    - "group.perf-flavtag.802818.e8599_s4162_r15540_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23e
+    - "group.perf-flavtag.802818.e8599_s4369_r16083_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23g
+    - "group.perf-flavtag.800030.e7954_s3797_r13144_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC20d
+    - "group.perf-flavtag.800030.e8514_s4159_r15530_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23d
+    - "group.perf-flavtag.800030.e8514_s4162_r14622_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23a
+    - "group.perf-flavtag.800030.e8514_s4369_r16083_p7349.tdd.GN3_dev.25_2_101.26-08-20_Central_Production_output.h5/*.h5" # MC23e
+
+lowpt: &lowpt
+  name: lowpt
+  cuts:
+    - [pt_btagJes, ">", 20_000]
+    - [pt_btagJes, "<", 250_000]
+highpt: &highpt
+  name: highpt
+  cuts:
+    - [pt_btagJes, ">", 250_000]
+    - [pt_btagJes, "<", 6_000_000]
+
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [ghostbjets]
+    # avail (train, full cuts) 220,586,493 | ttbar is bottleneck; -1 to keep exact 2:1 with zprime
+    num_global_objects: 220_586_492
+    num_global_objects_test: 11_029_324
+    num_global_objects_val: 11_029_324
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [ghostcjets]
+    # avail (train, full cuts) 50,743,576 | ttbar is bottleneck, using 100%
+    num_global_objects: 50_743_576
+    num_global_objects_test: 2_537_178
+    num_global_objects_val: 2_537_178
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [ghostsjets]
+    # avail (train, full cuts) 40,055,330 | ttbar is bottleneck, using 100%
+    num_global_objects: 40_055_330
+    num_global_objects_test: 2_002_766
+    num_global_objects_val: 2_002_766
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [ghostudjets]
+    # avail (train, full cuts) 102,657,253 | ttbar is bottleneck; -1 to keep exact 2:1 with zprime
+    num_global_objects: 102_657_252
+    num_global_objects_test: 5_132_862
+    num_global_objects_val: 5_132_862
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [ghostgjets]
+    # avail (train, full cuts) 120,698,336 | ttbar is bottleneck, using 100%
+    num_global_objects: 120_698_336
+    num_global_objects_test: 6_034_916
+    num_global_objects_val: 6_034_916
+
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [ghosttaujets]
+    # avail (train, full cuts) 21,217,698 | ttbar is bottleneck, using 100%
+    num_global_objects: 21_217_698
+    num_global_objects_test: 1_060_884
+    num_global_objects_val: 1_060_884
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    classes: [ghostbjets]
+    # avail (train, full cuts) 166,365,630 | ttbar is bottleneck, using 50% (2:1 target)
+    num_global_objects: 110_293_246
+    num_global_objects_test: 5_514_662
+    num_global_objects_val: 5_514_662
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    classes: [ghostcjets]
+    # avail (train, full cuts) 171,046,924 | ttbar is bottleneck, using 50% (2:1 target)
+    num_global_objects: 25_371_788
+    num_global_objects_test: 1_268_589
+    num_global_objects_val: 1_268_589
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    classes: [ghostsjets]
+    # avail (train, full cuts) 65,906,199 | ttbar is bottleneck, using 50% (2:1 target)
+    num_global_objects: 20_027_665
+    num_global_objects_test: 1_001_383
+    num_global_objects_val: 1_001_383
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    classes: [ghostudjets]
+    # avail (train, full cuts) 122,176,309 | ttbar is bottleneck, using 50% (2:1 target)
+    num_global_objects: 51_328_626
+    num_global_objects_test: 2_566_431
+    num_global_objects_val: 2_566_431
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    classes: [ghostgjets]
+    # avail (train, full cuts) 136,594,381 | ttbar is bottleneck, using 50% (2:1 target)
+    num_global_objects: 60_349_168
+    num_global_objects_test: 3_017_458
+    num_global_objects_val: 3_017_458
+
+  - region:
+      <<: *highpt
+    sample:
+      <<: *zprime
+    classes: [ghosttaujets]
+    # avail (train, full cuts) 45,486,757 | ttbar is bottleneck, using 50% (2:1 target)
+    num_global_objects: 10_608_849
+    num_global_objects_test: 530_442
+    num_global_objects_val: 530_442
+
+resampling:
+  target: ghostcjets
+  method: countup
+  sampling_fraction: 1
+  variables:
+    pt_btagJes:
+      bins: [[20_000, 250_000, 46], [250_000, 1_000_000, 30], [1_000_000, 6_000_000, 20]]
+    absEta_btagJes:
+      bins: [[0, 2.5, 10]]
+
+# note: sensible defaults are defined in the PreprocessingConfig constructor
+global:
+  global_name: jets
+  batch_size: 1_000_000
+  num_global_objects_estimate: 50_000_000
+  num_global_objects_estimate_plotting: 10_000_000
+  num_global_objects_per_output_file: 5_000_000
+  base_dir: /srv/beegfs/scratch/users/f/froch/H5/26-08-20_Central_Production/
+  out_dir: /srv/beegfs/scratch/users/f/froch/H5/26-08-20_Central_Production/preprocessed/
+  ntuple_dir: /srv/beegfs/scratch/users/f/froch/H5/26-08-20_Central_Production/
+
+# Setting for plotting
+plotting:
+  num_global_objects_plotting: 10_000_000
+  show_num_global_objects: false
