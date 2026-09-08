@@ -2,7 +2,9 @@
 
 ### [Latest]
 
+- Adding new Central Preprocessed Dataset Configs [#164](https://github.com/umami-hep/umami-preprocessing/pull/164)
 - Add container image documentation and generic Slurm/HTCondor submission scripts with config-driven component enumeration [#160](https://github.com/umami-hep/umami-preprocessing/pull/160)
+
 ### [v0.3.2](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.2) (04.08.2026)
 
 - Add new configs for central dataset [#159](https://github.com/umami-hep/umami-preprocessing/pull/159)
