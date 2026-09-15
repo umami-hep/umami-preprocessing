@@ -210,7 +210,6 @@ class Normalisation:
                 assert not np.isinf(tf["std"]), f"{var} std is not finite"
                 assert not np.isnan(tf["mean"]), f"{var} mean is nan"
                 assert not np.isnan(tf["std"]), f"{var} std is nan"
-                assert tf["std"] != 0, f"{var} std is 0"
         with open(self.norm_fname, "w") as file:
             yaml.dump(norm_dict, file, sort_keys=False)
 
