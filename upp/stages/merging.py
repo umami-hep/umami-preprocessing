@@ -10,7 +10,7 @@ import h5py
 import numpy as np
 from ftag.hdf5 import H5Writer, join_structured_arrays
 
-from upp.utils.logger import ProgressBar
+from upp.utils.logger import ProgressBar, banner
 from upp.utils.tools import path_append
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -611,8 +611,7 @@ class Merging:
 
     def run(self):
         """Run merging of the components."""
-        title = " Running Merging "
-        log.info(f"[bold green]{title:-^100}")
+        log.info(banner(" Running Merging "))
 
         if not self.config.is_test or self.config.merge_test_samples:
             components = [(None, self.components)]

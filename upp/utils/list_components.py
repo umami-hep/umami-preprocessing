@@ -8,6 +8,7 @@ from typing import Any
 from ftag.cli_utils import HelpFormatter, valid_path
 
 from upp.classes.preprocessing_config import PreprocessingConfig
+from upp.utils.logger import setup_logger
 
 
 def parse_args(args: Any) -> argparse.Namespace:
@@ -44,6 +45,13 @@ def parse_args(args: Any) -> argparse.Namespace:
         action="store_true",
         help="Only print the unique region names",
     )
+    parser.add_argument(
+        "--log-level",
+        default=None,
+        type=str.upper,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Logging level. Overrides the UPP_LOG_LEVEL environment variable.",
+    )
 
     return parser.parse_args(args)
 
@@ -57,6 +65,7 @@ def main(args: Any | None = None) -> None:
         Command line arguments, by default None
     """
     args = parse_args(args)
+    setup_logger(args.log_level)
 
     config = PreprocessingConfig.from_file(
         config_path=args.config,

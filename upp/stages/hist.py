@@ -12,7 +12,7 @@ import numpy as np
 from numpy.lib.recfunctions import structured_to_unstructured as s2u
 from scipy.stats import binned_statistic_dd
 
-from upp.utils.logger import setup_logger
+from upp.utils.logger import banner, setup_logger
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
@@ -154,8 +154,7 @@ def create_histograms(
         return
     sampl_vars = config.sampl_cfg.vars
 
-    title = " Writing PDFs "
-    log.info(f"[bold green]{title:-^100}")
+    log.info(banner(" Writing PDFs "))
     log.info(
         f"[bold green]Estimating PDFs using {config.num_global_objects_estimate_hist:,} objects..."
     )

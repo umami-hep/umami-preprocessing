@@ -48,6 +48,13 @@ def parse_args(args: Any) -> argparse.Namespace:
         action="store_true",
         help="Print the final numbers to the terminal",
     )
+    parser.add_argument(
+        "--log-level",
+        default=None,
+        type=str.upper,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Logging level. Overrides the UPP_LOG_LEVEL environment variable.",
+    )
 
     args = parser.parse_args(args)
     return args
@@ -233,6 +240,7 @@ def run_input_sample_check(
 
 def main(args: Any | None = None) -> None:
     args = parse_args(args)
+    setup_logger(args.log_level)
 
     # Load preprocessing config
     config = PreprocessingConfig.from_file(

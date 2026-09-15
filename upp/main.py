@@ -30,7 +30,7 @@ from upp.stages.reweight import Reweight
 from upp.stages.rw_merge import RWMerge
 from upp.stages.split_containers import SplitContainers
 from upp.utils.check_input_samples import run_input_sample_check
-from upp.utils.logger import setup_logger
+from upp.utils.logger import banner, setup_logger
 
 
 def parse_args(args: Any) -> argparse.Namespace:
@@ -173,6 +173,13 @@ def parse_args(args: Any) -> argparse.Namespace:
         default=None,
         help="comma-separated list of files to use during the 'split-containers' stage ",
     )
+    parser.add_argument(
+        "--log-level",
+        default=None,
+        type=str.upper,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Logging level. Overrides the UPP_LOG_LEVEL environment variable.",
+    )
 
     args = parser.parse_args(args)
     d = vars(args)
@@ -188,6 +195,7 @@ def parse_args(args: Any) -> argparse.Namespace:
         "reweight",
         "rw_merge",
         "rw_merge_idx",
+        "log_level",
     ]
     if not any(v for a, v in d.items() if a not in ignore):
         for v in d:
@@ -204,7 +212,7 @@ def run_pp(args: argparse.Namespace) -> None:
     args : argparse.Namespace
         Parsed command line arguments
     """
-    log = setup_logger()
+    log = setup_logger(args.log_level)
 
     # print start info
     log.info("[bold green]Starting preprocessing...")
@@ -271,31 +279,28 @@ def run_pp(args: argparse.Namespace) -> None:
 
     # make plots
     if args.plot:
-        title = " Plotting "
-        log.info(f"[bold green]{title:-^100}")
+        log.info(banner(" Plotting "))
         plot_resampling_dists(config=config, stage="initial")
         plot_resampling_dists(config=config, stage=args.split)
 
     # print end info
     end = datetime.now()
-    title = " Finished Preprocessing! "
-    log.info(f"[bold green]{title:-^100}")
+    log.info(banner(" Finished Preprocessing! "))
     log.info(f"End time: {end.strftime('%Y-%m-%d %H:%M:%S')}")
     log.info(f"Elapsed time: {str(end - start).split('.')[0]}")
 
 
 def main(args: Any | None = None) -> None:
     args = parse_args(args)
-    log = setup_logger()
+    log = setup_logger(args.log_level)
 
     if args.split == "all":
         d = vars(args)
         for split in ["train", "val", "test"]:
             d["split"] = split
-            log.info(f"[bold blue]{'-' * 100}")
-            title = f" {args.split} "
-            log.info(f"[bold blue]{title:-^100}")
-            log.info(f"[bold blue]{'-' * 100}")
+            log.info(banner(style="bold blue"))
+            log.info(banner(f" {args.split} ", style="bold blue"))
+            log.info(banner(style="bold blue"))
             run_pp(args)
     else:
         run_pp(args)

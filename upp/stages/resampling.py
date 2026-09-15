@@ -12,7 +12,7 @@ from yamlinclude import YamlIncludeConstructor
 
 from upp.stages.hist import bin_global_objects
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
-from upp.utils.logger import ProgressBar
+from upp.utils.logger import ProgressBar, banner
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Generator
@@ -497,8 +497,7 @@ class Resampling:
         if component and not region:
             raise ValueError("Can't define component for resampling without region!")
 
-        title = " Running resampling "
-        log.info(f"[bold green]{title:-^100}")
+        log.info(banner(" Running resampling "))
         log.info(f"Resampling method: {self.method or 'none'}")
 
         # Setup the different components and readers/writers and their sampling fraction

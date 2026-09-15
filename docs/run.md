@@ -15,6 +15,22 @@ For a comprehensive list of available flags, refer to `preprocess --help`.
 
 !!!info "If you are running on lxplus you may need to use `python3 upp/main.py` instead of `preprocess`"
 
+### Logging
+
+By default UPP logs at the `INFO` level. You can change this with the `UPP_LOG_LEVEL`
+environment variable or with the `--log-level` flag, which wins over the environment variable:
+
+```bash
+export UPP_LOG_LEVEL=DEBUG
+preprocess --config path/to/config.yaml --log-level WARNING
+```
+
+The available levels are `DEBUG`, `INFO`, `WARNING`, `ERROR` and `CRITICAL`.
+
+Every log message is prefixed with the date and time. Debug and info messages are written to
+stdout while warnings, errors and critical messages are written to stderr, so in a batch job
+the `.out` file holds the progress of the run and the `.err` file only the problems.
+
 ### Splits 
 
 The data is divided into three splits: training (`train`), validation (`val`), and testing (`test`).

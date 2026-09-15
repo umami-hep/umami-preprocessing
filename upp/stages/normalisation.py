@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ftag.hdf5 import H5Reader
 
-from upp.utils.logger import ProgressBar
+from upp.utils.logger import ProgressBar, banner
 
 if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
@@ -231,8 +231,7 @@ class Normalisation:
 
     def run(self):
         """Run the normalisation calculation."""
-        title = " Computing Normalisations "
-        log.info(f"[bold green]{title:-^100}")
+        log.info(banner(" Computing Normalisations "))
         if self.config.rw_config is not None:
             fname = str(self.config.out_fname).replace(".h5", "_vds.h5")
 
