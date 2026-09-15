@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.59">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/classic/main.38807bfb.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.e0592429.min.css">
       
         
           
@@ -442,6 +442,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Logging
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#splits" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -687,6 +698,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Logging
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#splits" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -808,22 +830,32 @@
 <div class="admonition info">
 <p class="admonition-title">If you are running on lxplus you may need to use <code>python3 upp/main.py</code> instead of <code>preprocess</code></p>
 </div>
+<h3 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">#</a></h3>
+<p>By default UPP logs at the <code>INFO</code> level. You can change this with the <code>UPP_LOG_LEVEL</code>
+environment variable or with the <code>--log-level</code> flag, which wins over the environment variable:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UPP_LOG_LEVEL</span><span class="o">=</span>DEBUG
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--log-level<span class="w"> </span>WARNING
+</span></code></pre></div>
+<p>The available levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code> and <code>CRITICAL</code>.</p>
+<p>Every log message is prefixed with the date and time. Debug and info messages are written to
+stdout while warnings, errors and critical messages are written to stderr, so in a batch job
+the <code>.out</code> file holds the progress of the run and the <code>.err</code> file only the problems.</p>
 <h3 id="splits">Splits<a class="headerlink" href="#splits" title="Permanent link">#</a></h3>
 <p>The data is divided into three splits: training (<code>train</code>), validation (<code>val</code>), and testing (<code>test</code>).
 These splits are defined in <a href="../configuration/#global-cuts">configuration files</a>, typically based on the <code>eventNumber</code> variable.
 By default, the train split contains 80% of the jets, while val and test contain 10% each.</p>
 <p>If you want to preprocess the <code>val</code> or <code>test</code> split, use the <code>--split</code> argument:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--split<span class="w"> </span>val
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--split<span class="w"> </span>val
 </span></code></pre></div>
 <p>You can also process <code>train</code>, <code>val</code>, and <code>test</code> with a single command using <code>--split=all</code>.</p>
 <h3 id="stages">Stages<a class="headerlink" href="#stages" title="Permanent link">#</a></h3>
 <p>The preprocessing is broken up into several stages.</p>
 <p>To run with only specific stages enabled, include the flag for the required stages:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--resample
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--resample
 </span></code></pre></div>
 <p>To run the whole chain excluding certain stages, include the corresponding negative flag (<code>--no-*</code>).
 For example to run without plotting</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--no-plot
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--no-plot
 </span></code></pre></div>
 <p>The stages are described below.</p>
 <h4 id="1-prepare">1. Prepare<a class="headerlink" href="#1-prepare" title="Permanent link">#</a></h4>
@@ -832,31 +864,31 @@ For example to run without plotting</p>
 <details class="info">
 <summary>Paralellisation</summary>
 <p>This step can be parallelized to speed up the histogram creation. To do so, you need to provide the additional <code>--component</code> flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the <code>components</code> part of the config file. As an example, we take the <code>ghost-highstat.yaml</code> config file from the <code>gn3</code> folder in <code>configs/</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">classes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ghostsplitbjets</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nt">num_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22_000_000</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">num_global_objects_test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2_000_000</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">classes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ghostsplitbjets</span><span class="p p-Indicator">]</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">num_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22_000_000</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">num_global_objects_test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2_000_000</span>
 </span></code></pre></div>
 <p>The argument for the component flag can be constructed by taking the name of the region (this is defined in the definition of <code>lowpt</code>)</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nt">cuts</span><span class="p">:</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&gt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&lt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">cuts</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&gt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&lt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
 <p>plus the name of the sample which is used (this is defined in the definition of <code>ttbar</code>)</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">equal_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nt">pattern</span><span class="p">:</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc20d</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc23a</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">equal_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">pattern</span><span class="p">:</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc20d</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc23a</span>
 </span></code></pre></div>
 <p>and finally the flavour that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
 </span></code></pre></div>
 <p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.</p>
 </details>
@@ -868,12 +900,12 @@ You need to run the resampling stage even if you don't apply any resampling (e.g
 <summary>Parallelization</summary>
 <p>Similar to the <code>--prep</code> step, the resampling step is also able to run in parallel, but only for the different region (e.g. <code>lowpt</code> &amp; <code>highpt</code>). To do so, you need to run with the command line argument <code>--region</code> which takes as input the region on which to run. Please ensure that all components for this region were prepared in the <code>--prep</code> step before running this!</p>
 <p>The command to run the specific region would look like this:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
 </span></code></pre></div>
 <p>Similar to the <code>--prep</code> step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
 <p>If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the <code>--region</code> command line argument together with the <code>--component</code> command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the parallelization chapter of the Prepare stage.</p>
 <p>The command to run the specific region would look like this:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
 </span></code></pre></div>
 <p>Similar to the <code>--prep</code> step and the previous <code>--region</code> explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
 Also, please do NOT use this functionality if you don't have fast I/O (hard drives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.</p>
@@ -888,7 +920,7 @@ It also handles shuffling.</p>
 You can find these plots in <code>&lt;tbase_dir&gt;/plots/</code>.</p>
 <h3 id="additional-scripts-initial-sample-check">Additional Scripts: Initial Sample Check<a class="headerlink" href="#additional-scripts-initial-sample-check" title="Permanent link">#</a></h3>
 <p>The check for the initial samples from the prepare stage can also be run stand-alone. This is important if you plan to run in parallel mode. To do so, you can simply use the following command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>check_input_samples<span class="w"> </span>--config_path<span class="w"> </span>&lt;path/to/your/config&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>check_input_samples<span class="w"> </span>--config_path<span class="w"> </span>&lt;path/to/your/config&gt;
 </span></code></pre></div>
 <p>You can also add the <code>--deviation-factor</code>, which is by default <code>10.0</code> and the <code>--verbose</code> flags. The latter will print the number of initial jets to your terminal.</p>
 
@@ -952,10 +984,14 @@ You can find these plots in <code>&lt;tbase_dir&gt;/plots/</code>.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.6970bfe9.min.js"></script>
+      <script src="../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
