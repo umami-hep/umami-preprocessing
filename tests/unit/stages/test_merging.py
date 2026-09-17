@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
-from typing import cast
+from typing import ClassVar, cast
 
 import h5py
 import numpy as np
@@ -82,7 +82,7 @@ class DummyComponent(SimpleNamespace):
         return _gen()
 
 
-def _minimal_merging(monkeypatch, jets_per_file=10) -> merging_mod.Merging:
+def _minimal_merging(monkeypatch, jets_per_file=10, flavours=None) -> merging_mod.Merging:
     """Create modded Merging version.
 
     Return a fully-initialised Merging instance whose writer is the MemWriter
@@ -101,7 +101,7 @@ def _minimal_merging(monkeypatch, jets_per_file=10) -> merging_mod.Merging:
 
     # Setup cfg & components
     cfg = SimpleNamespace(
-        components=SimpleNamespace(flavours=[Flavours["bjets"]]),
+        components=SimpleNamespace(flavours=flavours or [Flavours["bjets"]]),
         variables=variables,
         batch_size=100,
         global_name="jets",
@@ -333,7 +333,7 @@ class ComponentsStub:
         return self._comps[i]
 
 
-def _mk_merge_for_path(monkeypatch, out_path: Path, jets_per_file=5):
+def _mk_merge_for_path(monkeypatch, out_path: Path, jets_per_file=5, flavours=None):
     """Like _minimal_merging, but lets us control out_fname path on disk."""
     # Patch H5Writer -> MemWriter for *output* (no real IO during merging)
     monkeypatch.setattr(merging_mod, "H5Writer", MemWriter)
@@ -345,7 +345,7 @@ def _mk_merge_for_path(monkeypatch, out_path: Path, jets_per_file=5):
         keys=lambda: ["jets"],
     )
     cfg = SimpleNamespace(
-        components=SimpleNamespace(flavours=[Flavours["bjets"]]),
+        components=SimpleNamespace(flavours=flavours or [Flavours["bjets"]]),
         variables=variables,
         batch_size=100,
         global_name="jets",
@@ -738,3 +738,116 @@ def test_run_groupby_sample_calls_write_components(monkeypatch, tmp_path):
 
     merge.run()
     assert called == [("A", 2), ("B", 3)]
+
+
+# Regression tests for single-component blocks at output file boundaries
+SPLIT_FLAVOURS = [Flavours[n] for n in ("bjets", "cjets", "ujets", "taujets")]
+SPLIT_SIZES = (400, 250, 250, 100)
+
+
+class RecordingWriter(MemWriter):
+    """MemWriter that keeps what was written, shuffling per call like H5Writer."""
+
+    files: ClassVar[dict[Path, list[np.ndarray]]] = {}
+
+    def __init__(self, dst, dtypes, shapes, global_objects_name, **kwargs):
+        super().__init__(dst, dtypes, shapes, global_objects_name, **kwargs)
+        self.rng = np.random.default_rng(42)
+        RecordingWriter.files[self.dst] = []
+
+    def write(self, data: dict):
+        idx = np.arange(len(data[self.global_objects_name]))
+        self.rng.shuffle(idx)
+        RecordingWriter.files[self.dst].append(data[self.global_objects_name][idx])
+        super().write(data)
+
+
+def _longest_run(labels: np.ndarray) -> int:
+    """Return the length of the longest run of identical labels."""
+    if len(labels) == 0:
+        return 0
+    bounds = np.concatenate([[0], np.flatnonzero(np.diff(labels)) + 1, [len(labels)]])
+    return int(np.diff(bounds).max())
+
+
+def _recorded_labels() -> dict[Path, np.ndarray]:
+    """Return the flavour labels written to each output file."""
+    return {
+        dst: np.concatenate([chunk["flavour_label"] for chunk in chunks])
+        for dst, chunks in RecordingWriter.files.items()
+    }
+
+
+def test_write_chunk_split_mixes_components(monkeypatch):
+    """A boundary split must draw both parts from the whole chunk.
+
+    The merged chunk is a component-ordered concatenation, so slicing it
+    positionally puts only the leading component into the current file
+    whenever the remaining capacity is smaller than its batch.
+    """
+    RecordingWriter.files = {}
+    merge = _minimal_merging(monkeypatch, jets_per_file=1000, flavours=SPLIT_FLAVOURS)
+    monkeypatch.setattr(merging_mod, "H5Writer", RecordingWriter)
+
+    comps = [
+        DummyComponent(flavour.name, [{"jets": _jets_struct(size)}])
+        for flavour, size in zip(SPLIT_FLAVOURS, SPLIT_SIZES, strict=True)
+    ]
+
+    merge.dtypes = {"jets": _jets_struct(1).dtype}
+    merge.base_shapes = {"jets": (1000,)}
+    merge.total_global_objects = 1000
+    merge._file_idx = 0
+    merge.global_objects_written = 0
+    merge._sample = None
+    merge.current_components = SimpleNamespace(
+        unique_global_objects=True, global_object_counts=lambda _gn: {}, dsids=[]
+    )
+
+    # Capacity of 200 is below the 400 jets of the leading component
+    merge._open_writer(None, 200, 0, merge.current_components)
+    assert merge.write_chunk(comps) == 1000
+
+    head, tail = _recorded_labels().values()
+    assert len(head) == 200
+    assert len(tail) == 800
+
+    # Both parts must see every component, and no jet may be lost
+    assert len(np.unique(head)) == len(SPLIT_FLAVOURS)
+    assert len(np.unique(tail)) == len(SPLIT_FLAVOURS)
+    assert np.array_equal(
+        np.bincount(np.concatenate([head, tail]), minlength=4), np.array(SPLIT_SIZES)
+    )
+
+
+def test_merge_has_no_single_flavour_blocks(monkeypatch, tmp_path):
+    """Output parts must stay mixed when chunks straddle file boundaries.
+
+    Chunks of 1000 jets and files of 1200 jets make every boundary cut
+    through a chunk, with the remaining capacity repeatedly below the
+    leading component's 400 jets.
+    """
+    RecordingWriter.files = {}
+    merge = _mk_merge_for_path(
+        monkeypatch, tmp_path / "merged.h5", jets_per_file=1200, flavours=SPLIT_FLAVOURS
+    )
+    monkeypatch.setattr(merging_mod, "H5Writer", RecordingWriter)
+
+    n_chunks = 12
+    comps = ComponentsStub(
+        [
+            ComponentStub(flavour.name, [{"jets": _jets_struct(size)} for _ in range(n_chunks)])
+            for flavour, size in zip(SPLIT_FLAVOURS, SPLIT_SIZES, strict=True)
+        ]
+    )
+    merge.write_components(None, comps)
+
+    labels = _recorded_labels()
+    assert len(labels) == n_chunks * sum(SPLIT_SIZES) // 1200
+
+    fractions = np.array(SPLIT_SIZES) / sum(SPLIT_SIZES)
+    for dst, part in labels.items():
+        assert len(part) == 1200, dst
+        assert _longest_run(part) < 30, f"{dst} has a block of {_longest_run(part)} jets"
+        observed = np.bincount(part, minlength=len(SPLIT_FLAVOURS)) / len(part)
+        assert np.allclose(observed, fractions, atol=0.06), f"{dst} composition {observed}"
