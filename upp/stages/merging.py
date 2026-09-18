@@ -363,6 +363,18 @@ class Merging:
         # Log for debugging
         log.debug(f"Setup merge output at {self.writer.dst}")
 
+    def _shuffle_chunk(self, merged: dict[str, np.ndarray]) -> None:
+        """Shuffle a merged chunk in place.
+
+        Parameters
+        ----------
+        merged : dict[str, np.ndarray]
+            Merged chunk, concatenated in component order. Shuffled in place.
+        """
+        perm = self.rng.permutation(len(merged[self.global_name]))
+        for name, array in merged.items():
+            merged[name] = array[perm]
+
     def write_chunk(self, components: Components) -> int:
         """Read one chunk, merge and write it to disk (or discard in fast-forward).
 
@@ -434,6 +446,8 @@ class Merging:
                 self.global_objects_written += merged_len
                 return merged_len
             else:
+                # Shuffle first, a raw slice would split along component boundaries
+                self._shuffle_chunk(merged)
                 head = {n: a[:capacity_left] for n, a in merged.items()}
                 tail = {n: a[capacity_left:] for n, a in merged.items()}
                 self.writer.write(head)
@@ -475,6 +489,9 @@ class Merging:
             self.writer.write(merged)
 
         else:
+            # Shuffle first, a raw slice would split along component boundaries
+            self._shuffle_chunk(merged)
+
             # Write the *head* that still fits into the present file
             head = {n: a[:capacity_left] for n, a in merged.items()}
             self.writer.write(head)
