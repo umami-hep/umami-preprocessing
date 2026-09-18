@@ -26,7 +26,7 @@ from upp.utils.logger import banner, setup_logger
 if TYPE_CHECKING:  # pragma: no cover
     from ftag import Cuts
 
-    from upp.classes.components import Component
+    from upp.classes.components import Component, Components
     from upp.classes.preprocessing_config import Split
 
 SPLITS = ("train", "val", "test")
@@ -337,7 +337,7 @@ def get_availability(
     """
     configs = {
         split: PreprocessingConfig.from_file(
-            config_path, cast("Split", split), skip_config_copy=True
+            config_path, cast("Split", split), skip_config_copy=True, skip_auto_counts=True
         )
         for split in splits
     }
@@ -387,6 +387,31 @@ def get_availability(
     return configs, available
 
 
+def apply_sampling_factor(
+    config: PreprocessingConfig,
+    components: Components,
+    available: dict[tuple[str, str], int],
+) -> dict[tuple[str, str], int]:
+    """Scale the available objects of one split by the fraction the resampling can use.
+
+    Parameters
+    ----------
+    config : PreprocessingConfig
+        Loaded preprocessing config of the split
+    components : Components
+        Components of the split
+    available : dict[tuple[str, str], int]
+        Available objects, keyed by (region, class)
+
+    Returns
+    -------
+    dict[tuple[str, str], int]
+        Usable objects, keyed by (region, class)
+    """
+    factors = {(c.region.name, c.flavour.name): sampling_factor(config, c) for c in components}
+    return {key: int(num * factors[key]) for key, num in available.items()}
+
+
 def usable_objects(
     configs: dict[str, PreprocessingConfig],
     available: dict[str, dict[tuple[str, str], int]],
@@ -405,14 +430,60 @@ def usable_objects(
     dict[str, dict[tuple[str, str], int]]
         Usable objects per split, keyed by (region, class)
     """
-    usable = {}
-    for split, split_available in available.items():
-        factors = {
-            (c.region.name, c.flavour.name): sampling_factor(configs[split], c)
-            for c in configs[split].components
-        }
-        usable[split] = {key: int(num * factors[key]) for key, num in split_available.items()}
-    return usable
+    return {
+        split: apply_sampling_factor(configs[split], configs[split].components, split_available)
+        for split, split_available in available.items()
+    }
+
+
+def resolve_auto_counts(config: PreprocessingConfig, components: Components) -> None:
+    """Set the object counts of components which requested them automatically.
+
+    Uses the estimate written by ``estimate_object_counts``, so no objects are read here.
+    The solved counts are recorded in the config which is copied to the output directory.
+
+    Parameters
+    ----------
+    config : PreprocessingConfig
+        Loaded preprocessing config
+    components : Components
+        Components to set the object counts of
+
+    Raises
+    ------
+    ValueError
+        If the estimate of a component is missing or was made with different cuts
+    """
+    split = config.split
+    cached = read_cache(cache_path(config))
+    num_estimate = config.num_global_objects_estimate_available
+    if num_estimate is not None and num_estimate <= 0:
+        num_estimate = None
+
+    available = {}
+    for component in components:
+        entry = cached.get(component.name, {}).get(split, {})
+        if entry.get("key") != cache_key(component, component.cuts, num_estimate):
+            raise ValueError(
+                f"No up to date estimate of the available objects of {component} for the"
+                f" {split} split. Run 'estimate_object_counts --config"
+                f" {config.config_path}' to create or update {cache_path(config)}."
+            )
+        available[(component.region.name, component.flavour.name)] = entry["available"]
+
+    counts = solve_counts(
+        {split: apply_sampling_factor(config, components, available)},
+        region_weights(config),
+        target_ratios(config),
+    )[split]
+
+    resolved = {}
+    for component in components:
+        component.num_global_objects = counts[(component.region.name, component.flavour.name)]
+        resolved[component.name] = component.num_global_objects
+        log.info(f"Using {component.num_global_objects:,} objects for {component}")
+
+    config.config.setdefault("auto_counts", {})[f"solved_{split}"] = resolved
 
 
 def recommend(

@@ -142,9 +142,9 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 | `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
 | `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
 | `classes` | `list[str]` | One or more object classes (flavours), e.g. `[bjets]` or `[ujets]`. Each name must exist in the active class container (the atlas-ftag-tools bundled flavours by default, or your own file via `class_config` — see [Custom classes](#custom-classes)). The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each class.|
-|`num_global_objects`|`int`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts.|
-|`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`) number of jets of this component in validation set.|
-|`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`) number of jets of this component in a test set.|
+|`num_global_objects`|`int` or `auto`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts. Set it to `auto` in every component to let UPP work the numbers out for you (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)).|
+|`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the validation split) number of jets of this component in validation set.|
+|`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the test split) number of jets of this component in a test set.|
 
 
 

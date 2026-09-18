@@ -4,14 +4,17 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
 import yaml
 from ftag import get_mock_file
 
 from upp.classes.preprocessing_config import PreprocessingConfig
+from upp.main import main as preprocess
 from upp.utils.availability import CACHE_FNAME, estimate_availability, main, recommend
 
 this_dir = Path(__file__).parent
 CONFIG = this_dir / "fixtures/test_config_availability.yaml"
+AUTO_CONFIG = this_dir / "fixtures/test_config_auto_counts.yaml"
 CACHE = Path("tmp/upp-tests/integration/temp_workspace/test_out_availability") / CACHE_FNAME
 
 
@@ -61,3 +64,30 @@ class TestClass:
 
         main(["--config", str(CONFIG)])
         assert "Using cached estimate" in capsys.readouterr().out
+
+    def test_auto_counts(self):
+        main(["--config", str(AUTO_CONFIG)])
+        _, counts = recommend(AUTO_CONFIG)
+
+        for split in ("train", "val", "test"):
+            config = PreprocessingConfig.from_file(AUTO_CONFIG, split, skip_config_copy=True)
+            for component in config.components:
+                key = (component.region.name, component.flavour.name)
+                assert component.num_global_objects == counts[split][key]
+                assert component.num_global_objects > 0
+
+    def test_auto_counts_without_estimate(self):
+        with pytest.raises(ValueError, match="estimate_object_counts"):
+            PreprocessingConfig.from_file(AUTO_CONFIG, "train", skip_config_copy=True)
+
+    def test_auto_counts_preprocessing(self):
+        main(["--config", str(AUTO_CONFIG)])
+        preprocess(
+            [
+                "--config",
+                str(AUTO_CONFIG),
+                "--no-plot",
+                "--split",
+                "train",
+            ]
+        )

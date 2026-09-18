@@ -173,7 +173,24 @@ estimate_object_counts --config <path/to/your/config>
 
 It measures how many objects each component has available for the train, validation
 and test splits, and then prints the largest object counts you can request, together
-with a snippet you can copy into your config. Since the resampling only uses a fraction
+with a snippet you can copy into your config. If you would rather not copy anything,
+set `num_global_objects: auto` in every component instead and the preprocessing picks
+the numbers up on its own:
+
+```yaml
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [bjets, cjets, ujets]
+    num_global_objects: auto
+```
+
+Each split gets its own count this way, so `num_global_objects_val` and
+`num_global_objects_test` are not needed either. The counts that were used end up in
+the config copy in your output directory. Either all components use `auto` or none of
+them do, since the counts of all components are solved together. Since the resampling only uses a fraction
 of the objects it reads, that fraction is already taken into account, so the numbers it
 suggests will not fail the availability check later on.
 
