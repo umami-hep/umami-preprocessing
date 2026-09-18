@@ -38,6 +38,7 @@ Below is an example and a table explaining each setting.
 | ------- | ---- | ----------- | ------- |
 |`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
 |`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
+|`sample_weight`|`int`| The relative number of objects taken from this sample, used by `estimate_object_counts` (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)). A sample with weight `2` contributes twice as many objects as one with weight `1`. | `1` |
 |`equal_global_objects`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
 
 The virtual dataset files created from wildcard patterns are by default stored alongside the input ntuples.
