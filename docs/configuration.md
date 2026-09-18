@@ -38,6 +38,7 @@ Below is an example and a table explaining each setting.
 | ------- | ---- | ----------- | ------- |
 |`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
 |`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
+|`sample_weight`|`int`| The relative number of objects taken from this sample, used by `estimate_object_counts` (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)). A sample with weight `2` contributes twice as many objects as one with weight `1`. | `1` |
 |`equal_global_objects`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
 
 The virtual dataset files created from wildcard patterns are by default stored alongside the input ntuples.
@@ -141,9 +142,9 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 | `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
 | `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
 | `classes` | `list[str]` | One or more object classes (flavours), e.g. `[bjets]` or `[ujets]`. Each name must exist in the active class container (the atlas-ftag-tools bundled flavours by default, or your own file via `class_config` — see [Custom classes](#custom-classes)). The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each class.|
-|`num_global_objects`|`int`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts.|
-|`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`) number of jets of this component in validation set.|
-|`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`) number of jets of this component in a test set.|
+|`num_global_objects`|`int` or `auto`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts. Set it to `auto` in every component to let UPP work the numbers out for you (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)).|
+|`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the validation split) number of jets of this component in validation set.|
+|`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the test split) number of jets of this component in a test set.|
 
 
 
