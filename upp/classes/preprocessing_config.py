@@ -119,14 +119,14 @@ class PreprocessingConfig:
         especially to the `countup` method to achive best agreement of target and resampled
         distributions. By default 100_000
     num_global_objects_estimate : int, optional
-        Any of the further three arguments that are not specified will default to this value
+        Any of the further four arguments that are not specified will default to this value.
         Is equal to 1_000_000 by default.
     num_global_objects_estimate_available : int | None, optional
         A sabsample taken from the whole sample to estimate the number of objects after the cuts.
         Please keep this number high in order to not get poisson error of more then 5%.
         If time allows you can use -1 to get a precise number of objects and not just an estimate
         although it will be slow for large datasets.
-        Is equal to num_global_objects_estimate by default.
+        Is equal to num_global_objects_estimate by default, but never less than 1_000_000.
     num_global_objects_estimate_hist : int | None, optional
         Number of objects of each flavour that are used to construct histograms for probability
         density function estimation. Larger numbers give a better quality estmate of the pdfs.
@@ -200,17 +200,25 @@ class PreprocessingConfig:
 
     def __post_init__(self):
         # postprocess paths
-        if self.num_global_objects_estimate:
-            if self.num_global_objects_estimate_available is None:
-                self.num_global_objects_estimate_available = max(
-                    self.num_global_objects_estimate, int(1e6)
+        if self.num_global_objects_estimate_available is None:
+            self.num_global_objects_estimate_available = max(
+                self.num_global_objects_estimate, int(1e6)
+            )
+        if self.num_global_objects_estimate_hist is None:
+            self.num_global_objects_estimate_hist = self.num_global_objects_estimate
+        if self.num_global_objects_estimate_norm is None:
+            self.num_global_objects_estimate_norm = self.num_global_objects_estimate
+        if self.num_global_objects_estimate_plotting is None:
+            self.num_global_objects_estimate_plotting = self.num_global_objects_estimate
+
+        # These are numbers of objects to read, so they have to be positive. Only
+        # num_global_objects_estimate_available also accepts -1, which counts exactly.
+        for name in ("hist", "norm", "plotting"):
+            if (num := getattr(self, f"num_global_objects_estimate_{name}")) <= 0:
+                raise ValueError(
+                    f"num_global_objects_estimate_{name} has to be positive, got {num}. It "
+                    "falls back to num_global_objects_estimate, so check that one as well."
                 )
-            if self.num_global_objects_estimate_hist is None:
-                self.num_global_objects_estimate_hist = self.num_global_objects_estimate
-            if self.num_global_objects_estimate_norm is None:
-                self.num_global_objects_estimate_norm = self.num_global_objects_estimate
-            if self.num_global_objects_estimate_plotting is None:
-                self.num_global_objects_estimate_plotting = self.num_global_objects_estimate
 
         for field in dataclasses.fields(self):
             if field.type == "Path" and field.name != "out_fname" and field.name != "base_dir":

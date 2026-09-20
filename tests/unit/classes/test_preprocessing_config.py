@@ -332,3 +332,38 @@ class TestPreprocessingConfig(unittest.TestCase):
         expected = (self.CFG_DIR / "test_flavour_config.yaml").absolute()
         self.assertEqual(config.class_config, expected)
         self.assertEqual(config.flavour_cont, LabelContainer.from_yaml(yaml_path=expected))
+
+    def _estimate_config(self, **kwargs) -> PreprocessingConfig:
+        return PreprocessingConfig(
+            config_path=self.CFG_DIR / "test.yaml",
+            split="train",
+            config={
+                "resampling": {"variables": {"jets": {"labels": ["test"]}}, "target": "bjets"},
+                "components": [],
+                "variables": {"jets": {"labels": ["test"]}},
+            },
+            base_dir=self.CFG_DIR,
+            skip_checks=True,
+            **kwargs,
+        )
+
+    def test_estimate_defaults(self) -> None:
+        config = self._estimate_config(num_global_objects_estimate=2_000_000)
+        # available never drops below a million, the others follow the estimate
+        self.assertEqual(config.num_global_objects_estimate_available, 2_000_000)
+        self.assertEqual(config.num_global_objects_estimate_hist, 2_000_000)
+        self.assertEqual(config.num_global_objects_estimate_norm, 2_000_000)
+        self.assertEqual(config.num_global_objects_estimate_plotting, 2_000_000)
+
+        config = self._estimate_config(num_global_objects_estimate=1_000)
+        self.assertEqual(config.num_global_objects_estimate_available, 1_000_000)
+        self.assertEqual(config.num_global_objects_estimate_hist, 1_000)
+
+    def test_estimate_zero_raises(self) -> None:
+        with self.assertRaises(ValueError) as ctx:
+            self._estimate_config(num_global_objects_estimate=0)
+        self.assertIn("num_global_objects_estimate_hist", str(ctx.exception))
+
+    def test_estimate_available_accepts_exact_count(self) -> None:
+        config = self._estimate_config(num_global_objects_estimate_available=-1)
+        self.assertEqual(config.num_global_objects_estimate_available, -1)
