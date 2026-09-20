@@ -167,10 +167,11 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 
 !!!warning "The class ratios have to match in every region"
 
-    UPP checks that each class makes up the same fraction of the objects in every region and
-    stops with an error if not. With two regions and three classes at `10M/10M/10M` in `lowpt`,
-    the `highpt` region has to use the same ratios (e.g. `5M/5M/5M`), not different ones.
-    Letting UPP work the numbers out for you (see below) takes care of this.
+    When resampling is enabled, UPP checks that each class makes up the same fraction of the
+    objects in every region and stops with an error if not. With two regions and three classes
+    at `10M/10M/10M` in `lowpt`, the `highpt` region has to use the same ratios
+    (e.g. `5M/5M/5M`), not different ones. Letting UPP work the numbers out for you (see below)
+    takes care of this.
 
 ### Automatic object counts
 
