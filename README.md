@@ -7,7 +7,7 @@
 
 # UPP: Umami PreProcessing
 
-This is a modular preprocessing pipeline for jet tagging.
+This is a modular preprocessing pipeline for tagging algorithms, built around jets but usable for any kind of object in the input files.
 It addresses [several issues](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/?label_name%5B%5D=Preprocessing) with the current umami preprocessing workflow, and uses the [`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/) package extensively.
 
 Documentation is found [here](https://umami-hep.github.io/umami-preprocessing/)

@@ -89,7 +89,18 @@ reweighting:
 
 `num_global_objects_estimate` represents the number of objects of each class used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
 Then, you have the `reweights` section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
-The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max, uniform` which will instead target the mean distribution, always take the maximum/minimum bin counts as the target, or target a flat distribution.
+
+Each entry of `reweights` takes the following settings:
+
+| Setting | Type | Explanation | Default |
+| ------- | ---- | ----------- | ------- |
+|`group`|`str`| Dataset the variables live in, e.g. `jets` or `tracks` | *Required* |
+|`reweight_vars`|`list[str]`| Variables the weights are calculated over | *Required* |
+|`bins`|`dict`| Binning per reweight variable, same format as in the resampling | *Required* |
+|`class_var`|`str`| Variable holding the label that is balanced, e.g. `flavour_label` | *Required* |
+|`class_target`|`int`, `tuple` or `str`| Target distribution: a label value, or one of `mean`, `min`, `max`, `uniform` | `None` |
+|`add_overflow`|`bool`| Add underflow and overflow bins to the binning, so objects outside the given range still get a weight | `True` |
 The reweighting can also be performed over track variables, for example
 
 ```yaml
