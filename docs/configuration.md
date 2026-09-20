@@ -5,12 +5,31 @@ Available example config files for UPP can be found in [`upp/configs`](https://g
 
 Each aspect of the configuration is described in detail below.
 
+The config is built from these top-level keys:
+
+| Key | Required | Section |
+| --- | -------- | ------- |
+| `global` | yes | [Global Config](#global-config) |
+| `variables` | yes | [Variables](#variables) |
+| `global_cuts` | yes | [Global Cuts](#global-cuts) |
+| `components` | yes | [Components](#components) |
+| `resampling` | no (omit to skip resampling) | [Resampling](#resampling) |
+| `auto_counts` | no | [Automatic object counts](#automatic-object-counts) |
+| `transform` | no | [Variable transformations](#variable-transformations) |
+| `plotting` | no | [Plotting](#plotting) |
+| `norm_fname` | no | name of the normalisation file, `norm_dict.yaml` by default |
+| `reweighting` | no | [Reweighting](reweighting.md) |
+| `umami` | no | [Umami integration](umami_int.md) |
+
+Sample, region and class blocks (`ttbar`, `lowpt`, ...) are defined at the top level as well
+and pulled into `components` with yaml anchors, as shown below.
+
 
 ### Input H5 Samples
 
 Here we define the input h5 samples which are to be preprocessed.
 Each sample is defined using one or more DSIDs, which generally come from the [training-dataset-dumper](https://gitlab.cern.ch/atlas-flavor-tagging-tools/training-dataset-dumper).
-If a list of DSIDs is provided, jets from each DSID will be merged according to the `equal_global_objects` flag (see below).
+If a list of DSIDs is provided, the objects from each DSID will be merged according to the `equal_global_objects` flag (see below).
 The samples are used to define components later on in configs and so one should define them with [anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
 
 Below is an example and a table explaining each setting.
@@ -39,7 +58,7 @@ Below is an example and a table explaining each setting.
 |`name`   |`str`| The name of the sample, used in output filenames.| *Required* |
 |`pattern`|`str` or `list[str]`| A single pattern or a list of pattern that match h5 files in a downloaded dataset. H5 files matching each pattern will be transparently merged using virtual datasets. | *Required* |
 |`sample_weight`|`int`| The relative number of objects taken from this sample, used by `estimate_object_counts` (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)). A sample with weight `2` contributes twice as many objects as one with weight `1`. | `1` |
-|`equal_global_objects`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of jets from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available jets. | `True` |
+|`equal_global_objects`|`bool`| Only relevant when providing a list of patterns. If `True`, the same number of objects from each DSID are selected. This is required for e.g. in Xbb QCD where each DSID belongs to a different slice, and the resampling would break if you tried to resample with one or more slices missing. If `False` this is not enforced, allowing for larger numbers of available objects. | `True` |
 
 The virtual dataset files created from wildcard patterns are by default stored alongside the input ntuples.
 If you have no write access to the input ntuples directory and would like to collect all VDS files in an accessible directory instead, set `vds_dir` in the global config (see [Global Config](#global-config)).
@@ -56,7 +75,7 @@ Possible operators are:
 
 -  `"=="`, `"!="`, `"<="`, `">="`, `">"`, `"<"` which work the same as in python.
 - `"in"` and `"notin"` to check if the value is in the list.
-- `"%{i}=="`, `"%{i}=="`, `"%{i}=="` operators to compare the modulo w.r.t. `i` of an integer. 
+- `"%{i}=="`, `"%{i}!="`, `"%{i}<="`, `"%{i}>="` operators to compare the modulo w.r.t. `i` of an integer, e.g. `"%10<="`. `i` can be any integer from 2 to 100.
 
 Along with the common selection cuts, you should also specify the cuts that separate `train`, `val` and `test` splits using modulo of `eventNumber`.
 For example:
@@ -142,11 +161,57 @@ Notice that we use `<<*` insertion tool to insert already defined regions and sa
 | `region`| anchor | The pre-defined kinematic region anchor, e.g. `lowpt` or `highpt`, or `inclusive` if not splitting in $p_T$ |
 | `sample`| anchor | The pre-defined sample anchor, e.g. $t\bar{t}$ or $Z'$ |
 | `classes` | `list[str]` | One or more object classes (flavours), e.g. `[bjets]` or `[ujets]`. Each name must exist in the active class container (the atlas-ftag-tools bundled flavours by default, or your own file via `class_config` — see [Custom classes](#custom-classes)). The list syntax is pure syntactic sugar. If more then one is provided, separate components are created for each class.|
-|`num_global_objects`|`int` or `auto`| The number of jets to be sampled from this component in the training split. When resampling is skipped, `-1` writes all jets of this component passing the cuts. Set it to `auto` in every component to let UPP work the numbers out for you (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)).|
-|`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the validation split) number of jets of this component in validation set.|
-|`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the test split) number of jets of this component in a test set.|
+|`num_global_objects`|`int` or `auto`| The number of objects to be sampled from this component in the training split. When resampling is skipped, `-1` writes all objects of this component passing the cuts. Set it to `auto` in every component to let UPP work the numbers out for you (see [Object Count Estimate](run.md#additional-scripts-object-count-estimate)).|
+|`num_global_objects_val`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the validation split) number of objects of this component in the validation set.|
+|`num_global_objects_test`|`int`| **Optional** (default: `num_global_objects//10`, or the automatic count of the test split) number of objects of this component in the test set.|
 
+!!!warning "The class ratios have to match in every region"
 
+    UPP checks that each class makes up the same fraction of the objects in every region and
+    stops with an error if not. With two regions and three classes at `10M/10M/10M` in `lowpt`,
+    the `highpt` region has to use the same ratios (e.g. `5M/5M/5M`), not different ones.
+    Letting UPP work the numbers out for you (see below) takes care of this.
+
+### Automatic object counts
+
+Instead of writing the counts yourself, set `num_global_objects: auto` in **every** component
+and let UPP solve them from a measurement of how many objects are actually available. The
+measurement is done by [`estimate_object_counts`](run.md#additional-scripts-object-count-estimate),
+which has to be run once before the preprocessing.
+
+```yaml
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [bjets, cjets, ujets]
+    num_global_objects: auto
+```
+
+Each split gets its own count, so `num_global_objects_val` and `num_global_objects_test` are
+not needed. How many objects a region gets relative to the others is set with `sample_weight`
+on the sample (see [Input H5 Samples](#input-h5-samples)).
+
+The optional `auto_counts` block tunes what is solved for:
+
+```yaml
+auto_counts:
+  class_ratios:
+    bjets: 1
+    cjets: 1
+    ujets: 2
+```
+
+| Setting | Type | Explanation | Default |
+| ------- | ---- | ----------- | ------- |
+|`class_ratios`|`dict` or `auto`| Ratios the classes should be mixed in. The largest counts matching these ratios are used. With `auto`, every class is made as large as its own available objects allow, so the ratios follow the input samples. | `auto` |
+
+!!!info "Where the solved numbers end up"
+
+    The counts are solved when the config is loaded, and the result is written into the config
+    copy in your output directory under `auto_counts.solved_<split>`. The config you maintain
+    keeps saying `auto`, while the copy next to the output records what was actually used.
 
 ### Custom classes
 
@@ -251,6 +316,43 @@ To do this, include a `selection` key in the variable config block under the tra
       - [d0, ">", 0.1]
 ```
 
+### Variable transformations
+
+The optional `transform:` block renames variables and remaps values while the input files are
+read. This is useful when the naming in your ntuples does not match what the training expects.
+It is handed to the `Transform` class of
+[`atlas-ftag-tools`](https://github.com/umami-hep/atlas-ftag-tools/blob/main/ftag/transform.py),
+which supports three maps:
+
+```yaml
+transform:
+  variable_map:
+    tracks:
+      truthOriginLabel: ftagTruthOriginLabel
+      truthVertexIndex: ftagTruthVertexIndex
+  ints_map:
+    tracks:
+      ftagTruthOriginLabel:
+        0: 1
+        -2: 0
+  floats_map:
+    jets:
+      pt: log
+```
+
+| Setting | Type | Explanation |
+| ------- | ---- | ----------- |
+|`variable_map`|`dict`| Renames variables, `variable_map[dataset][old_name] = new_name` |
+|`ints_map`|`dict`| Replaces integer values, `ints_map[dataset][variable][old_value] = new_value` |
+|`floats_map`|`dict`| Applies a function to a float variable, `floats_map[dataset][variable] = func`, where `func` is the name of a numpy function such as `log` |
+
+!!!warning "Every map starts with the dataset name"
+
+    The first level of each map is the dataset (`jets`, `tracks`, ...), and only then comes the
+    variable. A map that omits this level is silently ignored, because the dataset name is
+    looked up in the batch before the variable is touched. Nothing fails, the values simply
+    stay as they are.
+
 ### Resampling
 
 There are currently two resampling methods implemented in the package `pdf` and `countup` and they share most of setting.
@@ -274,11 +376,11 @@ resampling:
 
 | Setting | Type | Explanation |
 | ------- | ---- | ----------- |
-|`target`|`str`| The resampling is done in such a way that the distribution of the kinematic variables matches the distribution of those in one particular flavour given in here. Usually it is the least populated flavour, as this flavour will not be resampled instead all jets of this flavour are taken.|
+|`target`|`str`| The resampling is done in such a way that the distribution of the kinematic variables matches the distribution of those in one particular flavour given in here. Usually it is the least populated class, as this class will not be resampled and instead all of its objects are taken.|
 |`method`|`str`| Either  `pdf`, `countup` or `none`, depending on the method you would like to use|
 |`upscale_pdf`|`int`| **Optional** only available for `pdf` preprocessing. The coarse approximation of the pdf functions based on histograms are interpolated and to bins that are upscale_pdf**dimensions times smaller than original|
-|`sampling_fraction`|`None`, `float` or `auto`| The number of the jets sampled from each batch is equal to the sampling fraction time number of the jets in input batch (after the curs and flavour selection). The large is this variable, the more are jets upsampled i.e. repeated, thus smaller values are preferred. On the other hand with smaller sampling fractions lead to longer preprocessing times. `auto` option gives the smallest resampling fraction for each component depending on the number of available jets and number of jets that is asked for but caps it from below at 0.1 to prevent long preprocessing times when enough statistic is present. |
-|`variables`|`dict`| The jets will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable please provide a `bins` setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut between **regions** takes place to better handle the discontinuities.|
+|`sampling_fraction`|`None`, `float` or `auto`| The number of objects sampled from each batch is equal to the sampling fraction times the number of objects in the input batch (after the cuts and the class selection). The larger this variable, the more objects are upsampled i.e. repeated, thus smaller values are preferred. On the other hand, smaller sampling fractions lead to longer preprocessing times. The `auto` option gives the smallest sampling fraction for each component depending on the number of available objects and the number of objects that is asked for, but caps it from below at 0.1 to prevent long preprocessing times when enough statistics are present. |
+|`variables`|`dict`| The objects will be resampled according to the distribution of the kinematic variables you provide here. The variable names must correspond to the ones in TDD. For each variable please provide a `bins` setting with a list of lists of 2 floats and a an integer each. Each of the sub lists represent a binning region and is described by lower bound upper bound and the number of bins of equal width in this regions. The bins from each region will be combined to provide one (heterogenous width) binning. When upscaling the pdf each bin region is upscaled separately. THerefore is not necessary but advisable to have a split in binnings at the same place where the cut between **regions** takes place to better handle the discontinuities.|
 
 ### Plotting
 

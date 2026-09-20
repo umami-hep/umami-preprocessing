@@ -1,15 +1,15 @@
 # Reweighting
 
 A different approach to balancing classes to resampling is to instead reweight them.
-In resampling, we bin our jets over their kinematics. We look in each bin, and if we have more jets of a given flavour compared to the target flavour, we throw those jets away. If we have less of a given flavour than the target flavour, we copy-and-paste (upsample) the jet until the bins are equal.
+In resampling, we bin our objects over their kinematics. We look in each bin, and if we have more objects of a given class compared to the target class, we throw those objects away. If we have less of a given class than the target class, we copy-and-paste (upsample) the objects until the bins are equal.
 This ensures that the flavour ratio of any two bins is approximately constant.
 
 This does however have some disadvantages:
-- results in throwing away some jets
-- upsampling introduces copies of the same jet, meaning we are passing the same data through the model more than once per epoch
+- results in throwing away some objects
+- upsampling introduces copies of the same object, meaning we are passing the same data through the model more than once per epoch
 - bins always have some non-zero finite size, such that there can still be a residual distibution shape, see [this mention](https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf) of shark-toothing
 
-We can instead reweight, where instead of throwing away or copying jets, we assign each jet in a bin a weight such that we end up with a constant weighted flavour ratio per bin.
+We can instead reweight, where instead of throwing away or copying objects, we assign each object in a bin a weight such that we end up with a constant weighted class ratio per bin.
 
 !!!info "Reweighting instead of resampling is a new feature in UPP and is *not* the recommended method."
 
@@ -56,7 +56,7 @@ Where the dryrun flag will prepare the submission directory without submitting t
 Once all your jobs are complete, you can use the download_and_prepare script:
 
 ```
-python upp/grid/download_and_prepare.py -config {config} --rucio_user {your rucio username} --tag {same tag as before}
+python upp/grid/download_and_prepare.py --config {config} --rucio_user {your rucio username} --tag {same tag as before}
 ```
 
 which will then automatically download, package up, and generate the meta data ready for the next stage.
@@ -87,7 +87,7 @@ reweighting:
 
 ```
 
-`num_global_objects_estimate` represents the number of each jet flavour used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
+`num_global_objects_estimate` represents the number of objects of each class used to generate the reweighting histograms. The `merge_num_proc` variable will be relevant in the next section of these docs.
 Then, you have the `reweights` section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
 The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for `flavour_label==0`), or one of `mean, min, max` which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
 The reweighting can also be performed over track variables, for example
@@ -116,7 +116,7 @@ preprocess --config {config} --rw
 
 ## Merging
 
-Finally, we can merge all the relevant jets with their weights. This is done by
+Finally, we can merge all the relevant objects with their weights. This is done by
 
 ```
 preprocess --config {config} --rwm --split {train/test/val}
@@ -125,4 +125,4 @@ preprocess --config {config} --rwm --split {train/test/val}
 This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the `global` section of the pre-processing config includes `num_global_objects_per_output_file` and the `reweighting` section has `merge_num_proc>1`.
 This will then launch `merge_num_proc` processes, with approximately `num_global_objects_per_output_file` per file*.
 
-* Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.
+* Due to the nature of the H5Reader, the actual number of objects per file will be slightly smaller than what is requested, on the order of 0.1%.
