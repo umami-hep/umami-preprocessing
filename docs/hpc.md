@@ -67,6 +67,29 @@ srun apptainer exec --contain --pwd "$PWD" -B "$PWD" -B /home -B /tmp \
     "$UPP_IMAGE" preprocess --config <path/to/config.yaml> --prep
 ```
 
+## Estimating the object counts
+
+Working out how many objects your components can provide
+([`estimate_object_counts`](run.md#additional-scripts-object-count-estimate)) reads a large part
+of your inputs and should run as a batch job as well. It is a single job for the whole config,
+not one per component, and it is not one of the `submit.sh` modes:
+
+```bash
+#!/usr/bin/env bash
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem-per-cpu 16000
+#SBATCH --time 12:00:00
+
+srun apptainer exec --contain --pwd "${PWD}" -B /home -B /tmp -B <path/to/data> \
+    "${UPP_IMAGE}" estimate_object_counts --config <path/to/config.yaml>
+```
+
+Give it enough wall time: with a large `num_global_objects_estimate_available`, or with `-1`
+for an exact count, this reads a sizeable fraction of your input files. The result is cached
+in `<out_dir>/availability.yaml`, so the preprocessing jobs afterwards pick the numbers up
+without measuring again.
+
 ## Batch submission scripts
 
 The `scripts/batch/` directory contains:
