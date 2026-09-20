@@ -134,7 +134,7 @@ Afterwards, the prepare stage reads a specified number of objects (`num_global_o
     For each component the stage reports a line like
 
     ```
-    Estimated 220,586,493 lowpt_ttbar_bjets objects available - 5,000,000 requested
+    Estimated 220,586,493 lowpt_ttbar_bjets objects available - 5,000,000 requested (412,000,000 in ttbar)
     ```
 
     The requested number here is `num_global_objects_estimate_hist`, not the

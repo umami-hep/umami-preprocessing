@@ -246,7 +246,7 @@ class Component:
             log.debug(f"Sampling fraction {sampling_fraction}")
             log.info(
                 f"Estimated {available:,} {self} objects available - {num_req:,} requested"
-                f"({self.reader.num_global_objects:,} in {self.sample})"
+                f" ({self.reader.num_global_objects:,} in {self.sample})"
             )
 
     def get_auto_sampling_fraction(
