@@ -2,9 +2,8 @@
 
 ### [Latest]
 
+- Check the documentation against the code and restructure the run docs [#167](https://github.com/umami-hep/umami-preprocessing/pull/167)
 - Add `estimate_object_counts` and `num_global_objects: auto` to set the object counts of the components automatically [#166](https://github.com/umami-hep/umami-preprocessing/pull/166)
-- Check the documentation against the code, document the `transform` and `auto_counts` blocks and give the run docs a step by step walkthrough [#167](https://github.com/umami-hep/umami-preprocessing/pull/167)
-- Always apply the `num_global_objects_estimate` fallbacks and reject non-positive values instead of failing later in the prepare stage [#167](https://github.com/umami-hep/umami-preprocessing/pull/167)
 - Shuffle merged batches before splitting them across output files so that no output file ends in a single-flavour block [#165](https://github.com/umami-hep/umami-preprocessing/pull/165)
 - Make the log level configurable via `UPP_LOG_LEVEL` or `--log-level`, add timestamps to all log messages and write warnings and errors to stderr [#163](https://github.com/umami-hep/umami-preprocessing/pull/163)
 - Adding new Central Preprocessed Dataset Configs [#164](https://github.com/umami-hep/umami-preprocessing/pull/164)
