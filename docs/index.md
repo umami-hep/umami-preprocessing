@@ -1,6 +1,6 @@
 # UPP: Umami Preprocessing 
 
-Welcome to the Umami PreProcessing (UPP) package, a modular preprocessing pipeline for jet tagging.
+Welcome to the Umami PreProcessing (UPP) package, a modular preprocessing pipeline for tagging algorithms. It is built around jets, but works for any kind of object stored in the input files.
 UPP is used to prepare datasets for training various taggers. 
 In particular, it handles hybrid sample creation, resampling, normalisation, and shuffling.
 
@@ -28,7 +28,7 @@ UPP is [integrated](https://gitlab.cern.ch/aft/algorithms/umami/-/merge_requests
 The primary motivation behind preprocessing the training samples is to ensure that the distributions of kinematic variables, such as $p_T$ and $\eta$, are the same for all flavors.
 This uniformity in kinematic distributions in training data is crucial to avoid kinematic biases in the tagging performance. It also allows the machine learning model to focus on the less represented jet flavour classes such as b- and c-jets. Resampling techniques are used to achieve this goal. These techniques involve removing samples from the majority class (under-sampling) and/or adding more samples from the minority class (over-sampling).
 
-UPP can also be used to control the number of jets of each flavour in the training data, to stitch together jets from various samples, and to perform shuffling and normalisation of training features.
+UPP can also be used to control the number of objects of each class in the training data, to stitch together objects from various samples, and to perform shuffling and normalisation of training features.
 
 
 ## Hybrid Samples
@@ -54,7 +54,7 @@ The main differences between UPP and the old [Umami](https://umami.docs.cern.ch/
 
 - A modular, class-based design
 - The use of h5 virtual datasets to wrap the source files
-- Only 2 main stages: resample -> merge -> done!
+- A small number of stages: prepare -> resample -> merge -> normalise -> plot
 - Parallelised processing of flavours within a sample, which avoids wasted reads
 - Support for different resampling "regions", which is useful for generalising to [Xbb preprocessing](https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225)
 - n-dim sampling support, which is also useful for Xbb
@@ -64,8 +64,9 @@ The main differences between UPP and the old [Umami](https://umami.docs.cern.ch/
     - other plotting scripts can support a single file format
     - normalisation/concatenation is applied on the fly during training
     - training files can contain supersets of variables used for training
-- New "countup" sampling which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)
-- The code estimates the number of unique jets for you and saves this number as an attribute in the output file
+- New "countup" sampling which is more efficient than pdf (it uses more the available statistics and reduces duplication of objects)
+- The code estimates the number of unique objects for you and saves this number as an attribute in the output file
+- The object counts of the components can be worked out from the available statistics instead of by hand
 
 These features yield the following benefits as compared with the old Umami preprocessing:
 
