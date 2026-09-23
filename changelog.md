@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Update Puma Version to v0.5.5 [#168](https://github.com/umami-hep/umami-preprocessing/pull/168)
 - Shuffle merged batches before splitting them across output files so that no output file ends in a single-flavour block [#165](https://github.com/umami-hep/umami-preprocessing/pull/165)
 - Make the log level configurable via `UPP_LOG_LEVEL` or `--log-level`, add timestamps to all log messages and write warnings and errors to stderr [#163](https://github.com/umami-hep/umami-preprocessing/pull/163)
 - Adding new Central Preprocessed Dataset Configs [#164](https://github.com/umami-hep/umami-preprocessing/pull/164)
