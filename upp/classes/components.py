@@ -16,6 +16,9 @@ if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.preprocessing_config import PreprocessingConfig
     from upp.classes.variable_config import VariableConfig
 
+# Value of num_global_objects which asks for the count to be solved automatically
+AUTO = "auto"
+
 
 @dataclass
 class Component:
@@ -324,8 +327,17 @@ class Components:
         -------
         Components
             Components instance created from the PreprocessingConfig
+
+        Raises
+        ------
+        ValueError
+            If only some of the components request automatic object counts
         """
+        # imported here because the availability module needs the preprocessing config
+        from upp.utils.availability import resolve_auto_counts
+
         component_list = []
+        auto_counts = []
         for component in config.config["components"]:
             # Ensure equal_global_objects flag is correctly set
             assert "equal_global_objects" not in component, (
@@ -358,14 +370,14 @@ class Components:
             # Create the Component instances for the different flavours
             for name in component["classes"]:
                 num_global_objects = component["num_global_objects"]
-                if config.split == "val":
+                if config.split in {"val", "test"}:
+                    # an automatic count is solved for each split separately, so it is
+                    # passed on instead of being scaled down like a fixed count
+                    default = AUTO if num_global_objects == AUTO else num_global_objects // 10
                     num_global_objects = component.get(
-                        "num_global_objects_val", num_global_objects // 10
+                        f"num_global_objects_{config.split}", default
                     )
-                elif config.split == "test":
-                    num_global_objects = component.get(
-                        "num_global_objects_test", num_global_objects // 10
-                    )
+                auto_counts.append(num_global_objects == AUTO)
                 component_list.append(
                     Component(
                         region=region,
@@ -373,12 +385,24 @@ class Components:
                         flavour=config.flavour_cont[name],
                         global_cuts=config.global_cuts,
                         dirname=config.components_dir,
-                        num_global_objects=num_global_objects,
+                        num_global_objects=0 if num_global_objects == AUTO else num_global_objects,
                         num_global_objects_estimate_available=config.num_global_objects_estimate_available,  # type: ignore
                         equal_global_objects=equal_global_objects,
                     )
                 )
         components = cls(component_list)
+
+        # Solve for the object counts of the components which requested them automatically
+        if any(auto_counts):
+            if not all(auto_counts):
+                raise ValueError(
+                    f"Only some components request '{AUTO}' object counts. The counts of "
+                    "all components have to be solved together, so either all or none of "
+                    f"them can be set to '{AUTO}'."
+                )
+            if config.skip_auto_counts:
+                return components
+            resolve_auto_counts(config, components)
 
         # Check the flavour ratios (not meaningful when resampling is skipped)
         if not config.skip_resampling:

@@ -166,6 +166,9 @@ class PreprocessingConfig:
         Skip checks for the input files. This is used for grid submission
     skip_config_copy : bool, optional
         Decide, if the config copying is skipped or not. By default False
+    skip_auto_counts : bool, optional
+        Skip solving the object counts of components which are set to `auto`. This is
+        used by the tool which creates the estimate they are solved from. By default False
     vds_dir : Path | None, optional
         Directory name for creation of virtual datasets. By default None
         If none is given, virtual datasets is created next to input ntuples
@@ -192,6 +195,7 @@ class PreprocessingConfig:
     num_global_objects_per_output_file: int | None = None
     skip_checks: bool = False
     skip_config_copy: bool = False
+    skip_auto_counts: bool = False
     vds_dir: Path | None = None
 
     def __post_init__(self):
@@ -304,6 +308,7 @@ class PreprocessingConfig:
         split: Split,
         skip_checks: bool = False,
         skip_config_copy: bool = False,
+        skip_auto_counts: bool = False,
     ):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
@@ -322,6 +327,7 @@ class PreprocessingConfig:
                 split=split,
                 config=config,
                 skip_config_copy=skip_config_copy,
+                skip_auto_counts=skip_auto_counts,
                 **config["global"],
                 skip_checks=skip_checks,
             )
@@ -501,7 +507,9 @@ class PreprocessingConfig:
         containers_with_splits = {}
 
         for split in ["train", "val", "test"]:
-            split_config = PreprocessingConfig.from_file(config_path, split, skip_checks=True)
+            split_config = PreprocessingConfig.from_file(
+                config_path, split, skip_checks=True, skip_auto_counts=True
+            )
 
             for component in split_config.components.components:
                 for container in component.sample.pattern:
