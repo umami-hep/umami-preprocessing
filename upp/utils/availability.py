@@ -24,6 +24,8 @@ from upp.classes.preprocessing_config import PreprocessingConfig
 from upp.utils.logger import banner, setup_logger
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Generator
+
     from ftag import Cuts
 
     from upp.classes.components import Component, Components
@@ -83,6 +85,39 @@ def cache_key(component: Component, cuts: Cuts, num_estimate: int | None) -> str
     return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]
 
 
+def selected_fractions(
+    stream: Generator, name: str, split_cuts: dict[str, Cuts]
+) -> dict[str, float]:
+    """Return the fraction of the streamed objects passing the cuts of each split.
+
+    The objects are counted batch by batch, so only one batch is held in memory at a
+    time. Summing the counts gives the same fraction as applying the cuts to all of the
+    streamed objects at once.
+
+    Parameters
+    ----------
+    stream : Generator
+        Stream of batches to count
+    name : str
+        Name of the global object dataset in the batches
+    split_cuts : dict[str, Cuts]
+        Cuts of each split
+
+    Returns
+    -------
+    dict[str, float]
+        Fraction of the streamed objects passing the cuts, for each split
+    """
+    selected = dict.fromkeys(split_cuts, 0)
+    total = 0
+    for batch in stream:
+        objects = batch[name]
+        total += len(objects)
+        for split, cuts in split_cuts.items():
+            selected[split] += len(cuts(objects).values)
+    return {split: num / total for split, num in selected.items()}
+
+
 def estimate_availability(
     component: Component,
     split_cuts: dict[str, Cuts],
@@ -91,7 +126,8 @@ def estimate_availability(
     """Estimate the available objects of one component for several splits.
 
     Mirrors ``H5Reader.estimate_available_global_objects()``, but evaluates the cuts of
-    every split on the same loaded objects so that all splits cost a single pass.
+    every split on the same streamed objects, so that all splits cost a single pass and
+    no more than one batch is held in memory.
 
     Parameters
     ----------
@@ -120,23 +156,21 @@ def estimate_availability(
     if reader.equal_global_objects:
         totals: dict[str, list[float]] = {split: [] for split in split_cuts}
         for single_reader in reader.readers:
-            stream = single_reader.stream({name: variables}, num_estimate)
-            objects = np.concatenate([batch[name].copy() for batch in stream])
-            for split, cuts in split_cuts.items():
-                frac_selected = len(cuts(objects).values) / len(objects)
-                totals[split].append(frac_selected * single_reader.num_global_objects)
+            fractions = selected_fractions(
+                single_reader.stream({name: variables}, num_estimate), name, split_cuts
+            )
+            for split, fraction in fractions.items():
+                totals[split].append(fraction * single_reader.num_global_objects)
         return {
             split: math.floor(min(total) * len(reader.readers) * 0.99)
             for split, total in totals.items()
         }
 
     # otherwise, available objects is based on all samples
-    objects = reader.load({name: variables}, num_estimate)[name]
+    fractions = selected_fractions(reader.stream({name: variables}, num_estimate), name, split_cuts)
     return {
-        split: math.floor(
-            len(cuts(objects).values) / len(objects) * reader.num_global_objects * 0.99
-        )
-        for split, cuts in split_cuts.items()
+        split: math.floor(fraction * reader.num_global_objects * 0.99)
+        for split, fraction in fractions.items()
     }
 
 
@@ -287,7 +321,13 @@ def read_cache(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
     if not path.exists():
         return {}
     with open(path) as file:
-        return yaml.safe_load(file).get("components", {})
+        cache = yaml.safe_load(file)
+    if (version := cache.get("upp_version")) != __version__:
+        log.warning(
+            f"The estimate in {path} was written with UPP {version}, this is UPP "
+            f"{__version__}. Rerun estimate_object_counts if the numbers look wrong."
+        )
+    return cache.get("components", {})
 
 
 def write_cache(path: Path, config: PreprocessingConfig, components: dict) -> None:

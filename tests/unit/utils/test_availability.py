@@ -8,6 +8,7 @@ import yaml
 from ftag import Cuts
 
 import upp.utils.availability as av
+from upp import __version__
 
 
 def _objects(pt):
@@ -22,7 +23,9 @@ class _SingleReader:
         self.num_global_objects = num_global_objects
 
     def stream(self, _variables, _num):
-        yield {"jets": self.objects}
+        half = len(self.objects) // 2
+        yield {"jets": self.objects[:half]}
+        yield {"jets": self.objects[half:]}
 
 
 class _Reader:
@@ -36,8 +39,9 @@ class _Reader:
     def num_global_objects(self):
         return sum(r.num_global_objects for r in self.readers)
 
-    def load(self, _variables, _num):
-        return {"jets": np.concatenate([r.objects for r in self.readers])}
+    def stream(self, _variables, _num):
+        for reader in self.readers:
+            yield from reader.stream(_variables, _num)
 
 
 def _component(reader, name="lowpt_ttbar_bjets", pattern=("data1.h5",)):
@@ -251,3 +255,26 @@ def test_solve_counts_reproduces_central_config():
     for name, (lowpt, highpt) in expected.items():
         assert counts[("lowpt", name)] == lowpt
         assert counts[("highpt", name)] == highpt
+
+
+def test_selected_fractions_counts_across_batches():
+    cuts = {"train": Cuts.from_list([["pt", ">", 49]])}
+    stream = ({"jets": _objects(chunk)} for chunk in (np.arange(60), np.arange(60, 100)))
+
+    # 50 of the 100 streamed objects pass, split over two batches of different size
+    assert av.selected_fractions(stream, "jets", cuts) == {"train": 0.5}
+
+
+def test_read_cache_warns_on_other_version(tmp_path, caplog):
+    config = SimpleNamespace(
+        config_path=tmp_path / "config.yaml",
+        out_dir=tmp_path,
+        num_global_objects_estimate_available=1000,
+    )
+    av.write_cache(av.cache_path(config), config, {"lowpt_ttbar_bjets": {}})
+    path = av.cache_path(config)
+    path.write_text(path.read_text().replace(__version__, "0.0.1"))
+
+    with caplog.at_level("WARNING"):
+        av.read_cache(path)
+    assert "0.0.1" in caplog.text
