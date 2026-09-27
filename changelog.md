@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Add `estimate_object_counts` and `num_global_objects: auto` to set the object counts of the components automatically [#166](https://github.com/umami-hep/umami-preprocessing/pull/166)
 - Update Puma Version to v0.5.5 [#168](https://github.com/umami-hep/umami-preprocessing/pull/168)
 - Shuffle merged batches before splitting them across output files so that no output file ends in a single-flavour block [#165](https://github.com/umami-hep/umami-preprocessing/pull/165)
 - Make the log level configurable via `UPP_LOG_LEVEL` or `--log-level`, add timestamps to all log messages and write warnings and errors to stderr [#163](https://github.com/umami-hep/umami-preprocessing/pull/163)

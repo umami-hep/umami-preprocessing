@@ -159,3 +159,58 @@ check_input_samples --config_path <path/to/your/config>
 ```
 
 You can also add the `--deviation-factor`, which is by default `10.0` and the `--verbose` flags. The latter will print the number of initial jets to your terminal.
+
+### Additional Scripts: Object Count Estimate
+
+Picking the `num_global_objects` values by hand is tedious: each component can only
+provide as many objects as it has after the cuts, and the numbers have to keep the
+class ratios the same in every region, otherwise the preprocessing stops with an error.
+The following command works these numbers out for you:
+
+```bash
+estimate_object_counts --config <path/to/your/config>
+```
+
+It measures how many objects each component has available for the train, validation
+and test splits, and then prints the largest object counts you can request, together
+with a snippet you can copy into your config. If you would rather not copy anything,
+set `num_global_objects: auto` in every component instead and the preprocessing picks
+the numbers up on its own:
+
+```yaml
+components:
+  - region:
+      <<: *lowpt
+    sample:
+      <<: *ttbar
+    classes: [bjets, cjets, ujets]
+    num_global_objects: auto
+```
+
+Each split gets its own count this way, so `num_global_objects_val` and
+`num_global_objects_test` are not needed either. The counts that were used end up in
+the config copy in your output directory. Either all components use `auto` or none of
+them do, since the counts of all components are solved together. Since the resampling only uses a fraction
+of the objects it reads, that fraction is already taken into account, so the numbers it
+suggests will not fail the availability check later on.
+
+The measurement reads a large part of your input samples and is best submitted as a
+batch job. Its results are cached in `<out_dir>/availability.yaml` and reused whenever
+your samples and cuts have not changed, so a second call is cheap. Use `--force` to
+measure again anyway, and `--splits` to restrict the work to certain splits.
+
+By default every class is made as large as its available objects allow. If you want a
+specific composition instead, add an `auto_counts` block to your config:
+
+```yaml
+auto_counts:
+  class_ratios:
+    bjets: 1
+    cjets: 1
+    ujets: 2
+```
+
+How much of the sample each region gets is set with `sample_weight` on the sample
+(see [Input H5 Samples](configuration.md#input-h5-samples)). With a weight of `2` on
+$t\bar{t}$ and `1` on $Z'$, twice as many objects are taken from $t\bar{t}$ as from
+$Z'$ for every class.
