@@ -19,10 +19,10 @@ classifiers = [
 ]
 
 dependencies = [
-  "atlas-ftag-tools==0.3.5",
+  "atlas-ftag-tools==0.3.6",
   "dotmap>=1.3.30",
   "numpy>=2.2.6",
-  "puma-hep==0.5.5",
+  "puma-hep==0.5.6",
   "pyyaml-include==1.3",
   "PyYAML>=6.0.2",
   "rich>=14.1.0",
