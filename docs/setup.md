@@ -133,7 +133,8 @@ python -m pip install .
 If you don't want to set up a Python environment at all, you can use the UPP container image.
 The CI builds `gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest` on every merge to
 `main` and a tagged image `upp:<tag>` (e.g. `upp:v0.3.1`) for every release. The image comes with UPP
-and its command line scripts (`preprocess`, `check_input_samples`, `list_components`) pre-installed.
+and its command line scripts (`preprocess`, `check_input_samples`, `list_components`,
+`estimate_object_counts`) pre-installed.
 
 === "apptainer"
 

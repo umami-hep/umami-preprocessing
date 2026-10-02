@@ -2,6 +2,7 @@
 
 ### [Latest]
 
+- Check the documentation against the code and restructure the run docs [#167](https://github.com/umami-hep/umami-preprocessing/pull/167)
 - Update `atlas-ftag-tools` and `puma` [#169](https://github.com/umami-hep/umami-preprocessing/pull/169)
 - Add `estimate_object_counts` and `num_global_objects: auto` to set the object counts of the components automatically [#166](https://github.com/umami-hep/umami-preprocessing/pull/166)
 - Update Puma Version to v0.5.5 [#168](https://github.com/umami-hep/umami-preprocessing/pull/168)
