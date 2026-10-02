@@ -725,13 +725,13 @@
 
 <h1 id="reweighting">Reweighting<a class="headerlink" href="#reweighting" title="Permanent link">#</a></h1>
 <p>A different approach to balancing classes to resampling is to instead reweight them.
-In resampling, we bin our jets over their kinematics. We look in each bin, and if we have more jets of a given flavour compared to the target flavour, we throw those jets away. If we have less of a given flavour than the target flavour, we copy-and-paste (upsample) the jet until the bins are equal.
+In resampling, we bin our objects over their kinematics. We look in each bin, and if we have more objects of a given class compared to the target class, we throw those objects away. If we have less of a given class than the target class, we copy-and-paste (upsample) the objects until the bins are equal.
 This ensures that the flavour ratio of any two bins is approximately constant.</p>
 <p>This does however have some disadvantages:
-- results in throwing away some jets
-- upsampling introduces copies of the same jet, meaning we are passing the same data through the model more than once per epoch
+- results in throwing away some objects
+- upsampling introduces copies of the same object, meaning we are passing the same data through the model more than once per epoch
 - bins always have some non-zero finite size, such that there can still be a residual distibution shape, see <a href="https://indico.cern.ch/event/1510815/contributions/6361217/attachments/3014489/5316063/Effects%20of%20Trackless%20Jets%20and%20UPP%20on%20NN%20Based%20Preselection.pdf">this mention</a> of shark-toothing</p>
-<p>We can instead reweight, where instead of throwing away or copying jets, we assign each jet in a bin a weight such that we end up with a constant weighted flavour ratio per bin.</p>
+<p>We can instead reweight, where instead of throwing away or copying objects, we assign each object in a bin a weight such that we end up with a constant weighted class ratio per bin.</p>
 <div class="admonition info">
 <p class="admonition-title">Reweighting instead of resampling is a new feature in UPP and is <em>not</em> the recommended method.</p>
 </div>
@@ -761,7 +761,7 @@ First, you must setup a virtual environment to be packaged up and sent to the gr
 </span></code></pre></div>
 <p>Where the dryrun flag will prepare the submission directory without submitting to the grid.</p>
 <p>Once all your jobs are complete, you can use the download_and_prepare script:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python upp/grid/download_and_prepare.py -config {config} --rucio_user {your rucio username} --tag {same tag as before}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python upp/grid/download_and_prepare.py --config {config} --rucio_user {your rucio username} --tag {same tag as before}
 </span></code></pre></div>
 <p>which will then automatically download, package up, and generate the meta data ready for the next stage.</p>
 <h2 id="generate-weights">Generate weights<a class="headerlink" href="#generate-weights" title="Permanent link">#</a></h2>
@@ -783,10 +783,64 @@ First, you must setup a virtual environment to be packaged up and sent to the gr
 </span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flavour_label</span>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">      </span><span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
 </span></code></pre></div>
-<p><code>num_global_objects_estimate</code> represents the number of each jet flavour used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevant in the next section of these docs.
+<p><code>num_global_objects_estimate</code> represents the number of objects of each class used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevant in the next section of these docs.
 Then, you have the <code>reweights</code> section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
-The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max</code> which will instead target either the mean distribution, or always take the maximum/minimum bin counts as the target.
-The reweighting can also be performed over track variables, for example</p>
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max, uniform</code> which will instead target the mean distribution, always take the maximum/minimum bin counts as the target, or target a flat distribution.</p>
+<p>Each entry of <code>reweights</code> takes the following settings:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Type</th>
+<th>Explanation</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>group</code></td>
+<td><code>str</code></td>
+<td>Dataset the variables live in, e.g. <code>jets</code> or <code>tracks</code></td>
+<td><em>Required</em></td>
+</tr>
+<tr>
+<td><code>reweight_vars</code></td>
+<td><code>list[str]</code></td>
+<td>Variables the weights are calculated over</td>
+<td><em>Required</em></td>
+</tr>
+<tr>
+<td><code>bins</code></td>
+<td><code>dict</code></td>
+<td>Binning per reweight variable, same format as in the resampling</td>
+<td><em>Required</em></td>
+</tr>
+<tr>
+<td><code>class_var</code></td>
+<td><code>str</code></td>
+<td>Variable holding the label that is balanced, e.g. <code>flavour_label</code></td>
+<td><em>Required</em></td>
+</tr>
+<tr>
+<td><code>class_target</code></td>
+<td><code>int</code>, <code>tuple</code> or <code>str</code></td>
+<td>Target distribution: a label value, or one of <code>mean</code>, <code>min</code>, <code>max</code>, <code>uniform</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>add_overflow</code></td>
+<td><code>bool</code></td>
+<td>Add underflow and overflow bins to the binning, so objects outside the given range still get a weight</td>
+<td><code>True</code></td>
+</tr>
+<tr>
+<td>The reweighting can also be performed over track variables, for example</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tracks</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">reweight_vars</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_frac</span><span class="p p-Indicator">]</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">bins</span><span class="p">:</span>
@@ -803,13 +857,13 @@ The reweighting can also be performed over track variables, for example</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>preprocess --config {config} --rw
 </span></code></pre></div>
 <h2 id="merging">Merging<a class="headerlink" href="#merging" title="Permanent link">#</a></h2>
-<p>Finally, we can merge all the relevant jets with their weights. This is done by</p>
+<p>Finally, we can merge all the relevant objects with their weights. This is done by</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>preprocess --config {config} --rwm --split {train/test/val}
 </span></code></pre></div>
 <p>This can either work in series to create 1 single large file, or we can produce multiple files with multi-processing. To do this, ensure the <code>global</code> section of the pre-processing config includes <code>num_global_objects_per_output_file</code> and the <code>reweighting</code> section has <code>merge_num_proc&gt;1</code>.
 This will then launch <code>merge_num_proc</code> processes, with approximately <code>num_global_objects_per_output_file</code> per file*.</p>
 <ul>
-<li>Due to the nature of the H5Reader, the actual number of jets per file will be slightly smaller than what is requested, on the order of 0.1%.</li>
+<li>Due to the nature of the H5Reader, the actual number of objects per file will be slightly smaller than what is requested, on the order of 0.1%.</li>
 </ul>
 
 

@@ -442,6 +442,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#step-by-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step by step
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#logging" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -709,6 +720,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#step-by-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step by step
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#logging" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -853,11 +875,46 @@
 <div class="admonition info">
 <p class="admonition-title">If you are running on lxplus you may need to use <code>python3 upp/main.py</code> instead of <code>preprocess</code></p>
 </div>
+<h3 id="step-by-step">Step by step<a class="headerlink" href="#step-by-step" title="Permanent link">#</a></h3>
+<p>A complete run, from a config to the files you train on, looks like this:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 1. check the input samples and create the virtual datasets</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>check_input_samples<span class="w"> </span>--config_path<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--verbose
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 2. work out how many objects you can ask for</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>estimate_object_counts<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># 3. run the stages, one after the other</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--merge
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--norm
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--plot
+</span></code></pre></div>
+<p>Step 2 is only needed the first time and whenever your samples or cuts change. It tells you
+the largest object counts your samples support, which you either copy into your config or
+pick up automatically with <code>num_global_objects: auto</code>
+(see <a href="../configuration/#automatic-object-counts">Automatic object counts</a>).</p>
+<p>Steps 3 onwards produce the <code>train</code> split. Add <code>--split val</code> and <code>--split test</code> to produce
+the other two, or use <code>--split all</code> to run all three in one go.</p>
+<div class="admonition warning">
+<p class="admonition-title">Finish one stage before starting the next</p>
+<p>Each stage reads what the previous one wrote, so let all jobs of a stage finish before
+submitting the next one. The one exception is the normalisation, which is computed from
+the merged training file and therefore needs the merge of the <code>train</code> split only.</p>
+</div>
+<details class="info">
+<summary>Running everything with a single command</summary>
+<p>Leaving out the stage flags runs the whole chain in order:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--split<span class="w"> </span>all
+</span></code></pre></div>
+<p>This is the simplest way to run small setups. For anything with real statistics the
+stages are better submitted as separate batch jobs, see <a href="../hpc/">Running on HPC</a>.</p>
+</details>
 <h3 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">#</a></h3>
 <p>By default UPP logs at the <code>INFO</code> level. You can change this with the <code>UPP_LOG_LEVEL</code>
 environment variable or with the <code>--log-level</code> flag, which wins over the environment variable:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UPP_LOG_LEVEL</span><span class="o">=</span>DEBUG
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--log-level<span class="w"> </span>WARNING
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">UPP_LOG_LEVEL</span><span class="o">=</span>DEBUG
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--log-level<span class="w"> </span>WARNING
 </span></code></pre></div>
 <p>The available levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code> and <code>CRITICAL</code>.</p>
 <p>Every log message is prefixed with the date and time. Debug and info messages are written to
@@ -865,129 +922,205 @@ stdout while warnings, errors and critical messages are written to stderr, so in
 the <code>.out</code> file holds the progress of the run and the <code>.err</code> file only the problems.</p>
 <h3 id="splits">Splits<a class="headerlink" href="#splits" title="Permanent link">#</a></h3>
 <p>The data is divided into three splits: training (<code>train</code>), validation (<code>val</code>), and testing (<code>test</code>).
-These splits are defined in <a href="../configuration/#global-cuts">configuration files</a>, typically based on the <code>eventNumber</code> variable.
-By default, the train split contains 80% of the jets, while val and test contain 10% each.</p>
+Which objects end up in which split is decided by the cuts you define in the
+<a href="../configuration/#global-cuts">configuration file</a>, typically using the modulo of the
+<code>eventNumber</code>. The split configs shipped with UPP in <code>upp/configs/splits/</code> use 80% for
+training and 10% each for validation and testing, and there are k-folded variants as well.</p>
 <p>If you want to preprocess the <code>val</code> or <code>test</code> split, use the <code>--split</code> argument:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--split<span class="w"> </span>val
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--split<span class="w"> </span>val
 </span></code></pre></div>
 <p>You can also process <code>train</code>, <code>val</code>, and <code>test</code> with a single command using <code>--split=all</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">The splits are not the same data with a different name</p>
+<p>Cuts and object counts differ between splits. The <code>test</code> split drops the region cuts
+entirely and applies no resampling, and if you do not set <code>num_global_objects_val</code> or
+<code>num_global_objects_test</code>, each defaults to a tenth of the training count.</p>
+</div>
 <h3 id="stages">Stages<a class="headerlink" href="#stages" title="Permanent link">#</a></h3>
 <p>The preprocessing is broken up into several stages.</p>
 <p>To run with only specific stages enabled, include the flag for the required stages:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--resample
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--resample
 </span></code></pre></div>
 <p>To run the whole chain excluding certain stages, include the corresponding negative flag (<code>--no-*</code>).
 For example to run without plotting</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--no-plot
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--no-plot
 </span></code></pre></div>
 <p>The stages are described below.</p>
 <h4 id="1-prepare">1. Prepare<a class="headerlink" href="#1-prepare" title="Permanent link">#</a></h4>
-<p>The prepare stage (<code>--prep</code>) checks first the number of initial jets that are available per group/sample. For each of the entries in the <code>pattern</code> of the group, it checks how many jets are in total available. If this differs too much between the entries in <code>pattern</code>, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in <code>pattern</code> are different MC campaigns and by using drastically different numbers of initial jets, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument <code>--skip-sample-check</code>. If you run the script the first time and you want to run the prepare stage in parallel, please let this script run first! It creates virtual datasets for each entry in <code>pattern</code> which could become corrupted if you do run this script in parallel multiple times! Instructions on how to run this check stand-alone can be found in <a href="#additional-scripts-initial-sample-check">here</a>.</p>
-<p>Afterwards, the prepare stage reads a specified number of jets (<code>num_global_objects_estimate_hist</code>) for each flavor and constructs histograms of the resampling variables. These histograms are stored in <code>&lt;base_dir&gt;/hists</code>.</p>
+<p>The prepare stage (<code>--prep</code>) checks first the number of initial objects that are available per group/sample. For each of the entries in the <code>pattern</code> of the group, it checks how many objects are in total available. If this differs too much between the entries in <code>pattern</code>, an error is thrown because it indicates that you will might introduce biases in the training. For example, usually entries in <code>pattern</code> are different MC campaigns and by using drastically different numbers of initial objects, a campaign dependency can be introduced. If you manually checked it and you expect large differences, you can skip this by adding the command line argument <code>--skip-sample-check</code>. Instructions on how to run this check stand-alone can be found <a href="#additional-scripts-initial-sample-check">here</a>.</p>
+<p>Keep in mind that this check counts all objects of each entry in <code>pattern</code>, before any cuts are applied. It tells you whether your input samples are balanced, not how many objects are left in a component once its cuts are applied.</p>
+<p>Afterwards, the prepare stage reads a specified number of objects (<code>num_global_objects_estimate_hist</code>) for each class and constructs histograms of the resampling variables. These histograms are stored in <code>&lt;base_dir&gt;/hists/</code>. This part only runs for the <code>train</code> split, and only when resampling is enabled.</p>
+<div class="admonition warning">
+<p class="admonition-title">Run the sample check once before starting parallel prepare jobs</p>
+<p>The check creates the virtual datasets which wrap the files of each <code>pattern</code>. These can
+get corrupted when several jobs create them at the same time, so let a single run finish
+before submitting the prepare jobs in parallel.</p>
+</div>
+<details class="info">
+<summary>The available objects reported here are for the full sample</summary>
+<p>For each component the stage reports a line like</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Estimated 220,586,493 lowpt_ttbar_bjets objects available - 5,000,000 requested (412,000,000 in ttbar)
+</span></code></pre></div>
+<p>The requested number here is <code>num_global_objects_estimate_hist</code>, not the
+<code>num_global_objects</code> of your component, and the estimate leaves the train/val/test split
+cut out, so it is the number for the full sample rather than for one split. The stage
+only reports it and never stops because of it. For per-split numbers that take the class
+ratios into account, use <a href="#additional-scripts-object-count-estimate"><code>estimate_object_counts</code></a>.</p>
+</details>
+<div class="admonition info">
+<p class="admonition-title"><code>num_global_objects</code> is not used in this stage</p>
+<p>Setting the counts of your components very high here to take all the statistics has no
+effect, they are only used from the resample stage onwards.</p>
+</div>
 <details class="info">
 <summary>Paralellisation</summary>
-<p>This step can be parallelized to speed up the histogram creation. To do so, you need to provide the additional <code>--component</code> flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the <code>components</code> part of the config file. As an example, we take the <code>ghost-highstat.yaml</code> config file from the <code>gn3</code> folder in <code>configs/</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">classes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ghostsplitbjets</span><span class="p p-Indicator">]</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">num_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22_000_000</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">num_global_objects_test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2_000_000</span>
+<p>This step can be parallelized to speed up the histogram creation. To do so, you need to provide the additional <code>--component</code> flag. The argument for the flag is the name of the component, which is to be processed. The argument can be constructed when looking closer at the different blocks in the <code>components</code> part of the config file. As an example, we take the <code>ghost-highstat.yaml</code> config file from the <code>GN3V00</code> folder in <code>upp/configs/</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nt">classes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ghostsplitbjets</span><span class="p p-Indicator">]</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nt">num_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22_000_000</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">num_global_objects_test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2_000_000</span>
 </span></code></pre></div>
 <p>The argument for the component flag can be constructed by taking the name of the region (this is defined in the definition of <code>lowpt</code>)</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">cuts</span><span class="p">:</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&gt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&lt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">lowpt</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;lowpt</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lowpt</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nt">cuts</span><span class="p">:</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&gt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20_000</span><span class="p p-Indicator">]</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pt_btagJes</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"&lt;"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250_000</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
 <p>plus the name of the sample which is used (this is defined in the definition of <code>ttbar</code>)</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">equal_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">pattern</span><span class="p">:</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc20d</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc23a</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">ttbar</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;ttbar</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttbar</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nt">equal_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nt">pattern</span><span class="p">:</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8547_s3797_r13144_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc20d</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"user.svanstro.601589.e8549_s4159_r14799_p6368.tdd.GN3_dev.25_2_27.24-09-17_v00_output.h5/*.h5"</span><span class="w"> </span><span class="c1"># mc23a</span>
 </span></code></pre></div>
-<p>and finally the flavour that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
+<p>and finally the class that is used. In this case, <code>ghostsplitbjets</code>. The full name of the component is therefore: <code>lowpt_ttbar_ghostsplitbjets</code>. The full command would look like this:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--prep<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
+</span></code></pre></div>
+<p>Instead of building the names by hand you can also let UPP print them for you:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>list_components<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml
 </span></code></pre></div>
 <p>It is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. In addition, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.</p>
 </details>
 <h4 id="2-resample">2. Resample<a class="headerlink" href="#2-resample" title="Permanent link">#</a></h4>
-<p>The resample stage (<code>--resample</code>) resamples jets to achieve similar <span class="arithmatex">\(p_T\)</span> and <span class="arithmatex">\(\eta\)</span> distributions across flavours.
-After execution, resampled samples for each flavor, sample, and split are saved separately in <code>&lt;base_dir&gt;/components/&lt;split&gt;/</code>.
+<p>The resample stage (<code>--resample</code>) resamples objects to achieve similar <span class="arithmatex">\(p_T\)</span> and <span class="arithmatex">\(\eta\)</span> distributions across classes.
+After execution, resampled samples for each class, sample, and split are saved separately in <code>&lt;base_dir&gt;/components/&lt;split&gt;/</code>.
 You need to run the resampling stage even if you don't apply any resampling (e.g. you configured with <code>method: none</code>).</p>
+<p>Before anything is written, the stage checks for every component that the requested
+<code>num_global_objects</code> can be delivered with the configured sampling fraction.</p>
+<div class="admonition warning">
+<p class="admonition-title">Requesting more objects than are available</p>
+<p>If a component cannot deliver what you asked for, the run stops right away with an error
+naming that component. Raising the number further does not give you more statistics, it
+only moves the error. Run
+<a href="#additional-scripts-object-count-estimate"><code>estimate_object_counts</code></a> to get the numbers
+your samples support, or set <code>num_global_objects: auto</code> and let UPP fill them in.</p>
+<p>The check is based on an estimate taken from a subsample, so it can also be too
+optimistic. In that case the run starts and stops later with
+<code>Ran out of &lt;component&gt; objects after writing N</code>. Increasing
+<code>num_global_objects_estimate_available</code> makes the estimate more precise, and <code>-1</code> counts
+the objects exactly at the cost of a full pass over the inputs.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>sampling_fraction: auto</code> with the countup method</p>
+<p>With <code>auto</code>, the sampling fraction of a component is derived from the objects it has
+available and the number you requested. If that lands above one, the <code>countup</code> method
+stops with an error, because it cannot select more objects than it reads. Ask for fewer
+objects, or switch to <code>pdf</code>, which only warns.</p>
+</div>
 <details class="info">
 <summary>Parallelization</summary>
 <p>Similar to the <code>--prep</code> step, the resampling step is also able to run in parallel, but only for the different region (e.g. <code>lowpt</code> &amp; <code>highpt</code>). To do so, you need to run with the command line argument <code>--region</code> which takes as input the region on which to run. Please ensure that all components for this region were prepared in the <code>--prep</code> step before running this!</p>
 <p>The command to run the specific region would look like this:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt
 </span></code></pre></div>
 <p>Similar to the <code>--prep</code> step, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all regions are resampled, you can continue with the following steps.</p>
 <p>If you want to go one step further, you can also tell the resampling to resample each component in the region in it's own process. To do so, you need to provide the <code>--region</code> command line argument together with the <code>--component</code> command line argument. Very important is here the full name of the component, which is constructed in the same way as already explained in the parallelization chapter of the Prepare stage.</p>
 <p>The command to run the specific region would look like this:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--resample<span class="w"> </span>--region<span class="w"> </span>lowpt<span class="w"> </span>--component<span class="w"> </span>lowpt_ttbar_ghostsplitbjets
 </span></code></pre></div>
 <p>Similar to the <code>--prep</code> step and the previous <code>--region</code> explanation, it is hardly discouraged to run multiple steps with this option enabled. This option is mainly to parallelize the processing on HPCs. Once all components from all regions are resampled, you can continue with the following steps. Furthermore, do not run this in the same job with multiple threads! h5py has access issues when the same file is read by multiple threads in the same job. Use multiple instances/jobs to run this.
 Also, please do NOT use this functionality if you don't have fast I/O (hard drives). This is very heavy in terms of I/O load and ends up to be slower if you are using "default" HDD drives.</p>
 </details>
 <h4 id="3-merge">3. Merge<a class="headerlink" href="#3-merge" title="Permanent link">#</a></h4>
-<p>The merge stage (<code>--merge</code>) combines the resampled samples into a single file named <code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/pp_output_&lt;split&gt;.h5</code>.
+<p>The merge stage (<code>--merge</code>) combines the resampled components into a single file named <code>&lt;out_dir&gt;/pp_output_&lt;split&gt;.h5</code>, where the file name comes from <code>out_fname</code>.
 It also handles shuffling.</p>
+<details class="info">
+<summary>Several output files instead of one</summary>
+<p>With <code>num_global_objects_per_output_file</code> set in the global config, the output is split
+into several files of that size, written to a split-specific subdirectory as
+<code>&lt;out_dir&gt;/&lt;split&gt;/pp_output_&lt;split&gt;_split_000.h5</code>, <code>_001</code>, and so on. Each file is
+shuffled across the components, so no file ends in a block of a single class.</p>
+<p>For the <code>test</code> split the components are merged per sample, giving one file per sample
+(<code>pp_output_test_ttbar.h5</code>), unless you set <code>merge_test_samples: true</code> in the global
+config.</p>
+</details>
 <h4 id="4-normalise">4. Normalise<a class="headerlink" href="#4-normalise" title="Permanent link">#</a></h4>
-<p>The normalize stage (<code>--norm</code>) calculates scaling and shifting values for all variables intended for training based on (<code>num_global_objects_estimate_norm</code>). The results are stored in<code>&lt;tbase_dir&gt;/&lt;out_dir&gt;/norm_dict.yaml</code>.</p>
+<p>The normalise stage (<code>--norm</code>) calculates scaling and shifting values for all variables intended for training, based on <code>num_global_objects_estimate_norm</code> objects. The results are stored in <code>&lt;out_dir&gt;/norm_dict.yaml</code>, which can be renamed with the top-level <code>norm_fname</code> key.</p>
+<div class="admonition info">
+<p class="admonition-title">The normalisation only runs for the training split</p>
+<p>With <code>--split val</code> or <code>--split test</code> the stage is skipped, and with <code>--split all</code> it runs
+during the training split only. This is what you want: validation and test data have to be
+normalised with the values from the training data.</p>
+</div>
 <h4 id="5-plotting">5. Plotting<a class="headerlink" href="#5-plotting" title="Permanent link">#</a></h4>
-<p>The plotting stage (<code>--plot</code>) produces histograms of resampled variables to verify the resampling quality.
-You can find these plots in <code>&lt;tbase_dir&gt;/plots/</code>.</p>
+<p>The plotting stage (<code>--plot</code>) produces histograms of the resampling variables before and after resampling, so you can verify the resampling quality.
+You can find these plots in <code>&lt;out_dir&gt;/plots/</code>, which can be changed with <code>output_directory</code> in the <a href="../configuration/#plotting">plotting config</a>.</p>
 <h3 id="additional-scripts-initial-sample-check">Additional Scripts: Initial Sample Check<a class="headerlink" href="#additional-scripts-initial-sample-check" title="Permanent link">#</a></h3>
 <p>The check for the initial samples from the prepare stage can also be run stand-alone. This is important if you plan to run in parallel mode. To do so, you can simply use the following command:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>check_input_samples<span class="w"> </span>--config_path<span class="w"> </span>&lt;path/to/your/config&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>check_input_samples<span class="w"> </span>--config_path<span class="w"> </span>&lt;path/to/your/config&gt;
 </span></code></pre></div>
-<p>You can also add the <code>--deviation-factor</code>, which is by default <code>10.0</code> and the <code>--verbose</code> flags. The latter will print the number of initial jets to your terminal.</p>
+<p>You can also add the <code>--deviation-factor</code>, which is by default <code>10.0</code> and the <code>--verbose</code> flags. The latter will print the number of initial objects to your terminal.</p>
+<div class="admonition info">
+<p class="admonition-title">This script takes <code>--config_path</code>, not <code>--config</code></p>
+<p>The other UPP scripts use <code>--config</code>. This one is spelled differently for historical
+reasons.</p>
+</div>
 <h3 id="additional-scripts-object-count-estimate">Additional Scripts: Object Count Estimate<a class="headerlink" href="#additional-scripts-object-count-estimate" title="Permanent link">#</a></h3>
-<p>Picking the <code>num_global_objects</code> values by hand is tedious: each component can only
-provide as many objects as it has after the cuts, and the numbers have to keep the
-class ratios the same in every region, otherwise the preprocessing stops with an error.
-The following command works these numbers out for you:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>estimate_object_counts<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/your/config&gt;
+<p>Picking the <code>num_global_objects</code> values by hand is tedious: each component can only provide as
+many objects as it has after the cuts, and the numbers have to keep the class ratios the same
+in every region, otherwise the preprocessing stops with an error. The following command works
+these numbers out for you:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>estimate_object_counts<span class="w"> </span>--config<span class="w"> </span>&lt;path/to/your/config&gt;
 </span></code></pre></div>
-<p>It measures how many objects each component has available for the train, validation
-and test splits, and then prints the largest object counts you can request, together
-with a snippet you can copy into your config. If you would rather not copy anything,
-set <code>num_global_objects: auto</code> in every component instead and the preprocessing picks
-the numbers up on its own:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">components</span><span class="p">:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">      </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">      </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="nt">classes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="nt">num_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+<p>It measures how many objects each component has available for the train, validation and test
+splits, and then prints the largest object counts you can request, together with a snippet you
+can copy into your config. Since the resampling only uses a fraction of the objects it reads,
+that fraction is already taken into account, so the numbers it suggests will not fail the
+availability check later on.</p>
+<p>If you would rather not copy anything, set <code>num_global_objects: auto</code> in every component
+instead and the preprocessing picks the numbers up on its own:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nt">components</span><span class="p">:</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">region</span><span class="p">:</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">      </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*lowpt</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="nt">sample</span><span class="p">:</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">      </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*ttbar</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="nt">classes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cjets</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ujets</span><span class="p p-Indicator">]</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="nt">num_global_objects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
 </span></code></pre></div>
 <p>Each split gets its own count this way, so <code>num_global_objects_val</code> and
-<code>num_global_objects_test</code> are not needed either. The counts that were used end up in
-the config copy in your output directory. Either all components use <code>auto</code> or none of
-them do, since the counts of all components are solved together. Since the resampling only uses a fraction
-of the objects it reads, that fraction is already taken into account, so the numbers it
-suggests will not fail the availability check later on.</p>
-<p>The measurement reads a large part of your input samples and is best submitted as a
-batch job. Its results are cached in <code>&lt;out_dir&gt;/availability.yaml</code> and reused whenever
-your samples and cuts have not changed, so a second call is cheap. Use <code>--force</code> to
-measure again anyway, and <code>--splits</code> to restrict the work to certain splits.</p>
-<p>By default every class is made as large as its available objects allow. If you want a
-specific composition instead, add an <code>auto_counts</code> block to your config:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">auto_counts</span><span class="p">:</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">class_ratios</span><span class="p">:</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">bjets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">cjets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nt">ujets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-</span></code></pre></div>
+<code>num_global_objects_test</code> are not needed either. The counts that were used end up in the config
+copy in your output directory. Either all components use <code>auto</code> or none of them do, since the
+counts of all components are solved together.</p>
+<p>By default every class is made as large as its available objects allow. If you want a specific
+composition instead, add an <a href="../configuration/#automatic-object-counts"><code>auto_counts</code></a> block to
+your config.</p>
 <p>How much of the sample each region gets is set with <code>sample_weight</code> on the sample
 (see <a href="../configuration/#input-h5-samples">Input H5 Samples</a>). With a weight of <code>2</code> on
-<span class="arithmatex">\(t\bar{t}\)</span> and <code>1</code> on <span class="arithmatex">\(Z'\)</span>, twice as many objects are taken from <span class="arithmatex">\(t\bar{t}\)</span> as from
-<span class="arithmatex">\(Z'\)</span> for every class.</p>
+<span class="arithmatex">\(t\bar{t}\)</span> and <code>1</code> on <span class="arithmatex">\(Z'\)</span>, twice as many objects are taken from <span class="arithmatex">\(t\bar{t}\)</span> as from <span class="arithmatex">\(Z'\)</span> for
+every class.</p>
+<div class="admonition warning">
+<p class="admonition-title">This reads a large part of your input samples</p>
+<p>The measurement is as expensive as one pass over <code>num_global_objects_estimate_available</code>
+objects per component and belongs in a batch job, see <a href="../hpc/">Running on HPC</a>. Its
+results are cached in <code>&lt;out_dir&gt;/availability.yaml</code> and reused whenever your samples and
+cuts have not changed, so a second call is cheap. Use <code>--force</code> to measure again anyway,
+and <code>--splits</code> to restrict the work to certain splits.</p>
+</div>
 
 
 

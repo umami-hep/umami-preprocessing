@@ -676,7 +676,7 @@
 
 
 <h1 id="upp-umami-preprocessing">UPP: Umami Preprocessing<a class="headerlink" href="#upp-umami-preprocessing" title="Permanent link">#</a></h1>
-<p>Welcome to the Umami PreProcessing (UPP) package, a modular preprocessing pipeline for jet tagging.
+<p>Welcome to the Umami PreProcessing (UPP) package, a modular preprocessing pipeline for tagging algorithms. It is built around jets, but works for any kind of object stored in the input files.
 UPP is used to prepare datasets for training various taggers. 
 In particular, it handles hybrid sample creation, resampling, normalisation, and shuffling.</p>
 <p>The code is hosted on the Github:</p>
@@ -697,7 +697,7 @@ UPP is <a href="https://gitlab.cern.ch/aft/algorithms/umami/-/merge_requests/740
 <h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">#</a></h2>
 <p>The primary motivation behind preprocessing the training samples is to ensure that the distributions of kinematic variables, such as <span class="arithmatex">\(p_T\)</span> and <span class="arithmatex">\(\eta\)</span>, are the same for all flavors.
 This uniformity in kinematic distributions in training data is crucial to avoid kinematic biases in the tagging performance. It also allows the machine learning model to focus on the less represented jet flavour classes such as b- and c-jets. Resampling techniques are used to achieve this goal. These techniques involve removing samples from the majority class (under-sampling) and/or adding more samples from the minority class (over-sampling).</p>
-<p>UPP can also be used to control the number of jets of each flavour in the training data, to stitch together jets from various samples, and to perform shuffling and normalisation of training features.</p>
+<p>UPP can also be used to control the number of objects of each class in the training data, to stitch together objects from various samples, and to perform shuffling and normalisation of training features.</p>
 <h2 id="hybrid-samples">Hybrid Samples<a class="headerlink" href="#hybrid-samples" title="Permanent link">#</a></h2>
 <p>Umami/DIPS and DL1r are trained on so-called hybrid samples created by combining <span class="arithmatex">\(t\bar{t}\)</span> and <span class="arithmatex">\(Z'\)</span> jets using a <span class="arithmatex">\(p_T\)</span> threshold.
 Below a certain <span class="arithmatex">\(p_T\)</span> threshold (which needs to be defined for the preprocessing), <span class="arithmatex">\(t\bar{t}\)</span> events are used in the hybrid sample.
@@ -714,7 +714,7 @@ Additionally, you're not obligated to create a hybrid sample; UPP can still be u
 <ul>
 <li>A modular, class-based design</li>
 <li>The use of h5 virtual datasets to wrap the source files</li>
-<li>Only 2 main stages: resample -&gt; merge -&gt; done!</li>
+<li>A small number of stages: prepare -&gt; resample -&gt; merge -&gt; normalise -&gt; plot</li>
 <li>Parallelised processing of flavours within a sample, which avoids wasted reads</li>
 <li>Support for different resampling "regions", which is useful for generalising to <a href="https://gitlab.cern.ch/atlas-flavor-tagging-tools/algorithms/umami/-/issues/225">Xbb preprocessing</a></li>
 <li>n-dim sampling support, which is also useful for Xbb</li>
@@ -726,8 +726,9 @@ Additionally, you're not obligated to create a hybrid sample; UPP can still be u
 <li>training files can contain supersets of variables used for training</li>
 </ul>
 </li>
-<li>New "countup" sampling which is more efficient than pdf (it uses more the available statistics and reduces duplication of jets)</li>
-<li>The code estimates the number of unique jets for you and saves this number as an attribute in the output file</li>
+<li>New "countup" sampling which is more efficient than pdf (it uses more the available statistics and reduces duplication of objects)</li>
+<li>The code estimates the number of unique objects for you and saves this number as an attribute in the output file</li>
+<li>The object counts of the components can be worked out from the available statistics instead of by hand</li>
 </ul>
 <p>These features yield the following benefits as compared with the old Umami preprocessing:</p>
 <ul>

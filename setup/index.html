@@ -814,7 +814,8 @@ environment with <code>source .venv/bin/activate</code>.</p>
 <p>If you don't want to set up a Python environment at all, you can use the UPP container image.
 The CI builds <code>gitlab-registry.cern.ch/aft/training-images/upp-images/upp:latest</code> on every merge to
 <code>main</code> and a tagged image <code>upp:&lt;tag&gt;</code> (e.g. <code>upp:v0.3.1</code>) for every release. The image comes with UPP
-and its command line scripts (<code>preprocess</code>, <code>check_input_samples</code>, <code>list_components</code>) pre-installed.</p>
+and its command line scripts (<code>preprocess</code>, <code>check_input_samples</code>, <code>list_components</code>,
+<code>estimate_object_counts</code>) pre-installed.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">apptainer</label><label for="__tabbed_3_2">docker</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
