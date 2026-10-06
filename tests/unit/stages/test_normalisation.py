@@ -70,6 +70,23 @@ class TestCombineClassDict:
         assert result == expected_result
 
     @staticmethod
+    def test_combine_class_dict_label_missing_in_b():
+        # Labels only seen in an earlier batch must not be dropped
+        class_dict_A = {
+            "name1": {"var1": ([-15, 0, 15, 4124], [3, 10, 4, 1])},
+        }
+        class_dict_B = {
+            "name1": {"var1": ([0, 15, 511], [20, 5, 2])},
+        }
+
+        expected_result = {
+            "name1": {"var1": ([-15, 0, 15, 511, 4124], [3, 30, 9, 2, 1])},
+        }
+
+        result = Normalisation.combine_class_dict(class_dict_A, class_dict_B)
+        assert result == expected_result
+
+    @staticmethod
     def test_combine_class_dict_variable_length_mismatch():
         # Test when class_dict_A has arrays of different lengths for the same variable
         class_dict_A = {
