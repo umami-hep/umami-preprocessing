@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+import yaml
 from ftag import get_mock_file
 
 from upp.classes.preprocessing_config import PreprocessingConfig
@@ -99,6 +100,15 @@ class TestCombineClassDict:
         # Call the function and expect a ValueError to be raised
         with pytest.raises(ValueError):
             Normalisation.combine_class_dict(class_dict_A, class_dict_B)
+
+    @staticmethod
+    def test_write_class_dict(tmp_path):
+        norm = Normalisation.__new__(Normalisation)
+        norm.class_fname = tmp_path / "class_dict.yaml"
+        norm.write_class_dict({"jets": {"var1": ([-15, 0, 15], [10, 40, 20])}})
+
+        with open(norm.class_fname) as f:
+            assert yaml.safe_load(f) == {"jets": {"var1": {-15: 4.0, 0: 1.0, 15: 2.0}}}
 
     @staticmethod
     def test_combine_mean_std():
