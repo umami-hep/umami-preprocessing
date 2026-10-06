@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Store the label values next to their weights in the class dict [#171](https://github.com/umami-hep/umami-preprocessing/pull/171)
+
 - Keep class dict labels that are missing from later batches [#170](https://github.com/umami-hep/umami-preprocessing/pull/170)
 
 ### [v0.3.3](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.3) (02.10.2026)
