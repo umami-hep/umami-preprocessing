@@ -265,6 +265,8 @@ It also handles shuffling.
 #### 4. Normalise 
 The normalise stage (`--norm`) calculates scaling and shifting values for all variables intended for training, based on `num_global_objects_estimate_norm` objects. The results are stored in `<out_dir>/norm_dict.yaml`, which can be renamed with the top-level `norm_fname` key.
 
+The same stage writes the class weights of the integer labels to `<out_dir>/class_dict.yaml`, as a mapping from label value to weight for each label. The most common value gets a weight of 1. Reading this format in Salt with `use_class_dict` needs Salt with [salt!470](https://gitlab.cern.ch/aft/algorithms/salt/-/merge_requests/470).
+
 !!!info "The normalisation only runs for the training split"
 
     With `--split val` or `--split test` the stage is skipped, and with `--split all` it runs

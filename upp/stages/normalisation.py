@@ -221,15 +221,20 @@ class Normalisation:
     def write_class_dict(self, class_dict: dict) -> None:
         """Write the class dict to a yaml file.
 
+        The weights of each label are stored as a mapping from label value to weight.
+
         Parameters
         ----------
         class_dict : dict
             Class dict which is to be saved
         """
         for labels in class_dict.values():
-            for v, (_, counts) in labels.items():
+            for v, (values, counts) in labels.items():
                 weights = sum(counts) / np.asarray(counts)
-                labels[v] = np.around(weights / weights.min(), 2).tolist()
+                weights = np.around(weights / weights.min(), 2)
+                labels[v] = {
+                    int(value): float(weight) for value, weight in zip(values, weights, strict=True)
+                }
         with open(self.class_fname, "w") as file:
             yaml.dump(class_dict, file, sort_keys=False)
 
