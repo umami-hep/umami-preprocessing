@@ -2,6 +2,8 @@
 
 ### [Latest]
 
+- Keep class dict labels that are missing from later batches [#170](https://github.com/umami-hep/umami-preprocessing/pull/170)
+
 ### [v0.3.3](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.3) (02.10.2026)
 
 - Check the documentation against the code and restructure the run docs [#167](https://github.com/umami-hep/umami-preprocessing/pull/167)

@@ -165,6 +165,9 @@ class Normalisation:
     def combine_class_dict(class_dict_A: dict, class_dict_B: dict) -> dict:
         """Combine two class dicts A and B into one.
 
+        Labels present in only one of the two dicts are kept and the
+        combined labels are sorted.
+
         Parameters
         ----------
         class_dict_A : dict
@@ -183,17 +186,18 @@ class Normalisation:
             If class dict A has arrays of different lengths for the same variable
         """
         for name, var in class_dict_B.items():
-            for v, stats in var.items():
-                labels, counts = stats
-                for i, label in enumerate(labels):
-                    if len(class_dict_A[name][v][0]) != len(class_dict_A[name][v][1]):
-                        raise ValueError(
-                            "Class dict A has arrays of different lengths for the same"
-                            " variable. This should not happen."
-                        )
-                    counts_A = dict(zip(*class_dict_A[name][v], strict=False))
-                    counts[i] += counts_A.get(label, 0)
-                var[v] = (labels, counts)
+            for v, (labels, counts) in var.items():
+                labels_A, counts_A = class_dict_A[name][v]
+                if len(labels_A) != len(counts_A):
+                    raise ValueError(
+                        "Class dict A has arrays of different lengths for the same"
+                        " variable. This should not happen."
+                    )
+                combined = dict(zip(labels_A, counts_A, strict=True))
+                for label, count in zip(labels, counts, strict=True):
+                    combined[label] = combined.get(label, 0) + count
+                combined_labels = sorted(combined)
+                var[v] = (combined_labels, [combined[label] for label in combined_labels])
         return class_dict_B
 
     def write_norm_dict(self, norm_dict: dict) -> None:
@@ -224,7 +228,7 @@ class Normalisation:
         """
         for labels in class_dict.values():
             for v, (_, counts) in labels.items():
-                weights = sum(counts) / counts
+                weights = sum(counts) / np.asarray(counts)
                 labels[v] = np.around(weights / weights.min(), 2).tolist()
         with open(self.class_fname, "w") as file:
             yaml.dump(class_dict, file, sort_keys=False)
