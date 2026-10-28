@@ -2,7 +2,7 @@
 
 ### [Latest]
 
-- Update `atlas-ftag-tools` and `puma` [#172](https://github.com/umami-hep/umami-preprocessing/pull/172)
+- Update `atlas-ftag-tools` and `puma` [#173](https://github.com/umami-hep/umami-preprocessing/pull/173)
 - Store the label values next to their weights in the class dict [#171](https://github.com/umami-hep/umami-preprocessing/pull/171)
 - Keep class dict labels that are missing from later batches [#170](https://github.com/umami-hep/umami-preprocessing/pull/170)
 
