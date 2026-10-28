@@ -2,13 +2,10 @@ from __future__ import annotations
 
 import logging as log
 import random
-from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import numpy as np
-import yaml
 from ftag.hdf5 import H5Reader
-from yamlinclude import YamlIncludeConstructor
 
 from upp.stages.hist import bin_global_objects
 from upp.stages.interpolation import subdivide_bins, upscale_array_regionally
@@ -25,11 +22,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from upp.classes.region import Region
 
 random.seed(42)
-
-# support inclusion of yaml files in the config dir
-YamlIncludeConstructor.add_to_loader_class(
-    loader_class=yaml.SafeLoader, base_dir=Path(__file__).parent.parent / "configs"
-)
 
 
 def select_batch(batch: dict, idx) -> dict:
