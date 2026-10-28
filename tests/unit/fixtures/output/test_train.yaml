@@ -1,0 +1,12 @@
+resampling:
+  variables:
+    jets:
+      labels:
+      - test
+  target: bjets
+components: []
+variables:
+  jets:
+    labels:
+    - test
+upp_hash: 42cb409

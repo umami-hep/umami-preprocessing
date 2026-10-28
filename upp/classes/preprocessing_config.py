@@ -26,8 +26,38 @@ from upp.classes.reweight_config import ReweightConfig
 from upp.classes.variable_config import VariableConfig
 from upp.utils.tools import path_append
 
-# support inclusion of yaml files in the config dir
-YamlIncludeConstructor.add_to_loader_class(
+
+class IncludeConstructor(YamlIncludeConstructor):
+    """Resolve `!include` next to the loaded config first, then in the package config dir."""
+
+    config_dir: Path | None = None
+
+    def load(self, loader: yaml.SafeLoader, pathname: str, *args: Any, **kwargs: Any) -> Any:
+        """Load the included file.
+
+        Parameters
+        ----------
+        loader : yaml.SafeLoader
+            Instance of the PyYAML loader class.
+        pathname : str
+            Path of the included file as given in the config.
+        *args : Any
+            Further arguments passed to `YamlIncludeConstructor.load`.
+        **kwargs : Any
+            Further keyword arguments passed to `YamlIncludeConstructor.load`.
+
+        Returns
+        -------
+        Any
+            Content of the included file.
+        """
+        if self.config_dir is not None and (self.config_dir / pathname).is_file():
+            pathname = str((self.config_dir / pathname).resolve())
+        return super().load(loader, pathname, *args, **kwargs)
+
+
+# support inclusion of yaml files next to the config or in the package config dir
+INCLUDE_CONSTRUCTOR = IncludeConstructor.add_to_loader_class(
     loader_class=yaml.SafeLoader, base_dir=Path(__file__).parent.parent / "configs"
 )
 
@@ -320,6 +350,7 @@ class PreprocessingConfig:
     ):
         if not config_path.exists():
             raise FileNotFoundError(f"{config_path} does not exist - check your --config arg")
+        INCLUDE_CONSTRUCTOR.config_dir = config_path.parent
         with open(config_path) as file:
             config = yaml.safe_load(file)
             legacy: set[str] = set()

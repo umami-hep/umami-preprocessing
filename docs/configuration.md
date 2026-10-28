@@ -281,14 +281,15 @@ Each key under `variables:` corresponds to a dataset name in the TDD h5 file (e.
 The combined set of variables in `inputs` and `labels` are carried over to the output files to a dataset with the same name as the input dataset.
 Internally, UPP will compute normalisation parameters for variables in the `inputs`, and compute class weightings (for categorical labels) for variables in the `labels` block.
 
-Alternatively include the variables from your custom variable config by providing the full path to the file after an include statement.
+Alternatively include the variables from your custom variable config with an include statement.
 The file you provide should have the same structure as shown above but without `variable:` level.
+Relative paths are looked up next to your preprocessing config first.
 For example:
 ```yaml
 variables: !include xbb-variables.yaml
 ```
 
-One can also import variable configs already provided in this package under `upp/configs/` by using the yaml file name, e.g.:
+If the file is not found there, UPP falls back to the configs provided in this package under `upp/configs/`, so these can be used by their file name, e.g.:
 
 ```yaml
 variables: !include variables.yaml
