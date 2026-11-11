@@ -90,6 +90,7 @@ preprocess --config path/to/config.yaml --split val
 ```
 
 You can also process `train`, `val`, and `test` with a single command using `--split=all`.
+This always runs the `train` split as well, so if you already have it, run `val` and `test` separately.
 
 !!!info "The splits are not the same data with a different name"
 

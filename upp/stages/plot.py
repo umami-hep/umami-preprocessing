@@ -331,7 +331,9 @@ def _variable_range(config: PreprocessingConfig, variable: str) -> tuple[float, 
     return _range_from_bins(variable, config.sampl_cfg.bins[variable])
 
 
-def _unique_regions(config: PreprocessingConfig, pt_variable: str | None) -> list[PlotRegion]:
+def _unique_regions(
+    config: PreprocessingConfig, pt_variable: str | None, drop_cuts: Cuts | None = None
+) -> list[PlotRegion]:
     """Collect unique component regions for plotting.
 
     Parameters
@@ -340,6 +342,9 @@ def _unique_regions(config: PreprocessingConfig, pt_variable: str | None) -> lis
         Active preprocessing configuration.
     pt_variable : str | None
         Configured pT variable, if available.
+    drop_cuts : Cuts | None, optional
+        Cuts removed from the region selections, e.g. ones already applied to the
+        files that are plotted. By default None.
 
     Returns
     -------
@@ -354,7 +359,8 @@ def _unique_regions(config: PreprocessingConfig, pt_variable: str | None) -> lis
         if key in seen:
             continue
         seen.add(key)
-        regions.append(PlotRegion(region.name, region.cuts, pt_range))
+        cuts = Cuts(tuple(cut for cut in region.cuts if cut not in (drop_cuts or ())))
+        regions.append(PlotRegion(region.name, cuts, pt_range))
     return regions
 
 
@@ -684,7 +690,8 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
         Current preprocessing split name.
     """
     pt_var = _pt_variable(config)
-    base_regions = _unique_regions(config, pt_var)
+    # the output already passed the global cuts, whose variables need not be stored in it
+    base_regions = _unique_regions(config, pt_var, drop_cuts=config.global_cuts)
     plot_regions = list(base_regions)
     if full_region := _full_region(base_regions, pt_var):
         plot_regions.append(full_region)

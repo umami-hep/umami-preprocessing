@@ -27,7 +27,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
         def info(self, *_a, **_k):
             pass
 
-        def error(self, *_a, **_k):
+        def warning(self, *_a, **_k):
             pass
 
     monkeypatch.setattr(cis, "setup_logger", lambda *_: _Log())
@@ -56,7 +56,7 @@ def test_run_input_sample_check_handles_missing_ids_and_rtags(monkeypatch, tmp_p
             self.vds_dir = None
 
     cfg = _Cfg(tmp_path)
-    # Should run to completion (we only log errors for missing ids/rtags)
+    # Should run to completion (we only warn about missing ids/rtags)
     cis.run_input_sample_check(config=cfg, deviation_factor=10.0, verbose=False)
 
 
@@ -200,7 +200,7 @@ def test_builds_entry_name_with_only_rtag(monkeypatch, tmp_path):
         def info(self, *_a, **_k):
             pass
 
-        def error(self, *_a, **_k):
+        def warning(self, *_a, **_k):
             pass
 
     monkeypatch.setattr(cis, "setup_logger", lambda *_: _Log())

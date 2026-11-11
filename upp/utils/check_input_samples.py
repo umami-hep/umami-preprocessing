@@ -192,13 +192,13 @@ def run_input_sample_check(
             dsid = (d := re.search(r"(?<=\.)\d{6}(?=\.)", sample)) and d.group(0)
             rtag = (p := re.search(r"_(r\d+)", sample)) and p.group(1)
 
-            # Log an error that the dsid couldn't be extracted
+            # Warn that the dsid couldn't be extracted
             if dsid is None:
-                log.error(f"Can't extract DSID from pattern: {sample}")
+                log.warning(f"Can't extract DSID from pattern: {sample}")
 
-            # Log an error that the r-tag couldn't be extracted
+            # Warn that the r-tag couldn't be extracted
             if rtag is None:
-                log.error(f"Can't extract r-tag from pattern: {sample}")
+                log.warning(f"Can't extract r-tag from pattern: {sample}")
 
             # Build the name for the dict
             if dsid and rtag:

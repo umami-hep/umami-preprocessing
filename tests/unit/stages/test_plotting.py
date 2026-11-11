@@ -176,6 +176,17 @@ def test_plot_helpers_skip_duplicate_and_non_stitching_regions():
     )
 
 
+def test_unique_regions_drop_cuts():
+    """Check that already applied cuts are removed from the region selections."""
+    split = Cuts.from_list([["eventNumber", "%10<=", 7]])
+    region = SimpleNamespace(name="lowpt", cuts=Cuts.from_list([["pt", "<", 250_000]]) + split)
+    components = SimpleNamespace(groupby_region=lambda: [(region, object())])
+    config = SimpleNamespace(components=components)
+
+    (plot_region,) = plot_mod._unique_regions(config, "pt", drop_cuts=split)
+    assert plot_region.cuts.variables == ["pt"]
+
+
 def test_make_hist_adds_sample_linestyle_legend(monkeypatch, tmp_path):
     """Check that overlays of multiple samples create a linestyle legend."""
     fname, file = get_mock_file(num_jets=100, fname=tmp_path / "sample.h5")

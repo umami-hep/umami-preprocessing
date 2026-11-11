@@ -18,6 +18,22 @@ from upp.classes.preprocessing_config import (
 from upp.classes.resampling_config import ResamplingConfig
 
 
+def test_include_resolved_next_to_config(tmp_path):
+    """`!include` looks next to the config first and falls back to the package configs."""
+    (tmp_path / "variables.yaml").write_text("jets:\n  inputs: [my_var]\n")
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        "global: {}\n"
+        "variables: !include variables.yaml\n"
+        "global_cuts: !include splits/simple-split.yaml\n"
+    )
+    with patch.object(PreprocessingConfig, "__init__", return_value=None) as init:
+        PreprocessingConfig.from_file(config_path, "train")
+    config = init.call_args.kwargs["config"]
+    assert config["variables"] == {"jets": {"inputs": ["my_var"]}}
+    assert "train" in config["global_cuts"]
+
+
 def test_rename_legacy_keys_remaps_nested_and_records():
     """Deprecated jet-named keys are remapped everywhere, others untouched."""
     raw = {
