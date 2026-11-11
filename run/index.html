@@ -26,7 +26,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.73">
+      <meta name="generator" content="zensical-0.1.1">
     
     
       
@@ -37,7 +37,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/classic/main.94dd801d.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.0006804e.min.css">
       
         
           
@@ -930,7 +930,8 @@ training and 10% each for validation and testing, and there are k-folded variant
 <p>If you want to preprocess the <code>val</code> or <code>test</code> split, use the <code>--split</code> argument:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>preprocess<span class="w"> </span>--config<span class="w"> </span>path/to/config.yaml<span class="w"> </span>--split<span class="w"> </span>val
 </span></code></pre></div>
-<p>You can also process <code>train</code>, <code>val</code>, and <code>test</code> with a single command using <code>--split=all</code>.</p>
+<p>You can also process <code>train</code>, <code>val</code>, and <code>test</code> with a single command using <code>--split=all</code>.
+This always runs the <code>train</code> split as well, so if you already have it, run <code>val</code> and <code>test</code> separately.</p>
 <div class="admonition info">
 <p class="admonition-title">The splits are not the same data with a different name</p>
 <p>Cuts and object counts differ between splits. The <code>test</code> split drops the region cuts
@@ -1188,10 +1189,10 @@ and <code>--splits</code> to restrict the work to certain splits.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"redirect":null,"search":"../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.77dd0ce9.min.js"></script>
+      <script src="../assets/javascripts/bundle.3cb411a8.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       

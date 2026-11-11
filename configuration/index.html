@@ -26,7 +26,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.73">
+      <meta name="generator" content="zensical-0.1.1">
     
     
       
@@ -37,7 +37,7 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/classic/main.94dd801d.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/classic/main.0006804e.min.css">
       
         
           
@@ -1270,12 +1270,13 @@ Selecting only a subset of variables keeps the output files lightweight, and ens
 Each key under <code>variables:</code> corresponds to a dataset name in the TDD h5 file (e.g. <code>jets</code>, <code>tracks</code>, <code>hits</code>).
 The combined set of variables in <code>inputs</code> and <code>labels</code> are carried over to the output files to a dataset with the same name as the input dataset.
 Internally, UPP will compute normalisation parameters for variables in the <code>inputs</code>, and compute class weightings (for categorical labels) for variables in the <code>labels</code> block.</p>
-<p>Alternatively include the variables from your custom variable config by providing the full path to the file after an include statement.
+<p>Alternatively include the variables from your custom variable config with an include statement.
 The file you provide should have the same structure as shown above but without <code>variable:</code> level.
+Relative paths are looked up next to your preprocessing config first.
 For example:
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xbb-variables.yaml</span>
 </span></code></pre></div></p>
-<p>One can also import variable configs already provided in this package under <code>upp/configs/</code> by using the yaml file name, e.g.:</p>
+<p>If the file is not found there, UPP falls back to the configs provided in this package under <code>upp/configs/</code>, so these can be used by their file name, e.g.:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="kt">!include</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">variables.yaml</span>
 </span></code></pre></div>
 <details class="info">
@@ -2135,10 +2136,10 @@ If none is given, virtual datasets is created next to input ntuples</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["content.code.copy","navigation.sections","navigation.top"],"redirect":null,"search":"../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.77dd0ce9.min.js"></script>
+      <script src="../assets/javascripts/bundle.3cb411a8.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
       
