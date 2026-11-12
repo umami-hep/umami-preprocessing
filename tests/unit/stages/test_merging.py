@@ -120,16 +120,16 @@ def _minimal_merging(monkeypatch, jets_per_file=10, flavours=None) -> merging_mo
 
 
 # Actual tests
-def test_add_jet_flavour_label(monkeypatch):
-    """A flavour label is added exactly once and matches the flavour list."""
+def test_add_jet_class_label(monkeypatch):
+    """A class label is added exactly once and matches the flavour list."""
     merge = _minimal_merging(monkeypatch, jets_per_file=7)
 
     jets = _jets_struct(5)
     comp = SimpleNamespace(flavour=Flavours["bjets"])
     tagged = merge.add_global_object_label(jets, comp)
 
-    assert "flavour_label" in tagged.dtype.names
-    assert np.all(tagged["flavour_label"] == 0)
+    assert "class_label" in tagged.dtype.names
+    assert np.all(tagged["class_label"] == 0)
 
     # Calling again must not duplicate the column
     same = merge.add_global_object_label(tagged, comp)
@@ -158,7 +158,7 @@ def test_open_writer_names_and_shapes(monkeypatch):
     assert writer.num_global_objects == 7
     assert writer.dst.name.startswith("merged_split_000")
     assert writer.dst.parent.name == "train"
-    assert "flavour_label" in writer.attrs
+    assert "class_label" in writer.attrs
 
 
 def test_write_chunk_splits(monkeypatch):
@@ -771,9 +771,9 @@ def _longest_run(labels: np.ndarray) -> int:
 
 
 def _recorded_labels() -> dict[Path, np.ndarray]:
-    """Return the flavour labels written to each output file."""
+    """Return the class labels written to each output file."""
     return {
-        dst: np.concatenate([chunk["flavour_label"] for chunk in chunks])
+        dst: np.concatenate([chunk["class_label"] for chunk in chunks])
         for dst, chunks in RecordingWriter.files.items()
     }
 

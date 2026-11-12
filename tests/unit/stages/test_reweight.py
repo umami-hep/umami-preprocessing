@@ -20,7 +20,7 @@ def _make_organised_components(tmpdir, jets_per_flavour):
         import h5py
 
         with h5py.File(fpath, "w") as f:
-            dtype = np.dtype([("pt", "f4"), ("eta", "f4"), ("flavour_label", "i4")])
+            dtype = np.dtype([("pt", "f4"), ("eta", "f4"), ("class_label", "i4")])
             data = np.zeros(n, dtype=dtype)
             f.create_dataset("jets", data=data)
         files[flav] = [str(fpath)]
@@ -97,7 +97,7 @@ class TestCalculateWeightsStopIteration:
             group="jets",
             reweight_vars=["pt"],
             flat_bins=[np.array([0, 1, 2], dtype="f4")],
-            class_var="flavour_label",
+            class_var="class_label",
             class_target="mean",
             target_hist_func=None,
         )

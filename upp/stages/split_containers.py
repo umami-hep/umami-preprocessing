@@ -126,12 +126,12 @@ class SplitContainers:
         overwrite: bool = False,
         output_name=None,
         variables: dict[str, dict[str, list[str]]] | None = None,
-        flavour_label_list: list[str] | None = None,
+        class_label_list: list[str] | None = None,
     ):
         if isinstance(input_file, str):
             input_file = Path(input_file)
         global_name = self.config.global_name
-        add_flavour_label = flavour_label_list is not None
+        add_class_label = class_label_list is not None
         # All variables for test file
         all_variables = get_all_datasets(input_file)
         print("All variables: ", all_variables, flush=True)
@@ -180,27 +180,27 @@ class SplitContainers:
                 shuffle=False,
                 variables=all_variables if "test" in split else parsed_variables,
                 compression="gzip",
-                add_flavour_label=add_flavour_label,
+                add_class_label=add_class_label,
                 global_objects_name=global_name,
             )
             cuts_by_sample_components[split] = component_cuts
             print(f"Creating writer for {split} saved to {output_file}", flush=True)
 
-        if add_flavour_label:
-            assert flavour_label_list is not None  # for mypy
-            _flavour_label_by_component = {
+        if add_class_label:
+            assert class_label_list is not None  # for mypy
+            _class_label_by_component = {
                 component: [
-                    i for i, label in enumerate(flavour_label_list) if f"_{label}" in component
+                    i for i, label in enumerate(class_label_list) if f"_{label}" in component
                 ]
                 for component in sample_components
             }
 
             assert all(
-                len(_flavour_label_by_component[component]) == 1 for component in sample_components
-            ), f"Each component must have exactly 1 flavour label not {_flavour_label_by_component}"
-            flavour_label_by_component: dict[str, int] = {
-                component: _flavour_label_by_component[component][0]
-                for component in _flavour_label_by_component
+                len(_class_label_by_component[component]) == 1 for component in sample_components
+            ), f"Each component must have exactly 1 class label not {_class_label_by_component}"
+            class_label_by_component: dict[str, int] = {
+                component: _class_label_by_component[component][0]
+                for component in _class_label_by_component
             }
 
         for i, batch in enumerate(reader.stream(all_variables)):
@@ -209,28 +209,27 @@ class SplitContainers:
                 cuts = cuts_by_sample_components[sample_component]
                 sel_idx = cuts(batch[global_name]).idx
                 sel_batch = {k: v[sel_idx] for k, v in batch.items()}
-                if add_flavour_label:
-                    this_flavour_label = flavour_label_by_component[sample_component]
+                if add_class_label:
+                    this_class_label = class_label_by_component[sample_component]
                     tfl_arr = (
-                        np.ones(sel_batch[global_name].shape[0], dtype=np.int32)
-                        * this_flavour_label
+                        np.ones(sel_batch[global_name].shape[0], dtype=np.int32) * this_class_label
                     )
 
                     # I think this is only going to happen during tests, as the mock file has
-                    # flavour_label in, but we wont
-                    if "flavour_label" in sel_batch[global_name].dtype.names:
+                    # class_label in, but we wont
+                    if "class_label" in sel_batch[global_name].dtype.names:
                         if i == 0:
                             print(
-                                f"Warning: {sample_component} already has a flavour label. "
+                                f"Warning: {sample_component} already has a class label. "
                                 "We will overwrite it now.",
                                 flush=True,
                             )
-                        sel_batch[global_name]["flavour_label"] = tfl_arr
+                        sel_batch[global_name]["class_label"] = tfl_arr
                     else:
                         # Get the
                         sel_batch[global_name] = rfn.append_fields(
                             sel_batch[global_name],
-                            "flavour_label",
+                            "class_label",
                             tfl_arr,
                             usemask=False,
                         )
@@ -350,7 +349,7 @@ class SplitContainers:
                     cuts_by_component=cuts_by_component,
                     batch_size=min(self.config.batch_size, self.MAX_BATCH_SIZE),
                     variables=self.config.config["variables"],
-                    flavour_label_list=all_flavours,
+                    class_label_list=all_flavours,
                     output_name="output",
                 )
 

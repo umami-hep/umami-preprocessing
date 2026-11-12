@@ -312,7 +312,7 @@ class Reweight:
                 rw_vars = [v.decode("utf-8") for v in histograms[group][rw]["rw_vars"][:]]
                 bins = histograms[group][rw]["bins"]
                 class_var = histograms[group][rw]["class_var"][0].decode("utf-8")
-                if class_var == "flavour_label":
+                if class_var == "class_label":
                     class_mapping = {self.flavours.index(f): f for f in self.flavours}
                 else:
                     class_mapping = {}

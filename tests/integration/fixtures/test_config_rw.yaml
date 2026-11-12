@@ -75,7 +75,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: mean
     - group: jets
       reweight_vars: [pt, eta]
@@ -87,7 +87,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: min
     - group: jets
       reweight_vars: [pt, eta]
@@ -99,7 +99,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: max
     - group: jets
       reweight_vars: [pt, eta]
@@ -111,7 +111,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: uniform
     - group: jets
       reweight_vars: [pt, eta]
@@ -123,7 +123,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: [0, 1]
     - group: jets
       reweight_vars: [pt, eta]
@@ -135,7 +135,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: 0
     - group: tracks
       reweight_vars: [deta]

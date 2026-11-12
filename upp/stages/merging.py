@@ -63,7 +63,7 @@ class Merging:
     def add_global_object_label(
         self, global_objects: np.ndarray, component: Component
     ) -> np.ndarray:
-        """Add the object flavour label to the objects.
+        """Add the object class label to the objects.
 
         If already present, objects will be returned without any changes.
 
@@ -78,12 +78,12 @@ class Merging:
         -------
         np.ndarray
             Structured array of the objects and their variables with the
-            "flavour_label" added.
+            "class_label" added.
         """
-        if "flavour_label" in global_objects.dtype.names:
+        if "class_label" in global_objects.dtype.names:
             return global_objects
         int_label = self.flavours.index(component.flavour)
-        label_array = np.full(len(global_objects), int_label, dtype=[("flavour_label", "i4")])
+        label_array = np.full(len(global_objects), int_label, dtype=[("class_label", "i4")])
 
         return join_structured_arrays([global_objects, label_array])
 
@@ -339,14 +339,14 @@ class Merging:
             fname,
             self.dtypes,
             shapes,
-            add_flavour_label=self.global_name,
+            add_class_label=self.global_name,
             global_objects_name=self.global_name,
             num_global_objects=global_objects_in_file,
         )
 
         # Copy the metadata attributes
         self.writer.add_attr(
-            "flavour_label",
+            "class_label",
             [f.name for f in self.flavours],
             self.global_name,
         )

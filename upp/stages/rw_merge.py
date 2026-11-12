@@ -42,7 +42,7 @@ class RWMerge:
         )
         self.attr_to_write = {
             self.config.global_name: {
-                "flavour_label": [f.name for f in self.config.components.flavours],
+                "class_label": [f.name for f in self.config.components.flavours],
             },
             None: {
                 f"unique_{self.config.global_name}": num_global_objects,
@@ -89,8 +89,8 @@ class RWMerge:
         ) or 1
 
         variables = self.config.variables.combined() if self.config.split != "test" else None
-        if variables and "flavour_label" not in variables:
-            variables[self.config.global_name] += ["flavour_label"]
+        if variables and "class_label" not in variables:
+            variables[self.config.global_name] += ["class_label"]
         args_list = []
         for i, bi in enumerate(range(0, num_batches, batches_per_file)):
             args_list.append(

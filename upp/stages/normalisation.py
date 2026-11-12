@@ -150,10 +150,10 @@ class Normalisation:
         for name, array in batch.items():
             if name != self.variables.global_name:
                 array = array[array["valid"]]
-            # separate case for flavour_label
-            if name == self.variables.global_name and "flavour_label" in array.dtype.names:
-                counts = np.unique(array["flavour_label"], return_counts=True)
-                class_dict[name]["flavour_label"] = counts
+            # separate case for class_label
+            if name == self.variables.global_name and "class_label" in array.dtype.names:
+                counts = np.unique(array["class_label"], return_counts=True)
+                class_dict[name]["class_label"] = counts
             for var in self.variables[name].get("labels", []):
                 if not np.issubdtype(array[var].dtype, np.integer) or any(s in var for s in ignore):
                     continue
@@ -269,8 +269,8 @@ class Normalisation:
         total = None
         vars = self.variables.combined()
         with h5py.File(reader.files[0]) as f:
-            if "flavour_label" in f[self.global_name].dtype.names:
-                vars[self.global_name].append("flavour_label")
+            if "class_label" in f[self.global_name].dtype.names:
+                vars[self.global_name].append("class_label")
         stream = reader.stream(vars, self.num_global_objects)
 
         with ProgressBar() as progress:
