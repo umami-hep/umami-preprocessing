@@ -3,6 +3,9 @@
 ### [Latest]
 
 - Update `atlas-ftag-tools` and `puma`, and rename `flavour_label` to `class_label` (breaking change) [#175](https://github.com/umami-hep/umami-preprocessing/pull/175)
+
+### [v0.3.4](https://github.com/umami-hep/umami-preprocessing/releases/tag/v0.3.4) (12.11.2026)
+
 - Resolve `!include` next to the config and fix issues found while testing the tutorial [#174](https://github.com/umami-hep/umami-preprocessing/pull/174)
 - Update `atlas-ftag-tools` and `puma` [#173](https://github.com/umami-hep/umami-preprocessing/pull/173)
 - Store the label values next to their weights in the class dict [#171](https://github.com/umami-hep/umami-preprocessing/pull/171)
