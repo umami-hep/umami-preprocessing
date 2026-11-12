@@ -75,7 +75,7 @@ reweighting:
             [1_000_000, 6_000_000, 50],
           ]
         eta: [[-2.5, 2.5, 40]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: mean
     - group: tracks
       reweight_vars: [deta]

@@ -94,7 +94,7 @@ class TestRunRW:
             }, f"Expected 'jets' key in histograms file only found {f.keys()}"
             jets = f["jets"]
             for dist_target in ["mean", "min", "max", "uniform"]:
-                rw_str = f"weight_jets_pt_eta_target_{dist_target}_flavour_label"
+                rw_str = f"weight_jets_pt_eta_target_{dist_target}_class_label"
                 assert rw_str in jets, f"{rw_str}' in jets group"
                 w = jets[rw_str]
                 assert w.keys() == {"bins", "class_var", "rw_vars", "weights"}
@@ -118,10 +118,10 @@ class TestRunRW:
                 assert "jets" in f, "Expected 'jets' group in output file"
                 print("LOL", f.attrs, f["jets"].attrs, f["jets"].attrs.keys())
 
-                assert "flavour_label" in f["jets"].attrs, (
-                    "Expected 'flavour_label' attribute in 'jets' group of output file"
+                assert "class_label" in f["jets"].attrs, (
+                    "Expected 'class_label' attribute in 'jets' group of output file"
                 )
-                assert "flavour_label" in f["jets"].dtype.names
+                assert "class_label" in f["jets"].dtype.names
 
     def test_rw(self):
         self._run_split()
@@ -166,8 +166,8 @@ class TestRunRW:
             with h5py.File(outfile, "r") as f:
                 assert "objects" in f, "Expected 'objects' group in output file"
                 assert "jets" not in f, "Output must not contain a hardcoded 'jets' group"
-                assert "flavour_label" in f["objects"].attrs
-                assert "flavour_label" in f["objects"].dtype.names
+                assert "class_label" in f["objects"].attrs
+                assert "class_label" in f["objects"].dtype.names
 
     def test_rw_custom_flavours(self):
         """End-to-end reweighting with a user-supplied custom class_config.
@@ -200,10 +200,10 @@ class TestRunRW:
             with h5py.File(outfile, "r") as f:
                 assert "objects" in f, "Expected 'objects' group in output file"
                 assert "jets" not in f, "Output must not contain a hardcoded 'jets' group"
-                assert "flavour_label" in f["objects"].dtype.names
+                assert "class_label" in f["objects"].dtype.names
                 labels = [
                     x.decode() if isinstance(x, bytes) else str(x)
-                    for x in f["objects"].attrs["flavour_label"]
+                    for x in f["objects"].attrs["class_label"]
                 ]
                 assert labels == ["heavy", "light"], f"Expected custom flavours, found {labels}"
 

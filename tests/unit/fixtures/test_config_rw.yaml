@@ -64,7 +64,7 @@ reweighting:
       bins:
         pt_btagJes: [[20_000, 250_000, 5], [250_000, 1_000_000, 5]]
         absEta_btagJes: [[0, 2.5, 5]]
-      class_var: flavour_label
+      class_var: class_label
       class_target: mean
 
 # note: sensible defaults are defined in the PreprocessingConfig constructor

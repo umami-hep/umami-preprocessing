@@ -479,7 +479,7 @@ def make_hist(
     The function can overlay multiple input samples via different linestyles and
     multiple flavours via colours. For initial plots, flavour selections come
     from the configured label cuts. For post-resampling plots, flavour selection
-    uses the ``flavour_label`` field written during merging.
+    uses the ``class_label`` field written during merging.
 
     Parameters
     ----------
@@ -548,7 +548,7 @@ def make_hist(
                 cuts = selection_cuts + flavour.cuts
 
             else:
-                cuts = selection_cuts + Cuts.from_list([f"flavour_label == {label_value}"])
+                cuts = selection_cuts + Cuts.from_list([f"class_label == {label_value}"])
 
             selected_values = cuts(values).values
             histo_values = _display_values(variable, selected_values[variable])
@@ -709,7 +709,7 @@ def _plot_post_resampling(config: PreprocessingConfig, stage: str) -> None:
         resampling_status="Post Resampling",
     )
 
-    vars_to_load = list(config.sampl_cfg.vars) + ["flavour_label"]
+    vars_to_load = list(config.sampl_cfg.vars) + ["class_label"]
     for region in plot_regions:
         vars_to_load += region.cuts.variables
 
