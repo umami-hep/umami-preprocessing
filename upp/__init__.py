@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__version__ = "v0.3.3"
+__version__ = "v0.3.4"
 
 from . import classes, stages, utils
 from .main import run_pp
