@@ -781,12 +781,12 @@ First, you must setup a virtual environment to be packaged up and sent to the gr
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">1_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6_000_000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">],</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">          </span><span class="p p-Indicator">]</span>
 </span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">        </span><span class="nt">eta_btagJes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">-2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">40</span><span class="p p-Indicator">]]</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flavour_label</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">class_var</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">class_label</span>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">      </span><span class="nt">class_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean</span>
 </span></code></pre></div>
 <p><code>num_global_objects_estimate</code> represents the number of objects of each class used to generate the reweighting histograms. The <code>merge_num_proc</code> variable will be relevant in the next section of these docs.
 Then, you have the <code>reweights</code> section, which includes a list of reweight configurations. In this example, we have the first reweight calculated over the jets group. It reweights based on the flavour-label, over the pt and eta distributions. The bins follow the same logic as in resampling.
-The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>flavour_label==0</code>), or one of <code>mean, min, max, uniform</code> which will instead target the mean distribution, always take the maximum/minimum bin counts as the target, or target a flat distribution.</p>
+The class target can then either be chosen as a single label (e.g, if 0 then the reweighting would target the distribution for <code>class_label==0</code>), or one of <code>mean, min, max, uniform</code> which will instead target the mean distribution, always take the maximum/minimum bin counts as the target, or target a flat distribution.</p>
 <p>Each entry of <code>reweights</code> takes the following settings:</p>
 <table>
 <thead>
@@ -819,7 +819,7 @@ The class target can then either be chosen as a single label (e.g, if 0 then the
 <tr>
 <td><code>class_var</code></td>
 <td><code>str</code></td>
-<td>Variable holding the label that is balanced, e.g. <code>flavour_label</code></td>
+<td>Variable holding the label that is balanced, e.g. <code>class_label</code></td>
 <td><em>Required</em></td>
 </tr>
 <tr>
